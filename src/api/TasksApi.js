@@ -79,3 +79,5 @@ export class TasksApi {
     }
 
 }
+
+export default TasksApi;

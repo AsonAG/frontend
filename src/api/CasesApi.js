@@ -317,3 +317,5 @@ export class CasesApi {
     }
 
 }
+
+export default CasesApi;

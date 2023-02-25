@@ -82,3 +82,5 @@ export class DocumentsApi {
     }
 
 }
+
+export default DocumentsApi;
