@@ -3,7 +3,7 @@ import { tokens } from "../../theme";
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
 
-const Dashboard = () => {
+const Dossier = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
   
@@ -11,11 +11,11 @@ const Dashboard = () => {
       <Box m="25px">
         {/* HEADER */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+          <Header title="DOSSIER" subtitle="Your personal details and documents" />
         </Box>
       </Box>
   )};  
 
 
 
-  export default Dashboard;
+  export default Dossier;
