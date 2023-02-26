@@ -7,45 +7,30 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import TasksApi from "../../api/TasksApi";
 import ApiClient from "../../ApiClient";
+import { React, useEffect, useState } from "react";
 
 const mockDataTeam = [
   {
     id: 1,
     name: "Onboarding",
     date: "12.05.2023",
-    access: "admin"
-  },{
+    access: "admin",
+  },
+  {
     id: 2,
     name: "Quellensteuer vervollstaedigen",
     date: "20.04.2023",
-    access: "user"
-  }
+    access: "user",
+  },
 ];
 
-let tableData = [];
-
-const tasksArrayToTableArray = function(tasksArray){
-
-}
-
-const callback = function (error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log("API called successfully. Returned data: " + data);
-    data.forEach(element => {
-      tableData.push({"name": element["name"]})
-    });
-  }
-};
 
 const Tasks = () => {
+  const [tasksData, setTasksData] = useState([]);
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const tasksApi = new TasksApi(ApiClient);
-  tasksApi.getCaseTasks(callback);
-  console.log("Table data loaded: " + tableData);
-
 
   const columns = [
     // { field: "id", headerName: "ID" },
@@ -90,6 +75,26 @@ const Tasks = () => {
     },
   ];
 
+  
+const callback = function (error, data, response) {
+  let tableData = [];
+
+  if (error) {
+    console.error(error);
+  } else {
+    console.log("API called successfully. Returned data: " + data);
+    data.forEach((element) => {
+      tableData = [...tableData, { name: element["name"] }];
+    });
+    console.log("Table data loaded: " + tableData);
+    setTasksData(tableData);
+  }
+};
+
+useEffect(() => {
+  tasksApi.getCaseTasks(callback);
+}, []);
+
   return (
     <Box m="25px">
       {/* HEADER */}
@@ -127,7 +132,7 @@ const Tasks = () => {
           },
         }}
       >
-        <DataGrid rows={mockDataTeam} columns={columns} />
+        <DataGrid rows={tasksData} columns={columns} />
       </Box>
     </Box>
   );
