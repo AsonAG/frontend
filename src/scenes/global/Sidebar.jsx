@@ -18,8 +18,6 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import TaskIcon from '@mui/icons-material/Task';
 
-let marginLeft = "20px";
-
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -54,7 +52,7 @@ const Sidebar = () => {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
+          // padding: "5px 35px 5px 20px !important",
         },
         "& .pro-inner-item:hover": {
           color: "#868dfb !important",
@@ -71,7 +69,7 @@ const Sidebar = () => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
-              margin: "10px 0 20px 10px",
+              margin: "10px 0 20px 0px",
               color: colors.grey[100],
             }}
           >
@@ -92,7 +90,7 @@ const Sidebar = () => {
             )}
           </MenuItem>
 
-          <Box paddingLeft="10px">
+          <Box>
             <Item
               title="Dashboard"
               to="/"
@@ -102,11 +100,12 @@ const Sidebar = () => {
             />
 
             <Typography
-              variant="h6"
+              variant="h5"
               color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 25px" }}
+              sx={{ m: "15px 0 5px 0px" }}
+              textAlign="center"
             >
-              Employee / HR
+              Employee
             </Typography>
             <Item
               title="Tasks"
@@ -132,11 +131,12 @@ const Sidebar = () => {
             />
 
             <Typography
-              variant="h6"
+              variant="h5"
               color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
+              sx={{ m: "15px 0 5px 0px" }}
+              textAlign="center"
             >
-              Pages
+              HR
             </Typography>
             <Item
               title="Profile Form"
@@ -179,10 +179,10 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Adam Frank
+                  Filip Russel
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  ACME Company
+                  The XYZ Company
                 </Typography>
               </Box>
             </Box>
