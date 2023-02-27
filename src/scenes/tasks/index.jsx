@@ -1,12 +1,11 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import NavigateNextOutlinedIcon from '@mui/icons-material/NavigateNextOutlined';
+import SendIcon from "@mui/icons-material/Send";
 import TasksApi from "../../api/TasksApi";
 import ApiClient from "../../ApiClient";
 import Header from "../../components/Header";
 import { React, useEffect, useState } from "react";
-
 
 const Tasks = () => {
   const [tasksData, setTasksData] = useState([]);
@@ -27,24 +26,18 @@ const Tasks = () => {
     {
       field: "action",
       headerName: "Action",
-      headerAlign: "center",
       flex: 2,
+      align: "center",
       renderCell: ({ row: { access } }) => {
         return (
-          <Box
-            width="80px"
-            m="0 auto"
-            p="6px"
-            display="flex"
-            justifyContent="center"
-            backgroundColor={colors.blueAccent[800]}
-            borderRadius="4px"
-          >
-            <Typography color={colors.grey[100]} sx={{ m: "0 2px" }}>
-              Proceed
-            </Typography>
-            <NavigateNextOutlinedIcon />
-          </Box>
+            <IconButton
+              variant="outlined"
+              color="secondary"
+              size="medium"
+              // endIcon={<SendIcon />}
+            >
+              <SendIcon />
+            </IconButton>
         );
       },
     },
@@ -63,8 +56,9 @@ const Tasks = () => {
           {
             id: index,
             name: element["name"],
-            link: ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
-            access: "user"
+            link:
+              ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
+            access: "user",
           },
         ];
       });
@@ -97,10 +91,10 @@ const Tasks = () => {
           },
           "& .name-column--cell": {
             // color: colors.greenAccent[300],
-            marginLeft: "5px"
+            marginLeft: "5px",
           },
           "& .MuiDataGrid-columnHeaderTitle": {
-            marginLeft: "5px"
+            marginLeft: "5px",
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[800],
@@ -118,7 +112,9 @@ const Tasks = () => {
           },
         }}
       >
-        <DataGrid rows={tasksData} columns={columns} />
+        <DataGrid disableSelectionOnClick rows={tasksData} columns={columns} 
+  justifyContent="center"
+  alignItems="center"/>
       </Box>
     </Box>
   );
