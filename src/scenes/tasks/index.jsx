@@ -1,28 +1,11 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
-import Header from "../../components/Header";
+import NavigateNextOutlinedIcon from '@mui/icons-material/NavigateNextOutlined';
 import TasksApi from "../../api/TasksApi";
 import ApiClient from "../../ApiClient";
+import Header from "../../components/Header";
 import { React, useEffect, useState } from "react";
-
-const mockDataTeam = [
-  {
-    id: 1,
-    name: "Onboarding",
-    date: "12.05.2023",
-    access: "admin",
-  },
-  {
-    id: 2,
-    name: "Quellensteuer vervollstaedigen",
-    date: "20.04.2023",
-    access: "user",
-  },
-];
 
 
 const Tasks = () => {
@@ -42,58 +25,57 @@ const Tasks = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "accessLevel",
-      headerName: "Access Level",
+      field: "action",
+      headerName: "Action",
       headerAlign: "center",
       flex: 2,
       renderCell: ({ row: { access } }) => {
         return (
           <Box
-            width="50%"
+            width="80px"
             m="0 auto"
-            p="5px"
+            p="6px"
             display="flex"
             justifyContent="center"
-            backgroundColor={
-              access === "admin"
-                ? colors.greenAccent[600]
-                : access === "manager"
-                ? colors.greenAccent[700]
-                : colors.greenAccent[700]
-            }
+            backgroundColor={colors.blueAccent[800]}
             borderRadius="4px"
           >
-            {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
-            {access === "manager" && <SecurityOutlinedIcon />}
-            {access === "user" && <LockOpenOutlinedIcon />}
-            <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
-              {access}
+            <Typography color={colors.grey[100]} sx={{ m: "0 2px" }}>
+              Proceed
             </Typography>
+            <NavigateNextOutlinedIcon />
           </Box>
         );
       },
     },
   ];
 
-  
-const callback = function (error, data, response) {
-  let tableData = [];
+  const callback = function (error, data, response) {
+    let tableData = [];
 
-  if (error) {
-    console.error(error);
-  } else {
-    console.log("API called successfully. Returned data: " + data);
-    data.forEach((element) => {
-      tableData = [...tableData, { name: element["name"] }];
-    });
-    console.log("Table data loaded: " + tableData);
-    setTasksData(tableData);
-  }
-};
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("API called successfully. Returned data: " + data);
+      data.forEach((element, index) => {
+        tableData = [
+          ...tableData,
+          {
+            id: index,
+            name: element["name"],
+            link: ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
+            access: "user"
+          },
+        ];
+      });
+      console.log("Table data loaded: " + JSON.stringify(tableData, null, 2));
+      setTasksData(tableData);
+    }
+  };
 
-useEffect(() => {
-  tasksApi.getCaseTasks(callback);
-}, []);
+  useEffect(() => {
+    tasksApi.getCaseTasks(callback);
+  }, []);
 
   return (
     <Box m="25px">
@@ -114,7 +96,11 @@ useEffect(() => {
             // borderBottom: "none",
           },
           "& .name-column--cell": {
-            color: colors.greenAccent[300],
+            // color: colors.greenAccent[300],
+            marginLeft: "5px"
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            marginLeft: "5px"
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.blueAccent[800],
