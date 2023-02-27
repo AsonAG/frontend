@@ -1,11 +1,13 @@
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
+import { React, useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 import SendIcon from "@mui/icons-material/Send";
 import TasksApi from "../../api/TasksApi";
 import ApiClient from "../../ApiClient";
 import Header from "../../components/Header";
-import { React, useEffect, useState } from "react";
+
 
 const Tasks = () => {
   const [tasksData, setTasksData] = useState([]);
@@ -17,7 +19,7 @@ const Tasks = () => {
   const columns = [
     // { field: "id", headerName: "ID" },
     {
-      field: "name",
+      field: "displayName",
       headerName: "Name",
       headerAlign: "left",
       flex: 3,
@@ -28,9 +30,13 @@ const Tasks = () => {
       headerName: "Action",
       flex: 2,
       align: "center",
-      renderCell: ({ row: { access } }) => {
+      renderCell: ({ row: { caseName } }) => {
         return (
             <IconButton
+              component={Link}
+              to={"/case"}
+              params={ caseName }
+
               variant="outlined"
               color="secondary"
               size="medium"
@@ -55,10 +61,10 @@ const Tasks = () => {
           ...tableData,
           {
             id: index,
-            name: element["name"],
-            link:
-              ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
-            access: "user",
+            displayName: element["name"],
+            action:
+              element["name"],
+              // ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
           },
         ];
       });

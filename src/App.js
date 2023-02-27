@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
 import Reporting from "./scenes/reporting";
-import { Routes, Route } from "react-router-dom";
+import CaseForm from "./scenes/global/CaseForm";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -28,6 +29,7 @@ function App() {
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/dossier" element={<Dossier />} />
               <Route path="/reporting" element={<Reporting />} />
+              <Route path="/case" element={<CaseForm />} />
             </Routes>
           </main>
         </div>
