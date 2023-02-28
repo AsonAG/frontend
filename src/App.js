@@ -13,6 +13,7 @@ import CaseForm from "./scenes/global/CaseForm";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
+  const [caseName, setCaseName] = useState("Lohn");
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -26,10 +27,10 @@ function App() {
 
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/tasks" element={<Tasks updateCaseName={setCaseName} />} />
               <Route path="/dossier" element={<Dossier />} />
               <Route path="/reporting" element={<Reporting />} />
-              <Route path="/case" element={<CaseForm />} />
+              <Route path="/case" element={<CaseForm caseName={caseName} />} />
             </Routes>
           </main>
         </div>

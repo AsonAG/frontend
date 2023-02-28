@@ -146,6 +146,13 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
+              title="Manage Employees"
+              to="/employees"
+              icon={<PeopleOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
               title="Calendar"
               to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
@@ -162,7 +169,7 @@ const Sidebar = () => {
           </Box>
 
           {!isCollapsed && (
-            <Box mt="260px">
+            <Box mt="180px">
               <Box display="flex" justifyContent="left" alignItems="left" marginLeft="35px">
                 <img
                   alt="profile-user"

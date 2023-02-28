@@ -2,20 +2,18 @@ import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { React, useEffect, useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { LinearProgress } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import TasksApi from "../../api/TasksApi";
 import ApiClient from "../../ApiClient";
 import Header from "../../components/Header";
 
-
-const Tasks = () => {
+const Tasks = ({ updateCaseName }) => {
   const [tasksData, setTasksData] = useState([]);
-
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const tasksApi = new TasksApi(ApiClient);
-
   const columns = [
     // { field: "id", headerName: "ID" },
     {
@@ -26,24 +24,25 @@ const Tasks = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "action",
-      headerName: "Action",
+      field: "caseName",
+      headerName: "Proceed",
       flex: 2,
       align: "center",
       renderCell: ({ row: { caseName } }) => {
-        return (
-            <IconButton
-              component={Link}
-              to={"/case"}
-              params={ caseName }
+        console.log(caseName);
 
-              variant="outlined"
-              color="secondary"
-              size="medium"
-              // endIcon={<SendIcon />}
-            >
-              <SendIcon />
-            </IconButton>
+        return (
+          <IconButton
+            component={Link}
+            to="/case"
+            variant="outlined"
+            color="secondary"
+            size="medium"
+            // endIcon={<SendIcon />}
+            onClick={() => updateCaseName(caseName)}
+          >
+            <SendIcon />
+          </IconButton>
         );
       },
     },
@@ -51,7 +50,6 @@ const Tasks = () => {
 
   const callback = function (error, data, response) {
     let tableData = [];
-
     if (error) {
       console.error(error);
     } else {
@@ -62,9 +60,8 @@ const Tasks = () => {
           {
             id: index,
             displayName: element["name"],
-            action:
-              element["name"],
-              // ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
+            caseName: element["name"],
+            // ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
           },
         ];
       });
@@ -118,9 +115,18 @@ const Tasks = () => {
           },
         }}
       >
-        <DataGrid disableSelectionOnClick rows={tasksData} columns={columns} 
-  justifyContent="center"
-  alignItems="center"/>
+        <DataGrid
+          disableSelectionOnClick
+          components={{
+            LoadingOverlay: LinearProgress,
+          }}
+          loading
+          {...tasksData}
+          rows={tasksData}
+          columns={columns}
+          justifyContent="center"
+          alignItems="center"
+        />
       </Box>
     </Box>
   );
