@@ -11,7 +11,7 @@ const Reporting = () => {
       <Box m="25px">
         {/* HEADER */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Header title="Reporting" subtitle="Find what you want to report to the HR department" />
+          <Header title="REPORTING" subtitle="Find what you want to report to the HR department" />
         </Box>
       </Box>
   )};  
