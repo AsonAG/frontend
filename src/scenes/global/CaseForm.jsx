@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { CaseDetails as CaseDetailsClass} from "../../model/CaseDetails";
+import { Button, IconButton } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -26,7 +28,7 @@ const CaseForm = (props) => {
   };
 
   const callback = function (error, data, response) {
-    let caseDetailsCopy;
+    let CaseDetailsCopy;
 
     if (error) {
       console.error(error);
@@ -35,9 +37,9 @@ const CaseForm = (props) => {
         "API called successfully. Returned data: " +
           JSON.stringify(data, null, 2)
       );
-      CaseDetailsClass.constructFromObject(data, caseDetailsCopy);
+      CaseDetailsClass.constructFromObject(data, CaseDetailsCopy);
     }
-    setCaseDetails(caseDetailsCopy);
+    setCaseDetails(CaseDetailsCopy);
   };
 
   useEffect(() => {
@@ -52,29 +54,22 @@ const CaseForm = (props) => {
         <Header title={props.caseName} subtitle="Fulfill the case details" />
       </Box>
 
-      { caseDetails ? 
       <Accordion>
-      <AccordionSummary
-        onChange={handleChange("panel1")} // TODO
-        expandIcon={<ExpandMoreIcon />}
-        aria-controls="panel1a-content"
-        id="panel1a-header"
-      >
-        <Typography>{caseDetails.name}</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Typography>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-          malesuada lacus ex, sit amet blandit leo lobortis eget.
-        </Typography>
-      </AccordionDetails>
-    </Accordion>
-      :
-      
-      
-      };
-
-      
+        <AccordionSummary
+          onChange={handleChange("panel1")} // TODO
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>{props.caseName}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+            malesuada lacus ex, sit amet blandit leo lobortis eget.
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
 
       <Accordion>
         <AccordionSummary
@@ -82,7 +77,7 @@ const CaseForm = (props) => {
           aria-controls="panel2a-content"
           id="panel2a-header"
         >
-          <Typography>Accordion 2</Typography>
+          <Typography>Case 2</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
@@ -98,9 +93,19 @@ const CaseForm = (props) => {
           aria-controls="panel3a-content"
           id="panel3a-header"
         >
-          <Typography>Disabled Accordion</Typography>
+          <Typography>Disabled Case</Typography>
         </AccordionSummary>
       </Accordion>
+
+      <Button 
+        pt="25px"
+            variant="outlined"
+            color="neutral"
+            size="medium"
+            endIcon={<SendIcon />}
+            >
+                Send
+      </Button>
     </Box>
   );
 };
