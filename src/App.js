@@ -9,6 +9,7 @@ import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
 import Reporting from "./scenes/reporting";
 import CaseForm from "./scenes/global/CaseForm";
+import { height } from "@mui/system";
 
 function App() {
   const [theme, colorMode] = useMode();

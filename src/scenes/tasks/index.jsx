@@ -11,6 +11,7 @@ import Header from "../../components/Header";
 
 const Tasks = ({ updateCaseName }) => {
   const [tasksData, setTasksData] = useState([]);
+  const [tasksDataLoaded, setTasksDataLoaded] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const tasksApi = new TasksApi(ApiClient);
@@ -67,6 +68,7 @@ const Tasks = ({ updateCaseName }) => {
       });
       console.log("Table data loaded: " + JSON.stringify(tableData, null, 2));
       setTasksData(tableData);
+      setTasksDataLoaded(true);
     }
   };
 
@@ -117,11 +119,7 @@ const Tasks = ({ updateCaseName }) => {
       >
         <DataGrid
           disableSelectionOnClick
-          components={{
-            LoadingOverlay: LinearProgress,
-          }}
-          loading
-          {...tasksData}
+          loading={!tasksDataLoaded}
           rows={tasksData}
           columns={columns}
           justifyContent="center"

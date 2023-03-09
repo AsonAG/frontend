@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { CaseDetails as CaseDetailsClass} from "../../model/CaseDetails";
+import { CaseDetails as CaseDetailsClass } from "../../model/CaseDetails";
 import { Button, IconButton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import Accordion from "@mui/material/Accordion";
@@ -15,20 +15,75 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Header from "../../components/Header";
 import ApiClient from "../../ApiClient";
 import CasesApi from "../../api/CasesApi";
+import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 
-const CaseForm = (props) => {
+const FieldWrapper = ({ field }) => {
+  return (
+    <Box display="flex" justifyContent="space-between">
+      <Typography fontWeight="bold">{field.name}</Typography>
+      <Typography>{field.value.value}</Typography>
+      <IconButton>
+        <HistoryOutlinedIcon />
+      </IconButton>
+    </Box>
+  );
+};
+
+const CaseWrapper = ({ caseBase }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [caseDetails, setCaseDetails] = useState(new CaseDetailsClass());
-  const { state } = useLocation();
-  const casesApi = new CasesApi(ApiClient);
 
   const handleChange = (panel) => (isExpanded) => {
     // TODO: send build request when clicked (?)
   };
 
+  return (
+    <Accordion defaultExpanded={true}>
+      <AccordionSummary
+        onChange={handleChange("")} // TODO
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          backgroundColor: colors.primary[400],
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold">
+          {caseBase?.name}
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails
+        sx={{
+          backgroundColor: colors.primary[400],
+        }}
+      >
+        {/* Fields */}
+        <Box borderTop={1} paddingTop="16px">
+          {caseBase.fields?.map((field, i) => (
+            <FieldWrapper field={field} />
+          ))}
+        </Box>
+
+        {/* Related cases */}
+        <Box borderTop={1} paddingTop="16px">
+          {caseBase.relatedCases?.map((relatedCase, i) => (
+            <CaseWrapper
+              caseBase={CaseDetailsClass.constructFromObject(relatedCase)}
+            />
+          ))}
+        </Box>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+const CaseForm = (props) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const [caseDetails, setCaseDetails] = useState(new CaseDetailsClass());
+  const casesApi = new CasesApi(ApiClient);
+
   const callback = function (error, data, response) {
-    let CaseDetailsCopy;
+    let caseDetailsCopy;
+    let caseDetailsCopyConst;
 
     if (error) {
       console.error(error);
@@ -37,9 +92,16 @@ const CaseForm = (props) => {
         "API called successfully. Returned data: " +
           JSON.stringify(data, null, 2)
       );
-      CaseDetailsClass.constructFromObject(data, CaseDetailsCopy);
+      caseDetailsCopyConst = CaseDetailsClass.constructFromObject(
+        data,
+        caseDetailsCopy
+      );
+
+      console.log(
+        "caseDetails print: " + JSON.stringify(caseDetailsCopyConst, null, 2)
+      );
     }
-    setCaseDetails(CaseDetailsCopy);
+    setCaseDetails(caseDetailsCopyConst);
   };
 
   useEffect(() => {
@@ -54,57 +116,16 @@ const CaseForm = (props) => {
         <Header title={props.caseName} subtitle="Fulfill the case details" />
       </Box>
 
-      <Accordion>
-        <AccordionSummary
-          onChange={handleChange("panel1")} // TODO
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography>{props.caseName}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
+      {<CaseWrapper caseBase={caseDetails} />}
 
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2a-content"
-          id="panel2a-header"
-        >
-          <Typography>Case 2</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-
-      <Accordion disabled>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel3a-content"
-          id="panel3a-header"
-        >
-          <Typography>Disabled Case</Typography>
-        </AccordionSummary>
-      </Accordion>
-
-      <Button 
+      <Button
         pt="25px"
-            variant="outlined"
-            color="neutral"
-            size="medium"
-            endIcon={<SendIcon />}
-            >
-                Send
+        variant="outlined"
+        color="neutral"
+        size="medium"
+        endIcon={<SendIcon />}
+      >
+        Send
       </Button>
     </Box>
   );

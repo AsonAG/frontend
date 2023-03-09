@@ -61,7 +61,7 @@ CaseDetails.prototype.name = undefined;
 /**
  * @member {Array.<module:model/CaseField>} fields
  */
-CaseDetails.prototype.fields = undefined;
+CaseDetails.prototype.fields = [];
 
 /**
  * @member {Array.<module:model/CaseDetails>} relatedCases
