@@ -73,7 +73,7 @@ const Tasks = ({ updateCaseName }) => {
   };
 
   useEffect(() => {
-    tasksApi.getCaseTasks(callback);
+    tasksApi.getCaseTasksMOCK(callback);
   }, []);
 
   return (

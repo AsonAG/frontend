@@ -13,17 +13,16 @@
  * Do not edit the class manually.
  *
  */
-import {ApiClient} from "../ApiClient";
-import {CasesArray} from '../model/CasesArray';
+import { ApiClient } from "../ApiClient";
+import { CasesArray } from "../model/CasesArray";
 
 /**
-* Tasks service.
-* @module api/TasksApi
-* @version 1.0.11
-*/
+ * Tasks service.
+ * @module api/TasksApi
+ * @version 1.0.11
+ */
 export class TasksApi {
-
-    /**
+  /**
     * Constructs a new TasksApi. 
     * @alias module:api/TasksApi
     * @class
@@ -31,53 +30,60 @@ export class TasksApi {
     * default to {@link module:ApiClient#instanc
     e} if unspecified.
     */
-    constructor(apiClient) {
-        this.apiClient = apiClient || ApiClient.instance;
+  constructor(apiClient) {
+    this.apiClient = apiClient || ApiClient.instance;
+  }
+
+  /**
+   * Callback function to receive the result of the getCaseTasks operation.
+   * @callback moduleapi/TasksApi~getCaseTasksCallback
+   * @param {String} error Error message, if any.
+   * @param {module:model/CasesArray{ data The data returned by the service call.
+   * @param {String} response The complete HTTP response.
+   */
+
+  /**
+   * Gets a list of tasks
+   * Gets a list of employee tasks.
+   * @param {module:api/TasksApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
+   * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
+   */
+  getCaseTasks(callback) {
+    let postBody = null;
+
+    let pathParams = {};
+    let queryParams = {};
+    let headerParams = {};
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = CasesArray;
+
+    return this.apiClient.callApi(
+      "/tasks",
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      callback
+    );
+  }
+  getCaseTasksMOCK(callback) {
+    // MOCK - use only for development mock data. to use real api use above function implementation
+    var data = null;
+    if (callback) {
+      data = [{"name":"All Value Types"},{"name":"All Time Types"},{"name":"Lohn"},{"name":"BaseCase"},{"name":"BaseExtensionCase"}];
     }
-
-    /**
-     * Callback function to receive the result of the getCaseTasks operation.
-     * @callback moduleapi/TasksApi~getCaseTasksCallback
-     * @param {String} error Error message, if any.
-     * @param {module:model/CasesArray{ data The data returned by the service call.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Gets a list of tasks
-     * Gets a list of employee tasks.
-     * @param {module:api/TasksApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
-     */
-    getCaseTasks(callback) {
-      
-      let postBody = null;
-
-      let pathParams = {
-        
-      };
-      let queryParams = {
-        
-      };
-      let headerParams = {
-        
-      };
-      let formParams = {
-        
-      };
-
-      let authNames = [];
-      let contentTypes = [];
-      let accepts = ['application/json'];
-      let returnType = CasesArray;
-
-      return this.apiClient.callApi(
-        '/tasks', 'GET',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
+    callback(null, data, null);
+  }
 }
 
 export default TasksApi;

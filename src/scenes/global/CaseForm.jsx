@@ -57,14 +57,14 @@ const CaseWrapper = ({ caseBase }) => {
       >
         {/* Fields */}
         <Box borderTop={1} paddingTop="16px">
-          {caseBase.fields?.map((field, i) => (
+          {caseBase?.fields?.map((field, i) => (
             <FieldWrapper field={field} />
           ))}
         </Box>
 
         {/* Related cases */}
         <Box borderTop={1} paddingTop="16px">
-          {caseBase.relatedCases?.map((relatedCase, i) => (
+          {caseBase?.relatedCases?.map((relatedCase, i) => (
             <CaseWrapper
               caseBase={CaseDetailsClass.constructFromObject(relatedCase)}
             />
@@ -82,9 +82,6 @@ const CaseForm = (props) => {
   const casesApi = new CasesApi(ApiClient);
 
   const callback = function (error, data, response) {
-    let caseDetailsCopy;
-    let caseDetailsCopyConst;
-
     if (error) {
       console.error(error);
     } else {
@@ -92,41 +89,34 @@ const CaseForm = (props) => {
         "API called successfully. Returned data: " +
           JSON.stringify(data, null, 2)
       );
-      caseDetailsCopyConst = CaseDetailsClass.constructFromObject(
-        data,
-        caseDetailsCopy
-      );
-
-      console.log(
-        "caseDetails print: " + JSON.stringify(caseDetailsCopyConst, null, 2)
-      );
     }
-    setCaseDetails(caseDetailsCopyConst);
+    setCaseDetails(data);
   };
 
   useEffect(() => {
     console.log("Making api Request for a case: " + props.caseName);
-    casesApi.getCaseFields(props.caseName, callback);
+    casesApi.getCaseFieldsMOCK(props.caseName, callback);
   }, []);
 
   return (
-    <Box m="25px">
+    <Box m="25px" display="flex" flexDirection="column" alignItems="left">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title={props.caseName} subtitle="Fulfill the case details" />
       </Box>
 
-      {<CaseWrapper caseBase={caseDetails} />}
+      <Box>{<CaseWrapper caseBase={caseDetails} />}</Box>
 
-      <Button
-        pt="25px"
-        variant="outlined"
-        color="neutral"
-        size="medium"
-        endIcon={<SendIcon />}
-      >
-        Send
-      </Button>
+      <Box mt="20px" ml="auto">
+        <Button
+          variant="contained"
+          color="secondary"
+          size="large"
+          endIcon={<SendIcon />}
+        >
+          Send
+        </Button>
+      </Box>
     </Box>
   );
 };
