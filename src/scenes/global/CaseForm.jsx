@@ -29,7 +29,7 @@ const FieldWrapper = ({ field }) => {
   );
 };
 
-const CaseWrapper = ({ caseBase }) => {
+const CaseWrapper = ({ caseBase, isBase }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -38,18 +38,34 @@ const CaseWrapper = ({ caseBase }) => {
   };
 
   return (
-    <Accordion defaultExpanded={true}>
-      <AccordionSummary
-        onChange={handleChange("")} // TODO
-        expandIcon={<ExpandMoreIcon />}
-        sx={{
-          backgroundColor: colors.primary[400],
-        }}
-      >
-        <Typography variant="h4" fontWeight="bold">
-          {caseBase?.name}
-        </Typography>
-      </AccordionSummary>
+    <Box>
+    <Accordion defaultExpanded={true} elevation={5}>
+      {isBase ? (
+        <AccordionSummary
+          onChange={handleChange("")} // TODO
+          expandIcon={<ExpandMoreIcon />}
+          sx={{
+            backgroundColor: colors.primary[400],
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold">
+            {caseBase?.name}
+          </Typography>
+        </AccordionSummary>
+      ) : (
+        <AccordionSummary
+          onChange={handleChange("")} // TODO
+          expandIcon={<ExpandMoreIcon />}
+          sx={{
+            backgroundColor: colors.primary[300],
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold">
+            {caseBase?.name}
+          </Typography>
+        </AccordionSummary>
+      )}
+
       <AccordionDetails
         sx={{
           backgroundColor: colors.primary[400],
@@ -62,16 +78,25 @@ const CaseWrapper = ({ caseBase }) => {
           ))}
         </Box>
 
-        {/* Related cases */}
-        <Box borderTop={1} paddingTop="16px">
+        {/* Embeded related cases - IF NEEDED */}
+        {/* <Box borderTop={1} paddingTop="16px">
+          {caseBase?.relatedCases?.map((relatedCase, i) => (
+            <CaseWrapper
+              caseBase={CaseDetailsClass.constructFromObject(relatedCase)}
+            />
+          ))}
+        </Box> */}
+      </AccordionDetails>
+    </Accordion>
+    
+    <Box borderTop={1} paddingTop="16px">
           {caseBase?.relatedCases?.map((relatedCase, i) => (
             <CaseWrapper
               caseBase={CaseDetailsClass.constructFromObject(relatedCase)}
             />
           ))}
         </Box>
-      </AccordionDetails>
-    </Accordion>
+        </Box>
   );
 };
 
@@ -105,7 +130,7 @@ const CaseForm = (props) => {
         <Header title={props.caseName} subtitle="Fulfill the case details" />
       </Box>
 
-      <Box>{<CaseWrapper caseBase={caseDetails} />}</Box>
+      <Box>{<CaseWrapper caseBase={caseDetails} isBase={true} />}</Box>
 
       <Box mt="20px" ml="auto">
         <Button
