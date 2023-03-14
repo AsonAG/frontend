@@ -11,25 +11,41 @@ import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
+import Input from "@mui/material/Input";
+import Popover from "@mui/material/Popover";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Header from "../../components/Header";
 import ApiClient from "../../ApiClient";
 import CasesApi from "../../api/CasesApi";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 
-const FieldWrapper = ({ field }) => {
+const FieldWrapper = ({ field, setPopupVisible}) => {
+  const handleTimingButtonClick = () => {
+    console.log("Timing button clicked for field with name:", field.name);
+    // setPopupVisible(true);
+    setPopupVisible && setPopupVisible(true);
+    // return (
+    //   <Popover></Popover>
+    // )
+  };
+
   return (
-    <Box display="flex" justifyContent="space-between">
-      <Typography fontWeight="bold">{field.name}</Typography>
-      <Typography>{field.value.value}</Typography>
-      <IconButton>
-        <HistoryOutlinedIcon />
-      </IconButton>
+    <Box display="grid" gridTemplateColumns="1fr 2fr 2fr 1fr">
+      <Box fontWeight="bold">{field.name}</Box>
+      <Box>{field.description}</Box>
+      <Box>
+        <Input defaultValue={field.value.value} required={field.optional} />
+      </Box>
+      <Box>
+        <IconButton onClick={handleTimingButtonClick()}>
+          <HistoryOutlinedIcon />
+        </IconButton>
+      </Box>
     </Box>
   );
 };
 
-const CaseWrapper = ({ caseBase, isBase }) => {
+const CaseWrapper = ({ caseBase, isBase, setPopupVisible }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -39,64 +55,64 @@ const CaseWrapper = ({ caseBase, isBase }) => {
 
   return (
     <Box>
-    <Accordion defaultExpanded={true} elevation={5}>
-      {isBase ? (
-        <AccordionSummary
-          onChange={handleChange("")} // TODO
-          expandIcon={<ExpandMoreIcon />}
+      <Accordion defaultExpanded={true} elevation={5}>
+        {isBase ? (
+          <AccordionSummary
+            onChange={handleChange("")} // TODO
+            expandIcon={<ExpandMoreIcon />}
+            sx={{
+              backgroundColor: colors.primary[300],
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold">
+              {caseBase?.name}
+            </Typography>
+          </AccordionSummary>
+        ) : (
+          <AccordionSummary
+            onChange={handleChange("")} // TODO
+            expandIcon={<ExpandMoreIcon />}
+            sx={{
+              backgroundColor: colors.primary[400],
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold">
+              {caseBase?.name}
+            </Typography>
+          </AccordionSummary>
+        )}
+
+        <AccordionDetails
           sx={{
             backgroundColor: colors.primary[400],
           }}
         >
-          <Typography variant="h4" fontWeight="bold">
-            {caseBase?.name}
-          </Typography>
-        </AccordionSummary>
-      ) : (
-        <AccordionSummary
-          onChange={handleChange("")} // TODO
-          expandIcon={<ExpandMoreIcon />}
-          sx={{
-            backgroundColor: colors.primary[300],
-          }}
-        >
-          <Typography variant="h4" fontWeight="bold">
-            {caseBase?.name}
-          </Typography>
-        </AccordionSummary>
-      )}
+          {/* Fields */}
+          <Box borderTop={1} paddingTop="16px">
+            {caseBase?.fields?.map((field, i) => (
+              <FieldWrapper field={field} setPopupVisible={setPopupVisible} />
+            ))}
+          </Box>
 
-      <AccordionDetails
-        sx={{
-          backgroundColor: colors.primary[400],
-        }}
-      >
-        {/* Fields */}
-        <Box borderTop={1} paddingTop="16px">
-          {caseBase?.fields?.map((field, i) => (
-            <FieldWrapper field={field} />
-          ))}
-        </Box>
-
-        {/* Embeded related cases - IF NEEDED */}
-        {/* <Box borderTop={1} paddingTop="16px">
+          {/* Embeded related cases - IF NEEDED */}
+          {/* <Box borderTop={1} paddingTop="16px">
           {caseBase?.relatedCases?.map((relatedCase, i) => (
             <CaseWrapper
               caseBase={CaseDetailsClass.constructFromObject(relatedCase)}
             />
           ))}
         </Box> */}
-      </AccordionDetails>
-    </Accordion>
-    
-    <Box borderTop={1} paddingTop="16px">
-          {caseBase?.relatedCases?.map((relatedCase, i) => (
-            <CaseWrapper
-              caseBase={CaseDetailsClass.constructFromObject(relatedCase)}
-            />
-          ))}
-        </Box>
-        </Box>
+        </AccordionDetails>
+      </Accordion>
+
+      <Box borderTop={1} paddingTop="16px">
+        {caseBase?.relatedCases?.map((relatedCase, i) => (
+          <CaseWrapper
+            caseBase={CaseDetailsClass.constructFromObject(relatedCase)}
+          />
+        ))}
+      </Box>
+    </Box>
   );
 };
 
@@ -104,6 +120,7 @@ const CaseForm = (props) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseDetails, setCaseDetails] = useState(new CaseDetailsClass());
+  const [isPopupVisible, setPopupVisible] = useState(false);
   const casesApi = new CasesApi(ApiClient);
 
   const callback = function (error, data, response) {
@@ -130,7 +147,8 @@ const CaseForm = (props) => {
         <Header title={props.caseName} subtitle="Fulfill the case details" />
       </Box>
 
-      <Box>{<CaseWrapper caseBase={caseDetails} isBase={true} />}</Box>
+
+      <Box>{<CaseWrapper caseBase={caseDetails} isBase={true} setPopupVisible={setPopupVisible}/>}</Box>
 
       <Box mt="20px" ml="auto">
         <Button
