@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { CaseDetails as CaseDetailsClass } from "../../model/CaseDetails";
 import { Button, IconButton } from "@mui/material";
+import { CaseFieldValue } from "../../model/CaseFieldValue"; 
 import SendIcon from "@mui/icons-material/Send";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -22,7 +23,6 @@ import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 const FieldWrapper = ({ field, setPopupVisible}) => {
   const handleTimingButtonClick = () => {
     console.log("Timing button clicked for field with name:", field.name);
-    // setPopupVisible(true);
     setPopupVisible && setPopupVisible(true);
     // return (
     //   <Popover></Popover>
@@ -120,8 +120,9 @@ const CaseForm = (props) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseDetails, setCaseDetails] = useState(new CaseDetailsClass());
-  const [isPopupVisible, setPopupVisible] = useState(false);
   const casesApi = new CasesApi(ApiClient);
+  const [isPopupVisible, setPopupVisible] = useState(false);
+  const [fieldTimeEdit, setfieldTimeEdit] = useState(new CaseFieldValue());
 
   const callback = function (error, data, response) {
     if (error) {
@@ -147,7 +148,7 @@ const CaseForm = (props) => {
         <Header title={props.caseName} subtitle="Fulfill the case details" />
       </Box>
 
-
+      
       <Box>{<CaseWrapper caseBase={caseDetails} isBase={true} setPopupVisible={setPopupVisible}/>}</Box>
 
       <Box mt="20px" ml="auto">
