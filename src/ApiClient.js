@@ -34,8 +34,9 @@ export class ApiClient {
          * The base URL against which to resolve every API call's (relative) path.
          * @type {String}
          * @default https://localhost:9020/
+         * https://localhost:44354/api/tenants/3/payrolls/4/cases/sets?userId=8&caseType=Employee&employeeId=51
          */
-        this.basePath = 'https://localhost:9020/api/'.replace(/\/+$/, '');
+        this.basePath = 'https://localhost:44354/api/tenants/3/payrolls/4'.replace(/\/+$/, '');
 
         /**
          * The authentication methods to be included for all API calls.
@@ -340,11 +341,7 @@ export class ApiClient {
     * all properties on <code>data<code> will be converted to this type.
     * @returns A value of the specified type.
     */
-    deserialize(response, returnType) {
-        if (response == null || returnType == null || response.status == 204) {
-            return null;
-        }
-
+    deserialize(response) {
         // Rely on SuperAgent for parsing response body.
         // See http://visionmedia.github.io/superagent/#parsing-response-bodies
         var data = response.body;
@@ -353,7 +350,7 @@ export class ApiClient {
             data = response.text;
         }
 
-        return ApiClient.convertToType(data, returnType);
+        return data;
     }
 
     /**
@@ -388,6 +385,8 @@ export class ApiClient {
         var url = this.buildUrl(path, pathParams);
         var request = superagent(httpMethod, url);
 
+        console.log("Sending request to:", url);
+        
         // apply authentications
         this.applyAuthToRequest(request, authNames);
 
@@ -465,7 +464,7 @@ export class ApiClient {
                 var data = null;
                 if (!error) {
                     try {
-                        data = this.deserialize(response, returnType);
+                        data = this.deserialize(response);
                         if (this.enableCookies && typeof window === 'undefined'){
                             this.agent.saveCookies(response);
                         }

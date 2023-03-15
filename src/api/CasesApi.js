@@ -221,7 +221,7 @@ export class CasesApi {
       let returnType = CaseDetails;
 
       return this.apiClient.callApi(
-        '/cases/{caseName}', 'GET',
+        'cases/sets/{caseName}?userId=8&caseType=Employee&employeeId=51', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

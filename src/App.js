@@ -14,7 +14,7 @@ import { height } from "@mui/system";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
-  const [caseName, setCaseName] = useState("Lohn");
+  const [caseName, setCaseName] = useState("CH.Swiss.PersonalData");
 
   return (
     <ColorModeContext.Provider value={colorMode}>

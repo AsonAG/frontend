@@ -30,8 +30,6 @@ const Tasks = ({ updateCaseName }) => {
       flex: 2,
       align: "center",
       renderCell: ({ row: { caseName } }) => {
-        console.log(caseName);
-
         return (
           <IconButton
             component={Link}
@@ -54,7 +52,6 @@ const Tasks = ({ updateCaseName }) => {
     if (error) {
       console.error(error);
     } else {
-      console.log("API called successfully. Returned data: " + data);
       data.forEach((element, index) => {
         tableData = [
           ...tableData,
@@ -66,14 +63,14 @@ const Tasks = ({ updateCaseName }) => {
           },
         ];
       });
-      console.log("Table data loaded: " + JSON.stringify(tableData, null, 2));
+      console.log("API called successfully. Table data loaded: " + JSON.stringify(tableData, null, 2));
       setTasksData(tableData);
       setTasksDataLoaded(true);
     }
   };
 
   useEffect(() => {
-    tasksApi.getCaseTasksMOCK(callback);
+    tasksApi.getCaseTasks(callback);
   }, []);
 
   return (
@@ -84,7 +81,6 @@ const Tasks = ({ updateCaseName }) => {
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        m="40px 0 0 0"
         height="75vh"
         width="55vw"
         sx={{

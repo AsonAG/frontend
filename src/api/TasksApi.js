@@ -62,7 +62,7 @@ export class TasksApi {
     let returnType = CasesArray;
 
     return this.apiClient.callApi(
-      "/tasks",
+      "cases/sets?userId=8&caseType=Employee&employeeId=51",
       "GET",
       pathParams,
       queryParams,
