@@ -40,8 +40,8 @@ const CaseForm = (props) => {
     const colors = tokens(theme.palette.mode);
 
     return (
-      <Box borderBottom={1}>
-        <Accordion defaultExpanded={true} elevation={5}>
+      <Box borderBottom={1} key={'casebox_'+caseBase.id}>
+        <Accordion defaultExpanded={true} elevation={5} key={'caseaccordion_'+caseBase.id}>
           {isBase ? (
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
@@ -72,10 +72,11 @@ const CaseForm = (props) => {
             sx={{
               backgroundColor: colors.primary[400],
             }}
+            key={'fields_'+caseBase.id}
           >
-            <Box borderTop={1} paddingTop="16px">
+            <Box borderTop={1} paddingTop="16px" key={'fieldswrapper_'+caseBase.id} >
               {caseBase?.fields?.map((field, i) => (
-                <FieldsForm field={field} outputFields={outputFields} setOutputFields={setOutputFields} />
+                <FieldsForm field={field} setOutputFields={setOutputFields} key={'field_'+field.id} />
               ))}
             </Box>
           </AccordionDetails>
@@ -101,6 +102,11 @@ const CaseForm = (props) => {
     casesApi.getCaseFields(props.caseName, callback);
   }, []);
 
+  useEffect(() => {
+    console.log("Making api Request for a case fields update: " + props.caseName);
+    casesApi.getCaseFields(props.caseName, callback);
+  }, [outputFields]);
+
   return (
     <Box m="25px" display="flex" flexDirection="column" alignItems="left">
       {/* HEADER */}
@@ -112,7 +118,7 @@ const CaseForm = (props) => {
       <form 
         // handleSubmit={handleSubmit}
         >
-        <Box>{<CaseWrapper caseBase={caseDetails} isBase={true} />}</Box>
+        <Box>{<CaseWrapper caseBase={caseDetails} isBase={true} key={'case_'+caseDetails.id} />}</Box>
 
         <Box>
           {caseDetails?.relatedCases?.map((relatedCase, i) => (

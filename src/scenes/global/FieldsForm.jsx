@@ -4,14 +4,14 @@ import { Button, IconButton } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 
-const FieldsForm = ({ field, outputFields, setOutputFields }) => {
+const FieldsForm = ({ field, setOutputFields }) => {
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [fieldName, setFieldName] = useState();
   const [fieldValue, setFieldValue] = useState();
 
   useEffect(() => {
-        setFieldName(field.displayName);
-        setFieldValue(outputFields[field.displayName]);
+        setFieldName(field.name);
+        setFieldValue(field.value);
   }, []);
 
   const handleInputChange = (e) => {
@@ -38,33 +38,33 @@ const FieldsForm = ({ field, outputFields, setOutputFields }) => {
     // )
   };
 
-  return (
-    <Box display="grid" gridTemplateColumns="3fr 1fr" padding="8px">
+  return field && (
+    <Box display="grid" gridTemplateColumns="3fr 1fr" padding="8px" key={"field_inline_"+field.id}>
       {/* <Box fontWeight="bold">{field.displayName}</Box> */}
       {/* <Box>{field.description}</Box> */}
-      <Box>
+      {/* <Box key={"field_inline_textwrap_"+field.id}> */}
         <TextField
           fullWidth
-          name={field.displayName}
+          name={field.name}
           label={field.displayName}
-          id={field.displayName}
+          id={''+field.id}
           helperText={field.description}
           inputProps={{
             inputMode: field.valueType,
             onBlur: updateOutpuFields,
             // pattern: '[0-9]*'  TODO: PATTERN
           }}
-          defaultValue={field.defaultValue}
           required={field.optional}
-          value={outputFields[field.displayName]}
+          value={field.value ? field.value : ''}
           onChange={handleInputChange}
+          key={"field_textfield_"+field.id}
         >
           {/* {...fieldInputs(field.displayName)} */}
         </TextField>
-      </Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <IconButton onClick={handleTimingButtonClick}>
-          <HistoryOutlinedIcon />
+      {/* </Box> */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" key={"field_timefield_"+field.id}>
+        <IconButton onClick={handleTimingButtonClick} key={"icon_"+field.id}>
+          <HistoryOutlinedIcon key={"field_timefield_icon_"+field.id} />
         </IconButton>
       </Box>
     </Box>
