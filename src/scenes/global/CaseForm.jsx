@@ -48,9 +48,10 @@ const CaseForm = (props) => {
               sx={{
                 backgroundColor: colors.primary[300],
               }}
+              key={'casesummary_'+caseBase.id}
             >
-              <Typography variant="h4" fontWeight="bold">
-                {caseBase?.name}
+              <Typography variant="h4" fontWeight="bold" key={'casename_'+caseBase.id} >
+                {caseBase?.displayName}
               </Typography>
             </AccordionSummary>
           ) : (
@@ -60,8 +61,9 @@ const CaseForm = (props) => {
                 backgroundColor: colors.primary[400],
                 marginTop: "18px",
               }}
+              key={'casesummary_'+caseBase.id}
             >
-              <Typography variant="h4" fontWeight="bold">
+              <Typography variant="h4" fontWeight="bold" key={'casename_'+caseBase.id} >
                 {caseBase?.displayName}
               </Typography>
             </AccordionSummary>
@@ -122,7 +124,7 @@ const CaseForm = (props) => {
 
         <Box>
           {caseDetails?.relatedCases?.map((relatedCase, i) => (
-            <CaseWrapper caseBase={relatedCase} />
+            <CaseWrapper caseBase={relatedCase} key={'case_'+relatedCase.id} />
           ))}
         </Box>
 
