@@ -181,19 +181,19 @@ export class CasesApi {
     }
 
     buildCaseFieldValues(caseName, caseFields){
-      return caseFields?.map((field, i) => (
+      return Object.keys(caseFields).map((fieldName) => (
         {
           caseName: caseName,
-          caseFieldName: field.name,
-          value: field.value
+          caseFieldName: fieldName,
+          value: caseFields[fieldName]
         }
       ));
     }
     buildCaseBuildRequestBody(caseName, caseFields){
       return {
         case:{
-          caseName: {caseName},
-          values: this.buildCaseFieldValues(caseFields)
+          caseName: caseName,
+          values: this.buildCaseFieldValues(caseName, caseFields)
         }
       };
     }
@@ -243,7 +243,7 @@ export class CasesApi {
       let returnType = CaseDetails;
 
       return this.apiClient.callApi(
-        'cases/sets/{caseName}?userId=8&caseType=Employee&employeeId=51', 'GET',
+        'cases/sets/{caseName}?userId=8&caseType=Employee&employeeId=51', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

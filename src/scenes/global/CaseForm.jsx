@@ -91,10 +91,10 @@ const CaseForm = (props) => {
     if (error) {
       console.error(error);
     } else {
-      // console.log(
-      //   "API called successfully. Returned CaseForm data: " +
-      //     JSON.stringify(data, null, 2)
-      // );
+      console.log(
+        "API called successfully. Returned CaseForm data: " +
+          JSON.stringify(data, null, 2)
+      );
     }
     setCaseDetails(data);
   };
