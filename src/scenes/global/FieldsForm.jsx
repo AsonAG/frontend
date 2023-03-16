@@ -9,9 +9,13 @@ const FieldsForm = ({ field, outputFields, setOutputFields }) => {
   const [fieldName, setFieldName] = useState();
   const [fieldValue, setFieldValue] = useState();
 
+  useEffect(() => {
+        setFieldName(field.displayName);
+        setFieldValue(outputFields[field.displayName]);
+  }, []);
+
   const handleInputChange = (e) => {
     // const value = target.type === "checkbox" ? target.checked : target.value;
-    setFieldName(e.target.name);
     setFieldValue(e.target.value);
   };
 
@@ -47,7 +51,7 @@ const FieldsForm = ({ field, outputFields, setOutputFields }) => {
           helperText={field.description}
           inputProps={{
             inputMode: field.valueType,
-            onBlur:  updateOutpuFields ,
+            onBlur: updateOutpuFields,
             // pattern: '[0-9]*'  TODO: PATTERN
           }}
           defaultValue={field.defaultValue}
