@@ -17,6 +17,7 @@ const FieldsForm = ({ field, setOutputFields }) => {
   const handleInputChange = (e) => {
     // const value = target.type === "checkbox" ? target.checked : target.value;
     setFieldValue(e.target.value);
+    console.log("input change");
   };
 
   const updateOutpuFields = () => {
@@ -55,7 +56,7 @@ const FieldsForm = ({ field, setOutputFields }) => {
             // pattern: '[0-9]*'  TODO: PATTERN
           }}
           required={field.optional}
-          value={field.value ? field.value : ''}
+          value={field.value} // TODO: fix null issue field.? 
           onChange={handleInputChange}
           key={"field_textfield_"+field.id}
         >

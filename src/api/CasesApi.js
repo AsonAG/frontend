@@ -179,6 +179,24 @@ export class CasesApi {
         authNames, contentTypes, accepts, returnType, callback
       );
     }
+
+    buildCaseFieldValues(caseName, caseFields){
+      return caseFields?.map((field, i) => (
+        {
+          caseName: caseName,
+          caseFieldName: field.name,
+          value: field.value
+        }
+      ));
+    }
+    buildCaseBuildRequestBody(caseName, caseFields){
+      return {
+        case:{
+          caseName: {caseName},
+          values: this.buildCaseFieldValues(caseFields)
+        }
+      };
+    }
     /**
      * Callback function to receive the result of the getCaseFields operation.
      * @callback moduleapi/CasesApi~getCaseFieldsCallback
@@ -194,9 +212,13 @@ export class CasesApi {
      * @param {module:api/CasesApi~getCaseFieldsCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
      */
-    getCaseFields(caseName, callback) {
+    getCaseFields(caseName, callback, caseFields) {
       
-      let postBody = null;
+      // build a case body if case fields are provided
+      let postBody = caseFields ?
+        this.buildCaseBuildRequestBody(caseName, caseFields)
+      : null;
+
       // verify the required parameter 'caseName' is set
       if (caseName === undefined || caseName === null) {
         throw new Error("Missing the required parameter 'caseName' when calling getCaseFields");

@@ -91,22 +91,18 @@ const CaseForm = (props) => {
     if (error) {
       console.error(error);
     } else {
-      console.log(
-        "API called successfully. Returned CaseForm data: " +
-          JSON.stringify(data, null, 2)
-      );
+      // console.log(
+      //   "API called successfully. Returned CaseForm data: " +
+      //     JSON.stringify(data, null, 2)
+      // );
     }
     setCaseDetails(data);
   };
 
   useEffect(() => {
-    console.log("Making api Request for a case: " + props.caseName);
-    casesApi.getCaseFields(props.caseName, callback);
-  }, []);
-
-  useEffect(() => {
-    console.log("Making api Request for a case fields update: " + props.caseName);
-    casesApi.getCaseFields(props.caseName, callback);
+    console.log("Making api Request for a case fields update: " + props.caseName + JSON.stringify(outputFields));
+    // create request body
+    casesApi.getCaseFields(props.caseName, callback, outputFields);
   }, [outputFields]);
 
   return (
