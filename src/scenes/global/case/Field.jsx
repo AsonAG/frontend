@@ -8,25 +8,25 @@ const Field = ({ field, onChange }) => {
   const [isTimeSettingVisible, setTimeSettingVisible] = useState(true);
   const [fieldName, setFieldName] = useState(field.name);
   const [fieldValue, setFieldValue] = useState(field.value);
+  const [fieldStartDate, setFieldStartDate] = useState(field.value);
+  const [fieldEndDate, setFieldEndDate] = useState(field.value);
 
-  const handleInputChange = (e) => {
-    // const value = target.type === "checkbox" ? target.checked : target.value;
+  const handleInputValueChange = (e) => {
     setFieldValue(e.target.value);
     console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
   };
 
   const handleInputStartDateChange = (e) => {
-    setFieldValue(e.target.value);
+    setFieldStartDate(e.target.value);
   };
   
   const handleInputEndDateChange = (e) => {
-    setFieldValue(e.target.value);
+    setFieldEndDate(e.target.value);
   };
 
   const handleTextfieldBlur = () => {
     console.log("Blur activated");
-    onChange(fieldName, fieldValue);
-    // onChange(fieldName, fieldValue, fieldStartDate, fieldEndDate);
+    onChange(fieldName, fieldValue, fieldStartDate, fieldEndDate);
   };
 
   const handleTimingButtonClick = () => {
@@ -37,9 +37,6 @@ const Field = ({ field, onChange }) => {
       isTimeSettingVisible
     );
     setTimeSettingVisible(!isTimeSettingVisible);
-    // return (
-    //   <Popover></Popover>
-    // )
   };
 
   const transformJsonType = (jsonType) => {
@@ -79,7 +76,7 @@ const Field = ({ field, onChange }) => {
           }}
           required={field.optional}
           value={fieldValue ? fieldValue : ""}
-          onChange={handleInputChange}
+          onChange={handleInputValueChange}
           key={"field_textfield_" + field.id}
         >
           {/* {...fieldInputs(field.displayName)} */}
@@ -116,7 +113,7 @@ const Field = ({ field, onChange }) => {
               }}
               required={true}
               value={field.start ? field.start : ""}
-              onChange={handleInputDateChange}
+              onChange={handleInputStartDateChange}
               key={"field_textfield_startdate" + field.id}
             ></TextField>
             <TextField
@@ -131,7 +128,7 @@ const Field = ({ field, onChange }) => {
               }}
               required={true}
               value={field.end ? field.end : ""}
-              onChange={handleInputDateChange}
+              onChange={handleInputEndDateChange}
               key={"field_textfield_enddate" + field.id}
             ></TextField>
           </Box>

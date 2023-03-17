@@ -10,7 +10,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Field from "./Field";
 import useDidMountEffect from "../../../hooks/useDidMountEffect";
 
-const CaseWrapper = ({ caseBase, isBase, setOutputCases }) => {
+const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   // const [outputFields, setOutputFields] = useState({});
@@ -22,34 +22,52 @@ const CaseWrapper = ({ caseBase, isBase, setOutputCases }) => {
   //   }));
   // }, [outputFields]);
 
-  const updateOutputCases = () => {
-  };
+  const updateOutputCases = () => {};
 
   // const handleFieldChange = (fieldName, fieldValue) => {
   //   let outputFields = (state => ({
   //     ...state,
   //     [fieldName]: fieldValue,
   //   }));
-    
+
   //   setOutputCases((prevState) => ({
   //     ...prevState,
   //     [caseBase.name]: outputFields,
   //   }));
   // };
 
-  const handleFieldChange = (fieldName, fieldValue) => {
-    setOutputCases((prevState) => {
-      const tmp = prevState[caseBase.name] ?? {};
-      return {
-          ...prevState,
-          [caseBase.name]: {
-            ...tmp,
-            [fieldName]: fieldValue
-          },
-      };
-    });
+  const handleFieldChange = (
+    fieldName,
+    fieldValue,
+    fieldStartDate,
+    fieldEndDate
+  ) => {
+
+    setOutputCases([... outputCases, {
+            caseName: caseBase.name,
+            caseFieldName: fieldName,
+            value: fieldValue,
+            start: fieldStartDate,
+            end: fieldEndDate,
+          }]);
+
+    // setOutputCases((prevState) => {
+    //   // const tmp = prevState[caseBase.name] ?? {};
+    //   return [
+    //     ...prevState,
+    //     // [caseBase.name]: {
+    //     // ...tmp,
+    //     {
+    //       caseName: caseBase.name,
+    //       caseFieldName: fieldName,
+    //       value: fieldValue,
+    //       start: fieldStartDate,
+    //       end: fieldEndDate,
+    //     },
+    //   ];
+    // });
   };
-  
+
   return (
     <Box borderBottom={1} key={"casebox_" + caseBase.id}>
       <Accordion
@@ -100,7 +118,7 @@ const CaseWrapper = ({ caseBase, isBase, setOutputCases }) => {
           key={"fields_" + caseBase.id}
         >
           <Box
-            borderTop={1} 
+            borderTop={1}
             paddingTop="16px"
             key={"fieldswrapper_" + caseBase.id}
           >
