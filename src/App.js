@@ -8,7 +8,7 @@ import Dashboard from "./scenes/dashboard";
 import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
 import Reporting from "./scenes/reporting";
-import CaseForm from "./scenes/global/CaseForm";
+import CaseForm from "./scenes/global/case/CaseForm";
 import { height } from "@mui/system";
 
 function App() {

@@ -196,7 +196,8 @@ export class CasesApi {
       return {
         case:{
           caseName: caseName,
-          values: this.buildCaseFieldValues(caseName, caseFields)
+          values: caseFields
+          // this.buildCaseFieldValues(caseName, caseFields)
         }
       };
     }
@@ -218,7 +219,7 @@ export class CasesApi {
     getCaseFields(caseName, callback, caseFields) {
       
       // build a case body if case fields are provided
-      let postBody = caseFields ?
+      let postBody = 'undefined' in caseFields ?
         this.buildCaseBuildRequestBody(caseName, caseFields)
       : null;
 
