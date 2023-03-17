@@ -17,7 +17,7 @@ const FieldsForm = ({ field, setOutputFields }) => {
   const handleInputChange = (e) => {
     // const value = target.type === "checkbox" ? target.checked : target.value;
     setFieldValue(e.target.value);
-    console.log("input change");
+    console.log("input change:"+e.target.value +' fieldValue:'+fieldValue);
   };
 
   const updateOutpuFields = () => {
@@ -39,11 +39,22 @@ const FieldsForm = ({ field, setOutputFields }) => {
     // )
   };
 
+  const transformJsonType = (jsonType) => {
+    switch (jsonType) {
+      case 'Number':
+        return 'numeric'
+      case 'Boolean':
+        return ''
+      default:
+        break;
+    }
+  }
+
   return (
     field && (
       <Box
         display="grid"
-        gridTemplateColumns="3fr 1fr"
+        gridTemplateColumns="2fr 3fr"
         padding="8px"
         key={"field_inline_" + field.id}
       >
@@ -54,15 +65,17 @@ const FieldsForm = ({ field, setOutputFields }) => {
           fullWidth
           name={field.name}
           label={field.displayName}
-          id={"" + field.id}
+          // id={field.id}
           helperText={field.description}
+          // type={transformJsonType(field.valueType)} // TODO: remove later, use custom validation
           inputProps={{
-            inputMode: field.valueType,
+            inputMode: transformJsonType(field.valueType),
+
             onBlur: updateOutpuFields,
             // pattern: '[0-9]*'  TODO: PATTERN
           }}
           required={field.optional}
-          value={field.value} // TODO: fix null issue field.?
+          value={fieldValue ? fieldValue : ""} // TODO: fix null issue field.?
           onChange={handleInputChange}
           key={"field_textfield_" + field.id}
         >
@@ -76,6 +89,8 @@ const FieldsForm = ({ field, setOutputFields }) => {
           key={"field_timefield_" + field.id}
         >
           <IconButton
+          marginTop="10px"
+
             onClick={handleTimingButtonClick}
             key={"icon_" + field.id}
           >

@@ -32,6 +32,8 @@ export class TasksApi {
     */
   constructor(apiClient) {
     this.apiClient = apiClient || ApiClient.instance;
+    this.userId = '7'; //'8'
+    this.employeeId = '7'; //'51'
   }
 
   /**
@@ -52,8 +54,13 @@ export class TasksApi {
     let postBody = null;
 
     let pathParams = {};
-    let queryParams = {};
-    let headerParams = {};
+    let queryParams = {
+      userId: this.userId,
+      employeeId: this.employeeId,
+      caseType: 'Employee'
+    };
+    let headerParams = {
+    };
     let formParams = {};
 
     let authNames = [];
@@ -62,7 +69,7 @@ export class TasksApi {
     let returnType = CasesArray;
 
     return this.apiClient.callApi(
-      "cases/sets?userId=8&caseType=Employee&employeeId=51",
+      "cases/sets",
       "GET",
       pathParams,
       queryParams,

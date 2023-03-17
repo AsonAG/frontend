@@ -35,7 +35,7 @@ const CaseForm = (props) => {
   //   event.preventDefault();
   // };
 
-  const CaseWrapper = ({ caseBase, isBase }) => {
+  const CaseWrapper = ({ caseBase, isBase, setOutputFields }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
@@ -105,7 +105,7 @@ const CaseForm = (props) => {
     casesApi.getCaseFields(props.caseName, callback, outputFields);
   }, [outputFields]);
 
-  return (
+  return props.caseName && (
     <Box m="25px" display="flex" flexDirection="column" alignItems="left">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -116,11 +116,11 @@ const CaseForm = (props) => {
       <form 
         // handleSubmit={handleSubmit}
         >
-        <Box>{<CaseWrapper caseBase={caseDetails} isBase={true} key={'case_'+caseDetails.id} />}</Box>
+        <Box>{<CaseWrapper caseBase={caseDetails} isBase={true} setOutputFields={setOutputFields} key={'case_'+caseDetails.id} />}</Box>
 
         <Box>
           {caseDetails?.relatedCases?.map((relatedCase, i) => (
-            <CaseWrapper caseBase={relatedCase} key={'case_'+relatedCase.id} />
+            <CaseWrapper caseBase={relatedCase} setOutputFields={setOutputFields} key={'case_related'+i+relatedCase.id} />
           ))}
         </Box>
 

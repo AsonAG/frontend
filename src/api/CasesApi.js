@@ -25,6 +25,7 @@ import {CasesArray} from '../model/CasesArray';
 */
 export class CasesApi {
 
+
     /**
     * Constructs a new CasesApi. 
     * @alias module:api/CasesApi
@@ -35,6 +36,8 @@ export class CasesApi {
     */
     constructor(apiClient) {
         this.apiClient = apiClient || ApiClient.instance;
+        this.userId = '7'; //'8'
+        this.employeeId = '7'; //'51'
     }
 
     /**
@@ -228,14 +231,12 @@ export class CasesApi {
         'caseName': caseName
       };
       let queryParams = {
-        
+        userId: this.userId,
+        employeeId: this.employeeId,
+        caseType: 'Employee'        
       };
-      let headerParams = {
-        
-      };
-      let formParams = {
-        
-      };
+      let headerParams = {};
+      let formParams = {};
 
       let authNames = [];
       let contentTypes = [];
@@ -243,7 +244,7 @@ export class CasesApi {
       let returnType = CaseDetails;
 
       return this.apiClient.callApi(
-        'cases/sets/{caseName}?userId=8&caseType=Employee&employeeId=51', 'POST',
+        'cases/sets/{caseName}', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
