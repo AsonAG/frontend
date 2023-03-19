@@ -54,7 +54,7 @@ const Field = ({ field, onChange }) => {
     field && (
       <Box
         display="grid"
-        gridTemplateColumns="4fr 1fr 4fr"
+        gridTemplateColumns="6fr 1fr 4fr"
         padding="8px"
         key={"field_inline_" + field.id}
       >
@@ -84,7 +84,8 @@ const Field = ({ field, onChange }) => {
         {/* </Box> */}
         <Box
           display="flex"
-          justifyContent="space-between"
+          // justifyContent="space-between"
+          flexDirection="row-reverse"
           key={"field_timefield_icon_wrapper" + field.id}
           marginBottom="22px"
         >
@@ -98,13 +99,16 @@ const Field = ({ field, onChange }) => {
 
         {isTimeSettingVisible && (
           <Box key={"field_textfield_dates" + field.id} 
-          display="flex"
-          justifyContent="space-between"
+          display="inline-flex"
+          justifyContent='flex-start' 
+          paddingLeft="10px"
+          // justifyContent="space-between"
           >
             <TextField
-              fullWidth
+              // fullWidth
               name={field.name + "start"}
-              // label='Start'
+              label='Start'
+              InputLabelProps={{ shrink: true }}
               helperText="Start date"
               type="date"
               inputProps={{
@@ -116,21 +120,27 @@ const Field = ({ field, onChange }) => {
               onChange={handleInputStartDateChange}
               key={"field_textfield_startdate" + field.id}
             ></TextField>
+            <Box
+            key={"field_box_enddate" + field.id}
+            paddingLeft="20px"
+            >
             <TextField
-              fullWidth
+          // fullWidth
               name={field.name + "end"}
-              // label='End'
+              label='End'
+              InputLabelProps={{ shrink: true }}
               helperText="End date"
               type="date"
               inputProps={{
                 onBlur: handleTextfieldBlur,
                 // pattern: '[0-9]*'  TODO: PATTERN
               }}
-              required={true}
+              required={field.endMandatory}
               value={field.end ? field.end : ""}
               onChange={handleInputEndDateChange}
               key={"field_textfield_enddate" + field.id}
             ></TextField>
+          </Box>
           </Box>
         )}
       </Box>
