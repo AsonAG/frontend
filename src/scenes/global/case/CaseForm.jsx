@@ -18,7 +18,7 @@ const CaseForm = (props) => {
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
 
   const handleSubmit = (event) => {
-    alert("A case was submitted: " + JSON.stringify(outputCases, null, 2));
+    console.log("A case was submitted: " + JSON.stringify(outputCases, null, 2));
     // event.preventDefault();
     casesApi.saveCase(props.caseName, outputCases, caseSaveCallback);
   };

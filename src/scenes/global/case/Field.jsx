@@ -11,19 +11,18 @@ import {
 import TextField from "@mui/material/TextField";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 const Field = ({ field, onChange }) => {
-  const [isTimeSettingVisible, setTimeSettingVisible] = useState(true);
+  const [isTimeSettingVisible, setTimeSettingVisible] = useState(false);
   const [fieldName, setFieldName] = useState(field.name);
   const [fieldValue, setFieldValue] = useState(field.value);
-  // const [fieldStartDate, setFieldStartDate] = useState(field.start);
   const [fieldStartDate, setFieldStartDate] = useState(
     new Date(field.start ? field.start : null)
   );
   const [fieldEndDate, setFieldEndDate] = useState(
     new Date(field.end ? field.end : null)
   );
-  // const [fieldEndDate, setFieldEndDate] = useState(field.end);
 
   const handleInputValueChange = (e) => {
     const regex = /^[0-9\b]+$/;
@@ -41,11 +40,12 @@ const Field = ({ field, onChange }) => {
     handleTextfieldBlur();
   };
 
+  const handleInputDateValueChange = (dateValue) => {
+    setFieldValue(new Date(dateValue));
+  };
+
   const handleInputStartDateChange = (dateValue) => {
     setFieldStartDate(new Date(dateValue));
-    console.log(
-      "input date change:" + dateValue + " date value:" + fieldStartDate
-    );
     // setFieldStartDate(dateValue);
   };
 
@@ -86,8 +86,43 @@ const Field = ({ field, onChange }) => {
     // }
 
     switch (jsonType) {
-      case "Date":
-        return <></>;
+      case "None":
+        return (
+        <FormControl>
+          <FormControlLabel
+            name={field.name}
+            label={field.displayName}
+            helperText={field.description}
+          />
+        </FormControl>);
+        case "Date":
+          return (
+                  <DatePicker
+                    fullWidth
+                    name={field.name}
+                    label={field.label}
+                    helperText={field.description}
+                    onAccept={handleTextfieldBlur}
+                    required={field.required}
+                    value={fieldValue}
+                    onChange={handleInputDateValueChange}
+                    key={"field_textfield_" + field.id}
+                  ></DatePicker>
+          );
+          case "DateTime":
+            return (
+                    <DateTimePicker
+                      fullWidth
+                      name={field.name}
+                      label={field.label}
+                      helperText={field.description}
+                      onAccept={handleTextfieldBlur}
+                      required={field.required}
+                      value={fieldValue}
+                      onChange={handleInputDateValueChange}
+                      key={"field_textfield_" + field.id}
+                    ></DateTimePicker>
+            );
       case "Boolean":
         return (
           <FormControl required={field.optional}>
