@@ -1,11 +1,8 @@
 import { useTheme } from "@emotion/react";
 import { useMemo } from "react";
 import { tokens } from "../../../theme";
-import { Box } from "@mui/material";
-import { useEffect, useState } from "react";
-import { CaseDetails as CaseDetailsClass } from "../../../model/CaseDetails";
-import { Button } from "@mui/material";
-import { CaseFieldValue } from "../../../model/CaseFieldValue";
+import { Box, Button } from "@mui/material";
+import { useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import Header from "../../../components/Header";
 import ApiClient from "../../../ApiClient";
@@ -67,8 +64,7 @@ const CaseForm = (props) => {
           <Header title={props.caseName} subtitle="Fulfill the case details" />
         </Box>
 
-        {/* <FormControl */}
-        <form>
+         <form>
           <Box>
             {caseDetails && (
               <CaseWrapper
