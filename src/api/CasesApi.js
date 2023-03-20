@@ -196,8 +196,9 @@ export class CasesApi {
       return {
         case:{
           caseName: caseName,
-          values: caseFields
-          // this.buildCaseFieldValues(caseName, caseFields)
+          values: 
+            // caseFields[caseName]
+          this.buildCaseFieldValues(caseName, caseFields)
         }
       };
     }

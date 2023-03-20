@@ -36,51 +36,78 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   //   }));
   // };
 
+
+
   const handleFieldChange = (
     fieldName,
     fieldValue,
     fieldStartDate,
     fieldEndDate
   ) => {
-    fieldStartDate && fieldEndDate
-      ? setOutputCases([
-          ...outputCases,
-          {
-            caseName: caseBase.name,
-            caseFieldName: fieldName,
-            value: fieldValue,
-            start: new Date(fieldStartDate).toISOString(),
-            end: new Date(fieldEndDate).toISOString(),
-          },
-        ])
-      : !fieldStartDate && fieldEndDate
-      ? setOutputCases([
-          ...outputCases,
-          {
-            caseName: caseBase.name,
-            caseFieldName: fieldName,
-            value: fieldValue,
-            end: new Date(fieldEndDate).toISOString(),
-          },
-        ])
-      : fieldStartDate && !fieldEndDate
-      ? setOutputCases([
-          ...outputCases,
-          {
-            caseName: caseBase.name,
-            caseFieldName: fieldName,
-            value: fieldValue,
-            start: new Date(fieldStartDate).toISOString(),
-          },
-        ])
-      : setOutputCases([
-          ...outputCases,
-          {
-            caseName: caseBase.name,
-            caseFieldName: fieldName,
-            value: fieldValue,
-          },
-        ]);
+        setOutputCases({
+          ...outputCases, 
+          [fieldName] : {
+                  caseName: caseBase.name,
+                  caseFieldName: fieldName,
+                  value: fieldValue,
+                  start: new Date(fieldStartDate).toISOString(),
+                  end: new Date(fieldEndDate).toUTCString(),
+          }
+          })
+  };
+
+
+  //   setOutputCases([
+  //     ...outputCases,
+  //     {
+  //       caseName: caseBase.name,
+  //       caseFieldName: fieldName,
+  //       value: fieldValue,
+  //       start: {fieldStartDate ? {new Date(fieldStartDate).toISOString()} : null },
+  //       end: new Date(fieldEndDate).toUTCString(),
+  //     }
+  //   ]);
+  // };
+
+    // fieldStartDate && fieldEndDate
+    //   ? setOutputCases([
+    //       ...outputCases,
+    //       {
+    //         caseName: caseBase.name,
+    //         caseFieldName: fieldName,
+    //         value: fieldValue,
+    //         start: new Date(fieldStartDate).toISOString(),
+    //         end: new Date(fieldEndDate).toUTCString(),
+    //       },
+    //     ])
+    //   : !fieldStartDate && fieldEndDate
+    //   ? setOutputCases([
+    //       ...outputCases,
+    //       {
+    //         caseName: caseBase.name,
+    //         caseFieldName: fieldName,
+    //         value: fieldValue,
+    //         end: new Date(fieldEndDate).toISOString(),
+    //       },
+    //     ])
+    //   : fieldStartDate && !fieldEndDate
+    //   ? setOutputCases([
+    //       ...outputCases,
+    //       {
+    //         caseName: caseBase.name,
+    //         caseFieldName: fieldName,
+    //         value: fieldValue,
+    //         start: new Date(fieldStartDate).toISOString(),
+    //       },
+    //     ])
+    //   : setOutputCases([
+    //       ...outputCases,
+    //       {
+    //         caseName: caseBase.name,
+    //         caseFieldName: fieldName,
+    //         value: fieldValue,
+    //       },
+    //     ]);
 
     // setOutputCases((prevState) => {
     //   // const tmp = prevState[caseBase.name] ?? {};
@@ -97,7 +124,6 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
     //     },
     //   ];
     // });
-  };
 
   return (
     <Box borderBottom={1} key={"casebox_" + caseBase.id}>

@@ -18,7 +18,7 @@ const CaseForm = (props) => {
   const colors = tokens(theme.palette.mode);
   const [caseDetails, setCaseDetails] = useState(new CaseDetailsClass());
   const [fieldTimeEdit, setfieldTimeEdit] = useState(new CaseFieldValue());
-  const [outputCases, setOutputCases] = useState([]);
+  const [outputCases, setOutputCases] = useState({});
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
 
   // const handleSubmit = (event) => {
@@ -76,6 +76,7 @@ const CaseForm = (props) => {
             {caseDetails?.relatedCases?.map((relatedCase, i) => (
               <CaseWrapper
                 caseBase={relatedCase}
+                outputCases={outputCases}
                 setOutputCases={setOutputCases}
                 key={"case_related" + i + relatedCase.id}
               />
