@@ -9,6 +9,8 @@ import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
 import Reporting from "./scenes/reporting";
 import CaseForm from "./scenes/global/case/CaseForm";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { height } from "@mui/system";
 
 function App() {
@@ -17,6 +19,7 @@ function App() {
   const [caseName, setCaseName] = useState("");
 
   return (
+    <LocalizationProvider dateAdapter={AdapterDateFns }>
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
@@ -37,6 +40,7 @@ function App() {
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>
+    </LocalizationProvider>
   );
 }
 

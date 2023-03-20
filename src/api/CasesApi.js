@@ -36,8 +36,8 @@ export class CasesApi {
     */
     constructor(apiClient) {
         this.apiClient = apiClient || ApiClient.instance;
-        this.userId = '7'; //'8'
-        this.employeeId = '7'; //'51'
+        this.userId = this.apiClient.userId;
+        this.employeeId = this.apiClient.employeeId;
     }
 
     /**
@@ -219,7 +219,7 @@ export class CasesApi {
     getCaseFields(caseName, callback, caseFields) {
       
       // build a case body if case fields are provided
-      let postBody = 'undefined' in caseFields ?
+      let postBody = caseFields.length > 0 ?
         this.buildCaseBuildRequestBody(caseName, caseFields)
       : null;
 

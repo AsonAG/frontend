@@ -3,25 +3,44 @@ import { useEffect, useState } from "react";
 import { Button, IconButton } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+function padTo2Digits(num) {
+  return num.toString().padStart(2, '0');
+}
+
+function formatDate(date) {
+  return [
+    date.getFullYear(),
+    padTo2Digits(date.getMonth() + 1),
+    padTo2Digits(date.getDay()),
+  ].join('-');
+}
 
 const Field = ({ field, onChange }) => {
   const [isTimeSettingVisible, setTimeSettingVisible] = useState(true);
   const [fieldName, setFieldName] = useState(field.name);
   const [fieldValue, setFieldValue] = useState(field.value);
-  const [fieldStartDate, setFieldStartDate] = useState(field.value);
-  const [fieldEndDate, setFieldEndDate] = useState(field.value);
+  // const [fieldStartDate, setFieldStartDate] = useState(field.start);
+  const [fieldStartDate, setFieldStartDate] = useState(new Date(field.start ? field.start : null));
+  const [fieldEndDate, setFieldEndDate] = useState(new Date(field.end ? field.end : null));
+  // const [fieldEndDate, setFieldEndDate] = useState(field.end);
 
   const handleInputValueChange = (e) => {
     setFieldValue(e.target.value);
     console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
   };
 
-  const handleInputStartDateChange = (e) => {
-    setFieldStartDate(e.target.value);
+  const handleInputStartDateChange = (dateValue) => {
+    setFieldStartDate(new Date(dateValue));
+    console.log("input date change:" + dateValue + " date value:" + fieldStartDate);
+
+    // setFieldStartDate(dateValue);
   };
-  
-  const handleInputEndDateChange = (e) => {
-    setFieldEndDate(e.target.value);
+
+  const handleInputEndDateChange = (dateValue) => {
+    setFieldEndDate(new Date(dateValue));
+    // setFieldEndDate(dateValue);
   };
 
   const handleTextfieldBlur = () => {
@@ -79,12 +98,10 @@ const Field = ({ field, onChange }) => {
           onChange={handleInputValueChange}
           key={"field_textfield_" + field.id}
         >
-          {/* {...fieldInputs(field.displayName)} */}
         </TextField>
         {/* </Box> */}
         <Box
           display="flex"
-          // justifyContent="space-between"
           flexDirection="row-reverse"
           key={"field_timefield_icon_wrapper" + field.id}
           marginBottom="22px"
@@ -97,50 +114,42 @@ const Field = ({ field, onChange }) => {
           </IconButton>
         </Box>
 
-        {isTimeSettingVisible && (
-          <Box key={"field_textfield_dates" + field.id} 
-          display="inline-flex"
-          justifyContent='flex-start' 
-          paddingLeft="10px"
-          // justifyContent="space-between"
+        {isTimeSettingVisible && field.timeType != "Timeless" && (
+          <Box
+            key={"field_textfield_dates" + field.id}
+            display="inline-flex"
+            justifyContent="flex-start"
+            paddingLeft="10px"
+            // justifyContent="space-between"
           >
-            <TextField
+            <DatePicker
               // fullWidth
               name={field.name + "start"}
-              label='Start'
+              label="Start"
               InputLabelProps={{ shrink: true }}
               helperText="Start date"
-              type="date"
-              inputProps={{
-                onBlur: handleTextfieldBlur,
-                // pattern: '[0-9]*'  TODO: PATTERN
-              }}
+              onAccept={handleTextfieldBlur}
               required={true}
-              value={field.start ? field.start : ""}
+              value={fieldStartDate}
               onChange={handleInputStartDateChange}
               key={"field_textfield_startdate" + field.id}
-            ></TextField>
-            <Box
-            key={"field_box_enddate" + field.id}
-            paddingLeft="20px"
-            >
-            <TextField
-          // fullWidth
-              name={field.name + "end"}
-              label='End'
-              InputLabelProps={{ shrink: true }}
-              helperText="End date"
-              type="date"
-              inputProps={{
-                onBlur: handleTextfieldBlur,
-                // pattern: '[0-9]*'  TODO: PATTERN
-              }}
-              required={field.endMandatory}
-              value={field.end ? field.end : ""}
-              onChange={handleInputEndDateChange}
-              key={"field_textfield_enddate" + field.id}
-            ></TextField>
-          </Box>
+            ></DatePicker>
+            {field.timeType != "Moment" && (
+              <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
+                <DatePicker
+                  // fullWidth
+                  name={field.name + "end"}
+                  label="End"
+                  InputLabelProps={{ shrink: true }}
+                  helperText="End date"
+                  onAccept={handleTextfieldBlur}
+                  required={field.endMandatory}
+                  value={fieldEndDate}
+                  onChange={handleInputEndDateChange}
+                  key={"field_textfield_enddate" + field.id}
+                ></DatePicker>
+              </Box>
+            )}
           </Box>
         )}
       </Box>

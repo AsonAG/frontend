@@ -32,8 +32,8 @@ export class TasksApi {
     */
   constructor(apiClient) {
     this.apiClient = apiClient || ApiClient.instance;
-    this.userId = '7'; //'8'
-    this.employeeId = '7'; //'51'
+    this.userId = this.apiClient.userId;
+    this.employeeId = this.apiClient.employeeId;
   }
 
   /**

@@ -42,14 +42,45 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
     fieldStartDate,
     fieldEndDate
   ) => {
-
-    setOutputCases([... outputCases, {
+    fieldStartDate && fieldEndDate
+      ? setOutputCases([
+          ...outputCases,
+          {
             caseName: caseBase.name,
             caseFieldName: fieldName,
             value: fieldValue,
-            start: fieldStartDate,
-            end: fieldEndDate,
-          }]);
+            start: new Date(fieldStartDate).toISOString(),
+            end: new Date(fieldEndDate).toISOString(),
+          },
+        ])
+      : !fieldStartDate && fieldEndDate
+      ? setOutputCases([
+          ...outputCases,
+          {
+            caseName: caseBase.name,
+            caseFieldName: fieldName,
+            value: fieldValue,
+            end: new Date(fieldEndDate).toISOString(),
+          },
+        ])
+      : fieldStartDate && !fieldEndDate
+      ? setOutputCases([
+          ...outputCases,
+          {
+            caseName: caseBase.name,
+            caseFieldName: fieldName,
+            value: fieldValue,
+            start: new Date(fieldStartDate).toISOString(),
+          },
+        ])
+      : setOutputCases([
+          ...outputCases,
+          {
+            caseName: caseBase.name,
+            caseFieldName: fieldName,
+            value: fieldValue,
+          },
+        ]);
 
     // setOutputCases((prevState) => {
     //   // const tmp = prevState[caseBase.name] ?? {};
