@@ -88,41 +88,42 @@ const Field = ({ field, onChange }) => {
     switch (jsonType) {
       case "None":
         return (
-        <FormControl>
-          <FormControlLabel
+          <FormControl>
+            <FormControlLabel
+              name={field.name}
+              label={field.displayName}
+              helperText={field.description}
+            />
+          </FormControl>
+        );
+      case "Date":
+        return (
+          <DatePicker
+            fullWidth
             name={field.name}
-            label={field.displayName}
+            label={field.label}
             helperText={field.description}
-          />
-        </FormControl>);
-        case "Date":
-          return (
-                  <DatePicker
-                    fullWidth
-                    name={field.name}
-                    label={field.label}
-                    helperText={field.description}
-                    onAccept={handleTextfieldBlur}
-                    required={field.required}
-                    value={fieldValue}
-                    onChange={handleInputDateValueChange}
-                    key={"field_textfield_" + field.id}
-                  ></DatePicker>
-          );
-          case "DateTime":
-            return (
-                    <DateTimePicker
-                      fullWidth
-                      name={field.name}
-                      label={field.label}
-                      helperText={field.description}
-                      onAccept={handleTextfieldBlur}
-                      required={field.required}
-                      value={fieldValue}
-                      onChange={handleInputDateValueChange}
-                      key={"field_textfield_" + field.id}
-                    ></DateTimePicker>
-            );
+            onAccept={handleTextfieldBlur}
+            required={field.required}
+            value={fieldValue}
+            onChange={handleInputDateValueChange}
+            key={"field_textfield_" + field.id}
+          ></DatePicker>
+        );
+      case "DateTime":
+        return (
+          <DateTimePicker
+            fullWidth
+            name={field.name}
+            label={field.label}
+            helperText={field.description}
+            onAccept={handleTextfieldBlur}
+            required={field.required}
+            value={fieldValue}
+            onChange={handleInputDateValueChange}
+            key={"field_textfield_" + field.id}
+          ></DateTimePicker>
+        );
       case "Boolean":
         return (
           <FormControl required={field.optional}>
@@ -162,9 +163,8 @@ const Field = ({ field, onChange }) => {
               endAdornment:
                 field.valueType == "Percent" ? (
                   <InputAdornment
-                    key={"percent_adornment_" + field.id}
-                    position="end"
-                  >
+                    key={"numbertype_adornment_" + field.id}
+                    position="end">
                     %
                   </InputAdornment>
                 ) : (
@@ -180,7 +180,7 @@ const Field = ({ field, onChange }) => {
     field && (
       <Box
         display="grid"
-        gridTemplateColumns="6fr 1fr 4fr"
+        gridTemplateColumns="6fr 40px 4fr"
         padding="8px"
         key={"field_inline_" + field.id}
       >
@@ -188,7 +188,8 @@ const Field = ({ field, onChange }) => {
         {buildTypedInputField(field.valueType)}
 
         {field.timeType != "Timeless" && (
-          <Box key={"field_timefield_icon_wrapper" + field.id}
+          <Box
+            key={"field_timefield_icon_wrapper" + field.id}
             display="flex"
             flexDirection="row-reverse"
             marginBottom="22px"
@@ -204,7 +205,8 @@ const Field = ({ field, onChange }) => {
         {field.timeType != "Timeless" &&
           isTimeSettingVisible &&
           fieldStartDate && (
-            <Box key={"field_textfield_dates" + field.id}
+            <Box
+              key={"field_textfield_dates" + field.id}
               display="inline-flex"
               justifyContent="flex-start"
               paddingLeft="10px"

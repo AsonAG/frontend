@@ -88,7 +88,7 @@ const CaseForm = (props) => {
             ))}
           </Box>
 
-          <Box mt="20px" display="flex" flex-direction="row-reverse">
+          <Box mt="20px" mb="30px">
             <Button
               type="submit"
               variant="contained"

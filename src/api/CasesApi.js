@@ -55,19 +55,18 @@ export class CasesApi {
      * @param {module:api/CasesApi~getCaseDropdownOptionsCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
      */
-    getCaseDropdownOptions(caseName, callback) {
+    getCaseLookups(lookupName, callback) {
       
       let postBody = null;
-      // verify the required parameter 'caseName' is set
-      if (caseName === undefined || caseName === null) {
-        throw new Error("Missing the required parameter 'caseName' when calling getCaseDropdownOptions");
+      // verify the required parameter 'lookupName' is set
+      if (lookupName === undefined || lookupName === null) {
+        throw new Error("Missing the required parameter 'lookupName' when calling getCaseLookups");
       }
 
       let pathParams = {
-        'caseName': caseName
       };
       let queryParams = {
-        
+        'lookupNames': lookupName
       };
       let headerParams = {
         
@@ -82,7 +81,7 @@ export class CasesApi {
       let returnType = CaseFieldBasic;
 
       return this.apiClient.callApi(
-        '/cases/{caseName}/dropdowns', 'GET',
+        '/lookups/values', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
