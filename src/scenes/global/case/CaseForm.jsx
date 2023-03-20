@@ -16,15 +16,26 @@ import useDidMountEffect from "../../../hooks/useDidMountEffect";
 const CaseForm = (props) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [caseDetails, setCaseDetails] = useState(new CaseDetailsClass());
-  const [fieldTimeEdit, setfieldTimeEdit] = useState(new CaseFieldValue());
+  const [caseDetails, setCaseDetails] = useState();
   const [outputCases, setOutputCases] = useState({});
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
 
-  // const handleSubmit = (event) => {
-  //   alert("A name was submitted: " + JSON(fieldInputs));
-  //   event.preventDefault();
-  // };
+  const handleSubmit = (event) => {
+    alert("A case was submitted: " + JSON.stringify(outputCases, null, 2));
+    // event.preventDefault();
+    casesApi.saveCase(props.caseName, outputCases, caseSaveCallback);
+  };
+
+  const caseSaveCallback = function (error, data, response) {
+    if (error) {
+      console.error(error);
+    } else {
+      console.log(
+        "Case saved successfully. Response: " +
+          JSON.stringify(response, null, 2)
+      );
+    }
+  };
 
   const callback = function (error, data, response) {
     if (error) {
@@ -57,9 +68,7 @@ const CaseForm = (props) => {
         </Box>
 
         {/* <FormControl */}
-        <form
-        // handleSubmit={handleSubmit}
-        >
+        <form>
           <Box>
             {caseDetails && (
               <CaseWrapper
@@ -83,12 +92,14 @@ const CaseForm = (props) => {
             ))}
           </Box>
 
-          <Box mt="20px" ml="auto">
+          <Box mt="20px" display="flex" flex-direction="row-reverse">
             <Button
               type="submit"
               variant="contained"
               color="secondary"
-              size="large"
+              size="large"        
+              onClick={handleSubmit}
+              to="/tasks"
               endIcon={<SendIcon />}
             >
               Send

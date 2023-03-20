@@ -51,7 +51,7 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
                   caseFieldName: fieldName,
                   value: fieldValue,
                   start: new Date(fieldStartDate).toISOString(),
-                  end: new Date(fieldEndDate).toUTCString(),
+                  end: new Date(fieldEndDate).toISOString(),
           }
           })
   };

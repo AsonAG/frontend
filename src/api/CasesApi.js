@@ -38,6 +38,7 @@ export class CasesApi {
         this.apiClient = apiClient || ApiClient.instance;
         this.userId = this.apiClient.userId;
         this.employeeId = this.apiClient.employeeId;
+        this.divisionId = this.apiClient.divisionId;
     }
 
     /**
@@ -188,12 +189,27 @@ export class CasesApi {
         {
           caseName: caseName,
           caseFieldName: fieldName,
-          value: caseFields[fieldName]
+          value: caseFields[fieldName].value,
+          start: caseFields[fieldName].start,
+          end: caseFields[fieldName].end,
         }
       ));
     }
     buildCaseBuildRequestBody(caseName, caseFields){
       return {
+        case:{
+          caseName: caseName,
+          values: 
+            // caseFields[caseName]
+          this.buildCaseFieldValues(caseName, caseFields)
+        }
+      };
+    }
+    buildCaseSaveRequestBody(caseName, caseFields){
+      return {
+        userId: this.userId,
+        employeeId: this.employeeId,
+        divisionId: this.divisionId,
         case:{
           caseName: caseName,
           values: 
@@ -218,16 +234,16 @@ export class CasesApi {
      * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
      */
     getCaseFields(caseName, callback, caseFields) {
-      
-      // build a case body if case fields are provided
-      let postBody = caseFields.length > 0 ?
-        this.buildCaseBuildRequestBody(caseName, caseFields)
-      : null;
-
       // verify the required parameter 'caseName' is set
       if (caseName === undefined || caseName === null) {
         throw new Error("Missing the required parameter 'caseName' when calling getCaseFields");
       }
+      
+      // build a case body if case fields are provided
+      // let postBody = caseFields.length > 0 ?
+      let postBody = JSON.stringify(caseFields)!='{}' ?
+        this.buildCaseBuildRequestBody(caseName, caseFields)
+      : null;
 
       let pathParams = {
         'caseName': caseName
@@ -338,25 +354,22 @@ export class CasesApi {
      * @param {module:model/CaseFieldBasic} opts.body 
      * @param {module:api/CasesApi~saveCaseCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    saveCase(caseName, opts, callback) {
+    saveCase(caseName, caseFields, callback, opts) {
       opts = opts || {};
-      let postBody = opts['body'];
-      // verify the required parameter 'caseName' is set
-      if (caseName === undefined || caseName === null) {
-        throw new Error("Missing the required parameter 'caseName' when calling saveCase");
-      }
+      let postBody = JSON.stringify(caseFields)!='{}' ?
+        this.buildCaseSaveRequestBody(caseName, caseFields)
+      : null;
 
       let pathParams = {
-        'caseName': caseName
       };
       let queryParams = {
-        
+        userId: this.userId,
+        employeeId: this.employeeId,
+        caseType: 'Employee'      
       };
       let headerParams = {
-        
       };
       let formParams = {
-        
       };
 
       let authNames = [];
@@ -365,7 +378,7 @@ export class CasesApi {
       let returnType = null;
 
       return this.apiClient.callApi(
-        '/cases/{caseName}/save', 'POST',
+        'cases/sets', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

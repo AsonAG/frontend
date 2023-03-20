@@ -39,6 +39,8 @@ export class ApiClient {
         this.basePath = 'https://localhost:44354/api/tenants/1/payrolls/1'.replace(/\/+$/, ''); //2 / 3
         this.userId = '1'; //'7''8'
         this.employeeId = '1'; //'7''51'
+        this.divisionId = '1';
+
 
         /**
          * The authentication methods to be included for all API calls.
