@@ -7,6 +7,8 @@ import {
   Autocomplete,
   FormControl,
   FormControlLabel,
+  FormHelperText,
+  Typography,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
@@ -14,24 +16,24 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 const Field = ({ field, onChange }) => {
-  const [isTimeSettingVisible, setTimeSettingVisible] = useState(false);
+  const [isTimeSettingVisible, setTimeSettingVisible] = useState(
+    field.start || field.end
+  );
   const [fieldName, setFieldName] = useState(field.name);
   const [fieldValue, setFieldValue] = useState(field.value);
   const [fieldStartDate, setFieldStartDate] = useState(
-    new Date(field.start ? field.start : null)
+    field.start ? new Date(field.start) : null
   );
   const [fieldEndDate, setFieldEndDate] = useState(
-    new Date(field.end ? field.end : null)
+    field.end ? new Date(field.end) : null
   );
 
   const handleInputValueChange = (e) => {
-    const regex = /^[0-9\b]+$/;
-    if (e.target.value === "" || regex.test(e.target.value)) {
-      setFieldValue(e.target.value);
-      console.log(
-        "input change:" + e.target.value + " fieldValue:" + fieldValue
-      );
-    }
+    // const regex = /^[0-9\b]+$/;
+    // if (e.target.value === "" || regex.test(e.target.value)) {
+    setFieldValue(e.target.value);
+    console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
+    // }
   };
 
   const handleInputBooleanValueChange = (e) => {
@@ -41,22 +43,29 @@ const Field = ({ field, onChange }) => {
   };
 
   const handleInputDateValueChange = (dateValue) => {
-    setFieldValue(new Date(dateValue));
+    dateValue && setFieldValue(new Date(dateValue));
   };
 
   const handleInputStartDateChange = (dateValue) => {
-    setFieldStartDate(new Date(dateValue));
+    dateValue && setFieldStartDate(new Date(dateValue));
     // setFieldStartDate(dateValue);
   };
 
   const handleInputEndDateChange = (dateValue) => {
-    setFieldEndDate(new Date(dateValue));
+    dateValue && setFieldEndDate(new Date(dateValue));
     // setFieldEndDate(dateValue);
   };
 
   const handleTextfieldBlur = () => {
     console.log("Blur activated");
-    onChange(fieldName, fieldValue, fieldStartDate, fieldEndDate);
+    onChange(
+      field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
+      fieldName,
+      fieldValue,
+      fieldStartDate,
+      fieldEndDate,
+      field.caseSlot
+    );
   };
 
   const handleTimingButtonClick = () => {
@@ -81,31 +90,62 @@ const Field = ({ field, onChange }) => {
   };
 
   const buildTypedInputField = (jsonType) => {
-    // if (field.lookupSettings != null) {
-    //   return <Autocomplete key={"field_textfield_" + field.id}></Autocomplete>;
+    // if ("lookupName" in field.lookupSettings) {
+    //   return (
+    //     <Autocomplete key={"field_textfield_" + field.id}
+    //       multiple
+    //       fullWidth
+    //       name={field.name}
+    //       value={fieldValue}
+    //       onChange={(event, newValue) => {
+    //         setValue([
+    //           ...fixedOptions,
+    //           ...newValue.filter(
+    //             (option) => fixedOptions.indexOf(option) === -1
+    //           ),
+    //         ]);
+    //       }}
+    //       options={top100Films}
+    //       getOptionLabel={(option) => option.title}
+    //       renderTags={(tagValue, getTagProps) =>
+    //         tagValue.map((option, index) => (
+    //           <Chip
+    //             label={option.title}
+    //             {...getTagProps({ index })}
+    //             disabled={fixedOptions.indexOf(option) !== -1}
+    //           />
+    //         ))
+    //       }
+    //       style={{ width: 500 }}
+    //       renderInput={(params) => (
+    //         <TextField {...params}
+    //           label="field.displayName"
+    //           helperText={field.description}
+    //           required={!field.optional}
+    //           placeholder="Favorites" />
+    //       )}
+    //     ></Autocomplete>
+    //   );
     // }
 
     switch (jsonType) {
       case "None":
         return (
-          <FormControl>
-            <FormControlLabel
-              name={field.name}
-              label={field.displayName}
-              helperText={field.description}
-            />
-          </FormControl>
+          <Box>
+            <Typography>{field.displayName}</Typography>
+            <Typography fontStyle="italic">{field.description}</Typography>
+          </Box>
         );
       case "Date":
         return (
           <DatePicker
             fullWidth
-            name={field.name}
-            label={field.label}
+            name={field.name + "datepicker"}
+            label={field.displayName}
             helperText={field.description}
             onAccept={handleTextfieldBlur}
-            required={field.required}
-            value={fieldValue}
+            required={!field.optional}
+            value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleInputDateValueChange}
             key={"field_textfield_" + field.id}
           ></DatePicker>
@@ -115,22 +155,21 @@ const Field = ({ field, onChange }) => {
           <DateTimePicker
             fullWidth
             name={field.name}
-            label={field.label}
+            label={field.displayName}
             helperText={field.description}
             onAccept={handleTextfieldBlur}
-            required={field.required}
-            value={fieldValue}
+            required={!field.optional}
+            value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleInputDateValueChange}
             key={"field_textfield_" + field.id}
           ></DateTimePicker>
         );
       case "Boolean":
         return (
-          <FormControl required={field.optional}>
+          <FormControl required={!field.optional}>
             <FormControlLabel
               name={field.name}
               label={field.displayName}
-              helperText={field.description}
               labelPlacement="end"
               control={
                 <Checkbox
@@ -142,16 +181,17 @@ const Field = ({ field, onChange }) => {
                 />
               }
             />
+            <FormHelperText>{field.description}</FormHelperText>
           </FormControl>
         );
-      default:
+      default: //TextField
         return (
           <TextField
             fullWidth
             name={field.name}
             label={field.displayName}
             helperText={field.description}
-            required={field.optional}
+            required={!field.optional}
             value={fieldValue ? fieldValue : ""}
             onChange={handleInputValueChange}
             key={"field_textfield_" + field.id}
@@ -164,7 +204,8 @@ const Field = ({ field, onChange }) => {
                 field.valueType == "Percent" ? (
                   <InputAdornment
                     key={"numbertype_adornment_" + field.id}
-                    position="end">
+                    position="end"
+                  >
                     %
                   </InputAdornment>
                 ) : (
@@ -180,11 +221,11 @@ const Field = ({ field, onChange }) => {
     field && (
       <Box
         display="grid"
-        gridTemplateColumns="6fr 40px 4fr"
+        gridTemplateColumns="1fr 40px 1fr"
         padding="8px"
         key={"field_inline_" + field.id}
       >
-        {/* Input field types {Boolean/Date/Numeric/String} */}
+        {/* Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean} */}
         {buildTypedInputField(field.valueType)}
 
         {field.timeType != "Timeless" && (
@@ -202,46 +243,41 @@ const Field = ({ field, onChange }) => {
             </IconButton>
           </Box>
         )}
-        {field.timeType != "Timeless" &&
-          isTimeSettingVisible &&
-          fieldStartDate && (
-            <Box
-              key={"field_textfield_dates" + field.id}
-              display="inline-flex"
-              justifyContent="flex-start"
-              paddingLeft="10px"
-              // justifyContent="space-between"
-            >
-              <DatePicker
-                // fullWidth
-                name={field.name + "start"}
-                label="Start"
-                InputLabelProps={{ shrink: true }}
-                helperText="Start date"
-                onAccept={handleTextfieldBlur}
-                required={true}
-                value={fieldStartDate}
-                onChange={handleInputStartDateChange}
-                key={"field_textfield_startdate" + field.id}
-              ></DatePicker>
-              {field.timeType != "Moment" && (
-                <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
-                  <DatePicker
-                    // fullWidth
-                    name={field.name + "end"}
-                    label="End"
-                    InputLabelProps={{ shrink: true }}
-                    helperText="End date"
-                    onAccept={handleTextfieldBlur}
-                    required={field.endMandatory}
-                    value={fieldEndDate}
-                    onChange={handleInputEndDateChange}
-                    key={"field_textfield_enddate" + field.id}
-                  ></DatePicker>
-                </Box>
-              )}
-            </Box>
-          )}
+        {field.timeType != "Timeless" && isTimeSettingVisible && (
+          // fieldStartDate &&
+          <Box
+            key={"field_textfield_dates" + field.id}
+            display="inline-flex"
+            justifyContent="flex-start"
+            paddingLeft="10px"
+            // justifyContent="space-between"
+          >
+            <DatePicker
+              name={field.name + "start"}
+              label="Start"
+              helperText="Start date"
+              onAccept={handleTextfieldBlur}
+              required={true}
+              value={fieldStartDate}
+              onChange={handleInputStartDateChange}
+              key={"field_textfield_startdate" + field.id}
+            ></DatePicker>
+            {field.timeType != "Moment" && (
+              <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
+                <DatePicker
+                  name={field.name + "end"}
+                  label="End"
+                  helperText="End date"
+                  onAccept={handleTextfieldBlur}
+                  required={field.endMandatory}
+                  value={fieldEndDate}
+                  onChange={handleInputEndDateChange}
+                  key={"field_textfield_enddate" + field.id}
+                ></DatePicker>
+              </Box>
+            )}
+          </Box>
+        )}
       </Box>
     )
   );

@@ -57,7 +57,7 @@ const Tasks = ({ updateCaseName }) => {
           ...tableData,
           {
             id: index,
-            displayName: element["name"],
+            displayName: element["displayName"],
             caseName: element["name"],
             // ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
           },

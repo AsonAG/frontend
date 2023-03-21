@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { tokens } from "../../../theme";
 import { Box, Button } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import Header from "../../../components/Header";
 import ApiClient from "../../../ApiClient";
@@ -12,6 +13,7 @@ import useDidMountEffect from "../../../hooks/useDidMountEffect";
 
 const CaseForm = (props) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
   const [caseDetails, setCaseDetails] = useState();
   const [outputCases, setOutputCases] = useState({});
@@ -21,6 +23,7 @@ const CaseForm = (props) => {
     console.log("A case was submitted: " + JSON.stringify(outputCases, null, 2));
     // event.preventDefault();
     casesApi.saveCase(props.caseName, outputCases, caseSaveCallback);
+    navigate('/tasks');
   };
 
   const caseSaveCallback = function (error, data, response) {
@@ -54,7 +57,16 @@ const CaseForm = (props) => {
     );
     // create request body
     casesApi.getCaseFields(props.caseName, callback, outputCases);
+
   }, [outputCases]);
+
+  // useDidMountEffect(() => {
+  //   caseDetails.map((case))
+  //   if ("lookupName" in field.lookupSettings) {
+  //     casesApi.getCaseLookups(field.lookupSettings.lookupName, callbackLookups);
+  //   }
+  // }, [caseDetails]);
+
 
   return (
     props.caseName && (

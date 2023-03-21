@@ -184,13 +184,14 @@ export class CasesApi {
     }
 
     buildCaseFieldValues(caseName, caseFields){
-      return Object.keys(caseFields).map((fieldName) => (
+      return Object.keys(caseFields).map((id) => (
         {
           caseName: caseName,
-          caseFieldName: fieldName,
-          value: caseFields[fieldName].value,
-          start: caseFields[fieldName].start,
-          end: caseFields[fieldName].end,
+          caseFieldName: caseFields[id].caseFieldName,
+          value: caseFields[id].value,
+          start: caseFields[id].start,
+          end: caseFields[id].end,
+          caseSlot: caseFields[id].caseSlot
         }
       ));
     }

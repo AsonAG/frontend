@@ -36,26 +36,26 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   //   }));
   // };
 
-
-
   const handleFieldChange = (
+    fieldId,
     fieldName,
     fieldValue,
     fieldStartDate,
-    fieldEndDate
+    fieldEndDate,
+    fieldCaseSlot
   ) => {
-        setOutputCases({
-          ...outputCases, 
-          [fieldName] : {
-                  caseName: caseBase.name,
-                  caseFieldName: fieldName,
-                  value: fieldValue,
-                  start: new Date(fieldStartDate).toISOString(),
-                  end: new Date(fieldEndDate).toISOString(),
-          }
-          })
+    setOutputCases({
+      ...outputCases,
+      [fieldId]: {
+        caseName: caseBase.name,
+        caseFieldName: fieldName,
+        value: fieldValue,
+        start: fieldStartDate ? new Date(fieldStartDate).toISOString() : null,
+        end: fieldEndDate ? new Date(fieldEndDate).toISOString() : null,
+        caseSlot: fieldCaseSlot,
+      },
+    });
   };
-
 
   //   setOutputCases([
   //     ...outputCases,
@@ -69,61 +69,61 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   //   ]);
   // };
 
-    // fieldStartDate && fieldEndDate
-    //   ? setOutputCases([
-    //       ...outputCases,
-    //       {
-    //         caseName: caseBase.name,
-    //         caseFieldName: fieldName,
-    //         value: fieldValue,
-    //         start: new Date(fieldStartDate).toISOString(),
-    //         end: new Date(fieldEndDate).toUTCString(),
-    //       },
-    //     ])
-    //   : !fieldStartDate && fieldEndDate
-    //   ? setOutputCases([
-    //       ...outputCases,
-    //       {
-    //         caseName: caseBase.name,
-    //         caseFieldName: fieldName,
-    //         value: fieldValue,
-    //         end: new Date(fieldEndDate).toISOString(),
-    //       },
-    //     ])
-    //   : fieldStartDate && !fieldEndDate
-    //   ? setOutputCases([
-    //       ...outputCases,
-    //       {
-    //         caseName: caseBase.name,
-    //         caseFieldName: fieldName,
-    //         value: fieldValue,
-    //         start: new Date(fieldStartDate).toISOString(),
-    //       },
-    //     ])
-    //   : setOutputCases([
-    //       ...outputCases,
-    //       {
-    //         caseName: caseBase.name,
-    //         caseFieldName: fieldName,
-    //         value: fieldValue,
-    //       },
-    //     ]);
+  // fieldStartDate && fieldEndDate
+  //   ? setOutputCases([
+  //       ...outputCases,
+  //       {
+  //         caseName: caseBase.name,
+  //         caseFieldName: fieldName,
+  //         value: fieldValue,
+  //         start: new Date(fieldStartDate).toISOString(),
+  //         end: new Date(fieldEndDate).toUTCString(),
+  //       },
+  //     ])
+  //   : !fieldStartDate && fieldEndDate
+  //   ? setOutputCases([
+  //       ...outputCases,
+  //       {
+  //         caseName: caseBase.name,
+  //         caseFieldName: fieldName,
+  //         value: fieldValue,
+  //         end: new Date(fieldEndDate).toISOString(),
+  //       },
+  //     ])
+  //   : fieldStartDate && !fieldEndDate
+  //   ? setOutputCases([
+  //       ...outputCases,
+  //       {
+  //         caseName: caseBase.name,
+  //         caseFieldName: fieldName,
+  //         value: fieldValue,
+  //         start: new Date(fieldStartDate).toISOString(),
+  //       },
+  //     ])
+  //   : setOutputCases([
+  //       ...outputCases,
+  //       {
+  //         caseName: caseBase.name,
+  //         caseFieldName: fieldName,
+  //         value: fieldValue,
+  //       },
+  //     ]);
 
-    // setOutputCases((prevState) => {
-    //   // const tmp = prevState[caseBase.name] ?? {};
-    //   return [
-    //     ...prevState,
-    //     // [caseBase.name]: {
-    //     // ...tmp,
-    //     {
-    //       caseName: caseBase.name,
-    //       caseFieldName: fieldName,
-    //       value: fieldValue,
-    //       start: fieldStartDate,
-    //       end: fieldEndDate,
-    //     },
-    //   ];
-    // });
+  // setOutputCases((prevState) => {
+  //   // const tmp = prevState[caseBase.name] ?? {};
+  //   return [
+  //     ...prevState,
+  //     // [caseBase.name]: {
+  //     // ...tmp,
+  //     {
+  //       caseName: caseBase.name,
+  //       caseFieldName: fieldName,
+  //       value: fieldValue,
+  //       start: fieldStartDate,
+  //       end: fieldEndDate,
+  //     },
+  //   ];
+  // });
 
   return (
     <Box borderBottom={1} key={"casebox_" + caseBase.id}>
@@ -145,7 +145,9 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
               fontWeight="bold"
               key={"casename_" + caseBase.id}
             >
-              {caseBase?.displayName}
+              {caseBase?.caseSlot
+                ? caseBase?.displayName + caseBase?.caseSlot
+                : caseBase?.displayName}
             </Typography>
           </AccordionSummary>
         ) : (
@@ -162,7 +164,9 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
               fontWeight="bold"
               key={"casename_" + caseBase.id}
             >
-              {caseBase?.displayName}
+              {caseBase?.caseSlot
+                ? caseBase?.displayName + ' ' + caseBase?.caseSlot
+                : caseBase?.displayName}
             </Typography>
           </AccordionSummary>
         )}
@@ -187,6 +191,22 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
               />
             ))}
           </Box>
+
+          {isBase ? (
+            <></>
+          ) : (
+            <Box>
+              {caseBase?.relatedCases?.map((relatedCase, i) => (
+                <CaseWrapper
+                  isBase={false}
+                  caseBase={relatedCase}
+                  outputCases={outputCases}
+                  setOutputCases={setOutputCases}
+                  key={"case_related" + i + relatedCase.id}
+                />
+              ))}
+            </Box>
+          )}
         </AccordionDetails>
       </Accordion>
     </Box>
