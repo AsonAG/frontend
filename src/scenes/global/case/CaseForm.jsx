@@ -23,7 +23,7 @@ const CaseForm = (props) => {
   const handleSubmit = (event) => {
     console.log("A case was submitted: " + JSON.stringify(outputCase, null, 2) +' ___related_cases___  '+ JSON.stringify(relatedCases, null, 2));
     // event.preventDefault();
-    casesApi.saveCase(props.caseName, [outputCase, relatedCases], caseSaveCallback);
+    casesApi.saveCase(outputCase, relatedCases, caseSaveCallback);
     navigate('/tasks');
   };
 

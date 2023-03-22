@@ -177,6 +177,40 @@ export class CasesApi {
       },
     };
   }
+
+  generateCasesBodyFromCasesObj(mainCase, relatedMainCases) {
+    if (
+      JSON.stringify(mainCase) != "{}" &&
+      Object.values(mainCase)[0]?.values.length > 0
+    ) {
+      // remove case name key
+      let baseCase = JSON.parse(JSON.stringify(Object.values(mainCase)[0])); // TODO: remove cloning object later and move body creating logic to CaseForm
+      let relatedCases = Object.values(relatedMainCases);
+      let filteredRelatedCases = [];
+
+      baseCase.values.forEach((field, i) => {
+        baseCase.values[i] = Object.values(field)[0];
+      });
+
+      relatedCases.map(
+        (relatedCase) =>
+          relatedCase.values.forEach((field, i) => {
+            // relatedCase.values[i] = Object.values(field)
+            filteredRelatedCases.push(Object.values(field)[0]);
+          })
+        // (relatedCase.values = Object.values(relatedCase.values))
+      );
+
+      if (baseCase.values.length === 0) delete baseCase.values;
+
+      baseCase.relatedCases = filteredRelatedCases;
+
+      return {
+        case: baseCase,
+      };
+    } else return null;
+  }
+
   /**
    * Callback function to receive the result of the getCaseFields operation.
    * @callback moduleapi/CasesApi~getCaseFieldsCallback
@@ -192,7 +226,7 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCaseFieldsCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseFields(caseName, callback, mainCase, relatedMainCases) {
+  getCaseFields(caseName, callback, baseCase, relatedCases) {
     // verify the required parameter 'caseName' is set
     if (caseName === undefined || caseName === null) {
       throw new Error(
@@ -202,40 +236,7 @@ export class CasesApi {
 
     // build a case body if case fields are provided
     // let postBody = caseFields.length > 0 ?
-    let postBody =
-      JSON.stringify(mainCase) != "{}" &&
-      Object.values(mainCase)[0]?.values.length > 0
-        ? // this.buildRequestBodyCaseBuild(caseName, caseFields)
-          (() => {
-            // remove case name key
-            let baseCase = JSON.parse(JSON.stringify( Object.values(mainCase)[0] )); // TODO: remove cloning object later and move body creating logic to CaseForm 
-            let relatedCases = Object.values(relatedMainCases)
-            let filteredRelatedCases = [];
-
-            baseCase.values.forEach((field, i) => {
-              baseCase.values[i] = Object.values(field)[0]
-            })
-
-            relatedCases.map(
-              (relatedCase) =>
-              (
-                relatedCase.values.forEach((field, i) => {
-                  // relatedCase.values[i] = Object.values(field)
-                  filteredRelatedCases.push(Object.values(field)[0]);
-                })
-              )
-                // (relatedCase.values = Object.values(relatedCase.values))
-            );
-
-            if (baseCase.values.length === 0) delete baseCase.values;
-            
-            baseCase.relatedCases = filteredRelatedCases;
-
-            return {
-              case: baseCase,
-            };
-          })()
-        : null;
+    let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases);
 
     console.log(JSON.stringify(postBody));
 
@@ -356,12 +357,16 @@ export class CasesApi {
    * @param {module:model/CaseFieldBasic} opts.body
    * @param {module:api/CasesApi~saveCaseCallback} callback The callback function, accepting three arguments: error, data, response
    */
-  saveCase(caseName, caseFields, callback, opts) {
+  saveCase(baseCase, relatedCases, callback, opts) {
     opts = opts || {};
-    let postBody =
-      JSON.stringify(caseFields[0]) != "{}"
-        ? this.buildRequestBodyCaseSave(caseName, caseFields)
-        : null;
+    // let postBody =
+    //   JSON.stringify(caseFields[0]) != "{}"
+    //     ? this.buildRequestBodyCaseSave(caseName, caseFields)
+    //     : null;
+    let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases);
+    postBody.userId = this.userId;
+    postBody.employeeId = this.employeeId;
+    postBody.divisionId = this.divisionId;
 
     let pathParams = {};
     let queryParams = {
