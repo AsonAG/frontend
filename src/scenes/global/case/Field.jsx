@@ -154,8 +154,8 @@ const Field = ({ field, onChange }) => {
           }}
           onBlur={handleTextfieldBlur}
           onChange={handleInputLookupValueChange}
-          isOptionEqualToValue={(option, value) => JSON.parse(option.value)[field.lookupSettings.valueFieldName] === JSON.parse(value.value)[field.lookupSettings.valueFieldName]}
-          getOptionLabel={(option) => JSON.parse(option.value)[field.lookupSettings.valueFieldName]}
+          isOptionEqualToValue={(option, value) => JSON.parse(option.value)[field.lookupSettings.textFieldName] === JSON.parse(value.value)[field.lookupSettings.textFieldName]}
+          getOptionLabel={(option) => JSON.parse(option.value)[field.lookupSettings.textFieldName]}
           options={lookupOptions}
           loading={lookupLoading}
           renderInput={(params) => (
