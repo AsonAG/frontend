@@ -200,8 +200,11 @@ export class CasesApi {
         case:{
           caseName: caseName,
           values: 
-            // caseFields[caseName]
-          this.buildCaseFieldValues(caseName, caseFields)
+            this.buildCaseFieldValues(caseName, caseFields[0]),
+          // relatedCases:
+          // JSON.stringify(caseFields[1]) == '{}' ? 
+          // '{}' :
+          // caseFields[1].map((relatedCase, i) => this.buildCaseFieldValues(relatedCase.name, relatedCase))
         }
       };
     }
@@ -213,8 +216,10 @@ export class CasesApi {
         case:{
           caseName: caseName,
           values: 
-            // caseFields[caseName]
-          this.buildCaseFieldValues(caseName, caseFields)
+            this.buildCaseFieldValues(caseName, caseFields[0]),
+          // relatedCases:
+          //   JSON.stringify(caseFields[1]) != '{}' ? this.buildCaseFieldValues(caseName, caseFields[1]) : '[]',
+          
         }
       };
     }
@@ -241,7 +246,7 @@ export class CasesApi {
       
       // build a case body if case fields are provided
       // let postBody = caseFields.length > 0 ?
-      let postBody = JSON.stringify(caseFields)!='{}' ?
+      let postBody = JSON.stringify(caseFields[0])!='{}' ?
         this.buildCaseBuildRequestBody(caseName, caseFields)
       : null;
 
@@ -356,7 +361,7 @@ export class CasesApi {
      */
     saveCase(caseName, caseFields, callback, opts) {
       opts = opts || {};
-      let postBody = JSON.stringify(caseFields)!='{}' ?
+      let postBody = JSON.stringify(caseFields[0])!='{}' ?
         this.buildCaseSaveRequestBody(caseName, caseFields)
       : null;
 

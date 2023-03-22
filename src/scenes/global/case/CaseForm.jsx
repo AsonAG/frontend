@@ -17,12 +17,13 @@ const CaseForm = (props) => {
   const colors = tokens(theme.palette.mode);
   const [caseDetails, setCaseDetails] = useState();
   const [outputCases, setOutputCases] = useState({});
+  const [relatedCases, setRelatedCases] = useState([]);
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
 
   const handleSubmit = (event) => {
-    console.log("A case was submitted: " + JSON.stringify(outputCases, null, 2));
+    console.log("A case was submitted: " + JSON.stringify(outputCases, null, 2) +' ___related_cases___  '+ JSON.stringify(relatedCases, null, 2));
     // event.preventDefault();
-    casesApi.saveCase(props.caseName, outputCases, caseSaveCallback);
+    casesApi.saveCase(props.caseName, [outputCases, relatedCases], caseSaveCallback);
     navigate('/tasks');
   };
 
@@ -53,13 +54,19 @@ const CaseForm = (props) => {
     console.log(
       "Making api Request for a case fields update: " +
         props.caseName +
-        JSON.stringify(outputCases)
+        JSON.stringify(outputCases, null, 2) +' ___related_cases___  '+ JSON.stringify(relatedCases, null, 2)
     );
     // create request body
-    casesApi.getCaseFields(props.caseName, callback, outputCases);
+    casesApi.getCaseFields(props.caseName, callback, [outputCases, relatedCases]);
 
-  }, [outputCases]);
+  }, [outputCases, relatedCases]);
 
+  const updateRelatedCases = (newCase) => {
+    setRelatedCases([
+      ...relatedCases,
+      newCase
+    ]);
+  };
   // useDidMountEffect(() => {
   //   caseDetails.map((case))
   //   if ("lookupName" in field.lookupSettings) {
@@ -93,8 +100,8 @@ const CaseForm = (props) => {
             {caseDetails?.relatedCases?.map((relatedCase, i) => (
               <CaseWrapper
                 caseBase={relatedCase}
-                outputCases={outputCases}
-                setOutputCases={setOutputCases}
+                outputCases={relatedCases}
+                setOutputCases={updateRelatedCases}
                 key={"case_related" + i + relatedCase.id}
               />
             ))}
