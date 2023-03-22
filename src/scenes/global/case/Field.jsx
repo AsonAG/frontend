@@ -40,7 +40,7 @@ const Field = ({ field, onChange }) => {
     if (!lookupLoading) {
       return undefined;
     }
-    casesApi.getCaseLookups(field.lookupSettings.lookupName, callbackLookups);
+    casesApi.getCaseFieldLookups(field.lookupSettings.lookupName, callbackLookups);
     return () => {
       active = false;
     };

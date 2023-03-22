@@ -13,14 +13,21 @@ import useDidMountEffect from "../../../hooks/useDidMountEffect";
 const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  // const [outputFields, setOutputFields] = useState({});
+  const [caseFieldsList, setCaseFieldsList] = useState([]);
 
-  // useDidMountEffect(() => {
-  //   setOutputCases((prevState) => ({
-  //     ...prevState,
-  //     [caseBase.name]: outputFields,
-  //   }));
-  // }, [outputFields]);
+  // useEffect(() => {
+  useDidMountEffect(() => {
+    // update output cases
+    setOutputCases((prevState) => ({
+      ...prevState,
+      [caseBase.caseSlot ? caseBase.name + "_" + caseBase.caseSlot : caseBase.name]: 
+      {
+        caseName: caseBase.name,
+        values: caseFieldsList,
+        caseSlot: caseBase.caseSlot
+      }
+    }));
+  }, [caseFieldsList]);
 
   const updateOutputCases = () => {};
 
@@ -44,17 +51,27 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
     fieldEndDate,
     fieldCaseSlot
   ) => {
-    setOutputCases({
-      ...outputCases,
-      [fieldId]: {
+    // add to fields list
+    setCaseFieldsList(current => [
+      ...current,
+      {
+        [fieldId]: {
         caseName: caseBase.name,
         caseFieldName: fieldName,
         value: fieldValue,
         start: fieldStartDate ? new Date(fieldStartDate).toISOString() : null,
         end: fieldEndDate ? new Date(fieldEndDate).toISOString() : null,
         caseSlot: fieldCaseSlot,
-      },
-    });
+      }
+    }
+    ]);
+    
+    // setOutputCases({
+    //   [caseBase.caseSlot ? caseBase.name + "_" + caseBase.caseSlot : caseBase.name]:
+    //   {
+    //   ...outputCases,
+    //   values: caseFieldsList
+    // }});
   };
 
   //   setOutputCases([
