@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState, Fragment, useEffect } from "react";
+import CircularProgress from '@mui/material/CircularProgress';
+import ApiClient from "../../../ApiClient";
+import CasesApi from "../../../api/CasesApi";
 import {
   Box,
   InputAdornment,
@@ -27,6 +30,53 @@ const Field = ({ field, onChange }) => {
   const [fieldEndDate, setFieldEndDate] = useState(
     field.end ? new Date(field.end) : null
   );
+// LookUp options ================================ START ================================
+  const [isLookupOpened, setLookupOpened] = useState(false);
+  const [lookupOptions, setLookupOptions] = useState([]);
+  const lookupLoading = isLookupOpened && lookupOptions?.length === 0;
+  const casesApi = useMemo(() => new CasesApi(ApiClient), []);
+  useEffect(() => {
+    let active = true;
+    if (!lookupLoading) {
+      return undefined;
+    }
+    casesApi.getCaseLookups(field.lookupSettings.lookupName, callbackLookups);
+    return () => {
+      active = false;
+    };
+  }, [lookupLoading]);
+
+  useEffect(() => {
+    if (!isLookupOpened) {
+      setLookupOptions([]);
+    }
+  }, [isLookupOpened]);
+
+  const callbackLookups = function (error, data, response) {
+    if (error) {
+      console.error(error);
+    } else {
+      console.log(
+        "API called successfully. Returned Lookups data: " +
+          JSON.stringify(data, null, 2)
+      );
+    }
+    setLookupOptions(data[0].values);
+    console.log(
+      "Lookups: " +
+        JSON.stringify(data[0].values, null, 2)
+    );
+  };
+
+  const handleInputLookupValueChange = (e, option) => {
+    // const regex = /^[0-9\b]+$/;
+    // if (e.target.value === "" || regex.test(e.target.value)) {
+    let newValue = option ? JSON.parse(option.value)[field.lookupSettings.valueFieldName] : null;
+    setFieldValue(newValue);
+    console.log("lookup input change:" + newValue + " field text:" );//+ JSON.parse(option.value)[field.lookupSettings.textFieldName]);
+  };
+// LookUp options ================================ END ================================ 
+
 
   const handleInputValueChange = (e) => {
     // const regex = /^[0-9\b]+$/;
@@ -90,43 +140,75 @@ const Field = ({ field, onChange }) => {
   };
 
   const buildTypedInputField = (jsonType) => {
-    // if ("lookupName" in field.lookupSettings) {
-    //   return (
-    //     <Autocomplete key={"field_textfield_" + field.id}
-    //       multiple
-    //       fullWidth
-    //       name={field.name}
-    //       value={fieldValue}
-    //       onChange={(event, newValue) => {
-    //         setValue([
-    //           ...fixedOptions,
-    //           ...newValue.filter(
-    //             (option) => fixedOptions.indexOf(option) === -1
-    //           ),
-    //         ]);
-    //       }}
-    //       options={top100Films}
-    //       getOptionLabel={(option) => option.title}
-    //       renderTags={(tagValue, getTagProps) =>
-    //         tagValue.map((option, index) => (
-    //           <Chip
-    //             label={option.title}
-    //             {...getTagProps({ index })}
-    //             disabled={fixedOptions.indexOf(option) !== -1}
-    //           />
-    //         ))
-    //       }
-    //       style={{ width: 500 }}
-    //       renderInput={(params) => (
-    //         <TextField {...params}
-    //           label="field.displayName"
-    //           helperText={field.description}
-    //           required={!field.optional}
-    //           placeholder="Favorites" />
-    //       )}
-    //     ></Autocomplete>
-    //   );
-    // }
+    if (field.lookupSettings && "lookupName" in field.lookupSettings) {
+      return (
+        <Autocomplete
+          key={"field_textfield_" + field.id}
+          // sx={{ width: 300 }}
+          open={isLookupOpened}
+          onOpen={() => {
+            setLookupOpened(true);
+          }}
+          onClose={() => {
+            setLookupOpened(false);
+          }}
+          onBlur={handleTextfieldBlur}
+          onChange={handleInputLookupValueChange}
+          isOptionEqualToValue={(option, value) => JSON.parse(option.value)[field.lookupSettings.valueFieldName] === JSON.parse(value.value)[field.lookupSettings.valueFieldName]}
+          getOptionLabel={(option) => JSON.parse(option.value)[field.lookupSettings.valueFieldName]}
+          options={lookupOptions}
+          loading={lookupLoading}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={field.displayName}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <Fragment>
+                    {lookupLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </Fragment>
+                ),
+              }}
+            />
+          )}
+
+        // <Autocomplete key={"field_textfield_" + field.id}
+        //   multiple
+        //   fullWidth
+        //   name={field.name}
+        //   value={fieldValue}
+        //   onChange={(event, newValue) => {
+        //     setValue([
+        //       ...fixedOptions,
+        //       ...newValue.filter(
+        //         (option) => fixedOptions.indexOf(option) === -1
+        //       ),
+        //     ]);
+        //   }}
+        //   options={top100Films}
+        //   getOptionLabel={(option) => option.title}
+        //   renderTags={(tagValue, getTagProps) =>
+        //     tagValue.map((option, index) => (
+        //       <Chip
+        //         label={option.title}
+        //         {...getTagProps({ index })}
+        //         disabled={fixedOptions.indexOf(option) !== -1}
+        //       />
+        //     ))
+        //   }
+        //   style={{ width: 500 }}
+        //   renderInput={(params) => (
+        //     <TextField {...params}
+        //       label="field.displayName"
+        //       helperText={field.description}
+        //       required={!field.optional}
+        //       placeholder="Favorites" />
+        //   )}
+        ></Autocomplete>
+      );
+    }
 
     switch (jsonType) {
       case "None":

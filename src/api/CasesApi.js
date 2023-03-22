@@ -201,10 +201,8 @@ export class CasesApi {
           caseName: caseName,
           values: 
             this.buildCaseFieldValues(caseName, caseFields[0]),
-          // relatedCases:
-          // JSON.stringify(caseFields[1]) == '{}' ? 
-          // '{}' :
-          // caseFields[1].map((relatedCase, i) => this.buildCaseFieldValues(relatedCase.name, relatedCase))
+          relatedCases:
+            caseFields[1].map((relatedCase, i) => this.buildCaseFieldValues(relatedCase.name, relatedCase))
         }
       };
     }
