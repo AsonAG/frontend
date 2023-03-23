@@ -13,7 +13,7 @@ import useDidMountEffect from "../../../hooks/useDidMountEffect";
 const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [caseFieldsList, setCaseFieldsList] = useState([]);
+  const [caseFieldsList, setCaseFieldsList] = useState({});
 
   // useEffect(() => {
   useDidMountEffect(() => {
@@ -52,9 +52,9 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
     fieldCaseSlot
   ) => {
     // add to fields list
-    setCaseFieldsList(current => [
+    setCaseFieldsList(current => ({
       ...current,
-      {
+      
         [fieldId]: {
         caseName: caseBase.name,
         caseFieldName: fieldName,
@@ -63,8 +63,8 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
         end: fieldEndDate ? new Date(fieldEndDate).toISOString() : null,
         caseSlot: fieldCaseSlot,
       }
-    }
-    ]);
+    
+  }));
     
     // setOutputCases({
     //   [caseBase.caseSlot ? caseBase.name + "_" + caseBase.caseSlot : caseBase.name]:

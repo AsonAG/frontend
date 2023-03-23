@@ -36,18 +36,16 @@ export class ApiClient {
          * @default https://localhost:9020/
          * https://localhost:44354/api/tenants/3/payrolls/4/cases/sets?userId=8&caseType=Employee&employeeId=51
          */
-        this.tenantId = '1';
-        this.payrollId = '1';
+        this.userSettings = ['1', '1', '1', '1', '1'];
+        // this.userSettings = ['3', '4', '8', '51', '3'];
+        // this.userSettings = ['2', '3', '7', '2', '2'];
 
-        this.userId = '1'; 
-        this.employeeId = '1';
-        this.divisionId = '1';
-        // this.tenantId = '3';
-        // this.payrollId = '4';
+        this.tenantId = this.userSettings[0];
+        this.payrollId = this.userSettings[1];
 
-        // this.userId = '8'; 
-        // this.employeeId = '51';
-        // this.divisionId = '3';
+        this.userId = this.userSettings[2]; 
+        this.employeeId = this.userSettings[3];
+        this.divisionId = this.userSettings[4];
         this.basePath = 'https://localhost:44354/api/tenants/'+this.tenantId+'/payrolls/'+this.payrollId.replace(/\/+$/, ''); //2 / 3
 
 

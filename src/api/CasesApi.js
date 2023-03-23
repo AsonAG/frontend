@@ -178,25 +178,25 @@ export class CasesApi {
     };
   }
 
-  generateCasesBodyFromCasesObj(mainCase, relatedMainCases) {
+  generateCasesBodyFromCasesObj(mainCase, relatedMainCases, shouldIncludeBody) {
     if (
-      JSON.stringify(mainCase) != "{}" &&
-      Object.values(mainCase)[0]?.values.length > 0
+      shouldIncludeBody
+      // JSON.stringify(mainCase) != "{}" 
+      // && Object.values( Object.values(mainCase)[0]?.values ).length > 1    // TODO: change condition - now it checks if BaseField has more than 0 values!!
     ) {
       // remove case name key
       let baseCase = JSON.parse(JSON.stringify(Object.values(mainCase)[0])); // TODO: remove cloning object later and move body creating logic to CaseForm
       let relatedCases = Object.values(relatedMainCases);
       let filteredRelatedCases = [];
 
-      baseCase.values.forEach((field, i) => {
-        baseCase.values[i] = Object.values(field)[0];
-      });
+      baseCase.values = JSON.parse(JSON.stringify( Object.values((Object.values(mainCase)[0]).values) ));
 
       relatedCases.map(
         (relatedCase) =>
-          relatedCase.values.forEach((field, i) => {
+        Object.values(relatedCase.values).forEach((field, i) => {
             // relatedCase.values[i] = Object.values(field)
-            filteredRelatedCases.push(Object.values(field)[0]);
+            // if (Object.values(relatedCase.values).length > 0 )
+              filteredRelatedCases.push(JSON.parse(JSON.stringify( field) ))
           })
         // (relatedCase.values = Object.values(relatedCase.values))
       );
@@ -234,9 +234,10 @@ export class CasesApi {
       );
     }
 
+    let shouldIncludeBody = JSON.stringify(baseCase) != "{}" &&  JSON.stringify(Object.values(baseCase)[0]?.values) != "{}";  
     // build a case body if case fields are provided
     // let postBody = caseFields.length > 0 ?
-    let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases);
+    let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases, shouldIncludeBody);
 
     console.log(JSON.stringify(postBody));
 
@@ -363,7 +364,7 @@ export class CasesApi {
     //   JSON.stringify(caseFields[0]) != "{}"
     //     ? this.buildRequestBodyCaseSave(caseName, caseFields)
     //     : null;
-    let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases);
+    let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases, true);
     postBody.userId = this.userId;
     postBody.employeeId = this.employeeId;
     postBody.divisionId = this.divisionId;

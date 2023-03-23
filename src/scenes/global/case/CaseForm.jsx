@@ -1,8 +1,7 @@
 import { useTheme } from "@emotion/react";
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { tokens } from "../../../theme";
 import { Box, Button } from "@mui/material";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import Header from "../../../components/Header";
@@ -19,12 +18,21 @@ const CaseForm = (props) => {
   const [outputCase, setOutputCase] = useState({});
   const [relatedCases, setRelatedCases] = useState({});
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
+  const formRef = useRef();
 
   const handleSubmit = (event) => {
-    console.log("A case was submitted: " + JSON.stringify(outputCase, null, 2) +' ___related_cases___  '+ JSON.stringify(relatedCases, null, 2));
+    console.log(
+      "A case was submitted: " +
+        JSON.stringify(outputCase, null, 2) +
+        " ___related_cases___  " +
+        JSON.stringify(relatedCases, null, 2)
+    );
     // event.preventDefault();
-    casesApi.saveCase(outputCase, relatedCases, caseSaveCallback);
-    navigate('/tasks');
+    if (formRef.current.reportValidity()) {
+      console.log("form is valid");
+      casesApi.saveCase(outputCase, relatedCases, caseSaveCallback);
+      navigate("/tasks");
+    } else console.log("form INVALID");
   };
 
   const caseSaveCallback = function (error, data, response) {
@@ -54,19 +62,21 @@ const CaseForm = (props) => {
     console.log(
       "Making api Request for a case fields update: " +
         props.caseName +
-        JSON.stringify(outputCase, null, 2) +' ___related_cases___  '+ JSON.stringify(relatedCases, null, 2)
+        JSON.stringify(outputCase, null, 2) +
+        " ___related_cases___  " +
+        JSON.stringify(relatedCases, null, 2)
     );
     // create request body
-    casesApi.getCaseFields(props.caseName, callback, outputCase, relatedCases);
-
+    casesApi.getCaseFields(
+      props.caseName,
+      callback,
+      outputCase,
+      relatedCases
+    );
   }, [outputCase, relatedCases]);
 
   const updateRelatedCases = (newCase) => {
-    setRelatedCases([
-      ...relatedCases,
-      newCase
-      
-    ]);
+    setRelatedCases([...relatedCases, newCase]);
   };
   // useDidMountEffect(() => {
   //   caseDetails.map((case))
@@ -74,7 +84,6 @@ const CaseForm = (props) => {
   //     casesApi.getCaseLookups(field.lookupSettings.lookupName, callbackLookups);
   //   }
   // }, [caseDetails]);
-
 
   return (
     props.caseName && (
@@ -84,7 +93,7 @@ const CaseForm = (props) => {
           <Header title={props.caseName} subtitle="Fulfill the case details" />
         </Box>
 
-         <form>
+        <form ref={formRef}>
           <Box>
             {caseDetails && (
               <CaseWrapper
@@ -113,7 +122,7 @@ const CaseForm = (props) => {
               type="submit"
               variant="contained"
               color="secondary"
-              size="large"        
+              size="large"
               onClick={handleSubmit}
               to="/tasks"
               endIcon={<SendIcon />}
