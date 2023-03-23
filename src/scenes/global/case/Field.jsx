@@ -89,7 +89,15 @@ const Field = ({ field, onChange }) => {
   const handleInputBooleanValueChange = (e) => {
     console.log("input change: boolean clicked." + e.target.checked);
     setFieldValue(e.target.checked + "");
-    handleTextfieldBlur();
+    console.log("Blur activated");
+    onChange(
+      field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
+      fieldName,
+      e.target.checked+'',
+      fieldStartDate,
+      fieldEndDate,
+      field.caseSlot
+    );
   };
 
   const handleInputDateValueChange = (dateValue) => {
