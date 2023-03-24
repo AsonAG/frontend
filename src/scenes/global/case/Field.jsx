@@ -35,6 +35,7 @@ const Field = ({ field, onChange }) => {
   const [lookupOptions, setLookupOptions] = useState([]);
   const lookupLoading = isLookupOpened && lookupOptions?.length === 0;
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
+  
   useEffect(() => {
     let active = true;
     if (!lookupLoading) {

@@ -9,7 +9,7 @@ import TasksApi from "../../api/TasksApi";
 import ApiClient from "../../ApiClient";
 import Header from "../../components/Header";
 
-const Tasks = ({ updateCaseName }) => {
+const CompanyCases = ({ updateCaseName }) => {
   const [tasksData, setTasksData] = useState([]);
   const [tasksDataLoaded, setTasksDataLoaded] = useState(false);
   const theme = useTheme();
@@ -70,13 +70,13 @@ const Tasks = ({ updateCaseName }) => {
   };
 
   useEffect(() => {
-    tasksApi.getCaseTasks(callback, 'Employee');
+    tasksApi.getCaseTasks(callback, 'Company');
   }, []);
 
   return (
     <Box m="25px">
       {/* HEADER */}
-      <Header title="TASKS" subtitle="Finish your tasks" />
+      <Header title="COMPANY CASES" subtitle="Choose a case" />
       <Box
         display="flex"
         justifyContent="space-between"
@@ -126,4 +126,4 @@ const Tasks = ({ updateCaseName }) => {
   );
 };
 
-export default Tasks;
+export default CompanyCases;

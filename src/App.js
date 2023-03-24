@@ -12,6 +12,7 @@ import CaseForm from "./scenes/global/case/CaseForm";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { height } from "@mui/system";
+import CompanyCases from "./scenes/companyCases";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -35,6 +36,7 @@ function App() {
               <Route path="/dossier" element={<Dossier />} />
               <Route path="/reporting" element={<Reporting />} />
               <Route path="/case" element={<CaseForm caseName={caseName} />} />
+              <Route path="/company" element={<CompanyCases updateCaseName={setCaseName} />} />
             </Routes>
           </main>
         </div>

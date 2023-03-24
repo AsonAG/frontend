@@ -50,14 +50,14 @@ export class TasksApi {
    * @param {module:api/TasksApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseTasks(callback) {
+  getCaseTasks(callback, caseType) {
     let postBody = null;
 
     let pathParams = {};
     let queryParams = {
       userId: this.userId,
       employeeId: this.employeeId,
-      caseType: 'Employee'
+      caseType: caseType
     };
     let headerParams = {
     };
