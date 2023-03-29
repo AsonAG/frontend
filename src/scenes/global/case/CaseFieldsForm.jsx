@@ -10,7 +10,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Field from "./Field";
 import useDidMountEffect from "../../../hooks/useDidMountEffect";
 
-const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
+const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
@@ -214,7 +214,7 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
           ) : (
             <Box>
               {caseBase?.relatedCases?.map((relatedCase, i) => (
-                <CaseWrapper
+                <CaseFieldsForm
                   isBase={false}
                   caseBase={relatedCase}
                   outputCases={outputCases}
@@ -230,4 +230,4 @@ const CaseWrapper = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   );
 };
 
-export default CaseWrapper;
+export default CaseFieldsForm;

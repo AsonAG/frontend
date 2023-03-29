@@ -15,7 +15,7 @@ import { height } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
 import SubmitionFeedback from "./scenes/global/case/submitionFeedback";
 
-export const Context = createContext();
+export const UserContext = createContext();
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -39,7 +39,7 @@ function App() {
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
 
-            <Context.Provider value={userContext}> 
+            <UserContext.Provider value={userContext}> 
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/tasks" element={<Tasks updateCaseName={setCaseName} />} />
@@ -49,7 +49,7 @@ function App() {
                 <Route path="/company" element={<CompanyCases updateCaseName={setCaseName} />} />
                 <Route path="/status" element={<SubmitionFeedback />} />
               </Routes>
-            </Context.Provider>
+            </UserContext.Provider>
 
           </main>
         </div>

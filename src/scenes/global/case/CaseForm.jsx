@@ -7,9 +7,9 @@ import SendIcon from "@mui/icons-material/Send";
 import Header from "../../../components/Header";
 import ApiClient from "../../../ApiClient";
 import CasesApi from "../../../api/CasesApi";
-import CaseWrapper from "./CaseWrapper";
+import CaseFieldsForm from "./CaseFieldsForm";
 import useDidMountEffect from "../../../hooks/useDidMountEffect";
-import { Context } from "../../../App";
+import { UserContext } from "../../../App";
 
 const CaseForm = (props) => {
   const theme = useTheme();
@@ -99,7 +99,7 @@ const CaseForm = (props) => {
         <form ref={formRef}>
           <Box>
             {caseDetails && (
-              <CaseWrapper
+              <CaseFieldsForm
                 caseBase={caseDetails}
                 isBase={true}
                 outputCases={outputCase}
@@ -111,7 +111,7 @@ const CaseForm = (props) => {
 
           <Box>
             {caseDetails?.relatedCases?.map((relatedCase, i) => (
-              <CaseWrapper
+              <CaseFieldsForm
                 caseBase={relatedCase}
                 outputCases={relatedCases}
                 setOutputCases={setRelatedCases}
