@@ -33,8 +33,7 @@ export class ApiClient {
         /**
          * The base URL against which to resolve every API call's (relative) path.
          * @type {String}
-         * @default https://localhost:9020/
-         * https://localhost:44354/api/tenants/3/payrolls/4/cases/sets?userId=8&caseType=Employee&employeeId=51
+         * @default https://localhost:44354/api/tenants/3/payrolls/4/cases/sets
          */
         this.userSettings = ['1', '1', '1', '1', '1'];
         // this.userSettings = ['3', '4', '8', '51', '3'];
@@ -42,12 +41,10 @@ export class ApiClient {
 
         this.tenantId = this.userSettings[0];
         this.payrollId = this.userSettings[1];
-
         this.userId = this.userSettings[2]; 
         this.employeeId = this.userSettings[3];
         this.divisionId = this.userSettings[4];
         this.basePath = 'https://localhost:44354/api/tenants/'+this.tenantId+'/payrolls/'+this.payrollId.replace(/\/+$/, ''); //2 / 3
-
 
         /**
          * The authentication methods to be included for all API calls.
@@ -396,7 +393,7 @@ export class ApiClient {
         var url = this.buildUrl(path, pathParams);
         var request = superagent(httpMethod, url);
 
-        console.log("Sending request to:", url);
+        console.log("Sending "+httpMethod+" request to:", url);
         
         // apply authentications
         this.applyAuthToRequest(request, authNames);

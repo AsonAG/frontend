@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, createContext  } from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
@@ -13,11 +13,20 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { height } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
+import SubmitionFeedback from "./scenes/global/case/submitionFeedback";
+
+export const Context = createContext();
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const [caseName, setCaseName] = useState("");
+
+  const userContext = {
+    loaded: false,
+    success: true,
+    userId: ""
+  }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns }>
@@ -30,14 +39,18 @@ function App() {
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
 
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/tasks" element={<Tasks updateCaseName={setCaseName} />} />
-              <Route path="/dossier" element={<Dossier />} />
-              <Route path="/reporting" element={<Reporting />} />
-              <Route path="/case" element={<CaseForm caseName={caseName} />} />
-              <Route path="/company" element={<CompanyCases updateCaseName={setCaseName} />} />
-            </Routes>
+            <Context.Provider value={userContext}> 
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/tasks" element={<Tasks updateCaseName={setCaseName} />} />
+                <Route path="/dossier" element={<Dossier />} />
+                <Route path="/reporting" element={<Reporting />} />
+                <Route path="/case" element={<CaseForm caseName={caseName} />} />
+                <Route path="/company" element={<CompanyCases updateCaseName={setCaseName} />} />
+                <Route path="/status" element={<SubmitionFeedback />} />
+              </Routes>
+            </Context.Provider>
+
           </main>
         </div>
       </ThemeProvider>

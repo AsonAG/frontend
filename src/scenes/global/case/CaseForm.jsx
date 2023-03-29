@@ -1,5 +1,5 @@
 import { useTheme } from "@emotion/react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useContext } from "react";
 import { tokens } from "../../../theme";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import ApiClient from "../../../ApiClient";
 import CasesApi from "../../../api/CasesApi";
 import CaseWrapper from "./CaseWrapper";
 import useDidMountEffect from "../../../hooks/useDidMountEffect";
+import { Context } from "../../../App";
 
 const CaseForm = (props) => {
   const theme = useTheme();
@@ -19,6 +20,8 @@ const CaseForm = (props) => {
   const [relatedCases, setRelatedCases] = useState({});
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
   const formRef = useRef();
+
+  const userContext = useContext(UserContext);
 
   const handleSubmit = (event) => {
     console.log(
@@ -124,7 +127,7 @@ const CaseForm = (props) => {
               color="secondary"
               size="large"
               onClick={handleSubmit}
-              to="/tasks"
+              to="/status"
               endIcon={<SendIcon />}
             >
               Send
