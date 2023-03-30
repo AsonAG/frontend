@@ -8,6 +8,7 @@ import SendIcon from "@mui/icons-material/Send";
 import TasksApi from "../../api/TasksApi";
 import ApiClient from "../../ApiClient";
 import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
 
 const Tasks = ({ updateCaseName }) => {
   const [tasksData, setTasksData] = useState([]);
@@ -15,6 +16,7 @@ const Tasks = ({ updateCaseName }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const tasksApi = new TasksApi(ApiClient);
+  const navigate = useNavigate();
   const columns = [
     // { field: "id", headerName: "ID" },
     {
@@ -73,6 +75,13 @@ const Tasks = ({ updateCaseName }) => {
     tasksApi.getCaseTasks(callback, 'Employee');
   }, []);
 
+  
+  const handleRowClick = (params) => {
+    console.log(params.row.caseName + " row clicked.");
+    updateCaseName(params.row.caseName);
+    navigate("/case");
+  };
+
   return (
     <Box m="25px">
       {/* HEADER */}
@@ -82,7 +91,7 @@ const Tasks = ({ updateCaseName }) => {
         justifyContent="space-between"
         alignItems="center"
         height="75vh"
-        width="55vw"
+        // width="55vw"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
@@ -120,6 +129,7 @@ const Tasks = ({ updateCaseName }) => {
           columns={columns}
           justifyContent="center"
           alignItems="center"
+          onRowClick={handleRowClick}
         />
       </Box>
     </Box>
