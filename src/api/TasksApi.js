@@ -14,7 +14,7 @@
  *
  */
 import { ApiClient } from "../ApiClient";
-import { CasesArray } from "../model/CasesArray";
+import { CasesArray } from "../generated_model/CasesArray";
 
 /**
  * Tasks service.

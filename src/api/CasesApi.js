@@ -14,9 +14,9 @@
  *
  */
 import { ApiClient } from "../ApiClient";
-import { CaseDetails } from "../model/CaseDetails";
-import { CaseFieldBasic } from "../model/CaseFieldBasic";
-import { CasesArray } from "../model/CasesArray";
+import { CaseDetails } from "../generated_model/CaseDetails";
+import { CaseFieldBasic } from "../generated_model/CaseFieldBasic";
+import { CasesArray } from "../generated_model/CasesArray";
 
 /**
  * Cases service.

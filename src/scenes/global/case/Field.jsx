@@ -167,7 +167,7 @@ const dateSlotProps = (isRequired, value) => {
     if (field.lookupSettings && "lookupName" in field.lookupSettings) {
       return (
         <Autocomplete
-          key={"field_textfield_" + field.id}
+          key={"field_autocomplete_"+ field.id}
           // sx={{ width: 300 }}
           open={isLookupOpened}
           onOpen={() => {
@@ -184,6 +184,7 @@ const dateSlotProps = (isRequired, value) => {
           loading={lookupLoading}
           renderInput={(params) => (
             <TextField
+              key={"field_textfield_" + field.id}
               {...params}
               label={field.displayName}
               InputProps={{
