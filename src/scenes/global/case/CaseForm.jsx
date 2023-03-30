@@ -87,7 +87,8 @@ const CaseForm = (props) => {
       <Box m="25px" display="flex" flexDirection="column" alignItems="left">
         {/* HEADER */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Header title={props.caseName} subtitle="Fulfill the case details" />
+          {/* <Header title={props.caseName} subtitle="Fulfill the case details" /> */}
+          <Header title={caseDetails?.displayName} subtitle="Fulfill the case details" />
         </Box>
 
         <form ref={formRef}>
