@@ -1,4 +1,4 @@
-import { useMemo, useState, Fragment, useEffect } from "react";
+import { useMemo, useState, useContext, Fragment, useEffect } from "react";
 import CircularProgress from '@mui/material/CircularProgress';
 import ApiClient from "../../../ApiClient";
 import CasesApi from "../../../api/CasesApi";
@@ -17,6 +17,9 @@ import TextField from "@mui/material/TextField";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { CaseContext } from "./CaseForm";
+import { useTheme } from "@emotion/react";
+import { tokens } from "../../../theme";
 
 const Field = ({ field, onChange }) => {
   const [isTimeSettingVisible, setTimeSettingVisible] = useState(
@@ -30,6 +33,18 @@ const Field = ({ field, onChange }) => {
   const [fieldEndDate, setFieldEndDate] = useState(
     field.end ? new Date(field.end) : null
   );
+// Form validation SX options ================================ START ================================
+const theme = useTheme();
+const colors = tokens(theme.palette.mode);  
+const {isSaveButtonClicked, setIsSaveButtonClicked} = useContext(CaseContext);
+
+const dateSlotProps = (isRequired, value) => {
+  return isSaveButtonClicked && isRequired && value ? 
+    { textField: { error: true, helperText: 'Field can not be empty' } }
+    : null
+}
+// Form validation SX options ================================ END ================================
+
 // LookUp options ================================ START ================================
   const [isLookupOpened, setLookupOpened] = useState(false);
   const [lookupOptions, setLookupOptions] = useState([]);
@@ -185,7 +200,6 @@ const Field = ({ field, onChange }) => {
         ></Autocomplete>
       );
     }
-
     switch (jsonType) {
       case "None":
         return (
@@ -202,10 +216,10 @@ const Field = ({ field, onChange }) => {
             label={field.displayName}
             helperText={field.description}
             onAccept={handleTextfieldBlur}
-            required={!field.optional}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleInputDateValueChange}
             key={"field_textfield_" + field.id}
+            slotProps={dateSlotProps(!field.optional, fieldValue)} // field validation
           ></DatePicker>
         );
       case "DateTime":
@@ -216,10 +230,10 @@ const Field = ({ field, onChange }) => {
             label={field.displayName}
             helperText={field.description}
             onAccept={handleTextfieldBlur}
-            required={!field.optional}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleInputDateValueChange}
             key={"field_textfield_" + field.id}
+            slotProps={dateSlotProps(!field.optional, fieldValue)} // field validation
           ></DateTimePicker>
         );
       case "Boolean":
@@ -270,6 +284,8 @@ const Field = ({ field, onChange }) => {
                   <span />
                 ),
             }}
+            
+            slotProps={{ textField: { error: true, helperText: 'Field can not be empty' } }} // THIS ONE!
           />
         );
     }
@@ -313,25 +329,23 @@ const Field = ({ field, onChange }) => {
             <DatePicker
               name={field.name + "start"}
               label="Start"
-              helperText="Start date"
               onAccept={handleTextfieldBlur}
-              required={true}
               value={fieldStartDate}
               onChange={handleInputStartDateChange}
               key={"field_textfield_startdate" + field.id}
-            ></DatePicker>
+              slotProps={dateSlotProps(true, fieldStartDate)} // field validation
+            />
             {field.timeType != "Moment" && (
               <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
                 <DatePicker
                   name={field.name + "end"}
                   label="End"
-                  helperText="End date"
                   onAccept={handleTextfieldBlur}
-                  required={field.endMandatory}
                   value={fieldEndDate}
                   onChange={handleInputEndDateChange}
                   key={"field_textfield_enddate" + field.id}
-                ></DatePicker>
+                  slotProps={dateSlotProps(field.endMandatory, fieldEndDate)} // field validation
+                />
               </Box>
             )}
           </Box>

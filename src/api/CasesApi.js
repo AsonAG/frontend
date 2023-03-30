@@ -239,7 +239,7 @@ export class CasesApi {
     // let postBody = caseFields.length > 0 ?
     let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases, shouldIncludeBody);
 
-    console.log(JSON.stringify(postBody));
+    console.log("Request body: " + JSON.stringify(postBody, null, 2));
 
     let pathParams = {
       caseName: caseName,
@@ -368,6 +368,8 @@ export class CasesApi {
     postBody.userId = this.userId;
     postBody.employeeId = this.employeeId;
     postBody.divisionId = this.divisionId;
+
+    console.log("Request body: " + JSON.stringify(postBody, null, 2));
 
     let pathParams = {};
     let queryParams = {

@@ -1,5 +1,5 @@
 import { useTheme } from "@emotion/react";
-import { useMemo, useRef, useState, useContext } from "react";
+import { useMemo, useRef, useState, useContext, createContext } from "react";
 import { tokens } from "../../../theme";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -11,41 +11,41 @@ import CaseFieldsForm from "./CaseFieldsForm";
 import useDidMountEffect from "../../../hooks/useDidMountEffect";
 import { UserContext } from "../../../App";
 
+export const CaseContext = createContext();
+
 const CaseForm = (props) => {
   const theme = useTheme();
-  const navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate();
   const [caseDetails, setCaseDetails] = useState();
   const [outputCase, setOutputCase] = useState({});
   const [relatedCases, setRelatedCases] = useState({});
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
   const formRef = useRef();
 
+  const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
+
   const userContext = useContext(UserContext);
 
   const handleSubmit = (event) => {
-    console.log(
-      "A case was submitted: " +
-        JSON.stringify(outputCase, null, 2) +
-        " ___related_cases___  " +
-        JSON.stringify(relatedCases, null, 2)
-    );
     // event.preventDefault();
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
       casesApi.saveCase(outputCase, relatedCases, caseSaveCallback);
-      navigate("/tasks");
     } else console.log("form INVALID");
   };
 
   const caseSaveCallback = function (error, data, response) {
     if (error) {
       console.error(error);
+      setIsSaveButtonClicked(true);
     } else {
       console.log(
         "Case saved successfully. Response: " +
-          JSON.stringify(response, null, 2)
+          JSON.stringify(response, null, 2) +
+          "Exiting page..."
       );
+      navigate("/tasks");
     }
   };
 
@@ -81,12 +81,6 @@ const CaseForm = (props) => {
   const updateRelatedCases = (newCase) => {
     setRelatedCases([...relatedCases, newCase]);
   };
-  // useDidMountEffect(() => {
-  //   caseDetails.map((case))
-  //   if ("lookupName" in field.lookupSettings) {
-  //     casesApi.getCaseLookups(field.lookupSettings.lookupName, callbackLookups);
-  //   }
-  // }, [caseDetails]);
 
   return (
     props.caseName && (
@@ -97,6 +91,7 @@ const CaseForm = (props) => {
         </Box>
 
         <form ref={formRef}>
+          <CaseContext.Provider value={{isSaveButtonClicked, setIsSaveButtonClicked}}>
           <Box>
             {caseDetails && (
               <CaseFieldsForm
@@ -122,6 +117,7 @@ const CaseForm = (props) => {
 
           <Box mt="20px" mb="30px">
             <Button
+              disableRipple
               type="submit"
               variant="contained"
               color="secondary"
@@ -133,6 +129,7 @@ const CaseForm = (props) => {
               Send
             </Button>
           </Box>
+          </CaseContext.Provider>
         </form>
       </Box>
     )
