@@ -1,3 +1,4 @@
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { DataGrid } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
@@ -7,6 +8,7 @@ import { React, useState, useEffect } from "react";
 import EmployeesApi from "../../api/EmployeesApi";
 import ApiClient from "../../ApiClient";
 import { tokens } from "../../theme";
+import SplitButton from '../../components/SplitButton';
 
 const EmployeesTable = ({ updateCaseName }) => {
   const [employeeData, setEmployeeData] = useState([]);
@@ -54,11 +56,12 @@ const EmployeesTable = ({ updateCaseName }) => {
     navigate("/case");
   };
 
+  const options = ['Create a merge commit', 'Squash and merge', 'Rebase and merge'];
+
   const columns = [
         {
           field: "firstName",
           headerName: "First name",
-          headerAlign: "left",
           flex: 3,
           cellClassName: "name-column--cell",
         },
@@ -66,18 +69,17 @@ const EmployeesTable = ({ updateCaseName }) => {
           field: "lastName",
           headerName: "Last name",
           flex: 3,
-          headerAlign: "left",
         },
         {
           field: "email",
           headerName: "Email",
           flex: 3,
-          headerAlign: "left",
         },
     {
       field: "caseName",
       headerName: "Cases",
       flex: 1,
+      headerAlign: "left",
       align: "center",
       renderCell: ({ row: { caseName } }) => {
         return (
@@ -86,15 +88,18 @@ const EmployeesTable = ({ updateCaseName }) => {
             to="/case"
             variant="outlined"
             color="secondary"
-            size="medium"
             onClick={() => updateCaseName(caseName)}
           >
-            <SendIcon />
+            <MoreHorizIcon fontSize="large"
+            />
           </IconButton>
+          // <SplitButton options={options}></SplitButton>
         );
       },
     },
   ];
+
+
 
   return (
     <Box
