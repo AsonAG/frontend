@@ -1,13 +1,16 @@
 import { Box } from "@mui/material";
 import { React } from "react";
 import Header from "../../components/Header";
-import CasesTable from "../../components/CasesTable";
+import EmployeesTable from "./EmployeesTable";
 
-const Employees = ({updateCaseName}) => {
+const Employees = ({ updateCaseName }) => {
   return (
     <Box m="25px">
-      <Header title="COMPANY CASES" subtitle="Choose a case" />
-      <CasesTable updateCaseName={updateCaseName} caseType={'Company'}/>
+      <Header
+        title="EMPLOYEES"
+        subtitle="Choose an employee and proceed with employee case"
+      />
+      <EmployeesTable updateCaseName={updateCaseName} />
     </Box>
   );
 };

@@ -38,7 +38,7 @@ export class CasesApi {
     this.employeeId = this.apiClient.employeeId;
     this.divisionId = this.apiClient.divisionId;
 
-    this.payrollPath = '/payrolls/'+this.apiClient.payrollId + '/';
+    this.payrollPath = "/payrolls/" + this.apiClient.payrollId + "/";
   }
 
   buildCaseFieldValues(caseName, caseFields) {
@@ -81,7 +81,7 @@ export class CasesApi {
   generateCasesBodyFromCasesObj(mainCase, relatedMainCases, shouldIncludeBody) {
     if (
       shouldIncludeBody
-      // JSON.stringify(mainCase) != "{}" 
+      // JSON.stringify(mainCase) != "{}"
       // && Object.values( Object.values(mainCase)[0]?.values ).length > 1    // TODO: change condition - now it checks if BaseField has more than 0 values!!
     ) {
       // remove case name key
@@ -89,14 +89,16 @@ export class CasesApi {
       let relatedCases = Object.values(relatedMainCases);
       let filteredRelatedCases = [];
 
-      baseCase.values = JSON.parse(JSON.stringify( Object.values((Object.values(mainCase)[0]).values) ));
+      baseCase.values = JSON.parse(
+        JSON.stringify(Object.values(Object.values(mainCase)[0].values))
+      );
 
       relatedCases.map(
         (relatedCase) =>
-        Object.values(relatedCase.values).forEach((field, i) => {
+          Object.values(relatedCase.values).forEach((field, i) => {
             // relatedCase.values[i] = Object.values(field)
             // if (Object.values(relatedCase.values).length > 0 )
-              filteredRelatedCases.push(JSON.parse(JSON.stringify( field) ))
+            filteredRelatedCases.push(JSON.parse(JSON.stringify(field)));
           })
         // (relatedCase.values = Object.values(relatedCase.values))
       );
@@ -134,10 +136,16 @@ export class CasesApi {
       );
     }
 
-    let shouldIncludeBody = JSON.stringify(baseCase) != "{}" &&  JSON.stringify(Object.values(baseCase)[0]?.values) != "{}";  
+    let shouldIncludeBody =
+      JSON.stringify(baseCase) != "{}" &&
+      JSON.stringify(Object.values(baseCase)[0]?.values) != "{}";
     // build a case body if case fields are provided
     // let postBody = caseFields.length > 0 ?
-    let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases, shouldIncludeBody);
+    let postBody = this.generateCasesBodyFromCasesObj(
+      baseCase,
+      relatedCases,
+      shouldIncludeBody
+    );
 
     console.log("Request body: " + JSON.stringify(postBody, null, 2));
 
@@ -192,10 +200,9 @@ export class CasesApi {
     let queryParams = {
       userId: this.userId,
       employeeId: this.employeeId,
-      caseType: caseType
+      caseType: caseType,
     };
-    let headerParams = {
-    };
+    let headerParams = {};
     let formParams = {};
 
     let authNames = [];
@@ -240,7 +247,11 @@ export class CasesApi {
     //   JSON.stringify(caseFields[0]) != "{}"
     //     ? this.buildRequestBodyCaseSave(caseName, caseFields)
     //     : null;
-    let postBody = this.generateCasesBodyFromCasesObj(baseCase, relatedCases, true);
+    let postBody = this.generateCasesBodyFromCasesObj(
+      baseCase,
+      relatedCases,
+      true
+    );
     postBody.userId = this.userId;
     postBody.employeeId = this.employeeId;
     postBody.divisionId = this.divisionId;
@@ -277,7 +288,6 @@ export class CasesApi {
     );
   }
 
-
   /**
    * Gets case field dropdown options.
    * @param {String} caseName
@@ -306,7 +316,7 @@ export class CasesApi {
     let returnType = CaseFieldBasic;
 
     return this.apiClient.callApi(
-      this.payrollPath + "/lookups/values",
+      this.payrollPath + "lookups/values",
       "GET",
       pathParams,
       queryParams,
@@ -335,7 +345,8 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCaseFieldCurrentValuesCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseFieldCurrentValues(caseName, callback) {  // TODO: Implement values logic
+  getCaseFieldCurrentValues(caseName, callback) {
+    // TODO: Implement values logic
     let postBody = null;
     // verify the required parameter 'caseName' is set
     if (caseName === undefined || caseName === null) {
@@ -357,7 +368,7 @@ export class CasesApi {
     let returnType = CaseFieldBasic;
 
     return this.apiClient.callApi(
-      this.payrollPath + "/cases/{caseName}/currentValues",
+      this.payrollPath + "cases/{caseName}/currentValues",
       "GET",
       pathParams,
       queryParams,
@@ -371,9 +382,6 @@ export class CasesApi {
       callback
     );
   }
-
-
-
 }
 
 export default CasesApi;

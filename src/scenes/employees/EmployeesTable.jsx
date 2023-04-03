@@ -1,32 +1,20 @@
-import { Box, IconButton, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { tokens } from "../theme";
-import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import CasesApi from "../api/CasesApi";
-import ApiClient from "../ApiClient";
 import { useNavigate } from "react-router-dom";
+import { Box, IconButton, useTheme } from "@mui/material";
+import { React, useState, useEffect } from "react";
+import EmployeesApi from "../../api/EmployeesApi";
+import ApiClient from "../../ApiClient";
+import { tokens } from "../../theme";
 
-/**
- * Returns a table component representation of list of available cases.
- * @param updateCaseName setCaseName parent funciton.
- * @param caseType of CaseType type [Employee/Company/Global/National].
- * @returns {CasesTable} The a table component representation of list of available cases.
- */
-const CasesTable = ({ updateCaseName, caseType }) => {
-  const [caseData, setCaseData] = useState([]);
-  const [caseDataLoaded, setCaseDataLoaded] = useState(false);
+const EmployeesTable = ({ updateCaseName }) => {
+  const [employeeData, setEmployeeData] = useState([]);
+  const [employeeDataLoaded, setEmployeeDataLoaded] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  // const tasksApi = new TasksApi(ApiClient);
-  const casesApi = new CasesApi(ApiClient);
+  const employeesApi = new EmployeesApi(ApiClient);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    casesApi.getCases(callback, caseType);
-  }, []);
-
 
   const callback = function (error, data, response) {
     let tableData = [];
@@ -37,9 +25,12 @@ const CasesTable = ({ updateCaseName, caseType }) => {
         tableData = [
           ...tableData,
           {
-            id: index,
-            displayName: element["displayName"],
-            caseName: element["name"],
+            id: element["id"],
+            firstName: element["firstName"],
+            lastName: element["lastName"],
+            divisions: element["divisions"],
+            statuts: element["statuts"],
+            email: element["identifier"],
             // ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
           },
         ];
@@ -48,29 +39,45 @@ const CasesTable = ({ updateCaseName, caseType }) => {
         "API called successfully. Table data loaded: " +
           JSON.stringify(tableData, null, 2)
       );
-      setCaseData(tableData);
-      setCaseDataLoaded(true);
+      setEmployeeData(tableData);
+      setEmployeeDataLoaded(true);
     }
   };
+
+  useEffect(() => {
+    employeesApi.getEmployees(callback);
+  }, []);
 
   const handleRowClick = (params) => {
     console.log(params.row.caseName + " row clicked.");
     updateCaseName(params.row.caseName);
     navigate("/case");
   };
-  
+
   const columns = [
-    {
-      field: "displayName",
-      headerName: "Name",
-      headerAlign: "left",
-      flex: 3,
-      cellClassName: "name-column--cell",
-    },
+        {
+          field: "firstName",
+          headerName: "First name",
+          headerAlign: "left",
+          flex: 3,
+          cellClassName: "name-column--cell",
+        },
+        {
+          field: "lastName",
+          headerName: "Last name",
+          flex: 3,
+          headerAlign: "left",
+        },
+        {
+          field: "email",
+          headerName: "Email",
+          flex: 3,
+          headerAlign: "left",
+        },
     {
       field: "caseName",
-      headerName: "Proceed",
-      flex: 2,
+      headerName: "Cases",
+      flex: 1,
       align: "center",
       renderCell: ({ row: { caseName } }) => {
         return (
@@ -91,7 +98,7 @@ const CasesTable = ({ updateCaseName, caseType }) => {
 
   return (
     <Box
-      display="flex"
+//       display="flex"
       justifyContent="space-between"
       alignItems="center"
       height="75vh"
@@ -128,8 +135,8 @@ const CasesTable = ({ updateCaseName, caseType }) => {
     >
       <DataGrid
         disableSelectionOnClick
-        loading={!caseDataLoaded}
-        rows={caseData}
+        loading={!employeeDataLoaded}
+        rows={employeeData}
         columns={columns}
         justifyContent="center"
         alignItems="center"
@@ -139,4 +146,4 @@ const CasesTable = ({ updateCaseName, caseType }) => {
   );
 };
 
-export default CasesTable;
+export default EmployeesTable;
