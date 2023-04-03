@@ -7,17 +7,11 @@ import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import CasesOutlinedIcon from '@mui/icons-material/CasesOutlined';
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import TaskIcon from '@mui/icons-material/Task';
+import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -115,15 +109,15 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
+            {/* <Item
               title="Dossier"
               to="/dossier"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <Item
-              title="Reporting"
+              title="Report a case"
               to="/reporting"
               // icon={<PeopleOutlinedIcon />}
               icon={<ContactsOutlinedIcon />}
@@ -140,6 +134,13 @@ const Sidebar = () => {
               HR
             </Typography>
             <Item
+              title="Employees"
+              to="/employees"
+              icon={<PeopleOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
               title="Company Cases"
               to="/company"
               icon={<CasesOutlinedIcon />}
@@ -147,20 +148,20 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Profile Form"
+              title="Company Data"
+              to="/companyData"
+              icon={<ApartmentOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Documents"
               to="/form"
-              icon={<PersonOutlinedIcon />}
+              icon={<DescriptionOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Manage Employees"
-              to="/employees"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
+            {/* <Item
               title="Calendar"
               to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
@@ -173,7 +174,7 @@ const Sidebar = () => {
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
           </Box>
 
           {!isCollapsed && (

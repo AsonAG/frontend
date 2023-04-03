@@ -35,16 +35,16 @@ export class ApiClient {
          * @type {String}
          * @default https://localhost:44354/api/tenants/3/payrolls/4/cases/sets
          */
-        // this.userSettings = ['1', '1', '1', '1', '1'];
+        this.userSettings = ['1', '1', '1', '1', '1'];
         // this.userSettings = ['3', '4', '8', '51', '3'];
-        this.userSettings = ['2', '3', '7', '5', '3'];
+        // this.userSettings = ['2', '3', '7', '4', '3'];
 
         this.tenantId = this.userSettings[0];
         this.payrollId = this.userSettings[1];
         this.userId = this.userSettings[2]; 
         this.employeeId = this.userSettings[3];
         this.divisionId = this.userSettings[4];
-        this.basePath = 'https://localhost:44354/api/tenants/'+this.tenantId+'/payrolls/'+this.payrollId.replace(/\/+$/, ''); //2 / 3
+        this.basePath = 'https://localhost:44354/api/tenants/'+this.tenantId+'/'.replace(/\/+$/, ''); 
 
         /**
          * The authentication methods to be included for all API calls.

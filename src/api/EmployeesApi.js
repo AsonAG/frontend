@@ -14,17 +14,16 @@
  *
  */
 import { ApiClient } from "../ApiClient";
-import { CasesArray } from "../generated_model/CasesArray";
 
 /**
  * Tasks service.
- * @module api/TasksApi
+ * @module api/EmployeesApi
  * @version 1.0.11
  */
-export class TasksApi {
+export class EmployeesApi {
   /**
-    * Constructs a new TasksApi. 
-    * @alias module:api/TasksApi
+    * Constructs a new EmployeesApi. 
+    * @alias module:api/EmployeesApi
     * @class
     * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
     * default to {@link module:ApiClient#instanc
@@ -38,7 +37,7 @@ export class TasksApi {
 
   /**
    * Callback function to receive the result of the getCaseTasks operation.
-   * @callback moduleapi/TasksApi~getCaseTasksCallback
+   * @callback moduleapi/EmployeesApi~getCaseTasksCallback
    * @param {String} error Error message, if any.
    * @param {module:model/CasesArray{ data The data returned by the service call.
    * @param {String} response The complete HTTP response.
@@ -47,18 +46,14 @@ export class TasksApi {
   /**
    * Gets a list of tasks
    * Gets a list of employee tasks.
-   * @param {module:api/TasksApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
+   * @param {module:api/EmployeesApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseTasksFromCluster(callback, caseType, clusterName) {
+  getEmployees(callback) {
     let postBody = null;
 
     let pathParams = {};
     let queryParams = {
-      userId: this.userId,
-      employeeId: this.employeeId,
-      caseType: caseType,
-      clusterSetName: clusterName
     };
     let headerParams = {
     };
@@ -67,10 +62,10 @@ export class TasksApi {
     let authNames = [];
     let contentTypes = [];
     let accepts = ["application/json"];
-    let returnType = CasesArray;
+    let returnType = null;
 
     return this.apiClient.callApi(
-      "cases/sets", // TODO: change payroll path 
+      "employees",
       "GET",
       pathParams,
       queryParams,
@@ -84,14 +79,6 @@ export class TasksApi {
       callback
     );
   }
-  getCaseTasksMOCK(callback) {
-    // MOCK - use only for development mock data. to use real api use above function implementation
-    var data = null;
-    if (callback) {
-      data = [{"name":"All Value Types"},{"name":"All Time Types"},{"name":"Lohn"},{"name":"BaseCase"},{"name":"BaseExtensionCase"}];
-    }
-    callback(null, data, null);
-  }
 }
 
-export default TasksApi;
+export default EmployeesApi;

@@ -13,7 +13,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { height } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
-import SubmitionFeedback from "./scenes/global/case/submitionFeedback";
+import Employees from "./scenes/employees";
 
 export const UserContext = createContext();
 
@@ -43,11 +43,13 @@ function App() {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/tasks" element={<Tasks updateCaseName={setCaseName} />} />
+                <Route path="/company" element={<CompanyCases updateCaseName={setCaseName} />} />
+                <Route path="/case" element={<CaseForm caseName={caseName} />} />
+                
+                <Route path="/employees" element={<Employees updateCaseName={setCaseName} />} />
+
                 <Route path="/dossier" element={<Dossier />} />
                 <Route path="/reporting" element={<Reporting />} />
-                <Route path="/case" element={<CaseForm caseName={caseName} />} />
-                <Route path="/company" element={<CompanyCases updateCaseName={setCaseName} />} />
-                <Route path="/status" element={<SubmitionFeedback />} />
               </Routes>
             </UserContext.Provider>
 

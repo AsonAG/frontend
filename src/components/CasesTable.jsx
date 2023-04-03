@@ -4,7 +4,7 @@ import { tokens } from "../theme";
 import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import TasksApi from "../api/TasksApi";
+import CasesApi from "../api/CasesApi";
 import ApiClient from "../ApiClient";
 import { useNavigate } from "react-router-dom";
 
@@ -20,7 +20,8 @@ const CasesTable = ({ updateCaseName, caseType }) => {
   const [tasksDataLoaded, setTasksDataLoaded] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const tasksApi = new TasksApi(ApiClient);
+  // const tasksApi = new TasksApi(ApiClient);
+  const casesApi = new CasesApi(ApiClient);
   const navigate = useNavigate();
   const columns = [
     {
@@ -75,7 +76,7 @@ const CasesTable = ({ updateCaseName, caseType }) => {
   };
 
   useEffect(() => {
-    tasksApi.getCaseTasks(callback, caseType);
+    casesApi.getCases(callback, caseType);
   }, []);
 
   
