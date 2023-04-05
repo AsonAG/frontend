@@ -49,7 +49,7 @@ function App() {
                 <Route path="/employees" element={<Employees updateCaseName={setCaseName} />} />
 
                 <Route path="/dossier" element={<Dossier />} />
-                <Route path="/reporting" element={<Reporting />} />
+                <Route path="/reporting" element={<Reporting updateCaseName={setCaseName} />} />
               </Routes>
             </UserContext.Provider>
 

@@ -9,13 +9,15 @@ import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 
-export default function SplitButton( {options} ) {
+export default function SplitButton( params ) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
 
+  const options = ['Employee cases', 'Employee data', 'Assign tasks', 'Deactivate employee'];
+
   const handleClick = () => {
-    console.info(`You clicked ${options[selectedIndex]}`);
+    console.info(`You clicked ${options[selectedIndex]}, for an employee id: ${params.employeeId}`);
   };
 
   const handleMenuItemClick = (event, index) => {
@@ -74,7 +76,7 @@ export default function SplitButton( {options} ) {
                   {options.map((option, index) => (
                     <MenuItem
                       key={option}
-                      disabled={index === 2}
+                      disabled={index === 3}
                       selected={index === selectedIndex}
                       onClick={(event) => handleMenuItemClick(event, index)}
                     >

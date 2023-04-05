@@ -1,5 +1,5 @@
 import { Box, IconButton, useTheme } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { tokens } from "../theme";
 import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -50,6 +50,7 @@ const CasesTable = ({ updateCaseName, caseType }) => {
       );
       setCaseData(tableData);
       setCaseDataLoaded(true);
+      setCaseDataFiltered(tableData);
     }
   };
 
@@ -88,6 +89,37 @@ const CasesTable = ({ updateCaseName, caseType }) => {
       },
     },
   ];
+
+  function QuickSearchToolbar() {
+    return (
+      <Box
+        sx={{
+          p: 0.5,
+          pb: 0,
+        }}
+      >
+        <GridToolbarQuickFilter />
+      </Box>
+    );
+  };
+
+  function escapeRegExp(value) {
+    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  }
+  
+  const [searchText, setSearchText] = useState('');
+  const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
+
+  const requestSearch = (searchValue) => {
+    setSearchText(searchValue);
+    const searchRegex = new RegExp(escapeRegExp(searchValue), 'i');
+    const filteredRows = caseData.filter((row) => {
+      return Object.keys(row).some((field) => {
+        return searchRegex.test(row[field].toString());
+      });
+    });
+    setCaseDataFiltered(filteredRows);
+  };
 
   return (
     <Box
@@ -134,6 +166,14 @@ const CasesTable = ({ updateCaseName, caseType }) => {
         justifyContent="center"
         alignItems="center"
         onRowClick={handleRowClick}
+        components={{ Toolbar: QuickSearchToolbar }}
+        componentsProps={{
+          toolbar: {
+            value: searchText,
+            onChange: (event) => requestSearch(event.target.value),
+            clearSearch: () => requestSearch(''),
+          },
+        }}
       />
     </Box>
   );

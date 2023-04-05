@@ -1,5 +1,5 @@
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarQuickFilter, GridToolbar } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +28,7 @@ const EmployeesTable = ({ updateCaseName }) => {
           ...tableData,
           {
             id: element["id"],
+            employeeId: element["id"],
             firstName: element["firstName"],
             lastName: element["lastName"],
             divisions: element["divisions"],
@@ -43,20 +44,20 @@ const EmployeesTable = ({ updateCaseName }) => {
       );
       setEmployeeData(tableData);
       setEmployeeDataLoaded(true);
+      setEmployeeDataFiltered(tableData);
     }
   };
-
+  
   useEffect(() => {
     employeesApi.getEmployees(callback);
   }, []);
 
-  const handleRowClick = (params) => {
-    console.log(params.row.caseName + " row clicked.");
-    updateCaseName(params.row.caseName);
-    navigate("/case");
-  };
+  // const handleRowClick = (params) => {
+  //   console.log(params.row.caseName + " row clicked.");
+  //   updateCaseName(params.row.caseName);
+  //   navigate("/case");
+  // };
 
-  const options = ['Create a merge commit', 'Squash and merge', 'Rebase and merge'];
 
   const columns = [
         {
@@ -76,30 +77,59 @@ const EmployeesTable = ({ updateCaseName }) => {
           flex: 3,
         },
     {
-      field: "caseName",
+      field: "employeeId",
       headerName: "Cases",
-      flex: 1,
+      flex: 3,
       headerAlign: "left",
       align: "center",
-      renderCell: ({ row: { caseName } }) => {
+      renderCell: ({ row: { employeeId } }) => {
         return (
-          <IconButton
-            component={Link}
-            to="/case"
-            variant="outlined"
-            color="secondary"
-            onClick={() => updateCaseName(caseName)}
-          >
-            <MoreHorizIcon fontSize="large"
-            />
-          </IconButton>
-          // <SplitButton options={options}></SplitButton>
+          // <IconButton
+          //   component={Link}
+          //   to="/case"
+          //   variant="outlined"
+          //   color="secondary"
+          //   onClick={() => updateCaseName(caseName)}
+          // >
+          //   <MoreHorizIcon fontSize="large"
+          //   />
+          // </IconButton>
+          <SplitButton employeeId={employeeId}></SplitButton>
         );
       },
     },
   ];
 
+  function QuickSearchToolbar() {
+    return (
+      <Box
+        sx={{
+          p: 0.5,
+          pb: 0,
+        }}
+      >
+        <GridToolbarQuickFilter />
+      </Box>
+    );
+  };
 
+  function escapeRegExp(value) {
+    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  }
+  
+  const [searchText, setSearchText] = useState('');
+  const [employeeDataFiltered, setEmployeeDataFiltered] = useState(employeeData);
+
+  const requestSearch = (searchValue) => {
+    setSearchText(searchValue);
+    const searchRegex = new RegExp(escapeRegExp(searchValue), 'i');
+    const filteredRows = employeeData.filter((row) => {
+      return Object.keys(row).some((field) => {
+        return searchRegex.test(row[field].toString());
+      });
+    });
+    setEmployeeDataFiltered(filteredRows);
+  };
 
   return (
     <Box
@@ -107,7 +137,6 @@ const EmployeesTable = ({ updateCaseName }) => {
       justifyContent="space-between"
       alignItems="center"
       height="75vh"
-      // width="55vw"
       sx={{
         "& .MuiDataGrid-root": {
           border: "none",
@@ -140,12 +169,33 @@ const EmployeesTable = ({ updateCaseName }) => {
     >
       <DataGrid
         disableSelectionOnClick
+        disableColumnFilter
+        disableColumnSelector
+        disableDensitySelector
         loading={!employeeDataLoaded}
-        rows={employeeData}
+        rows={employeeDataFiltered}
         columns={columns}
         justifyContent="center"
         alignItems="center"
-        onRowClick={handleRowClick}
+        // slots={{ 
+        //   Toolbar: GridToolbar 
+        // // toolbar: QuickSearchToolbar
+        // }}
+        // slotProps={{ 
+        //   toolbar: {
+        //     showQuickFilter: true,
+        //     quickFilterProps: { debounceMs: 500 },
+        //   }, 
+        // }}
+        components={{ Toolbar: QuickSearchToolbar }}
+        componentsProps={{
+          toolbar: {
+            value: searchText,
+            onChange: (event) => requestSearch(event.target.value),
+            clearSearch: () => requestSearch(''),
+          },
+        }}
+
       />
     </Box>
   );

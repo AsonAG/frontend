@@ -2,8 +2,9 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
+import CasesTable from "../../components/CasesTable";
 
-const Reporting = () => {
+const Reporting = ( {updateCaseName} ) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
   
@@ -13,6 +14,8 @@ const Reporting = () => {
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Header title="REPORTING" subtitle="Find what you want to report to the HR department" />
         </Box>
+        <CasesTable updateCaseName={updateCaseName} caseType={'Employee'}/>
+
       </Box>
   )};  
 
