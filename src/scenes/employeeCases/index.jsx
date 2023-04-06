@@ -11,7 +11,7 @@ const EmployeeCases = ({ updateCaseName }) => {
     <Box m="25px">
       <Header 
           title={ employee.firstName + ' ' + employee.lastName }
-          subtitle={ "Employee divisions: " + employee.divisions.join(", ") }
+          subtitle={ employee.divisions.join(", ") }
       />
       <CasesTable 
           updateCaseName={updateCaseName} 

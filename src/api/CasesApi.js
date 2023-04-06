@@ -13,7 +13,7 @@
  * Do not edit the class manually.
  *
  */
-import { ApiClient } from "../ApiClient";
+import { ApiClient } from "./ApiClient";
 import { CaseDetails } from "../generated_model/CaseDetails";
 import { CaseFieldBasic } from "../generated_model/CaseFieldBasic";
 import { CasesArray } from "../generated_model/CasesArray";
@@ -193,13 +193,13 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCasesCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCases(callback, caseType) {
+  getCases(callback, caseType, employeeId) {
     let postBody = null;
 
     let pathParams = {};
     let queryParams = {
       userId: this.userId,
-      employeeId: this.employeeId,
+      employeeId: employeeId ? employeeId : this.employeeId,
       caseType: caseType,
     };
     let headerParams = {};

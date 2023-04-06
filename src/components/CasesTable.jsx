@@ -5,7 +5,7 @@ import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import CasesApi from "../api/CasesApi";
-import ApiClient from "../ApiClient";
+import ApiClient from "../api/ApiClient";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -24,7 +24,7 @@ const CasesTable = ({ updateCaseName, caseType, employee }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    casesApi.getCases(callback, caseType);
+    casesApi.getCases(callback, caseType, employee?.employeeId);
   }, []);
 
 

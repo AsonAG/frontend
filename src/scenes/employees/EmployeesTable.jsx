@@ -9,7 +9,7 @@ import SendIcon from "@mui/icons-material/Send";
 import { Box, IconButton, useTheme } from "@mui/material";
 import { React, useState, useEffect } from "react";
 import EmployeesApi from "../../api/EmployeesApi";
-import ApiClient from "../../ApiClient";
+import ApiClient from "../../api/ApiClient";
 import { tokens } from "../../theme";
 import EmployeesSplitButton from "./EmployeesSplitButton";
 

@@ -5,7 +5,7 @@ import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import Header from "../../../components/Header";
-import ApiClient from "../../../ApiClient";
+import ApiClient from "../../../api/ApiClient";
 import CasesApi from "../../../api/CasesApi";
 import CaseFieldsForm from "./CaseFieldsForm";
 import useDidMountEffect from "../../../hooks/useDidMountEffect";

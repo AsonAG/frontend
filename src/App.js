@@ -25,15 +25,7 @@ function App() {
   const [isSidebar, setIsSidebar] = useState(true);
   const [caseName, setCaseName] = useState("");
   const [employeeChoice, setEmployeeChoice] = useState(
-    {
-      id: "",
-      employeeId: "",
-      firstName: "",
-      lastName: "",
-      divisions: [],
-      statuts: "Active",
-      email: "",
-    }
+    {}
   );
 
   const userContext = {

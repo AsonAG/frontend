@@ -13,7 +13,7 @@
  * Do not edit the class manually.
  *
  */
-import {ApiClient} from '../ApiClient';
+import {ApiClient} from '../api/ApiClient';
 import {CaseFieldDateType} from './CaseFieldDateType';
 import {CaseFieldTimeType} from './CaseFieldTimeType';
 import {CaseFieldTimeUnit} from './CaseFieldTimeUnit';
