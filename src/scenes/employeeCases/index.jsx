@@ -1,19 +1,22 @@
 import { Box } from "@mui/material";
-import { React } from "react";
+import { useContext } from "react";
 import CasesTable from "../../components/CasesTable";
 import Header from "../../components/Header";
+import { EmployeeContext } from "../../App";
 
-const EmployeeCases = ({ employee, updateCaseName }) => {
+const EmployeeCases = ({ updateCaseName }) => {
+  const { employeeChoice: employee, setEmployeeChoice } = useContext(EmployeeContext);
+
   return (
     <Box m="25px">
       <Header 
           title={ employee.firstName + ' ' + employee.lastName }
-          subtitle={ "Employee divisions:" + employee.divisions.join(", ") }
+          subtitle={ "Employee divisions: " + employee.divisions.join(", ") }
       />
       <CasesTable 
           updateCaseName={updateCaseName} 
           caseType={'Employee'}
-          employeeId={employee.employeeId}    
+          employee={employee}    
       />
     </Box>
   );

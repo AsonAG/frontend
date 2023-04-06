@@ -2,9 +2,11 @@ import * as React from "react";
 import SplitButton from "../../components/SplitButton";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 import { useNavigate } from "react-router-dom";
+import { EmployeeContext } from "../../App";
 
-export default function EmployeesSplitButton( params ) {
+export default function EmployeesSplitButton(params) {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const { employeeChoice, setEmployeeChoice } = React.useContext(EmployeeContext);
   const navigate = useNavigate();
 
   const options = [
@@ -16,23 +18,22 @@ export default function EmployeesSplitButton( params ) {
 
   const handleClick = () => {
     console.info(
-      `You clicked ${options[selectedIndex]}, for payroll id: ${params.employeeId}`
+      `You clicked ${options[selectedIndex]}, for payroll id: ${params.employee.employeeId}`
     );
     switch (selectedIndex) {
-        case 0:
-                console.log("Option 0" + params.updateCaseName);
-                navigate('/employee');
-                break;
-    
-        case 1:
-                console.log("Option 1");
-                
-                break;
+      case 0:
+        console.log("Option 0: " + options[0] + params.updateCaseName);
+        setEmployeeChoice(params.employee);
+        navigate("/employee");
+        break;
 
-        default:
-                console.log("Option default");
+      case 1:
+        console.log("Option 1: " + options[1]);
+        break;
 
-                break;
+      default:
+        console.log("Option default");
+        break;
     }
   };
 

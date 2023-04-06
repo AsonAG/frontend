@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
  * @param caseType of CaseType type [Employee/Company/Global/National].
  * @returns {CasesTable} The a table component representation of list of available cases.
  */
-const CasesTable = ({ updateCaseName, caseType }) => {
+const CasesTable = ({ updateCaseName, caseType, employee }) => {
   const [caseData, setCaseData] = useState([]);
   const [caseDataLoaded, setCaseDataLoaded] = useState(false);
   const theme = useTheme();

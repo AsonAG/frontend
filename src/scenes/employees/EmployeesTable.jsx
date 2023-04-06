@@ -85,18 +85,8 @@ const EmployeesTable = ({ updateCaseName }) => {
       align: "center",
       renderCell: ({ row: { employeeId } }) => {
         return (
-          // <IconButton
-          //   component={Link}
-          //   to="/case"
-          //   variant="outlined"
-          //   color="secondary"
-          //   onClick={() => updateCaseName(caseName)}
-          // >
-          //   <MoreHorizIcon fontSize="large"
-          //   />
-          // </IconButton>
           <EmployeesSplitButton
-            employeeId={employeeId}
+            employee={employeeData.find((x) => x.employeeId === employeeId)}
             updateCaseName={updateCaseName}
           ></EmployeesSplitButton>
         );

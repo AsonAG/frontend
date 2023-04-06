@@ -1,5 +1,5 @@
 import { useMemo, useState, useContext, Fragment, useEffect } from "react";
-import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from "@mui/material/CircularProgress";
 import ApiClient from "../../../ApiClient";
 import CasesApi from "../../../api/CasesApi";
 import {
@@ -33,30 +33,34 @@ const Field = ({ field, onChange }) => {
   const [fieldEndDate, setFieldEndDate] = useState(
     field.end ? new Date(field.end) : null
   );
-// Form validation SX options ================================ START ================================
-const theme = useTheme();
-const colors = tokens(theme.palette.mode);  
-const {isSaveButtonClicked, setIsSaveButtonClicked} = useContext(CaseContext);
+  // Form validation SX options ================================ START ================================
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const { isSaveButtonClicked, setIsSaveButtonClicked } =
+    useContext(CaseContext);
 
-const dateSlotProps = (isRequired, value) => {
-  return isSaveButtonClicked && isRequired && value ? 
-    { textField: { error: true, helperText: 'Field can not be empty' } }
-    : null
-}
-// Form validation SX options ================================ END ================================
+  const dateSlotProps = (isRequired, value) => {
+    return isSaveButtonClicked && isRequired && value
+      ? { textField: { error: true, helperText: "Field can not be empty" } }
+      : null;
+  };
+  // Form validation SX options ================================ END ================================
 
-// LookUp options ================================ START ================================
+  // LookUp options ================================ START ================================
   const [isLookupOpened, setLookupOpened] = useState(false);
   const [lookupOptions, setLookupOptions] = useState([]);
   const lookupLoading = isLookupOpened && lookupOptions?.length === 0;
   const casesApi = useMemo(() => new CasesApi(ApiClient), []);
-  
+
   useEffect(() => {
     let active = true;
     if (!lookupLoading) {
       return undefined;
     }
-    casesApi.getCaseFieldLookups(field.lookupSettings.lookupName, callbackLookups);
+    casesApi.getCaseFieldLookups(
+      field.lookupSettings.lookupName,
+      callbackLookups
+    );
     return () => {
       active = false;
     };
@@ -78,21 +82,19 @@ const dateSlotProps = (isRequired, value) => {
       );
     }
     setLookupOptions(data[0].values);
-    console.log(
-      "Lookups: " +
-        JSON.stringify(data[0].values, null, 2)
-    );
+    console.log("Lookups: " + JSON.stringify(data[0].values, null, 2));
   };
 
   const handleInputLookupValueChange = (e, option) => {
     // const regex = /^[0-9\b]+$/;
     // if (e.target.value === "" || regex.test(e.target.value)) {
-    let newValue = option ? JSON.parse(option.value)[field.lookupSettings.valueFieldName] : null;
+    let newValue = option
+      ? JSON.parse(option.value)[field.lookupSettings.valueFieldName]
+      : null;
     setFieldValue(newValue);
-    console.log("lookup input change:" + newValue + " field text:" );//+ JSON.parse(option.value)[field.lookupSettings.textFieldName]);
+    console.log("lookup input change:" + newValue + " field text:"); //+ JSON.parse(option.value)[field.lookupSettings.textFieldName]);
   };
-// LookUp options ================================ END ================================ 
-
+  // LookUp options ================================ END ================================
 
   const handleInputValueChange = (e) => {
     // const regex = /^[0-9\b]+$/;
@@ -109,7 +111,7 @@ const dateSlotProps = (isRequired, value) => {
     onChange(
       field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
       fieldName,
-      e.target.checked+'',
+      e.target.checked + "",
       fieldStartDate,
       fieldEndDate,
       field.caseSlot
@@ -167,7 +169,7 @@ const dateSlotProps = (isRequired, value) => {
     if (field.lookupSettings && "lookupName" in field.lookupSettings) {
       return (
         <Autocomplete
-          key={"field_autocomplete_"+ field.id}
+          key={"field_autocomplete_" + field.id}
           // sx={{ width: 300 }}
           open={isLookupOpened}
           onOpen={() => {
@@ -178,8 +180,13 @@ const dateSlotProps = (isRequired, value) => {
           }}
           onBlur={handleTextfieldBlur}
           onChange={handleInputLookupValueChange}
-          isOptionEqualToValue={(option, value) => JSON.parse(option.value)[field.lookupSettings.textFieldName] === JSON.parse(value.value)[field.lookupSettings.textFieldName]}
-          getOptionLabel={(option) => JSON.parse(option.value)[field.lookupSettings.textFieldName]}
+          isOptionEqualToValue={(option, value) =>
+            JSON.parse(option.value)[field.lookupSettings.textFieldName] ===
+            JSON.parse(value.value)[field.lookupSettings.textFieldName]
+          }
+          getOptionLabel={(option) =>
+            JSON.parse(option.value)[field.lookupSettings.textFieldName]
+          }
           options={lookupOptions}
           loading={lookupLoading}
           renderInput={(params) => (
@@ -191,7 +198,9 @@ const dateSlotProps = (isRequired, value) => {
                 ...params.InputProps,
                 endAdornment: (
                   <Fragment>
-                    {lookupLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                    {lookupLoading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
                     {params.InputProps.endAdornment}
                   </Fragment>
                 ),
@@ -285,8 +294,9 @@ const dateSlotProps = (isRequired, value) => {
                   <span />
                 ),
             }}
-            
-            slotProps={{ textField: { error: true, helperText: 'Field can not be empty' } }} // THIS ONE!
+            slotProps={{
+              textField: { error: true, helperText: "Field can not be empty" },
+            }} // THIS ONE!
           />
         );
     }

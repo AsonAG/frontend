@@ -17,11 +17,24 @@ import Employees from "./scenes/employees";
 import EmployeeCases from "./scenes/employeeCases";
 
 export const UserContext = createContext();
+export const EmployeeContext = createContext();
+
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const [caseName, setCaseName] = useState("");
+  const [employeeChoice, setEmployeeChoice] = useState(
+    {
+      id: "",
+      employeeId: "",
+      firstName: "",
+      lastName: "",
+      divisions: [],
+      statuts: "Active",
+      email: "",
+    }
+  );
 
   const userContext = {
     loaded: false,
@@ -36,11 +49,14 @@ function App() {
         <CssBaseline />
 
         <div className="app">
+        <UserContext.Provider value={userContext}> 
+
+
           <Sidebar isSidebar={isSidebar} />
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
 
-            <UserContext.Provider value={userContext}> 
+            <EmployeeContext.Provider value={{employeeChoice, setEmployeeChoice}}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/tasks" element={<Tasks updateCaseName={setCaseName} />} />
@@ -53,9 +69,9 @@ function App() {
                 <Route path="/dossier" element={<Dossier />} />
                 <Route path="/reporting" element={<Reporting updateCaseName={setCaseName} />} />
               </Routes>
-            </UserContext.Provider>
-
+            </EmployeeContext.Provider>
           </main>
+          </UserContext.Provider>
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>
