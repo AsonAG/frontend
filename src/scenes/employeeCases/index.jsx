@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
-import { useContext } from "react";
 import CasesTable from "../../components/CasesTable";
 import Header from "../../components/Header";
 import { EmployeeContext } from "../../App";
+import { useContext } from "react";
 
 const EmployeeCases = ({ updateCaseName }) => {
   const { employeeChoice: employee, setEmployeeChoice } = useContext(EmployeeContext);

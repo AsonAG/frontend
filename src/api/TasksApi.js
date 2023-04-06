@@ -56,7 +56,7 @@ export class TasksApi {
     let pathParams = {};
     let queryParams = {
       userId: this.userId,
-      employeeId: this.employeeId,
+      employeeId: this.employeeId, // TODO: define params, right employee and clusters
       caseType: caseType,
       clusterSetName: clusterName
     };

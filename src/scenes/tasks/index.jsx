@@ -2,12 +2,18 @@ import { Box } from "@mui/material";
 import { React } from "react";
 import CasesTable from "../../components/CasesTable";
 import Header from "../../components/Header";
+import { EmployeeContext } from "../../App";
+import { useContext } from "react";
 
 const Tasks = ({ updateCaseName }) => {
+  const { employeeChoice: employee, setEmployeeChoice } =
+    useContext(EmployeeContext);
+  setEmployeeChoice(null);
+
   return (
     <Box m="25px">
       <Header title="TASKS" subtitle="Finish your tasks" />
-      <CasesTable updateCaseName={updateCaseName} caseType={'Employee'}/>
+      <CasesTable updateCaseName={updateCaseName} caseType={"Employee"} />
     </Box>
   );
 };

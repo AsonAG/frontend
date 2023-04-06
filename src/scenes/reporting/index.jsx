@@ -3,8 +3,13 @@ import { tokens } from "../../theme";
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
 import CasesTable from "../../components/CasesTable";
+import { EmployeeContext } from "../../App";
+import { useContext } from "react";
 
 const Reporting = ( {updateCaseName} ) => {
+    const { employeeChoice: employee, setEmployeeChoice } = useContext(EmployeeContext);
+    setEmployeeChoice(null);
+
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
   
