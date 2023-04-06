@@ -1,14 +1,17 @@
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { DataGrid, GridToolbarQuickFilter, GridToolbar } from "@mui/x-data-grid";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import {
+  DataGrid,
+  GridToolbarQuickFilter,
+  GridToolbar,
+} from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import { useNavigate } from "react-router-dom";
 import { Box, IconButton, useTheme } from "@mui/material";
 import { React, useState, useEffect } from "react";
 import EmployeesApi from "../../api/EmployeesApi";
 import ApiClient from "../../ApiClient";
 import { tokens } from "../../theme";
-import SplitButton from '../../components/SplitButton';
+import EmployeesSplitButton from "./EmployeesSplitButton";
 
 const EmployeesTable = ({ updateCaseName }) => {
   const [employeeData, setEmployeeData] = useState([]);
@@ -16,7 +19,6 @@ const EmployeesTable = ({ updateCaseName }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const employeesApi = new EmployeesApi(ApiClient);
-  const navigate = useNavigate();
 
   const callback = function (error, data, response) {
     let tableData = [];
@@ -47,7 +49,7 @@ const EmployeesTable = ({ updateCaseName }) => {
       setEmployeeDataFiltered(tableData);
     }
   };
-  
+
   useEffect(() => {
     employeesApi.getEmployees(callback);
   }, []);
@@ -58,24 +60,23 @@ const EmployeesTable = ({ updateCaseName }) => {
   //   navigate("/case");
   // };
 
-
   const columns = [
-        {
-          field: "firstName",
-          headerName: "First name",
-          flex: 3,
-          cellClassName: "name-column--cell",
-        },
-        {
-          field: "lastName",
-          headerName: "Last name",
-          flex: 3,
-        },
-        {
-          field: "email",
-          headerName: "Email",
-          flex: 3,
-        },
+    {
+      field: "firstName",
+      headerName: "First name",
+      flex: 3,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "lastName",
+      headerName: "Last name",
+      flex: 3,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 3,
+    },
     {
       field: "employeeId",
       headerName: "Cases",
@@ -94,7 +95,10 @@ const EmployeesTable = ({ updateCaseName }) => {
           //   <MoreHorizIcon fontSize="large"
           //   />
           // </IconButton>
-          <SplitButton employeeId={employeeId}></SplitButton>
+          <EmployeesSplitButton
+            employeeId={employeeId}
+            updateCaseName={updateCaseName}
+          ></EmployeesSplitButton>
         );
       },
     },
@@ -111,18 +115,19 @@ const EmployeesTable = ({ updateCaseName }) => {
         <GridToolbarQuickFilter />
       </Box>
     );
-  };
+  }
 
   function escapeRegExp(value) {
-    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
   }
-  
-  const [searchText, setSearchText] = useState('');
-  const [employeeDataFiltered, setEmployeeDataFiltered] = useState(employeeData);
+
+  const [searchText, setSearchText] = useState("");
+  const [employeeDataFiltered, setEmployeeDataFiltered] =
+    useState(employeeData);
 
   const requestSearch = (searchValue) => {
     setSearchText(searchValue);
-    const searchRegex = new RegExp(escapeRegExp(searchValue), 'i');
+    const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
     const filteredRows = employeeData.filter((row) => {
       return Object.keys(row).some((field) => {
         return searchRegex.test(row[field].toString());
@@ -133,7 +138,7 @@ const EmployeesTable = ({ updateCaseName }) => {
 
   return (
     <Box
-//       display="flex"
+      //       display="flex"
       justifyContent="space-between"
       alignItems="center"
       height="75vh"
@@ -177,25 +182,24 @@ const EmployeesTable = ({ updateCaseName }) => {
         columns={columns}
         justifyContent="center"
         alignItems="center"
-        // slots={{ 
-        //   Toolbar: GridToolbar 
+        // slots={{
+        //   Toolbar: GridToolbar
         // // toolbar: QuickSearchToolbar
         // }}
-        // slotProps={{ 
+        // slotProps={{
         //   toolbar: {
         //     showQuickFilter: true,
         //     quickFilterProps: { debounceMs: 500 },
-        //   }, 
+        //   },
         // }}
         components={{ Toolbar: QuickSearchToolbar }}
         componentsProps={{
           toolbar: {
             value: searchText,
             onChange: (event) => requestSearch(event.target.value),
-            clearSearch: () => requestSearch(''),
+            clearSearch: () => requestSearch(""),
           },
         }}
-
       />
     </Box>
   );

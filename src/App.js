@@ -14,6 +14,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { height } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
 import Employees from "./scenes/employees";
+import EmployeeCases from "./scenes/employeeCases";
 
 export const UserContext = createContext();
 
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/tasks" element={<Tasks updateCaseName={setCaseName} />} />
                 <Route path="/company" element={<CompanyCases updateCaseName={setCaseName} />} />
+                <Route path="/employee" element={<EmployeeCases updateCaseName={setCaseName} />} />
                 <Route path="/case" element={<CaseForm caseName={caseName} />} />
                 
                 <Route path="/employees" element={<Employees updateCaseName={setCaseName} />} />
