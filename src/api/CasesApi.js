@@ -82,7 +82,6 @@ export class CasesApi {
     if (
       shouldIncludeBody
       // JSON.stringify(mainCase) != "{}"
-      // && Object.values( Object.values(mainCase)[0]?.values ).length > 1    // TODO: change condition - now it checks if BaseField has more than 0 values!!
     ) {
       // remove case name key
       let baseCase = JSON.parse(JSON.stringify(Object.values(mainCase)[0])); // TODO: remove cloning object later and move body creating logic to CaseForm
@@ -100,12 +99,12 @@ export class CasesApi {
             // if (Object.values(relatedCase.values).length > 0 )
             filteredRelatedCases.push(JSON.parse(JSON.stringify(field)));
           })
-        // (relatedCase.values = Object.values(relatedCase.values))
       );
 
       if (baseCase.values.length === 0) delete baseCase.values;
 
-      baseCase.relatedCases = filteredRelatedCases;
+      // baseCase.relatedCases = filteredRelatedCases;
+      baseCase.values = baseCase.values.concat(filteredRelatedCases);
 
       return {
         case: baseCase,

@@ -15,6 +15,7 @@ import { height } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
 import Employees from "./scenes/employees";
 import EmployeeCases from "./scenes/employeeCases";
+import { useEffect } from "react";
 
 export const UserContext = createContext();
 export const EmployeeContext = createContext();
@@ -27,6 +28,10 @@ function App() {
   const [employeeChoice, setEmployeeChoice] = useState(
     {}
   );
+
+  useEffect(() => {
+    document.title = "Ason Payroll"
+  }, [])
 
   const userContext = {
     loaded: false,
