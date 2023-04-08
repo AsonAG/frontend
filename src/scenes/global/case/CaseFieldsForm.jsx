@@ -15,7 +15,6 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
 
-  // useEffect(() => {
   useDidMountEffect(() => {
     // update output cases
     setOutputCases((prevState) => ({

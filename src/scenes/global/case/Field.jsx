@@ -119,17 +119,43 @@ const Field = ({ field, onChange }) => {
   };
 
   const handleInputDateValueChange = (dateValue) => {
-    dateValue && setFieldValue(new Date(dateValue));
+    // TODO: fix wrong time zone issue
+    let newDate = dateValue ? new Date(dateValue) : null;
+    setFieldValue(newDate);
+    onChange(
+      field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
+      fieldName,
+      newDate,
+      fieldStartDate,
+      fieldEndDate,
+      field.caseSlot
+    );
   };
 
   const handleInputStartDateChange = (dateValue) => {
-    dateValue && setFieldStartDate(new Date(dateValue));
-    // setFieldStartDate(dateValue);
+    let newDate = dateValue ? new Date(dateValue) : null;
+    setFieldStartDate(newDate);
+    onChange(
+      field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
+      fieldName,
+      fieldValue,
+      newDate,
+      fieldEndDate,
+      field.caseSlot
+    );
   };
 
   const handleInputEndDateChange = (dateValue) => {
-    dateValue && setFieldEndDate(new Date(dateValue));
-    // setFieldEndDate(dateValue);
+    let newDate = dateValue ? new Date(dateValue) : null;
+    setFieldEndDate(newDate);
+    onChange(
+      field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
+      fieldName,
+      fieldValue,
+      fieldStartDate,
+      newDate,
+      field.caseSlot
+    );
   };
 
   const handleTextfieldBlur = () => {
@@ -225,7 +251,6 @@ const Field = ({ field, onChange }) => {
             name={field.name + "datepicker"}
             label={field.displayName}
             helperText={field.description}
-            onAccept={handleTextfieldBlur}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleInputDateValueChange}
             key={"field_textfield_" + field.id}
@@ -239,7 +264,6 @@ const Field = ({ field, onChange }) => {
             name={field.name}
             label={field.displayName}
             helperText={field.description}
-            onAccept={handleTextfieldBlur}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleInputDateValueChange}
             key={"field_textfield_" + field.id}
@@ -340,7 +364,6 @@ const Field = ({ field, onChange }) => {
             <DatePicker
               name={field.name + "start"}
               label="Start"
-              onAccept={handleTextfieldBlur}
               value={fieldStartDate}
               onChange={handleInputStartDateChange}
               key={"field_textfield_startdate" + field.id}
@@ -351,7 +374,6 @@ const Field = ({ field, onChange }) => {
                 <DatePicker
                   name={field.name + "end"}
                   label="End"
-                  onAccept={handleTextfieldBlur}
                   value={fieldEndDate}
                   onChange={handleInputEndDateChange}
                   key={"field_textfield_enddate" + field.id}
