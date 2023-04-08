@@ -16,10 +16,9 @@ import CompanyCases from "./scenes/companyCases";
 import Employees from "./scenes/employees";
 import EmployeeCases from "./scenes/employeeCases";
 import { useEffect } from "react";
+import { useAuth, useLoginWithRedirect, ContextHolder } from "@frontegg/react";
 
-export const UserContext = createContext();
 export const EmployeeContext = createContext();
-
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -28,9 +27,22 @@ function App() {
   const [employeeChoice, setEmployeeChoice] = useState(
     {}
   );
+  const { user, isAuthenticated } = useAuth();
+  const loginWithRedirect = useLoginWithRedirect();
+
+  const logout = () => {
+    const baseUrl = ContextHolder.getContext().baseUrl;
+    window.location.href = `${baseUrl}/oauth/logout?post_logout_redirect_uri=${window.location}`;
+  };
 
   useEffect(() => {
-    document.title = "Ason Payroll"
+    if (!isAuthenticated) {
+      loginWithRedirect();
+    }
+  }, [isAuthenticated, loginWithRedirect]);
+
+  useEffect(() => {
+    document.title = "Ason Payroll";
   }, [])
 
   const userContext = {
@@ -46,9 +58,7 @@ function App() {
         <CssBaseline />
 
         <div className="app">
-        <UserContext.Provider value={userContext}> 
-
-
+        {/* <UserContext.Provider value={userContext}>  */}
           <Sidebar isSidebar={isSidebar} />
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
@@ -68,7 +78,7 @@ function App() {
               </Routes>
             </EmployeeContext.Provider>
           </main>
-          </UserContext.Provider>
+          {/* </UserContext.Provider> */}
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>

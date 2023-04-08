@@ -9,7 +9,6 @@ import ApiClient from "../../../api/ApiClient";
 import CasesApi from "../../../api/CasesApi";
 import CaseFieldsForm from "./CaseFieldsForm";
 import useDidMountEffect from "../../../hooks/useDidMountEffect";
-import { UserContext } from "../../../App";
 
 export const CaseContext = createContext();
 
@@ -25,7 +24,6 @@ const CaseForm = (props) => {
 
   const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
 
-  const userContext = useContext(UserContext);
 
   const handleSubmit = (event) => {
     // event.preventDefault();
