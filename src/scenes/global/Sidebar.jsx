@@ -8,15 +8,14 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import CasesOutlinedIcon from "@mui/icons-material/CasesOutlined";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import TaskIcon from "@mui/icons-material/Task";
 import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import Logo from "../../components/Logo";
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
 
   const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -31,11 +30,11 @@ const Sidebar = () => {
         onClick={() => setSelected(title)}
         icon={icon}
       >
-        {!isCollapsed && 
-        <div>
-          <Typography>{title}</Typography>
-        </div>
-        }
+        {!isCollapsed && (
+          <div>
+            <Typography>{title}</Typography>
+          </div>
+        )}
         <Tooltip title={title}>
           <Link to={to} />
         </Tooltip>
@@ -45,7 +44,7 @@ const Sidebar = () => {
 
   return (
     <Box
-      // position="static"
+      // position="fixed"
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
@@ -54,7 +53,7 @@ const Sidebar = () => {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item": {
-          padding: "8px 20px 8px 20px !important"
+          padding: "0px 20px 10px 20px !important",
           // padding: "0px 10px 16px 20px !important",
         },
         "& .pro-inner-item:hover": {
@@ -65,42 +64,9 @@ const Sidebar = () => {
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed}>
-        <Menu iconShape="rectangle">
-          {/* LOGO AND MENU ICON */}
-          <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
-            style={{
-              // margin: "10px 0 20px 0px",
-              margin : "0",
-              color: colors.grey[100],
-            }}
-          >
-            {!isCollapsed && (
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                // alignItems="left"
-                ml="5px"
-              >
-                <Box display="flex" justifyContent="left" alignItems="left">
-                  <img
-                    alt="profile-user"
-                    width="100px"
-                    src={`../../assets/logo/logo.png`}
-                    style={{ cursor: "pointer" }}
-                  />
-                </Box>
-
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                  <MenuOutlinedIcon />
-                </IconButton>
-              </Box>
-            )}
-          </MenuItem>
-
-          <Box>
+      <ProSidebar position="fixed" collapsed={isCollapsed}>
+        <Menu>
+          <Box marginTop="80px">
             <Item
               title="Dashboard"
               to="/"

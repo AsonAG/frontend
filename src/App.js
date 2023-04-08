@@ -22,7 +22,7 @@ export const EmployeeContext = createContext();
 
 function App() {
   const [theme, colorMode] = useMode();
-  const [isSidebar, setIsSidebar] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [caseName, setCaseName] = useState("");
   const [employeeChoice, setEmployeeChoice] = useState(
     {}
@@ -59,9 +59,9 @@ function App() {
 
         <div className="app">
         {/* <UserContext.Provider value={userContext}>  */}
-          <Sidebar isSidebar={isSidebar} />
+          <Sidebar isCollapsed={isSidebarCollapsed} />
           <main className="content">
-            <Topbar setIsSidebar={setIsSidebar} />
+            <Topbar isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} />
 
             <EmployeeContext.Provider value={{employeeChoice, setEmployeeChoice}}>
               <Routes>
