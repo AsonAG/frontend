@@ -64,7 +64,6 @@ function App() {
             />
             <Box display="flex" flexDirection="row" width="100%" marginTop="60px">
 
-
               <Sidebar isCollapsed={isSidebarCollapsed} />
               <main className="content">
                 <EmployeeContext.Provider

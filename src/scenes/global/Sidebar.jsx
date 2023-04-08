@@ -11,12 +11,14 @@ import CasesOutlinedIcon from "@mui/icons-material/CasesOutlined";
 import TaskIcon from "@mui/icons-material/Task";
 import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import Logo from "../../components/Logo";
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 
 const Sidebar = ({ isCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Dashboard");
+  const minWidth = useMediaQuery('(min-width:600px)');
 
   const Item = ({ title, to, icon, selected, setSelected }) => {
     const theme = useTheme();
@@ -42,7 +44,8 @@ const Sidebar = ({ isCollapsed }) => {
     );
   };
 
-  return (
+  return (minWidth || !isCollapsed ) &&
+  (
     <Box
       // position="fixed"
       sx={{
@@ -90,13 +93,6 @@ const Sidebar = ({ isCollapsed }) => {
               selected={selected}
               setSelected={setSelected}
             />
-            {/* <Item
-              title="Dossier"
-              to="/dossier"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
             <Item
               title="Report a case"
               to="/reporting"

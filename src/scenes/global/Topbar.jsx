@@ -21,17 +21,17 @@ import SearchIcon from "@mui/icons-material/Search";
 import { AccountCircle } from "@mui/icons-material";
 import Logo from "../../components/Logo";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import { Link } from "react-router-dom";
 
 const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
 
-  const [auth, setAuth] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleChange = (event) => {
-    setAuth(event.target.checked);
+    // setAuth(event.target.checked);
   };
 
   const handleMenu = (event) => {
@@ -73,92 +73,88 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
     //     </IconButton>
     //   </Box>
     // </Box>
-<Box 
-sx={{
-  "& .MuiToolbar-root": {
-    background: `${colors.primary[400]} !important`,
-    padding: '0 22px 0 0px !important'
-  },
-  "& .MuiButtonBase-root:hover": {
-    color: "#868dfb !important",
-  },
-}}>
-    <AppBar>
-      <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Box 
-          display="flex" 
-          flexDirection="row" 
-          paddingLeft="15px"
-          >
-        {/* LOGO AND MENU ICON */}
-        <MenuItem
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          // icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
-          style={{
-            // margin: "10px 0 20px 0px",
-            // marginBottom: "15px",
-            color: colors.grey[100],
-          }}
-        >
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-          >
-            <MenuOutlinedIcon />
-          </IconButton>
-        </MenuItem>
-
-        <Logo />
-        </Box>
-
-        <div>
-          <IconButton
-            onClick={colorMode.toggleColorMode}
-            size="large"
+    <Box
+      sx={{
+        "& .MuiToolbar-root": {
+          background: `${colors.primary[400]} !important`,
+          padding: "0 22px 0 0px !important",
+        },
+        "& .MuiButtonBase-root:hover": {
+          color: "#868dfb !important",
+        },
+      }}
+    >
+      <AppBar>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Box display="flex" flexDirection="row" paddingLeft="15px">
+            {/* LOGO AND MENU ICON */}
+            <MenuItem
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              // icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+              style={{
+                // margin: "10px 0 20px 0px",
+                // marginBottom: "15px",
+                color: colors.grey[100],
+              }}
             >
-            {theme.palette.mode === "dark" ? (
-              <DarkModeOutlinedIcon />
-            ) : (
-              <LightModeOutlinedIcon />
-            )}
-          </IconButton>
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+              >
+                <MenuOutlinedIcon />
+              </IconButton>
+            </MenuItem>
 
-          <IconButton
-            size="large"
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={handleMenu}
-            color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
-          <Menu
-            id="menu-appbar"
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-          </Menu>
-        </div>
-      </Toolbar>
-    </AppBar>
-</Box>
+            <MenuItem>
+                <Logo />
+            </MenuItem>
+          </Box>
+
+          <div>
+            <IconButton onClick={colorMode.toggleColorMode} size="large">
+              {theme.palette.mode === "dark" ? (
+                <DarkModeOutlinedIcon />
+              ) : (
+                <LightModeOutlinedIcon />
+              )}
+            </IconButton>
+
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={handleClose}>Profile</MenuItem>
+              <MenuItem onClick={handleClose}>My account</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+          </div>
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 };
 
