@@ -66,7 +66,7 @@ const Sidebar = ({ isCollapsed }) => {
     >
       <ProSidebar position="fixed" collapsed={isCollapsed}>
         <Menu>
-          <Box marginTop="80px">
+          <Box marginTop="20px">
             <Item
               title="Dashboard"
               to="/"

@@ -22,7 +22,7 @@ import { AccountCircle } from "@mui/icons-material";
 import Logo from "../../components/Logo";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 
-const Topbar = ({ isCollapsed, setIsCollapsed }) => {
+const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
@@ -153,7 +153,7 @@ sx={{
           >
             <MenuItem onClick={handleClose}>Profile</MenuItem>
             <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </div>
       </Toolbar>
