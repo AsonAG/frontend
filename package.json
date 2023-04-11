@@ -22,6 +22,7 @@
     "react-pro-sidebar": "^0.7.1",
     "react-router-dom": "^6.10.0",
     "react-scripts": "5.0.1",
+    "react-sticky": "^6.0.3",
     "superagent": "^8.0.9",
     "web-vitals": "^2.1.4",
     "yup": "^1.0.0"
