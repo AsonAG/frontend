@@ -79,7 +79,9 @@ const CaseForm = (props) => {
     );
   }, [outputCase, relatedCases]);
 
-  useEffect(()=>{}, [user]);
+  useEffect(()=>{
+    console.log("User changed - Refresh");
+  }, [user]);
 
   return (
     props.caseName && (

@@ -32,8 +32,8 @@ export class EmployeesApi {
   constructor(apiClient, user) {
     this.apiClient = apiClient || ApiClient.instance;
     this.tenantId = user.tenantId;
-    this.userId = user.userId;
-    this.employeeId = user.employeeId;
+    // this.userId = user.userId;
+    // this.employeeId = user.employeeId;
   }
 
   /**

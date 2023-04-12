@@ -77,7 +77,7 @@ function App() {
     navigate("/login");
   };
   useEffect(() => {
-    // console.log(user.currentPayrollId);
+    console.log(user.currentPayrollId);
     if (user.isAuthenticated) {
       // navigate("/");
     } else navigate("/login");

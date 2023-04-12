@@ -12,7 +12,7 @@ import EmployeesApi from "../../api/EmployeesApi";
 import { tokens } from "../../theme";
 import EmployeesSplitButton from "./EmployeesSplitButton";
 import { UserContext } from "../../App";
-import { ApiClient } from "../../api/ApiClient";
+import ApiClient from "../../api/ApiClient";
 
 
 const EmployeesTable = ({ updateCaseName }) => {
