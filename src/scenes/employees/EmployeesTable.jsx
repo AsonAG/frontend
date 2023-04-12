@@ -81,6 +81,11 @@ const EmployeesTable = ({ updateCaseName }) => {
       flex: 3,
     },
     {
+      field: "divisions",
+      headerName: "Division",
+      flex: 3,
+    },
+    {
       field: "employeeId",
       headerName: "Cases",
       flex: 3,
@@ -166,8 +171,8 @@ const EmployeesTable = ({ updateCaseName }) => {
       }}
     >
       <DataGrid
-        disableSelectionOnClick
-        disableColumnFilter
+        // disableSelectionOnClick
+        // disableColumnFilter
         disableColumnSelector
         disableDensitySelector
         loading={!employeeDataLoaded}
