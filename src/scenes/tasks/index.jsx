@@ -6,10 +6,6 @@ import { EmployeeContext } from "../../App";
 import { useContext } from "react";
 
 const Tasks = ({ updateCaseName }) => {
-  const { employeeChoice: employee, setEmployeeChoice } =
-    useContext(EmployeeContext);
-  setEmployeeChoice(null);
-
   return (
     <Box m="25px">
       <Header title="TASKS" subtitle="Finish your tasks" />

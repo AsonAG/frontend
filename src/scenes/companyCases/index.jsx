@@ -6,9 +6,6 @@ import { EmployeeContext } from "../../App";
 import { useContext } from "react";
 
 const CompanyCases = ({updateCaseName}) => {
-  const { employeeChoice: employee, setEmployeeChoice } = useContext(EmployeeContext);
-  setEmployeeChoice(null);
-
   return (
     <Box m="25px">
       <Header title="COMPANY CASES" subtitle="Choose a case" />

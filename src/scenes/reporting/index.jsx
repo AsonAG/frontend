@@ -7,9 +7,6 @@ import { EmployeeContext } from "../../App";
 import { useContext } from "react";
 
 const Reporting = ( {updateCaseName} ) => {
-    const { employeeChoice: employee, setEmployeeChoice } = useContext(EmployeeContext);
-    setEmployeeChoice(null);
-
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
   
