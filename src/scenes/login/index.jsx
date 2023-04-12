@@ -16,15 +16,17 @@ export default function LoginForm() {
         userId: "1",
         employeeId: values.email,
         isAuthenticated: true,
-        payrollName: "SimplePayroll.Derived1",
-        payrollId: "1",
+        currentPayrollName: "SimplePayroll.Derived1",
+        currentPayrollId: "1",
       }));
     },
   });
   return (
+      <Box m="25px">
+        
     <form onSubmit={formik.handleSubmit}>
+
       <Box
-        padding="60px 20px"
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
@@ -52,5 +54,6 @@ export default function LoginForm() {
         </Button>
       </Box>
     </form>
+    </Box>
   );
 }

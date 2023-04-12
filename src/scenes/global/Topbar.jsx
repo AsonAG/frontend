@@ -6,9 +6,9 @@ import {
   TextField,
   AppBar,
   Toolbar,
-  Typography,
   Menu,
   MenuItem,
+  Select,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
@@ -22,6 +22,7 @@ import { AccountCircle } from "@mui/icons-material";
 import Logo from "../../components/Logo";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Link } from "react-router-dom";
+import PayrollSelector from "../../components/PayrollSelector";
 
 const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
   const theme = useTheme();
@@ -113,7 +114,9 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
             </MenuItem>
           </Box>
 
-          <div>
+          <Box display="flex">
+            <PayrollSelector />
+
             <IconButton onClick={colorMode.toggleColorMode} size="large">
               {theme.palette.mode === "dark" ? (
                 <DarkModeOutlinedIcon />
@@ -149,9 +152,10 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
             >
               <MenuItem onClick={handleClose}>Profile</MenuItem>
               <MenuItem onClick={handleClose}>Settings</MenuItem>
+              <MenuItem onClick={handleClose}>Switch tenant</MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
-          </div>
+          </Box>
         </Toolbar>
       </AppBar>
     </Box>

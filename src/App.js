@@ -16,12 +16,12 @@ import CompanyCases from "./scenes/companyCases";
 import Employees from "./scenes/employees";
 import EmployeeCases from "./scenes/employeeCases";
 import { useEffect } from "react";
-import { useAuth, useLoginWithRedirect, ContextHolder } from "@frontegg/react"; 
+// import { useAuth, useLoginWithRedirect, ContextHolder } from "@frontegg/react";
 import LoginForm from "./scenes/login";
-
 
 export const EmployeeContext = createContext();
 export const UserContext = createContext();
+export const PayrollContext = createContext();
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -51,31 +51,40 @@ function App() {
     isAuthenticated: false,
     userId: "",
     employeeId: "",
-    payrollId: "",
-    payrollName: "XYZ Payroll",
+    currentPayrollId: "1",
+    currentPayrollName: "SimplePayroll.Derived1",
+    availablePayrolls: [
+      {
+        payrollId: "1",
+        payrollName: "SimplePayroll.Derived1",
+      },
+      {
+        payrollId: "2",
+        payrollName: "SimplePayroll.Derived2",
+      },
+    ],
   });
-  
+
   const logout = () => {
-    setUser(current => ({
-            ...current,
-            isAuthenticated: false,
+    setUser((current) => ({
+      ...current,
+      isAuthenticated: false,
     }));
     navigate("/login");
-  }; 
+  };
   useEffect(() => {
-      if (user.isAuthenticated) {
-        navigate("/");
-      }
-    }, [user]);
+    if (user.isAuthenticated) {
+      navigate("/");
+    } else navigate("/login");
+  }, [user]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-
-          <div className="app">
-            <UserContext.Provider value={{ user, setUser }}>
+          <UserContext.Provider value={{ user, setUser }}>
+            <div className="app" display="flex" flexDirection="column">
               <Topbar
                 isCollapsed={isSidebarCollapsed}
                 setIsCollapsed={setIsSidebarCollapsed}
@@ -127,8 +136,8 @@ function App() {
                   </EmployeeContext.Provider>
                 </main>
               </Box>
-            </UserContext.Provider>
-          </div>
+            </div>
+          </UserContext.Provider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </LocalizationProvider>
