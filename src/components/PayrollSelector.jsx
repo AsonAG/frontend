@@ -1,20 +1,29 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, FormControl, MenuItem, Select, TextField } from "@mui/material";
 import { UserContext } from "../App";
 
 export default function PayrollSelector() {
   const { user, setUser } = useContext(UserContext);
-  const [payroll, setPayroll] = useState(user?.currentPayrollName);
+  const [payroll, setPayroll] = useState({
+        currentPayrollName: "",
+        currentPayrollId: ""
+  });
 
   const handleChange = (e) => {
-    setPayroll(e.value);
-
     setUser((current) => ({
       ...current,
-      currentPayrollName: e.value,
-      currentPayrollId: "1",
+      currentPayrollName: user.availablePayrolls.find((payroll) => 
+        payroll.payrollId === e.target.value).payrollName,
+      currentPayrollId: e.target.value,
     }));
   };
+
+  useEffect(()=>{
+        setPayroll({
+                currentPayrollName: user?.currentPayrollName,
+                currentPayrollId: user?.currentPayrollId
+          })
+  },[user]);
 
   return (
     <Box m="25px">
@@ -24,13 +33,13 @@ export default function PayrollSelector() {
           id="payroll-main-select"
           label="Payroll"
           onChange={handleChange}
-          value={payroll}
+          value={payroll.currentPayrollId}
         >
           {user?.availablePayrolls?.map((option) => {
             return (
               <MenuItem
                 key={"payroll-select-item-" + option.payrollId}
-                // value={option.payrollName}
+                value={option.payrollId}
               >
                 {option.payrollName}
               </MenuItem>
