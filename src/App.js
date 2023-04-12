@@ -8,7 +8,7 @@ import Dashboard from "./scenes/dashboard";
 import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
 import Reporting from "./scenes/reporting";
-import CaseForm from "./scenes/global/case/CaseForm";
+import CaseForm from "./components/case/CaseForm";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Box, height } from "@mui/system";
@@ -49,8 +49,11 @@ function App() {
   const [user, setUser] = useState({
     loaded: false,
     isAuthenticated: false,
+    userEmail: "",
     userId: "",
-    employeeId: "",
+    employeeId: "1",
+    tenantId: "",
+    divisionId: "",
     currentPayrollId: "1",
     currentPayrollName: "SimplePayroll.Derived1",
     availablePayrolls: [
@@ -69,13 +72,14 @@ function App() {
     setUser((current) => ({
       ...current,
       isAuthenticated: false,
+      loaded: false
     }));
     navigate("/login");
   };
   useEffect(() => {
     // console.log(user.currentPayrollId);
     if (user.isAuthenticated) {
-      navigate("/");
+      // navigate("/");
     } else navigate("/login");
   }, [user]);
 

@@ -1,14 +1,16 @@
 import { useTheme } from "@emotion/react";
-import { useMemo, useRef, useState, useContext, createContext } from "react";
-import { tokens } from "../../../theme";
+import { useMemo, useRef, useState, useContext, createContext, useEffect } from "react";
+import { tokens } from "../../theme";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import Header from "../../../components/Header";
-import ApiClient from "../../../api/ApiClient";
-import CasesApi from "../../../api/CasesApi";
+import Header from "../Header";
+import ApiClient from "../../api/ApiClient";
+import CasesApi from "../../api/CasesApi";
 import CaseFieldsForm from "./CaseFieldsForm";
-import useDidMountEffect from "../../../hooks/useDidMountEffect";
+import useDidMountEffect from "../../hooks/useDidMountEffect";
+import { UserContext } from "../../App";
+
 
 export const CaseContext = createContext();
 
@@ -19,7 +21,8 @@ const CaseForm = (props) => {
   const [caseDetails, setCaseDetails] = useState();
   const [outputCase, setOutputCase] = useState({});
   const [relatedCases, setRelatedCases] = useState({});
-  const casesApi = useMemo(() => new CasesApi(ApiClient), []);
+  const { user, setUser } = useContext(UserContext);
+  const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
 
   const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
@@ -76,9 +79,7 @@ const CaseForm = (props) => {
     );
   }, [outputCase, relatedCases]);
 
-  const updateRelatedCases = (newCase) => {
-    setRelatedCases([...relatedCases, newCase]);
-  };
+  useEffect(()=>{}, [user]);
 
   return (
     props.caseName && (

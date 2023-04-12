@@ -1,5 +1,5 @@
 import { useTheme } from "@emotion/react";
-import { tokens } from "../../../theme";
+import { tokens } from "../../theme";
 import { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
@@ -8,7 +8,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Field from "./Field";
-import useDidMountEffect from "../../../hooks/useDidMountEffect";
+import useDidMountEffect from "../../hooks/useDidMountEffect";
 
 const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const theme = useTheme();

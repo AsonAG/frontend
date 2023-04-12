@@ -1,7 +1,7 @@
 import { useMemo, useState, useContext, Fragment, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
-import ApiClient from "../../../api/ApiClient";
-import CasesApi from "../../../api/CasesApi";
+import ApiClient from "../../api/ApiClient";
+import CasesApi from "../../api/CasesApi";
 import {
   Box,
   InputAdornment,
@@ -19,7 +19,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "./CaseForm";
 import { useTheme } from "@emotion/react";
-import { tokens } from "../../../theme";
+import { tokens } from "../../theme";
+import { UserContext } from "../../App";
 
 const Field = ({ field, onChange }) => {
   const [isTimeSettingVisible, setTimeSettingVisible] = useState(
@@ -50,7 +51,9 @@ const Field = ({ field, onChange }) => {
   const [isLookupOpened, setLookupOpened] = useState(false);
   const [lookupOptions, setLookupOptions] = useState([]);
   const lookupLoading = isLookupOpened && lookupOptions?.length === 0;
-  const casesApi = useMemo(() => new CasesApi(ApiClient), []);
+
+  const { user, setUser } = useContext(UserContext);
+  const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
 
   useEffect(() => {
     let active = true;

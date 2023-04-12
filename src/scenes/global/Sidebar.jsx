@@ -179,9 +179,9 @@ const Sidebar = ({ isCollapsed }) => {
                 /> */}
                 </Box>
                 <Box textAlign="left" sx={{ m: "0 10px 20px 30px" }}>
-                  <Typography variant="h5" color={colors.greenAccent[500]}>
+                  {/* <Typography variant="h5" color={colors.greenAccent[500]}>
                     {user.payrollName}
-                  </Typography>
+                  </Typography> */}
 
                   <Typography
                     variant="h6"
@@ -189,7 +189,7 @@ const Sidebar = ({ isCollapsed }) => {
                     // fontWeight="bold"
                     m="0 0px 12px 0px"
                   >
-                    {user.employeeId}
+                    {user.userEmail}
                   </Typography>
 
                   <PayrollSelector />

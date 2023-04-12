@@ -32,13 +32,16 @@ export class CasesApi {
     * default to {@link module:ApiClient#instanc
     e} if unspecified.
     */
-  constructor(apiClient) {
+  constructor(apiClient, user) {
     this.apiClient = apiClient || ApiClient.instance;
-    this.userId = this.apiClient.userId;
-    this.employeeId = this.apiClient.employeeId;
-    this.divisionId = this.apiClient.divisionId;
 
-    this.payrollPath = "/payrolls/" + this.apiClient.payrollId + "/";
+    this.tenantId = user.tenantId;
+    this.userId = user.userId;
+    this.employeeId = user.employeeId;
+    this.divisionId = user.divisionId;
+    this.payrollId = user.currentPayrollId;
+
+    this.payrollPath = "/payrolls/" + this.payrollId + "/";
   }
 
   buildCaseFieldValues(caseName, caseFields) {
@@ -176,7 +179,8 @@ export class CasesApi {
       contentTypes,
       accepts,
       returnType,
-      callback
+      callback,
+      this.tenantId
     );
   }
   /**
@@ -221,7 +225,8 @@ export class CasesApi {
       contentTypes,
       accepts,
       returnType,
-      callback
+      callback,
+      this.tenantId
     );
   }
   /**
@@ -283,7 +288,8 @@ export class CasesApi {
       contentTypes,
       accepts,
       returnType,
-      callback
+      callback,
+      this.tenantId
     );
   }
 
@@ -326,7 +332,8 @@ export class CasesApi {
       contentTypes,
       accepts,
       returnType,
-      callback
+      callback,
+      this.tenantId
     );
   }
   /**
@@ -378,9 +385,11 @@ export class CasesApi {
       contentTypes,
       accepts,
       returnType,
-      callback
+      callback,
+      this.tenantId
     );
   }
 }
 
 export default CasesApi;
+

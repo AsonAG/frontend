@@ -29,10 +29,11 @@ export class EmployeesApi {
     * default to {@link module:ApiClient#instanc
     e} if unspecified.
     */
-  constructor(apiClient) {
+  constructor(apiClient, user) {
     this.apiClient = apiClient || ApiClient.instance;
-    this.userId = this.apiClient.userId;
-    this.employeeId = this.apiClient.employeeId;
+    this.tenantId = user.tenantId;
+    this.userId = user.userId;
+    this.employeeId = user.employeeId;
   }
 
   /**
@@ -76,7 +77,8 @@ export class EmployeesApi {
       contentTypes,
       accepts,
       returnType,
-      callback
+      callback,
+      this.tenantId
     );
   }
 }

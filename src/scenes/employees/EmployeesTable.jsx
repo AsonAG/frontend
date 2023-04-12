@@ -7,18 +7,21 @@ import {
 import { Link } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import { Box, IconButton, useTheme } from "@mui/material";
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useMemo, useContext } from "react";
 import EmployeesApi from "../../api/EmployeesApi";
-import ApiClient from "../../api/ApiClient";
 import { tokens } from "../../theme";
 import EmployeesSplitButton from "./EmployeesSplitButton";
+import { UserContext } from "../../App";
+import { ApiClient } from "../../api/ApiClient";
+
 
 const EmployeesTable = ({ updateCaseName }) => {
   const [employeeData, setEmployeeData] = useState([]);
   const [employeeDataLoaded, setEmployeeDataLoaded] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const employeesApi = new EmployeesApi(ApiClient);
+  const { user, setUser } = useContext(UserContext);
+  const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
 
   const callback = function (error, data, response) {
     let tableData = [];
