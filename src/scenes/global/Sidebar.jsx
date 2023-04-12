@@ -13,6 +13,7 @@ import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { UserContext } from "../../App";
+import PayrollSelector from "../../components/PayrollSelector";
 
 const Sidebar = ({ isCollapsed }) => {
   const theme = useTheme();
@@ -53,8 +54,8 @@ const Sidebar = ({ isCollapsed }) => {
             background: `${colors.primary[400]} !important`,
             // position: "-webkit-sticky",
             // position: 'sticky !important',
-            top: "0",
-            maxWidth: "250px",
+            // top: "0",
+            // maxWidth: "250px",
           },
           "& .pro-icon-wrapper": {
             backgroundColor: "transparent !important",
@@ -166,28 +167,35 @@ const Sidebar = ({ isCollapsed }) => {
               </Box>
             </Menu>
 
-            {(minWidth && !isCollapsed) && (<Box>
-              <Box display="flex" justifyContent="left" alignItems="left">
-                {/* <img
+            {minWidth && !isCollapsed && (
+              <Box>
+                <Box display="flex" justifyContent="left" alignItems="left">
+                  {/* <img
                   alt="profile-user"
                   width="120px"
                   height="120px"
                   src={`../../assets/user.png`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 /> */}
+                </Box>
+                <Box textAlign="left" sx={{ m: "0 10px 20px 30px" }}>
+                  <Typography variant="h5" color={colors.greenAccent[500]}>
+                    {user.payrollName}
+                  </Typography>
+
+                  <Typography
+                    variant="h6"
+                    color={colors.grey[100]}
+                    // fontWeight="bold"
+                    m="0 0px 12px 0px"
+                  >
+                    {user.employeeId}
+                  </Typography>
+
+                  <PayrollSelector />
+                </Box>
               </Box>
-              <Box textAlign="left" sx={{ m: "0 10px 20px 30px" }}>
-                <Typography
-                  variant="h5"
-                  color={colors.greenAccent[500]}
-                >
-                  {user.payrollName}
-                </Typography>
-                <Typography variant="h6" color={colors.grey[100]}>
-                  {user.employeeId}
-                </Typography>
-              </Box>
-            </Box>)}
+            )}
           </Box>
         </ProSidebar>
       </Box>

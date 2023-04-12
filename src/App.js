@@ -73,7 +73,7 @@ function App() {
     navigate("/login");
   };
   useEffect(() => {
-    console.log(user.currentPayrollId);
+    // console.log(user.currentPayrollId);
     if (user.isAuthenticated) {
       navigate("/");
     } else navigate("/login");
@@ -85,7 +85,11 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <UserContext.Provider value={{ user, setUser }}>
-            <div className="app" display="flex" flexDirection="column">
+            <Box 
+              className="app" 
+              // display="flex" 
+              // flexDirection="column"
+            >
               <Topbar
                 isCollapsed={isSidebarCollapsed}
                 setIsCollapsed={setIsSidebarCollapsed}
@@ -137,7 +141,7 @@ function App() {
                   </EmployeeContext.Provider>
                 </main>
               </Box>
-            </div>
+            </Box>
           </UserContext.Provider>
         </ThemeProvider>
       </ColorModeContext.Provider>

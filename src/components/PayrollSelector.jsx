@@ -26,7 +26,7 @@ export default function PayrollSelector() {
   },[user]);
 
   return (
-    <Box m="25px">
+    <Box>
       <FormControl variant="filled" size="small">
         <Select
           variant="outlined"

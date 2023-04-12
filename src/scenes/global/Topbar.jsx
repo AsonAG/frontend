@@ -115,7 +115,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
           </Box>
 
           <Box display="flex">
-            <PayrollSelector />
+            {/* <PayrollSelector /> */}
 
             <IconButton onClick={colorMode.toggleColorMode} size="large">
               {theme.palette.mode === "dark" ? (
