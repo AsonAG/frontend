@@ -10,6 +10,17 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Field from "./Field";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 
+function CaseNameHeader(caseBase) {
+  return (
+    <Typography variant="h4" fontWeight="bold" key={"casename_" + caseBase.id}>
+      {caseBase?.caseSlot
+        ? caseBase?.displayName + " " + caseBase?.caseSlot
+        : caseBase?.displayName}
+    </Typography>
+  );
+}
+
+
 const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -19,28 +30,15 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
     // update output cases
     setOutputCases((prevState) => ({
       ...prevState,
-      [caseBase.caseSlot ? caseBase.name + "_" + caseBase.caseSlot : caseBase.name]: 
-      {
+      [caseBase.caseSlot
+        ? caseBase.name + "_" + caseBase.caseSlot
+        : caseBase.name]: {
         caseName: caseBase.name,
         values: caseFieldsList,
-        caseSlot: caseBase.caseSlot
-      }
+        caseSlot: caseBase.caseSlot,
+      },
     }));
   }, [caseFieldsList]);
-
-  const updateOutputCases = () => {};
-
-  // const handleFieldChange = (fieldName, fieldValue) => {
-  //   let outputFields = (state => ({
-  //     ...state,
-  //     [fieldName]: fieldValue,
-  //   }));
-
-  //   setOutputCases((prevState) => ({
-  //     ...prevState,
-  //     [caseBase.name]: outputFields,
-  //   }));
-  // };
 
   const handleFieldChange = (
     fieldId,
@@ -51,95 +49,19 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
     fieldCaseSlot
   ) => {
     // add to fields list
-    setCaseFieldsList(current => ({
+    setCaseFieldsList((current) => ({
       ...current,
-      
-        [fieldId]: {
+
+      [fieldId]: {
         caseName: caseBase.name,
         caseFieldName: fieldName,
         value: fieldValue,
         start: fieldStartDate ? new Date(fieldStartDate).toISOString() : null,
         end: fieldEndDate ? new Date(fieldEndDate).toISOString() : null,
         caseSlot: fieldCaseSlot,
-      }
-    
-  }));
-    
-    // setOutputCases({
-    //   [caseBase.caseSlot ? caseBase.name + "_" + caseBase.caseSlot : caseBase.name]:
-    //   {
-    //   ...outputCases,
-    //   values: caseFieldsList
-    // }});
+      },
+    }));
   };
-
-  //   setOutputCases([
-  //     ...outputCases,
-  //     {
-  //       caseName: caseBase.name,
-  //       caseFieldName: fieldName,
-  //       value: fieldValue,
-  //       start: {fieldStartDate ? {new Date(fieldStartDate).toISOString()} : null },
-  //       end: new Date(fieldEndDate).toUTCString(),
-  //     }
-  //   ]);
-  // };
-
-  // fieldStartDate && fieldEndDate
-  //   ? setOutputCases([
-  //       ...outputCases,
-  //       {
-  //         caseName: caseBase.name,
-  //         caseFieldName: fieldName,
-  //         value: fieldValue,
-  //         start: new Date(fieldStartDate).toISOString(),
-  //         end: new Date(fieldEndDate).toUTCString(),
-  //       },
-  //     ])
-  //   : !fieldStartDate && fieldEndDate
-  //   ? setOutputCases([
-  //       ...outputCases,
-  //       {
-  //         caseName: caseBase.name,
-  //         caseFieldName: fieldName,
-  //         value: fieldValue,
-  //         end: new Date(fieldEndDate).toISOString(),
-  //       },
-  //     ])
-  //   : fieldStartDate && !fieldEndDate
-  //   ? setOutputCases([
-  //       ...outputCases,
-  //       {
-  //         caseName: caseBase.name,
-  //         caseFieldName: fieldName,
-  //         value: fieldValue,
-  //         start: new Date(fieldStartDate).toISOString(),
-  //       },
-  //     ])
-  //   : setOutputCases([
-  //       ...outputCases,
-  //       {
-  //         caseName: caseBase.name,
-  //         caseFieldName: fieldName,
-  //         value: fieldValue,
-  //       },
-  //     ]);
-
-  // setOutputCases((prevState) => {
-  //   // const tmp = prevState[caseBase.name] ?? {};
-  //   return [
-  //     ...prevState,
-  //     // [caseBase.name]: {
-  //     // ...tmp,
-  //     {
-  //       caseName: caseBase.name,
-  //       caseFieldName: fieldName,
-  //       value: fieldValue,
-  //       start: fieldStartDate,
-  //       end: fieldEndDate,
-  //     },
-  //   ];
-  // });
 
   return (
     <Box borderBottom={1} key={"casebox_" + caseBase.id}>
@@ -148,6 +70,7 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
         elevation={5}
         key={"caseaccordion_" + caseBase.id}
       >
+        {/***************************** Case Header ****************************/}
         {isBase ? (
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -156,15 +79,7 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
             }}
             key={"casesummary_" + caseBase.id}
           >
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              key={"casename_" + caseBase.id}
-            >
-              {caseBase?.caseSlot
-                ? caseBase?.displayName + caseBase?.caseSlot
-                : caseBase?.displayName}
-            </Typography>
+            {CaseNameHeader(caseBase)}
           </AccordionSummary>
         ) : (
           <AccordionSummary
@@ -175,19 +90,11 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
             }}
             key={"casesummary_" + caseBase.id}
           >
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              key={"casename_" + caseBase.id}
-            >
-              {caseBase?.caseSlot
-                ? caseBase?.displayName + ' ' + caseBase?.caseSlot
-                : caseBase?.displayName}
-            </Typography>
+            {CaseNameHeader(caseBase)}
           </AccordionSummary>
         )}
 
-        {/* Fields */}
+        {/***************************** Case Fields *****************************/}
         <AccordionDetails
           sx={{
             backgroundColor: colors.primary[400],
@@ -209,6 +116,7 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
           </Box>
 
           {isBase ? (
+            // skip base related cases, they are already considered in the Parent component 
             <></>
           ) : (
             <Box>
