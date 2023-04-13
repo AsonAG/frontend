@@ -28,7 +28,7 @@ const CasesTable = ({ updateCaseName, caseType, employee }) => {
 
   useEffect(() => {
     casesApi.getCases(callback, caseType, employee?.employeeId);
-  }, []);
+  }, [user]);
 
 
   const callback = function (error, data, response) {

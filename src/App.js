@@ -50,10 +50,10 @@ function App() {
     loaded: false,
     isAuthenticated: false,
     userEmail: "",
-    userId: "",
+    userId: "1",
     employeeId: "1",
-    tenantId: "",
-    divisionId: "",
+    tenantId: "1",
+    divisionId: "1",
     currentPayrollId: "1",
     currentPayrollName: "SimplePayroll.Derived1",
     availablePayrolls: [
@@ -76,12 +76,12 @@ function App() {
     }));
     navigate("/login");
   };
-  useEffect(() => {
-    console.log(user.currentPayrollId);
-    if (user.isAuthenticated) {
-      // navigate("/");
-    } else navigate("/login");
-  }, [user]);
+  // useEffect(() => {
+  //   console.log(user.currentPayrollId);
+  //   if (user.isAuthenticated) {
+  //     // navigate("/");
+  //   } else navigate("/login");
+  // }, [user]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
