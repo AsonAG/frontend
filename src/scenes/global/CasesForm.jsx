@@ -14,7 +14,8 @@ import { UserContext } from "../../App";
 
 export const CaseContext = createContext();
 
-const CasesForm = (props) => {
+const CasesForm = () => {
+  const caseName = window.sessionStorage.getItem("caseName");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
@@ -26,7 +27,6 @@ const CasesForm = (props) => {
   const formRef = useRef();
 
   const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
-
 
   const handleSubmit = (event) => {
     // event.preventDefault();
@@ -65,14 +65,14 @@ const CasesForm = (props) => {
   useDidMountEffect(() => {
     console.log(
       "Making api Request for a case fields update: " +
-        props.caseName +
+        caseName +
         JSON.stringify(outputCase, null, 2) +
         " ___related_cases___  " +
         JSON.stringify(relatedCases, null, 2)
     );
     // create request body
     casesApi.getCaseFields(
-      props.caseName,
+      caseName,
       callback,
       outputCase,
       relatedCases
@@ -84,11 +84,11 @@ const CasesForm = (props) => {
   }, [user]);
 
   return (
-    props.caseName && (
+    caseName && (
       <Box m="25px" display="flex" flexDirection="column" alignItems="left">
         {/* HEADER */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          {/* <Header title={props.caseName} subtitle="Fulfill the case details" /> */}
+          {/* <Header title={caseName} subtitle="Fulfill the case details" /> */}
           <Header title={caseDetails?.displayName} subtitle="Fulfill the case details" />
         </Box>
 

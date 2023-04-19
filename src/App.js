@@ -26,7 +26,7 @@ export const PayrollContext = createContext();
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [caseName, setCaseName] = useState("");
+  // const [caseName, onCaseSelect] = useState("");
   const [employeeChoice, setEmployeeChoice] = useState({});
   const navigate = useNavigate();
 
@@ -45,6 +45,14 @@ function App() {
   useEffect(() => {
     document.title = "Ason Payroll";
   }, []);
+  
+  // useEffect(() => {
+  //   window.sessionStorage.setItem("caseName", caseName);
+  // }, [caseName]);
+
+  const onCaseSelect = (caseName) => {
+    window.sessionStorage.setItem("caseName", caseName);
+  };
 
   const [user, setUser] = useState({
     loaded: false,
@@ -124,30 +132,30 @@ function App() {
                       <Route path="/" element={<Dashboard />} />
                       <Route
                         path="/tasks"
-                        element={<Tasks updateCaseName={setCaseName} />}
+                        element={<Tasks updateCaseName={onCaseSelect} />}
                       />
                       <Route
                         path="/company"
-                        element={<CompanyCases updateCaseName={setCaseName} />}
+                        element={<CompanyCases updateCaseName={onCaseSelect} />}
                       />
                       <Route
                         path="/employee"
-                        element={<EmployeeCases updateCaseName={setCaseName} />}
+                        element={<EmployeeCases updateCaseName={onCaseSelect} />}
                       />
                       <Route
                         path="/case"
-                        element={<CasesForm caseName={caseName} />} // TODO: Change caseName param to Router Path Param
+                        element={<CasesForm />} // TODO: Change caseName param to Router Path Param
                       />
 
                       <Route
                         path="/employees"
-                        element={<Employees updateCaseName={setCaseName} />}
+                        element={<Employees updateCaseName={onCaseSelect} />}
                       />
 
                       <Route path="/dossier" element={<Dossier />} />
                       <Route
                         path="/reporting"
-                        element={<Reporting updateCaseName={setCaseName} />}
+                        element={<Reporting updateCaseName={onCaseSelect} />}
                       />
 
                       <Route path="/login" element={<LoginForm />} />
