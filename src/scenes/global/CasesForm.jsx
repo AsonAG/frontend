@@ -4,17 +4,17 @@ import { tokens } from "../../theme";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import Header from "../Header";
+import Header from "../../components/Header";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
-import CaseFieldsForm from "./CaseFieldsForm";
+import CaseFieldsForm from "../../components/case/CaseFieldsForm";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 import { UserContext } from "../../App";
 
 
 export const CaseContext = createContext();
 
-const CaseForm = (props) => {
+const CasesForm = (props) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
@@ -138,4 +138,4 @@ const CaseForm = (props) => {
   );
 };
 
-export default CaseForm;
+export default CasesForm;

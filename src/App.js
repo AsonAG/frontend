@@ -8,7 +8,7 @@ import Dashboard from "./scenes/dashboard";
 import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
 import Reporting from "./scenes/reporting";
-import CaseForm from "./components/case/CaseForm";
+import CasesForm from "./scenes/global/CasesForm";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Box, height } from "@mui/system";
@@ -56,11 +56,21 @@ function App() {
     divisionId: "6",
     currentPayrollId: "6",
     currentPayrollName: "CaseDefPayroll.Derived",
+    // userId: "1",
+    // employeeId: "1",
+    // tenantId: "1",
+    // divisionId: "1",
+    // currentPayrollId: "1",
+    // currentPayrollName: "SimplePayroll.Derived1",
     availablePayrolls: [
       {
         payrollId: "6",
         payrollName: "CaseDefPayroll.Derived",
       },
+      // {
+      //   payrollId: "1",
+      //   payrollName: "SimplePayroll.Derived1",
+      // },
       // {
       //   payrollId: "2",
       //   payrollName: "SimplePayroll.Derived2",
@@ -126,7 +136,7 @@ function App() {
                       />
                       <Route
                         path="/case"
-                        element={<CaseForm caseName={caseName} />}
+                        element={<CasesForm caseName={caseName} />} // TODO: Change caseName param to Router Path Param
                       />
 
                       <Route

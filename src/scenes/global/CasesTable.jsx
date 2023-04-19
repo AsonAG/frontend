@@ -1,14 +1,14 @@
 import { Box, IconButton, useTheme } from "@mui/material";
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
-import { tokens } from "../theme";
+import { tokens } from "../../theme";
 import { React, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import CasesApi from "../api/CasesApi";
-import ApiClient from "../api/ApiClient";
+import CasesApi from "../../api/CasesApi";
+import ApiClient from "../../api/ApiClient";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
-import { UserContext } from "../App";
+import { UserContext } from "../../App";
 
 /**
  * Returns a table component representation of list of available cases.

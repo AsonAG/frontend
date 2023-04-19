@@ -106,7 +106,7 @@ const Sidebar = ({ isCollapsed }) => {
                   setSelected={setSelected}
                 />
                 <Item
-                  title="Report a case"
+                  title="Cases"
                   to="/reporting"
                   // icon={<PeopleOutlinedIcon />}
                   icon={<ContactsOutlinedIcon />}

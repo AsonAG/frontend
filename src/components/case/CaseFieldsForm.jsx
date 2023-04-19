@@ -7,7 +7,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Field from "./Field";
+import FieldWrapper from "./FieldWrapper";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 
 function CaseNameHeader(caseBase) {
@@ -107,7 +107,7 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
             key={"fieldswrapper_" + caseBase.id}
           >
             {caseBase?.fields?.map((field, i) => (
-              <Field
+              <FieldWrapper
                 field={field}
                 onChange={handleFieldChange}
                 key={"field_" + field.id}
