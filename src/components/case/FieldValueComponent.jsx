@@ -20,61 +20,6 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { UserContext } from "../../App";
 
-const getInputTypeFromJsonType = (jsonType) => {
-  switch (jsonType) {
-    case "String":
-      return "text";
-    case "Boolean":
-      return "Boolean";
-    case "Number":
-      return "numeric";
-    case "Decimal":
-      return "numeric";
-    default:
-      return jsonType;
-  }
-};
-
-const getAdornmentFromJsonType = (jsonType, fieldId) => {
-  let adornment;
-  switch (jsonType) {
-    case "Money":
-      adornment = "CHF";
-      break;
-    case "Percent":
-      adornment = "%";
-      break;
-    case "Distance":
-      adornment = "m";
-      break;
-    default:
-      return <></>;
-  }
-  return (
-    <InputAdornment key={"numbertype_adornment_" + fieldId} position="end">
-      {adornment}
-    </InputAdornment>
-  );
-};
-
-function textFieldProps(field, handleTextfieldBlur) {
-  return {
-    // inputMode: jsonTypeToInputMode(field.valueType),
-    // type: jsonTypeToInputMode(field.valueType),
-    onBlur: handleTextfieldBlur,
-    // pattern: '[0-9]*'  TODO: PATTERN
-    // Value types: input definitions according to a type:
-    endAdornment: getAdornmentFromJsonType(field.valueType, field.id),
-      // field.valueType == "Percent" ? (
-      //   <InputAdornment key={"numbertype_adornment_" + field.id} position="end">
-      //     %
-      //   </InputAdornment>
-      // ) : (
-      //   <></>
-      // ),
-  };
-}
-
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
  */
@@ -303,5 +248,60 @@ const FieldValueComponent = ({
     }
   /* Return any other type  =============================== END =============================== */
 };
+
+const getInputTypeFromJsonType = (jsonType) => {
+  switch (jsonType) {
+    case "String":
+      return "text";
+    case "Boolean":
+      return "Boolean";
+    case "Number":
+      return "numeric";
+    case "Decimal":
+      return "numeric";
+    default:
+      return jsonType;
+  }
+};
+
+const getAdornmentFromJsonType = (jsonType, fieldId) => {
+  let adornment;
+  switch (jsonType) {
+    case "Money":
+      adornment = "CHF";
+      break;
+    case "Percent":
+      adornment = "%";
+      break;
+    case "Distance":
+      adornment = "m";
+      break;
+    default:
+      return <></>;
+  }
+  return (
+    <InputAdornment key={"numbertype_adornment_" + fieldId} position="end">
+      {adornment}
+    </InputAdornment>
+  );
+};
+
+function textFieldProps(field, handleTextfieldBlur) {
+  return {
+    // inputMode: jsonTypeToInputMode(field.valueType),
+    // type: jsonTypeToInputMode(field.valueType),
+    onBlur: handleTextfieldBlur,
+    // pattern: '[0-9]*'  TODO: PATTERN
+    // Value types: input definitions according to a type:
+    endAdornment: getAdornmentFromJsonType(field.valueType, field.id),
+      // field.valueType == "Percent" ? (
+      //   <InputAdornment key={"numbertype_adornment_" + field.id} position="end">
+      //     %
+      //   </InputAdornment>
+      // ) : (
+      //   <></>
+      // ),
+  };
+}
 
 export default FieldValueComponent;

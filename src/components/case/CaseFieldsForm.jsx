@@ -12,14 +12,30 @@ import useDidMountEffect from "../../hooks/useDidMountEffect";
 
 function CaseNameHeader(caseBase) {
   return (
-    <Typography variant="h4" fontWeight="bold" key={"casename_" + caseBase.id}>
-      {caseBase?.caseSlot
-        ? caseBase?.displayName + " " + caseBase?.caseSlot
-        : caseBase?.displayName}
-    </Typography>
+    <Box display="flex" alignItems="baseline">
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        key={"casename_" + caseBase.id}
+        sx={{ 
+          marginRight: "20px", 
+          flexShrink: 0 }}
+      >
+        {caseBase?.caseSlot
+          ? caseBase?.displayName + " " + caseBase?.caseSlot
+          : caseBase?.displayName}
+      </Typography>
+
+      <Typography
+        variant="h5"
+        sx={{ color: "text.secondary" }}
+        key={"casename_desc_" + caseBase.id}
+      >
+        {caseBase?.description}
+      </Typography>
+    </Box>
   );
 }
-
 
 const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const theme = useTheme();
@@ -116,7 +132,7 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
           </Box>
 
           {isBase ? (
-            // skip base related cases, they are already considered in the Parent component 
+            // skip base related cases, they are already considered in the Parent component
             <></>
           ) : (
             <Box>

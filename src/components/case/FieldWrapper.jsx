@@ -1,31 +1,19 @@
-import { useMemo, useState, useContext, Fragment, useEffect } from "react";
-import CircularProgress from "@mui/material/CircularProgress";
-import ApiClient from "../../api/ApiClient";
-import CasesApi from "../../api/CasesApi";
+import { useState, useContext } from "react";
 import {
   Box,
-  InputAdornment,
   IconButton,
-  Checkbox,
-  Autocomplete,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  Typography,
 } from "@mui/material";
-import TextField from "@mui/material/TextField";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
-import { UserContext } from "../../App";
 import FieldValueComponent from "./FieldValueComponent";
 
 const FieldWrapper = ({ field, onChange }) => {
   const [isTimeSettingVisible, setTimeSettingVisible] = useState(
-    field.start || field.end
+    // field.start || field.end
+    true
   );
   const [fieldName, setFieldName] = useState(field.name);
   const [fieldValue, setFieldValue] = useState(field.value);
@@ -35,19 +23,6 @@ const FieldWrapper = ({ field, onChange }) => {
   const [fieldEndDate, setFieldEndDate] = useState(
     field.end ? new Date(field.end) : null
   );
-  // Form validation SX options ================================ START ================================
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const { isSaveButtonClicked, setIsSaveButtonClicked } =
-    useContext(CaseContext);
-
-  const dateSlotProps = (isRequired, value) => {
-    return isSaveButtonClicked && isRequired && value
-      ? { textField: { error: true, helperText: "Field can not be empty" } }
-      : null;
-  };
-  // Form validation SX options ================================ END ================================
-
 
   const onValueChange = (value) => {
     onChange(
@@ -59,7 +34,6 @@ const FieldWrapper = ({ field, onChange }) => {
       field.caseSlot
     );
   }
-
 
   const handleInputStartDateChange = (dateValue) => {
     let newDate = dateValue ? new Date(dateValue) : null;
@@ -128,7 +102,7 @@ const FieldWrapper = ({ field, onChange }) => {
             </IconButton>
           </Box>
         )}
-        {false && field.timeType != "Timeless" && isTimeSettingVisible && (
+        {field.timeType != "Timeless" && isTimeSettingVisible && (
           // fieldStartDate &&
           <Box
             key={"field_textfield_dates" + field.id}
@@ -143,7 +117,6 @@ const FieldWrapper = ({ field, onChange }) => {
               value={fieldStartDate}
               onChange={handleInputStartDateChange}
               key={"field_textfield_startdate" + field.id}
-              slotProps={dateSlotProps(true, fieldStartDate)} // field validation
             />
             {field.timeType != "Moment" && (
               <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
@@ -153,7 +126,6 @@ const FieldWrapper = ({ field, onChange }) => {
                   value={fieldEndDate}
                   onChange={handleInputEndDateChange}
                   key={"field_textfield_enddate" + field.id}
-                  slotProps={dateSlotProps(field.endMandatory, fieldEndDate)} // field validation
                 />
               </Box>
             )}
