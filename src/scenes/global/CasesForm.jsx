@@ -33,7 +33,9 @@ const CasesForm = () => {
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
       casesApi.saveCase(outputCase, relatedCases, caseSaveCallback);
-    } else console.log("form INVALID");
+    } else {
+      console.log("form INVALID");
+    }
   };
 
   const caseSaveCallback = function (error, data, response) {
@@ -125,7 +127,6 @@ const CasesForm = () => {
               color="secondary"
               size="large"
               onClick={handleSubmit}
-              to="/status"
               endIcon={<SendIcon />}
             >
               Send

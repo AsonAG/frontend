@@ -84,19 +84,7 @@ const FieldValueComponent = ({
   setFieldValue,
   onChange,
 }) => {
-  // Form validation SX options   ================================ START ================================
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const { isSaveButtonClicked, setIsSaveButtonClicked } =
-    useContext(CaseContext);
-
-  const dateSlotProps = (isRequired, value) => {
-    return isSaveButtonClicked && isRequired && value
-      ? { textField: { error: true, helperText: "Field can not be empty" } } // TODO: Change error message
-      : null;
-    // : { textField: { required: true } };
-  };
-  // Form validation SX options   ================================ END ================================
+  const [fieldVisited, setFieldVisited] = useState(false);
   /* LookUp options               =============================== START =============================== */
   const [isLookupOpened, setLookupOpened] = useState(false);
   const [lookupOptions, setLookupOptions] = useState([]);
@@ -146,11 +134,24 @@ const FieldValueComponent = ({
       : null;
     setFieldValue(newValue);
     console.log("lookup input change:" + newValue + " field text:"); //+ JSON.parse(option.value)[field.lookupSettings.textFieldName]);
+    onChange();
   };
   /* LookUp options   ================================ END ================================ */
 
+  // Form validation SX options   ================================ START ================================
+  const { isSaveButtonClicked, setIsSaveButtonClicked } =
+    useContext(CaseContext);
+
+  const dateSlotProps = (isRequired) => {
+    return fieldVisited && isRequired && !fieldValue
+      ? { textField: { error: true, helperText: "Field can not be empty" } } // TODO: Change error message
+      : null;
+    // : { textField: { required: true } };
+  };
+  // Form validation SX options   ================================ END ================================
+  
   /* Handlers         =============================== START =============================== */
-  const handleStringValueChange = (e) => {
+  const handleTextValueChange = (e) => {
     // const regex = /^[0-9\b]+$/;
     // if (e.target.value === "" || regex.test(e.target.value)) {
     setFieldValue(e.target.value);
@@ -161,7 +162,6 @@ const FieldValueComponent = ({
   const handleBooleanValueChange = (e) => {
     console.log("input change: boolean clicked." + e.target.checked);
     setFieldValue(e.target.checked + "");
-    console.log("Blur activated");
     onChange(e.target.checked + "");
   };
 
@@ -172,10 +172,14 @@ const FieldValueComponent = ({
     onChange(newDate);
   };
 
-  const handleTextfieldBlur = () => {
+  const handleBlur = () => {
     console.log("Blur activated");
     onChange();
   };
+
+  const handleDateClose = () => {
+    setFieldVisited(true);
+  }
   /* Handlers         ================================ END ================================ */
 
   /* Return lookup    =============================== START =============================== */
@@ -191,7 +195,7 @@ const FieldValueComponent = ({
         onClose={() => {
           setLookupOpened(false);
         }}
-        onBlur={handleTextfieldBlur}
+        // onBlur={handleBlur}
         onChange={handleInputLookupValueChange}
         isOptionEqualToValue={(option, value) =>
           JSON.parse(option.value)[field.lookupSettings.textFieldName] ===
@@ -238,12 +242,13 @@ const FieldValueComponent = ({
           <DatePicker
             fullWidth
             name={field.name + "datepicker"}
-            label={field.displayName}
+            label={field.displayName + (!field.optional ? "*" : "")}
             helperText={field.description}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
+            onClose={handleDateClose}
             key={"field_textfield_" + field.id}
-            slotProps={dateSlotProps(!field.optional, fieldValue)} // field validation
+            slotProps={dateSlotProps(!field.optional)} // field validation
           ></DatePicker>
         );
       case "DateTime":
@@ -251,12 +256,13 @@ const FieldValueComponent = ({
           <DateTimePicker
             fullWidth
             name={field.name}
-            label={field.displayName}
+            label={field.displayName + (!field.optional ? "*" : "")}
             helperText={field.description}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
+            onClose={handleDateClose}
             key={"field_textfield_" + field.id}
-            slotProps={dateSlotProps(!field.optional, fieldValue)} // field validation
+            slotProps={dateSlotProps(!field.optional)} // field validation
           ></DateTimePicker>
         );
       case "Boolean":
@@ -288,13 +294,10 @@ const FieldValueComponent = ({
             helperText={field.description}
             required={!field.optional}
             value={fieldValue ? fieldValue : ""}
-            onChange={handleStringValueChange}
+            onChange={handleTextValueChange}
             type={getInputTypeFromJsonType(field.valueType)}
             key={"field_textfield_" + field.id}
-            InputProps={textFieldProps(field, handleTextfieldBlur)}
-            slotProps={{
-              textField: { error: true, helperText: "Field can not be empty" },
-            }} // THIS slotProps allows textField prop
+            InputProps={textFieldProps(field, handleBlur)}
           />
         );
     }

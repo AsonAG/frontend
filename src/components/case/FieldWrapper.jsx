@@ -128,7 +128,7 @@ const FieldWrapper = ({ field, onChange }) => {
             </IconButton>
           </Box>
         )}
-        {field.timeType != "Timeless" && isTimeSettingVisible && (
+        {false && field.timeType != "Timeless" && isTimeSettingVisible && (
           // fieldStartDate &&
           <Box
             key={"field_textfield_dates" + field.id}
