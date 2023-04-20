@@ -24,19 +24,45 @@ import { UserContext } from "../../App";
 
 const transformJsonType = (jsonType) => {
   switch (jsonType) {
+    case "String":
+      return "string";
+    case "Boolean":
+      return "Boolean";
     case "Number":
       return "numeric";
-    case "Boolean":
-      return "";
+    case "Decimal":
+      return "numeric";
     default:
-      break;
+      return jsonType;
   }
 };
+
+function textFieldProps(field, handleTextfieldBlur) {
+  return {
+    // inputMode: transformJsonType(field.valueType),
+    onBlur: handleTextfieldBlur,
+    // pattern: '[0-9]*'  TODO: PATTERN
+    // Value types: input definitions according to a type:
+    endAdornment:
+      field.valueType == "Percent" ? (
+        <InputAdornment key={"numbertype_adornment_" + field.id} position="end">
+          %
+        </InputAdornment>
+      ) : (
+        <span />
+      ),
+  };
+}
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
  */
-const FieldValueComponent = ({field, fieldValue, setFieldValue, onChange}) => {
+const FieldValueComponent = ({
+  field,
+  fieldValue,
+  setFieldValue,
+  onChange,
+}) => {
   // Form validation SX options   ================================ START ================================
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -241,23 +267,7 @@ const FieldValueComponent = ({field, fieldValue, setFieldValue, onChange}) => {
           value={fieldValue ? fieldValue : ""}
           onChange={handleStringValueChange}
           key={"field_textfield_" + field.id}
-          InputProps={{
-            inputMode: transformJsonType(field.valueType),
-            onBlur: handleTextfieldBlur,
-            // pattern: '[0-9]*'  TODO: PATTERN
-            // Value types: input definitions according to a type:
-            endAdornment:
-              field.valueType == "Percent" ? (
-                <InputAdornment
-                  key={"numbertype_adornment_" + field.id}
-                  position="end"
-                >
-                  %
-                </InputAdornment>
-              ) : (
-                <span />
-              ),
-          }}
+          InputProps={textFieldProps(field, handleTextfieldBlur)}
           slotProps={{
             textField: { error: true, helperText: "Field can not be empty" },
           }} // THIS slotProps allows textField prop
