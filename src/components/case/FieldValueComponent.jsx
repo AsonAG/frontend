@@ -5,7 +5,6 @@ import CasesApi from "../../api/CasesApi";
 import {
   Box,
   InputAdornment,
-  IconButton,
   Checkbox,
   Autocomplete,
   FormControl,
@@ -14,7 +13,6 @@ import {
   Typography,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../scenes/global/CasesForm";
@@ -22,10 +20,10 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { UserContext } from "../../App";
 
-const transformJsonType = (jsonType) => {
+const getInputTypeFromJsonType = (jsonType) => {
   switch (jsonType) {
     case "String":
-      return "string";
+      return "text";
     case "Boolean":
       return "Boolean";
     case "Number":
@@ -37,20 +35,43 @@ const transformJsonType = (jsonType) => {
   }
 };
 
+const getAdornmentFromJsonType = (jsonType, fieldId) => {
+  let adornment;
+  switch (jsonType) {
+    case "Money":
+      adornment = "CHF";
+      break;
+    case "Percent":
+      adornment = "%";
+      break;
+    case "Distance":
+      adornment = "m";
+      break;
+    default:
+      return <></>;
+  }
+  return (
+    <InputAdornment key={"numbertype_adornment_" + fieldId} position="end">
+      {adornment}
+    </InputAdornment>
+  );
+};
+
 function textFieldProps(field, handleTextfieldBlur) {
   return {
-    // inputMode: transformJsonType(field.valueType),
+    // inputMode: jsonTypeToInputMode(field.valueType),
+    // type: jsonTypeToInputMode(field.valueType),
     onBlur: handleTextfieldBlur,
     // pattern: '[0-9]*'  TODO: PATTERN
     // Value types: input definitions according to a type:
-    endAdornment:
-      field.valueType == "Percent" ? (
-        <InputAdornment key={"numbertype_adornment_" + field.id} position="end">
-          %
-        </InputAdornment>
-      ) : (
-        <span />
-      ),
+    endAdornment: getAdornmentFromJsonType(field.valueType, field.id),
+      // field.valueType == "Percent" ? (
+      //   <InputAdornment key={"numbertype_adornment_" + field.id} position="end">
+      //     %
+      //   </InputAdornment>
+      // ) : (
+      //   <></>
+      // ),
   };
 }
 
@@ -71,8 +92,9 @@ const FieldValueComponent = ({
 
   const dateSlotProps = (isRequired, value) => {
     return isSaveButtonClicked && isRequired && value
-      ? { textField: { error: true, helperText: "Field can not be empty" } }
+      ? { textField: { error: true, helperText: "Field can not be empty" } } // TODO: Change error message
       : null;
+    // : { textField: { required: true } };
   };
   // Form validation SX options   ================================ END ================================
   /* LookUp options               =============================== START =============================== */
@@ -258,20 +280,23 @@ const FieldValueComponent = ({
           </FormControl>
         );
       default: //TextField
-        <TextField
-          fullWidth
-          name={field.name}
-          label={field.displayName}
-          helperText={field.description}
-          required={!field.optional}
-          value={fieldValue ? fieldValue : ""}
-          onChange={handleStringValueChange}
-          key={"field_textfield_" + field.id}
-          InputProps={textFieldProps(field, handleTextfieldBlur)}
-          slotProps={{
-            textField: { error: true, helperText: "Field can not be empty" },
-          }} // THIS slotProps allows textField prop
-        />;
+        return (
+          <TextField
+            fullWidth
+            name={field.name}
+            label={field.displayName}
+            helperText={field.description}
+            required={!field.optional}
+            value={fieldValue ? fieldValue : ""}
+            onChange={handleStringValueChange}
+            type={getInputTypeFromJsonType(field.valueType)}
+            key={"field_textfield_" + field.id}
+            InputProps={textFieldProps(field, handleTextfieldBlur)}
+            slotProps={{
+              textField: { error: true, helperText: "Field can not be empty" },
+            }} // THIS slotProps allows textField prop
+          />
+        );
     }
   /* Return any other type  =============================== END =============================== */
 };

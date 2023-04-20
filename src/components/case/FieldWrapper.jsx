@@ -106,6 +106,7 @@ const FieldWrapper = ({ field, onChange }) => {
         key={"field_inline_" + field.id}
       >
         <FieldValueComponent  
+          fieldName={fieldName}
           fieldValue={fieldValue}
           setFieldValue={setFieldValue}
           field={field} 
