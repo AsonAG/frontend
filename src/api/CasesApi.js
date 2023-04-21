@@ -196,7 +196,7 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCasesCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCases(callback, caseType, employeeId) {
+  getCases(callback, caseType, employeeId, clusterName) {
     let postBody = null;
 
     let pathParams = {};
@@ -204,6 +204,7 @@ export class CasesApi {
       userId: this.userId,
       employeeId: employeeId ? employeeId : this.employeeId,
       caseType: caseType,
+      clusterSetName: clusterName
     };
     let headerParams = {};
     let formParams = {};

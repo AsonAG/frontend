@@ -9,7 +9,11 @@ const Tasks = ({ updateCaseName }) => {
   return (
     <Box m="25px">
       <Header title="TASKS" subtitle="Finish your tasks" />
-      <CasesTable updateCaseName={updateCaseName} caseType={"Employee"} />
+      <CasesTable
+        updateCaseName={updateCaseName}
+        caseType={"Employee"}
+        clusterName={"ECT"}
+      />
     </Box>
   );
 };

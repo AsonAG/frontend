@@ -97,11 +97,9 @@ const FieldValueComponent = ({
   
   /* Handlers         =============================== START =============================== */
   const handleTextValueChange = (e) => {
-    // const regex = /^[0-9\b]+$/;
-    // if (e.target.value === "" || regex.test(e.target.value)) {
     setFieldValue(e.target.value);
     console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
-    // }
+    onChange(e.target.value);
   };
 
   const handleBooleanValueChange = (e) => {
@@ -290,7 +288,7 @@ function textFieldProps(field, handleTextfieldBlur) {
   return {
     // inputMode: jsonTypeToInputMode(field.valueType),
     // type: jsonTypeToInputMode(field.valueType),
-    onBlur: handleTextfieldBlur,
+    // onBlur: handleTextfieldBlur,
     // pattern: '[0-9]*'  TODO: PATTERN
     // Value types: input definitions according to a type:
     endAdornment: getAdornmentFromJsonType(field.valueType, field.id),
