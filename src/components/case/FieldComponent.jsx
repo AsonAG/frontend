@@ -10,7 +10,7 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import FieldValueComponent from "./FieldValueComponent";
 
-const FieldWrapper = ({ field, onChange }) => {
+const FieldComponent = ({ field, onChange }) => {
   const [isTimeSettingVisible, setTimeSettingVisible] = useState(
     // field.start || field.end
     true
@@ -136,4 +136,4 @@ const FieldWrapper = ({ field, onChange }) => {
   );
 };
 
-export default FieldWrapper;
+export default FieldComponent;
