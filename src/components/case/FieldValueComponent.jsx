@@ -115,11 +115,6 @@ const FieldValueComponent = ({
     onChange(newDate);
   };
 
-  const handleBlur = () => {
-    console.log("Blur activated");
-    onChange();
-  };
-
   const handleDateClose = () => {
     setFieldVisited(true);
   }
@@ -138,7 +133,6 @@ const FieldValueComponent = ({
         onClose={() => {
           setLookupOpened(false);
         }}
-        // onBlur={handleBlur}
         onChange={handleInputLookupValueChange}
         isOptionEqualToValue={(option, value) =>
           JSON.parse(option.value)[field.lookupSettings.textFieldName] ===
@@ -240,7 +234,7 @@ const FieldValueComponent = ({
             onChange={handleTextValueChange}
             type={getInputTypeFromJsonType(field.valueType)}
             key={"field_textfield_" + field.id}
-            InputProps={textFieldProps(field, handleBlur)}
+            InputProps={textFieldProps(field)}
           />
         );
     }
@@ -276,7 +270,7 @@ const getAdornmentFromJsonType = (jsonType, fieldId) => {
       break;
     default:
       return <></>;
-  }
+  };
   return (
     <InputAdornment key={"numbertype_adornment_" + fieldId} position="end">
       {adornment}
@@ -284,7 +278,7 @@ const getAdornmentFromJsonType = (jsonType, fieldId) => {
   );
 };
 
-function textFieldProps(field, handleTextfieldBlur) {
+function textFieldProps(field) {
   return {
     // inputMode: jsonTypeToInputMode(field.valueType),
     // type: jsonTypeToInputMode(field.valueType),
