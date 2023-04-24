@@ -1,8 +1,5 @@
 import { useState, useContext } from "react";
-import {
-  Box,
-  IconButton,
-} from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { CaseContext } from "../../scenes/global/CasesForm";
@@ -33,7 +30,7 @@ const FieldComponent = ({ field, onChange }) => {
       fieldEndDate,
       field.caseSlot
     );
-  }
+  };
 
   const handleInputStartDateChange = (dateValue) => {
     let newDate = dateValue ? new Date(dateValue) : null;
@@ -79,13 +76,15 @@ const FieldComponent = ({ field, onChange }) => {
         padding="8px"
         key={"field_inline_" + field.id}
       >
-        <FieldValueComponent  
+        <FieldValueComponent
           fieldName={fieldName}
           fieldValue={fieldValue}
           setFieldValue={setFieldValue}
-          field={field} 
+          field={field}
+          fieldValueType={field.valueType}
+          fieldDescription={field.description}
           onChange={onValueChange}
-           />
+        />
 
         {field.timeType != "Timeless" && (
           <Box
@@ -102,6 +101,7 @@ const FieldComponent = ({ field, onChange }) => {
             </IconButton>
           </Box>
         )}
+
         {field.timeType != "Timeless" && isTimeSettingVisible && (
           // fieldStartDate &&
           <Box
@@ -111,21 +111,33 @@ const FieldComponent = ({ field, onChange }) => {
             paddingLeft="10px"
             // justifyContent="space-between"
           >
-            <DatePicker
+            {/* <DatePicker
               name={field.name + "start"}
               label="Start"
               value={fieldStartDate}
               onChange={handleInputStartDateChange}
               key={"field_textfield_startdate" + field.id}
+            /> */}
+
+            <FieldValueComponent
+              fieldDisplayName={"Start"}
+              fieldValue={fieldStartDate}
+              setFieldValue={setFieldStartDate}
+              field={field}
+              fieldValueType={'Date'}
+              onChange={handleInputStartDateChange}
             />
+
             {field.timeType != "Moment" && (
               <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
-                <DatePicker
-                  name={field.name + "end"}
-                  label="End"
-                  value={fieldEndDate}
+                <FieldValueComponent
+                  fieldDisplayName={"End"}
+                  fieldValue={fieldEndDate}
+                  setFieldValue={setFieldEndDate}
+                  field={field}
+                  fieldValueType={'Date'}
                   onChange={handleInputEndDateChange}
-                  key={"field_textfield_enddate" + field.id}
+                  required={field.endMandatory}
                 />
               </Box>
             )}

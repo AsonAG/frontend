@@ -24,16 +24,21 @@ import { UserContext } from "../../App";
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
  */
 const FieldValueComponent = ({
+  fieldDisplayName,
   field,
   fieldValue,
   setFieldValue,
+  fieldValueType,
   onChange,
+  fieldDescription,
+  required=true,
 }) => {
   const [fieldVisited, setFieldVisited] = useState(false);
   /* LookUp options               =============================== START =============================== */
   const [isLookupOpened, setLookupOpened] = useState(false);
   const [lookupOptions, setLookupOptions] = useState([]);
   const lookupLoading = isLookupOpened && lookupOptions?.length === 0;
+  const fieldKey = "field_" + fieldDisplayName + "_" + field.id;
 
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
@@ -94,7 +99,7 @@ const FieldValueComponent = ({
     // : { textField: { required: true } };
   };
   // Form validation SX options   ================================ END ================================
-  
+
   /* Handlers         =============================== START =============================== */
   const handleTextValueChange = (e) => {
     setFieldValue(e.target.value);
@@ -117,14 +122,14 @@ const FieldValueComponent = ({
 
   const handleDateClose = () => {
     setFieldVisited(true);
-  }
+  };
   /* Handlers         ================================ END ================================ */
 
   /* Return lookup    =============================== START =============================== */
   if (field.lookupSettings && "lookupName" in field.lookupSettings) {
     return (
       <Autocomplete
-        key={"field_autocomplete_" + field.id}
+        name={fieldKey}
         // sx={{ width: 300 }}
         open={isLookupOpened}
         onOpen={() => {
@@ -145,9 +150,10 @@ const FieldValueComponent = ({
         loading={lookupLoading}
         renderInput={(params) => (
           <TextField
-            key={"field_textfield_" + field.id}
+          key={fieldKey}
+
             {...params}
-            label={field.displayName}
+            label={fieldDisplayName}
             InputProps={{
               ...params.InputProps,
               endAdornment: (
@@ -166,48 +172,48 @@ const FieldValueComponent = ({
   } else
   /* Return Lookup          ================================ END ================================ */
   /* Return any other type  =============================== START =============================== */
-    switch (field.valueType) {
+    switch (fieldValueType) {
       case "None":
         return (
           <Box>
-            <Typography>{field.displayName}</Typography>
-            <Typography fontStyle="italic">{field.description}</Typography>
+            <Typography>{fieldDisplayName}</Typography>
+            <Typography fontStyle="italic">{fieldDescription}</Typography>
           </Box>
         );
       case "Date":
         return (
           <DatePicker
             fullWidth
-            name={field.name + "datepicker"}
-            label={field.displayName + (!field.optional ? "*" : "")}
-            helperText={field.description}
+            label={fieldDisplayName + (required ? "*" : "")}
+            helperText={fieldDescription}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
             onClose={handleDateClose}
-            key={"field_textfield_" + field.id}
-            slotProps={dateSlotProps(!field.optional)} // field validation
+            name={fieldKey}
+            key={fieldKey}
+            slotProps={dateSlotProps(required)} // field validation
           ></DatePicker>
         );
       case "DateTime":
         return (
           <DateTimePicker
             fullWidth
-            name={field.name}
-            label={field.displayName + (!field.optional ? "*" : "")}
-            helperText={field.description}
+            label={fieldDisplayName + (required ? "*" : "")}
+            helperText={fieldDescription}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
             onClose={handleDateClose}
-            key={"field_textfield_" + field.id}
-            slotProps={dateSlotProps(!field.optional)} // field validation
+            name={fieldKey}
+            key={fieldKey}
+            slotProps={dateSlotProps(required)} // field validation
           ></DateTimePicker>
         );
       case "Boolean":
         return (
-          <FormControl required={!field.optional}>
+          <FormControl required={required}>
             <FormControlLabel
-              name={field.name}
-              label={field.displayName}
+              name={fieldKey}
+              label={fieldDisplayName}
               labelPlacement="end"
               control={
                 <Checkbox
@@ -215,26 +221,28 @@ const FieldValueComponent = ({
                     fieldValue ? fieldValue.toLowerCase?.() === "true" : false
                   }
                   onChange={handleBooleanValueChange}
-                  key={"field_textfield_" + field.id}
+            key={fieldKey}
                 />
               }
             />
-            <FormHelperText>{field.description}</FormHelperText>
+            <FormHelperText>{fieldDescription}</FormHelperText>
           </FormControl>
         );
       default: //TextField
         return (
           <TextField
             fullWidth
-            name={field.name}
-            label={field.displayName}
-            helperText={field.description}
-            required={!field.optional}
+            label={fieldDisplayName}
+            helperText={fieldDescription}
+            required={required}
             value={fieldValue ? fieldValue : ""}
             onChange={handleTextValueChange}
-            type={getInputTypeFromJsonType(field.valueType)}
-            key={"field_textfield_" + field.id}
-            InputProps={textFieldProps(field)}
+            type={getInputTypeFromJsonType(fieldValueType)}
+            name={fieldKey}
+            key={fieldKey}
+            InputProps={{
+              endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
+            }}
           />
         );
     }
@@ -270,30 +278,12 @@ const getAdornmentFromJsonType = (jsonType, fieldId) => {
       break;
     default:
       return <></>;
-  };
+  }
   return (
     <InputAdornment key={"numbertype_adornment_" + fieldId} position="end">
       {adornment}
     </InputAdornment>
   );
 };
-
-function textFieldProps(field) {
-  return {
-    // inputMode: jsonTypeToInputMode(field.valueType),
-    // type: jsonTypeToInputMode(field.valueType),
-    // onBlur: handleTextfieldBlur,
-    // pattern: '[0-9]*'  TODO: PATTERN
-    // Value types: input definitions according to a type:
-    endAdornment: getAdornmentFromJsonType(field.valueType, field.id),
-      // field.valueType == "Percent" ? (
-      //   <InputAdornment key={"numbertype_adornment_" + field.id} position="end">
-      //     %
-      //   </InputAdornment>
-      // ) : (
-      //   <></>
-      // ),
-  };
-}
 
 export default FieldValueComponent;
