@@ -15,13 +15,12 @@ import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
 import CaseFieldsForm from "../../components/case/CaseFieldsForm";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
-import { EmployeeContext, UserContext } from "../../App";
+import { UserContext } from "../../App";
 
 export const CaseContext = createContext();
 
-const CasesForm = () => {
+const CasesForm = (employee) => {
   const caseName = window.sessionStorage.getItem("caseName");
-  const employee = JSON.parse(window.sessionStorage.getItem("employee"));
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -116,9 +115,11 @@ const CasesForm = () => {
             ))}
           </Box>
 
-          <Box mt="20px" mb="30px">
+          <Box mt="20px" mb="30px" display="flex" flexDirection="row-reverse">
+            <Box width="200px" >
             <Button
               disableRipple
+              fullWidth
               type="submit"
               variant="contained"
               color="secondary"
@@ -128,6 +129,7 @@ const CasesForm = () => {
             >
               Send
             </Button>
+            </Box>
           </Box>
         </CaseContext.Provider>
       </form>

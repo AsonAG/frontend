@@ -20,7 +20,7 @@ const EmployeeCase = () => {
           title={ employee?.firstName + ' ' + employee?.lastName }
           subtitle={ employee?.divisions?.join(", ") }
       />
-      <CasesForm />
+      <CasesForm employee={employee} />
     </Box>
   );
 };

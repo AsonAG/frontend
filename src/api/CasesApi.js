@@ -67,19 +67,19 @@ export class CasesApi {
       },
     };
   }
-  buildRequestBodyCaseSave(caseName, caseFields) {
-    return {
-      userId: this.userId,
-      employeeId: this.employeeId,
-      divisionId: this.divisionId,
-      case: {
-        caseName: caseName,
-        values: this.buildCaseFieldValues(caseName, caseFields[0]),
-        // relatedCases:
-        //   JSON.stringify(caseFields[1]) != '{}' ? this.buildCaseFieldValues(caseName, caseFields[1]) : '[]',
-      },
-    };
-  }
+  // buildRequestBodyCaseSave(caseName, caseFields) {
+  //   return {
+  //     userId: this.userId,
+  //     employeeId: this.employeeId,
+  //     divisionId: this.divisionId,
+  //     case: {
+  //       caseName: caseName,
+  //       values: this.buildCaseFieldValues(caseName, caseFields[0]),
+  //       // relatedCases:
+  //       //   JSON.stringify(caseFields[1]) != '{}' ? this.buildCaseFieldValues(caseName, caseFields[1]) : '[]',
+  //     },
+  //   };
+  // }
 
   generateCasesBodyFromCasesObj(mainCase, relatedMainCases, shouldIncludeBody) {
     if (
@@ -156,7 +156,7 @@ export class CasesApi {
     };
     let queryParams = {
       userId: this.userId,
-      employeeId: employeeId,
+      employeeId: employeeId ? employeeId : this.employeeId,
       caseType: "Employee",
     };
     let headerParams = {};
@@ -183,12 +183,6 @@ export class CasesApi {
       this.tenantId
     );
   }
-
-  getPersonalCaseFields(caseName, callback, baseCase, relatedCases) {
-    return (this.getCaseFields(caseName, callback, baseCase, relatedCases, this.employeeId));
-    // return (getCaseFields(...props, props.employeeId));
-  }
-
 
   /**
    * Save a new case

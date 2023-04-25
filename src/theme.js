@@ -195,6 +195,10 @@ export const themeSettings = (mode) => {
         fontSize: 14,
       },
     },
+    // button: {
+    //   fontSize: 26,
+    //   fontWeight: 700,
+    // },
   };
 };
 
