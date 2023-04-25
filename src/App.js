@@ -14,7 +14,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Box, height } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
 import Employees from "./scenes/employees";
-import EmployeeCases from "./scenes/employeeCases";
+import EmployeeCases from "./scenes/employees/employeeCases";
 import EmployeeCase from "./scenes/case/EmployeeCase";
 import PersonalCase from "./scenes/case/PersonalCase";
 import CompanyCase from "./scenes/case/CompanyCase";
@@ -137,6 +137,10 @@ function App() {
                         element={<CompanyCases />}
                       />
                       <Route
+                        path="/employees"
+                        element={<Employees />}
+                      />
+                      <Route
                         path="/employee"
                         element={<EmployeeCases />}
                       />
@@ -151,10 +155,6 @@ function App() {
                       <Route
                         path="/companyCase"
                         element={<CompanyCase />}
-                      />
-                      <Route
-                        path="/employees"
-                        element={<Employees />}
                       />
 
                       <Route path="/dossier" element={<Dossier />} />

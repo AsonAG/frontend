@@ -6,20 +6,20 @@ import { useContext } from "react";
 import CasesForm from "../global/CasesForm";
 
 const EmployeeCase = () => {
+  // const caseName = window.sessionStorage.getItem("caseName");
+  // const caseDetails = window.sessionStorage.getItem("caseDetails");
   const employee = JSON.parse(window.sessionStorage.getItem("employee"));
 
   return (
-    <Box m="25px" display="flex" flexDirection="column" alignItems="left">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Box m="25px" display="flex" flexDirection="column" >
         {/* <Header
-          title={caseDetails?.displayName}
-          subtitle={caseDetails?.description}
+          title={caseName}
+          subtitle={caseDetails}
         /> */}
-        <Header
-          title={ employee?.divisions?.join(", ") }
-          subtitle={ `${employee?.firstName} ${employee?.lastName} - ${employee?.identifier}` }
-        />
-      </Box>
+      <Header   
+          title={ employee?.firstName + ' ' + employee?.lastName }
+          subtitle={ employee?.divisions?.join(", ") }
+      />
       <CasesForm />
     </Box>
   );

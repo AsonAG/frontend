@@ -1,9 +1,10 @@
 import { Box } from "@mui/material";
-import CasesTable from "../global/CasesTable";
-import Header from "../../components/Header";
+import CasesTable from "../../global/CasesTable";
+import Header from "../../../components/Header";
+import { useEffect, useState } from "react";
 
 const EmployeeCases = () => {
-  const employee = window.sessionStorage.getItem("employee"); //todo
+  const employee = JSON.parse(window.sessionStorage.getItem("employee"));
 
   return (
     <Box m="25px">

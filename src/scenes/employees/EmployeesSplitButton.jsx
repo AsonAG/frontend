@@ -19,7 +19,7 @@ export default function EmployeesSplitButton(params) {
     );
     switch (selectedIndex) {
       case 0:
-        console.log("Option 0: " + options[0] + params.setEmployeeChoice);
+        console.log("Option 0: " + options[0]);
         params.setEmployeeChoice(params.employee);
         navigate("/employee");
         break;
