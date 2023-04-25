@@ -157,7 +157,7 @@ export class CasesApi {
     let queryParams = {
       userId: this.userId,
       employeeId: employeeId ? employeeId : this.employeeId,
-      caseType: "Employee",
+      // caseType: "Employee",
     };
     let headerParams = {};
     let formParams = {};
