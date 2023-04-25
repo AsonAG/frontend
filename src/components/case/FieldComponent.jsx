@@ -2,9 +2,6 @@ import { useState, useContext } from "react";
 import { Box, IconButton } from "@mui/material";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { CaseContext } from "../../scenes/global/CasesForm";
-import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
 import FieldValueComponent from "./FieldValueComponent";
 
 const FieldComponent = ({ field, onChange }) => {

@@ -130,7 +130,7 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCaseFieldsCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseFields(caseName, callback, baseCase, relatedCases) {
+  getCaseFields(caseName, callback, baseCase, relatedCases, employeeId) {
     // verify the required parameter 'caseName' is set
     if (caseName === undefined || caseName === null) {
       throw new Error(
@@ -156,7 +156,7 @@ export class CasesApi {
     };
     let queryParams = {
       userId: this.userId,
-      employeeId: this.employeeId,
+      employeeId: employeeId,
       caseType: "Employee",
     };
     let headerParams = {};
@@ -183,13 +183,68 @@ export class CasesApi {
       this.tenantId
     );
   }
+
+  getPersonalCaseFields(caseName, callback, baseCase, relatedCases) {
+    return (this.getCaseFields(caseName, callback, baseCase, relatedCases, this.employeeId));
+    // return (getCaseFields(...props, props.employeeId));
+  }
+
+
   /**
-   * Callback function to receive the result of the getCases operation.
-   * @callback moduleapi/CasesApi~getCasesCallback
-   * @param {String} error Error message, if any.
-   * @param {module:model/CasesArray{ data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
+   * Save a new case
+   * Saves a new case&#x27;s values along with it&#x27;s related cases. Before &#x60;/cases/{caseName}/save&#x60; send a build request using either POST or GET &#x60; /cases/{caseName}&#x60;.
+   * @param {String} caseName
+   * @param {Object} opts Optional parameters
+   * @param {module:model/CaseFieldBasic} opts.body
+   * @param {module:api/CasesApi~saveCaseCallback} callback The callback function, accepting three arguments: error, data, response
    */
+  saveCase(baseCase, relatedCases, callback, employeeId, opts) {
+    opts = opts || {};
+    // let postBody =
+    //   JSON.stringify(caseFields[0]) != "{}"
+    //     ? this.buildRequestBodyCaseSave(caseName, caseFields)
+    //     : null;
+    let postBody = this.generateCasesBodyFromCasesObj(
+      baseCase,
+      relatedCases,
+      true
+    );
+    postBody.userId = this.userId;
+    postBody.employeeId = employeeId ? employeeId : this.employeeId;
+    postBody.divisionId = this.divisionId;
+
+    console.log("Request body: " + JSON.stringify(postBody, null, 2));
+
+    let pathParams = {};
+    let queryParams = {
+      // userId: this.userId,
+      // employeeId: employeeId ? employeeId : this.employeeId,
+      // caseType: "Employee",
+    };
+    let headerParams = {};
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = ["application/json"];
+    let accepts = [];
+    let returnType = null;
+
+    return this.apiClient.callApi(
+      this.payrollPath + "cases/sets",
+      "POST",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      callback,
+      this.tenantId
+    );
+  }
 
   /**
    * Get all case types available for an employee.
@@ -230,69 +285,7 @@ export class CasesApi {
       this.tenantId
     );
   }
-  /**
-   * Callback function to receive the result of the saveCase operation.
-   * @callback moduleapi/CasesApi~saveCaseCallback
-   * @param {String} error Error message, if any.
-   * @param data This operation does not return a value.
-   * @param {String} response The complete HTTP response.
-   */
 
-  /**
-   * Save a new case
-   * Saves a new case&#x27;s values along with it&#x27;s related cases. Before &#x60;/cases/{caseName}/save&#x60; send a build request using either POST or GET &#x60; /cases/{caseName}&#x60;.
-   * @param {String} caseName
-   * @param {Object} opts Optional parameters
-   * @param {module:model/CaseFieldBasic} opts.body
-   * @param {module:api/CasesApi~saveCaseCallback} callback The callback function, accepting three arguments: error, data, response
-   */
-  saveCase(baseCase, relatedCases, callback, opts) {
-    opts = opts || {};
-    // let postBody =
-    //   JSON.stringify(caseFields[0]) != "{}"
-    //     ? this.buildRequestBodyCaseSave(caseName, caseFields)
-    //     : null;
-    let postBody = this.generateCasesBodyFromCasesObj(
-      baseCase,
-      relatedCases,
-      true
-    );
-    postBody.userId = this.userId;
-    postBody.employeeId = this.employeeId;
-    postBody.divisionId = this.divisionId;
-
-    console.log("Request body: " + JSON.stringify(postBody, null, 2));
-
-    let pathParams = {};
-    let queryParams = {
-      userId: this.userId,
-      employeeId: this.employeeId,
-      caseType: "Employee",
-    };
-    let headerParams = {};
-    let formParams = {};
-
-    let authNames = [];
-    let contentTypes = ["application/json"];
-    let accepts = [];
-    let returnType = null;
-
-    return this.apiClient.callApi(
-      this.payrollPath + "cases/sets",
-      "POST",
-      pathParams,
-      queryParams,
-      headerParams,
-      formParams,
-      postBody,
-      authNames,
-      contentTypes,
-      accepts,
-      returnType,
-      callback,
-      this.tenantId
-    );
-  }
 
   /**
    * Gets case field dropdown options.

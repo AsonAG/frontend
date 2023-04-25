@@ -5,14 +5,14 @@ import Header from "../../components/Header";
 import { EmployeeContext } from "../../App";
 import { useContext } from "react";
 
-const Tasks = ({ updateCaseName }) => {
+const Tasks = () => {
   return (
     <Box m="25px">
       <Header title="TASKS" subtitle="Finish your tasks" />
       <CasesTable
-        updateCaseName={updateCaseName}
         caseType={"Employee"}
         clusterName={"ECT"}
+        navigateTo={'/personalCase'}
       />
     </Box>
   );

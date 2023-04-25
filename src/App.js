@@ -7,7 +7,7 @@ import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
-import Reporting from "./scenes/reporting";
+import PersonalCases from "./scenes/personalCases";
 import CasesForm from "./scenes/global/CasesForm";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -15,11 +15,13 @@ import { Box, height } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
 import Employees from "./scenes/employees";
 import EmployeeCases from "./scenes/employeeCases";
+import EmployeeCase from "./scenes/case/EmployeeCase";
+import PersonalCase from "./scenes/case/PersonalCase";
+import CompanyCase from "./scenes/case/CompanyCase";
 import { useEffect } from "react";
 // import { useAuth, useLoginWithRedirect, ContextHolder } from "@frontegg/react";
 import LoginForm from "./scenes/login";
 
-export const EmployeeContext = createContext();
 export const UserContext = createContext();
 export const PayrollContext = createContext();
 
@@ -27,7 +29,6 @@ function App() {
   const [theme, colorMode] = useMode();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   // const [caseName, onCaseSelect] = useState("");
-  const [employeeChoice, setEmployeeChoice] = useState({});
   const navigate = useNavigate();
 
   // const { user, isAuthenticated } = useAuth();
@@ -45,10 +46,6 @@ function App() {
   useEffect(() => {
     document.title = "Ason Payroll";
   }, []);
-
-  const onCaseSelect = (caseName) => {
-    window.sessionStorage.setItem("caseName", caseName);
-  };
 
   const [user, setUser] = useState({
     loaded: false,
@@ -129,42 +126,45 @@ function App() {
               >
                 <Sidebar isCollapsed={isSidebarCollapsed} />
                 <main className="content">
-                  <EmployeeContext.Provider
-                    value={{ employeeChoice, setEmployeeChoice }}
-                  >
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route
                         path="/tasks"
-                        element={<Tasks updateCaseName={onCaseSelect} />}
+                        element={<Tasks />}
                       />
                       <Route
                         path="/company"
-                        element={<CompanyCases updateCaseName={onCaseSelect} />}
+                        element={<CompanyCases />}
                       />
                       <Route
                         path="/employee"
-                        element={<EmployeeCases updateCaseName={onCaseSelect} />}
+                        element={<EmployeeCases />}
                       />
                       <Route
-                        path="/case"
-                        element={<CasesForm />} // TODO: Change caseName param to Router Path Param
+                        path="/personalCase"
+                        element={<PersonalCase />}
                       />
-
+                      <Route
+                        path="/employeeCase"
+                        element={<EmployeeCase />}
+                      />
+                      <Route
+                        path="/companyCase"
+                        element={<CompanyCase />}
+                      />
                       <Route
                         path="/employees"
-                        element={<Employees updateCaseName={onCaseSelect} />}
+                        element={<Employees />}
                       />
 
                       <Route path="/dossier" element={<Dossier />} />
                       <Route
                         path="/reporting"
-                        element={<Reporting updateCaseName={onCaseSelect} />}
+                        element={<PersonalCases />}
                       />
 
                       <Route path="/login" element={<LoginForm />} />
                     </Routes>
-                  </EmployeeContext.Provider>
                 </main>
               </Box>
             </Box>

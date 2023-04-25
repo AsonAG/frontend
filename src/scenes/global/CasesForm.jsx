@@ -1,21 +1,28 @@
 import { useTheme } from "@emotion/react";
-import { useMemo, useRef, useState, useContext, createContext, useEffect } from "react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+} from "react";
 import { tokens } from "../../theme";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import Header from "../../components/Header";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
 import CaseFieldsForm from "../../components/case/CaseFieldsForm";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
-import { UserContext } from "../../App";
-
+import { EmployeeContext, UserContext } from "../../App";
 
 export const CaseContext = createContext();
 
 const CasesForm = () => {
   const caseName = window.sessionStorage.getItem("caseName");
+  const employee = JSON.parse(window.sessionStorage.getItem("employee"));
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
@@ -32,7 +39,7 @@ const CasesForm = () => {
     // event.preventDefault();
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
-      casesApi.saveCase(outputCase, relatedCases, caseSaveCallback);
+      casesApi.saveCase(outputCase, relatedCases, caseSaveCallback, employee?.employeeId ); // TODO: change from 'employee?.employeeId' to different API functions for with or without employee param 
     } else {
       console.log("form INVALID");
     }
@@ -73,28 +80,19 @@ const CasesForm = () => {
         JSON.stringify(relatedCases, null, 2)
     );
     // create request body
-    casesApi.getCaseFields(
-      caseName,
-      callback,
-      outputCase,
-      relatedCases
-    );
+    casesApi.getCaseFields(caseName, callback, outputCase, relatedCases, employee?.employeeId);
   }, [outputCase, relatedCases]);
 
-  useEffect(()=>{
-    console.log("User changed - Refresh");
+  useEffect(() => {
+    console.log("User changed.");
   }, [user]);
 
   return (
     caseName && (
-      <Box m="25px" display="flex" flexDirection="column" alignItems="left">
-        {/* HEADER */}
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Header title={caseDetails?.displayName} subtitle="Fulfill the case details" />
-        </Box>
-
-        <form ref={formRef}>
-          <CaseContext.Provider value={{isSaveButtonClicked, setIsSaveButtonClicked}}>
+      <form ref={formRef}>
+        <CaseContext.Provider
+          value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
+        >
           <Box>
             {caseDetails && (
               <CaseFieldsForm
@@ -131,9 +129,8 @@ const CasesForm = () => {
               Send
             </Button>
           </Box>
-          </CaseContext.Provider>
-        </form>
-      </Box>
+        </CaseContext.Provider>
+      </form>
     )
   );
 };

@@ -12,11 +12,10 @@ import { UserContext } from "../../App";
 
 /**
  * Returns a table component representation of list of available cases.
- * @param updateCaseName setCaseName parent funciton.
  * @param caseType of CaseType type [Employee/Company/Global/National].
  * @returns {CasesTable} The a table component representation of list of available cases.
  */
-const CasesTable = ({ updateCaseName, caseType, employee, clusterName }) => {
+const CasesTable = ({ caseType, employee, clusterName, navigateTo }) => {
   const [caseData, setCaseData] = useState([]);
   const [caseDataLoaded, setCaseDataLoaded] = useState(false);
   const theme = useTheme();
@@ -31,7 +30,6 @@ const CasesTable = ({ updateCaseName, caseType, employee, clusterName }) => {
     setCaseData([]);
     casesApi.getCases(callback, caseType, employee?.employeeId, clusterName);
   }, [user]);
-
 
   const callback = function (error, data, response) {
     let tableData = [];
@@ -59,10 +57,14 @@ const CasesTable = ({ updateCaseName, caseType, employee, clusterName }) => {
     }
   };
 
+  const handleCaseSelection = (caseName) => {
+    window.sessionStorage.setItem("caseName", caseName);
+  };
+
   const handleRowClick = (params) => {
     console.log(params.row.caseName + " row clicked.");
-    updateCaseName(params.row.caseName);
-    navigate("/case");
+    handleCaseSelection(params.row.caseName);
+    navigate(navigateTo);
   };
   
   const columns = [
@@ -82,11 +84,11 @@ const CasesTable = ({ updateCaseName, caseType, employee, clusterName }) => {
         return (
           <IconButton
             component={Link}
-            to="/case"
+            to={navigateTo}
             variant="outlined"
             color="secondary"
             size="medium"
-            onClick={() => updateCaseName(caseName)}
+            onClick={() => handleCaseSelection(caseName)}
           >
             <SendIcon />
           </IconButton>

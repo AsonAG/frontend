@@ -3,14 +3,14 @@ import { React } from "react";
 import Header from "../../components/Header";
 import EmployeesTable from "./EmployeesTable";
 
-const Employees = ({ updateCaseName }) => {
+const Employees = () => {
   return (
     <Box m="25px">
       <Header
         title="EMPLOYEES"
         subtitle="Choose an employee and proceed with employee case"
       />
-      <EmployeesTable updateCaseName={updateCaseName} />
+      <EmployeesTable />
     </Box>
   );
 };

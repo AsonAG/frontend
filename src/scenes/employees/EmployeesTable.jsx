@@ -14,8 +14,15 @@ import EmployeesSplitButton from "./EmployeesSplitButton";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 
+/**
+ * set Employee object in session storage
+ */
+const handleEmployeeSelection = (employee) => {
+  window.sessionStorage.setItem("employee", JSON.stringify(employee));
+};
 
-const EmployeesTable = ({ updateCaseName }) => {
+
+const EmployeesTable = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [employeeDataLoaded, setEmployeeDataLoaded] = useState(false);
   const theme = useTheme();
@@ -95,7 +102,7 @@ const EmployeesTable = ({ updateCaseName }) => {
         return (
           <EmployeesSplitButton
             employee={employeeData.find((x) => x.employeeId === employeeId)}
-            updateCaseName={updateCaseName}
+            setEmployeeChoice={handleEmployeeSelection}
           ></EmployeesSplitButton>
         );
       },
