@@ -8,7 +8,6 @@ import Dashboard from "./scenes/dashboard";
 import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
 import PersonalCases from "./scenes/personalCases";
-import CasesForm from "./scenes/global/CasesForm";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Box, height } from "@mui/system";

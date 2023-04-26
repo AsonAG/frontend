@@ -19,7 +19,7 @@ import { UserContext } from "../../App";
 
 export const CaseContext = createContext();
 
-const CasesForm = (employee) => {
+const CasesForm = (employee, navigateTo) => {
   const caseName = window.sessionStorage.getItem("caseName");
 
   const theme = useTheme();
@@ -34,11 +34,11 @@ const CasesForm = (employee) => {
 
   const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event) => { 
     // event.preventDefault();
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
-      casesApi.saveCase(outputCase, relatedCases, caseSaveCallback, employee?.employeeId ); // TODO: change from 'employee?.employeeId' to different API functions for with or without employee param 
+      casesApi.saveCase(outputCase, relatedCases, caseSaveCallback, employee?.employeeId ); 
     } else {
       console.log("form INVALID");
     }
@@ -54,7 +54,7 @@ const CasesForm = (employee) => {
           JSON.stringify(response, null, 2) +
           "Exiting page..."
       );
-      navigate("/tasks");
+      navigate(navigateTo);
     }
   };
 

@@ -12,7 +12,8 @@ const PersonalCase = () => {
           title={caseDetails?.displayName}
           subtitle={caseDetails?.description}
         /> */}
-      <CasesForm />
+      <CasesForm 
+        navigateTo={"/tasks"}/>
     </Box>
   );
 };
