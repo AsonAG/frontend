@@ -82,7 +82,7 @@ const FieldComponent = ({ field, onChange }) => {
           setFieldValue={setFieldValue}
           fieldValueType={field.valueType}
           onChange={onValueChange}
-          field={field}
+          lookupSettings={field.lookupSettings}
         />
 
         {field.timeType != "Timeless" && (
@@ -123,7 +123,6 @@ const FieldComponent = ({ field, onChange }) => {
               fieldKey={fieldKey + "_start"}
               fieldValue={fieldStartDate}
               setFieldValue={setFieldStartDate}
-              field={field}
               fieldValueType={"Date"}
               onChange={handleInputStartDateChange}
             />
@@ -135,7 +134,6 @@ const FieldComponent = ({ field, onChange }) => {
                   fieldKey={fieldKey + "_end"}
                   fieldValue={fieldEndDate}
                   setFieldValue={setFieldEndDate}
-                  field={field}
                   fieldValueType={"Date"}
                   onChange={handleInputEndDateChange}
                   required={field.endMandatory}

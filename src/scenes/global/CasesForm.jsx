@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
-import CaseFieldsForm from "../../components/case/CaseFieldsForm";
+import CaseFieldsComponent from "../../components/case/CaseFieldsComponent";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 import { UserContext } from "../../App";
 
@@ -94,7 +94,7 @@ const CasesForm = (employee, navigateTo) => {
         >
           <Box>
             {caseDetails && (
-              <CaseFieldsForm
+              <CaseFieldsComponent
                 caseBase={caseDetails}
                 isBase={true}
                 outputCases={outputCase}
@@ -106,7 +106,7 @@ const CasesForm = (employee, navigateTo) => {
 
           <Box>
             {caseDetails?.relatedCases?.map((relatedCase, i) => (
-              <CaseFieldsForm
+              <CaseFieldsComponent
                 caseBase={relatedCase}
                 outputCases={relatedCases}
                 setOutputCases={setRelatedCases}

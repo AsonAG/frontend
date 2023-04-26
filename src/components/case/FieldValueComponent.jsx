@@ -32,7 +32,7 @@ const FieldValueComponent = ({
   fieldValueType,
   onChange,
   required=true,
-  field, // todo: remove later, used only for LookupSettings
+  lookupSettings
 }) => {
   const [fieldVisited, setFieldVisited] = useState(false);
   /* LookUp options               =============================== START =============================== */
@@ -49,7 +49,7 @@ const FieldValueComponent = ({
       return undefined;
     }
     casesApi.getCaseFieldLookups(
-      field.lookupSettings.lookupName,
+      lookupSettings.lookupName,
       callbackLookups
     );
     return () => {
@@ -80,10 +80,10 @@ const FieldValueComponent = ({
     // const regex = /^[0-9\b]+$/;
     // if (e.target.value === "" || regex.test(e.target.value)) {
     let newValue = option
-      ? JSON.parse(option.value)[field.lookupSettings.valueFieldName]
+      ? JSON.parse(option.value)[lookupSettings.valueFieldName]
       : null;
     setFieldValue(newValue);
-    console.log("lookup input change:" + newValue + " field text:"); //+ JSON.parse(option.value)[field.lookupSettings.textFieldName]);
+    console.log("lookup input change:" + newValue + " field text:"); //+ JSON.parse(option.value)[lookupSettings.textFieldName]);
     onChange();
   };
   /* LookUp options   ================================ END ================================ */
@@ -126,7 +126,7 @@ const FieldValueComponent = ({
   /* Handlers         ================================ END ================================ */
 
   /* Return lookup    =============================== START =============================== */
-  if (field.lookupSettings && "lookupName" in field.lookupSettings) {
+  if (lookupSettings && "lookupName" in lookupSettings) {
     return (
       <Autocomplete
         name={fieldKey}
@@ -140,11 +140,11 @@ const FieldValueComponent = ({
         }}
         onChange={handleInputLookupValueChange}
         isOptionEqualToValue={(option, value) =>
-          JSON.parse(option.value)[field.lookupSettings.textFieldName] ===
-          JSON.parse(value.value)[field.lookupSettings.textFieldName]
+          JSON.parse(option.value)[lookupSettings.textFieldName] ===
+          JSON.parse(value.value)[lookupSettings.textFieldName]
         }
         getOptionLabel={(option) =>
-          JSON.parse(option.value)[field.lookupSettings.textFieldName]
+          JSON.parse(option.value)[lookupSettings.textFieldName]
         }
         options={lookupOptions}
         loading={lookupLoading}

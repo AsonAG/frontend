@@ -37,7 +37,7 @@ function CaseNameHeader(caseBase) {
   );
 }
 
-const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
+const CaseFieldsComponent = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
@@ -137,7 +137,7 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
           ) : (
             <Box>
               {caseBase?.relatedCases?.map((relatedCase, i) => (
-                <CaseFieldsForm
+                <CaseFieldsComponent
                   isBase={false}
                   caseBase={relatedCase}
                   outputCases={outputCases}
@@ -153,4 +153,4 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   );
 };
 
-export default CaseFieldsForm;
+export default CaseFieldsComponent;
