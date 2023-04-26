@@ -25,20 +25,20 @@ import { UserContext } from "../../App";
  */
 const FieldValueComponent = ({
   fieldDisplayName,
-  field,
+  fieldDescription,
+  fieldKey,
   fieldValue,
   setFieldValue,
   fieldValueType,
   onChange,
-  fieldDescription,
   required=true,
+  field, // todo: remove later, used only for LookupSettings
 }) => {
   const [fieldVisited, setFieldVisited] = useState(false);
   /* LookUp options               =============================== START =============================== */
   const [isLookupOpened, setLookupOpened] = useState(false);
   const [lookupOptions, setLookupOptions] = useState([]);
   const lookupLoading = isLookupOpened && lookupOptions?.length === 0;
-  const fieldKey = "field_" + fieldDisplayName + "_" + field.id;
 
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);

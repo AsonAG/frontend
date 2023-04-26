@@ -9,7 +9,8 @@ const FieldComponent = ({ field, onChange }) => {
     // field.start || field.end
     true
   );
-  const [fieldName, setFieldName] = useState(field.name);
+  const fieldName = field.name;
+  const fieldKey = "field_" + field.name + "_" + field.id;
   const [fieldValue, setFieldValue] = useState(field.value);
   const [fieldStartDate, setFieldStartDate] = useState(
     field.start ? new Date(field.start) : null
@@ -20,7 +21,7 @@ const FieldComponent = ({ field, onChange }) => {
 
   const onValueChange = (value) => {
     onChange(
-      field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
+      fieldKey,
       fieldName,
       value ? value : fieldValue,
       fieldStartDate,
@@ -33,7 +34,7 @@ const FieldComponent = ({ field, onChange }) => {
     let newDate = dateValue ? new Date(dateValue) : null;
     setFieldStartDate(newDate);
     onChange(
-      field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
+      fieldKey,
       fieldName,
       fieldValue,
       newDate,
@@ -46,7 +47,7 @@ const FieldComponent = ({ field, onChange }) => {
     let newDate = dateValue ? new Date(dateValue) : null;
     setFieldEndDate(newDate);
     onChange(
-      field.caseSlot ? fieldName + "_" + field.caseSlot : fieldName,
+      fieldKey,
       fieldName,
       fieldValue,
       fieldStartDate,
@@ -74,13 +75,14 @@ const FieldComponent = ({ field, onChange }) => {
         key={"field_inline_" + field.id}
       >
         <FieldValueComponent
-          fieldName={fieldName}
+          fieldDisplayName={field.displayName}
+          fieldDescription={field.description}
+          fieldKey={fieldKey}
           fieldValue={fieldValue}
           setFieldValue={setFieldValue}
-          field={field}
           fieldValueType={field.valueType}
-          fieldDescription={field.description}
           onChange={onValueChange}
+          field={field}
         />
 
         {field.timeType != "Timeless" && (
@@ -118,10 +120,11 @@ const FieldComponent = ({ field, onChange }) => {
 
             <FieldValueComponent
               fieldDisplayName={"Start"}
+              fieldKey={fieldKey + "_start"}
               fieldValue={fieldStartDate}
               setFieldValue={setFieldStartDate}
               field={field}
-              fieldValueType={'Date'}
+              fieldValueType={"Date"}
               onChange={handleInputStartDateChange}
             />
 
@@ -129,10 +132,11 @@ const FieldComponent = ({ field, onChange }) => {
               <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
                 <FieldValueComponent
                   fieldDisplayName={"End"}
+                  fieldKey={fieldKey + "_end"}
                   fieldValue={fieldEndDate}
                   setFieldValue={setFieldEndDate}
                   field={field}
-                  fieldValueType={'Date'}
+                  fieldValueType={"Date"}
                   onChange={handleInputEndDateChange}
                   required={field.endMandatory}
                 />
