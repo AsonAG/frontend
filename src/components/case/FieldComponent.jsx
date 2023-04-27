@@ -4,13 +4,15 @@ import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import FieldValueComponent from "./FieldValueComponent";
 
+export const getFieldKey = (name, id) => "field_" + name + "_" + id;
+
 const FieldComponent = ({ field, onChange }) => {
   const [isTimeSettingVisible, setTimeSettingVisible] = useState(
     // field.start || field.end
     true
   );
   const fieldName = field.name;
-  const fieldKey = "field_" + field.name + "_" + field.id;
+  const fieldKey = getFieldKey(field.name, field.id);
   const [fieldValue, setFieldValue] = useState(field.value);
   const [fieldStartDate, setFieldStartDate] = useState(
     field.start ? new Date(field.start) : null

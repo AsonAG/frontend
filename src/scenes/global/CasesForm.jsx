@@ -35,7 +35,8 @@ const CasesForm = (employee, navigateTo) => {
   const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
 
   const handleSubmit = (event) => { 
-    // event.preventDefault();
+    event.preventDefault();
+
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
       casesApi.saveCase(outputCase, relatedCases, caseSaveCallback, employee?.employeeId ); 
@@ -51,9 +52,9 @@ const CasesForm = (employee, navigateTo) => {
     } else {
       console.log(
         "Case saved successfully. Response: " +
-          JSON.stringify(response, null, 2) +
-          "Exiting page..."
+          JSON.stringify(response, null, 2)
       );
+      console.log("Navigating to: " + navigateTo);
       navigate(navigateTo);
     }
   };
@@ -97,7 +98,6 @@ const CasesForm = (employee, navigateTo) => {
               <CaseFieldsComponent
                 caseBase={caseDetails}
                 isBase={true}
-                outputCases={outputCase}
                 setOutputCases={setOutputCase}
                 key={"case_main"}
               />
@@ -108,7 +108,6 @@ const CasesForm = (employee, navigateTo) => {
             {caseDetails?.relatedCases?.map((relatedCase, i) => (
               <CaseFieldsComponent
                 caseBase={relatedCase}
-                outputCases={relatedCases}
                 setOutputCases={setRelatedCases}
                 key={"case_related" + i + relatedCase.id}
               />
@@ -116,8 +115,9 @@ const CasesForm = (employee, navigateTo) => {
           </Box>
 
           <Box mt="20px" mb="30px" display="flex" flexDirection="row-reverse">
-            <Box width="200px" >
+            <Box width="240px" >
             <Button
+              // disable={}
               disableRipple
               fullWidth
               type="submit"

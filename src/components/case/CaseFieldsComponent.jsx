@@ -7,7 +7,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FieldComponent from "./FieldComponent";
+import FieldComponent, { getFieldKey } from "./FieldComponent";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 
 function CaseNameHeader(caseBase) {
@@ -37,7 +37,7 @@ function CaseNameHeader(caseBase) {
   );
 }
 
-const CaseFieldsComponent = ({ caseBase, isBase, outputCases, setOutputCases }) => {
+const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
@@ -46,9 +46,11 @@ const CaseFieldsComponent = ({ caseBase, isBase, outputCases, setOutputCases }) 
     // update output cases
     setOutputCases((prevState) => ({
       ...prevState,
-      [caseBase.caseSlot
-        ? caseBase.name + "_" + caseBase.caseSlot
-        : caseBase.name]: {
+      // [caseBase.caseSlot
+      //   ? caseBase.name + "_" + caseBase.caseSlot
+      //   : caseBase.name]: 
+      [getFieldKey(caseBase.name, caseBase.id)]:
+        {
         caseName: caseBase.name,
         values: caseFieldsList,
         caseSlot: caseBase.caseSlot,
@@ -140,7 +142,6 @@ const CaseFieldsComponent = ({ caseBase, isBase, outputCases, setOutputCases }) 
                 <CaseFieldsComponent
                   isBase={false}
                   caseBase={relatedCase}
-                  outputCases={outputCases}
                   setOutputCases={setOutputCases}
                   key={"case_related" + i + relatedCase.id}
                 />
