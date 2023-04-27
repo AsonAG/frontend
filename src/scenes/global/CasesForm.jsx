@@ -72,14 +72,14 @@ const CasesForm = (employee, navigateTo) => {
   };
 
   useDidMountEffect(() => {
-    console.log(
-      "Making api Request for a case fields update: " +
-        caseName +
-        JSON.stringify(outputCase, null, 2) +
-        " ___related_cases___  " +
-        JSON.stringify(relatedCases, null, 2)
-    );
-    // create request body
+    // console.log(
+    //   "Making api Request for a case fields update: " +
+    //     caseName +
+    //     JSON.stringify(outputCase, null, 2) +
+    //     " ___related_cases___  " +
+    //     JSON.stringify(relatedCases, null, 2)
+    // );
+
     casesApi.getCaseFields(caseName, callback, outputCase, relatedCases, employee?.employeeId);
   }, [outputCase, relatedCases]);
 
