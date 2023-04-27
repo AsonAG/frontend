@@ -20,6 +20,7 @@ import CompanyCase from "./scenes/case/CompanyCase";
 import { useEffect } from "react";
 // import { useAuth, useLoginWithRedirect, ContextHolder } from "@frontegg/react";
 import LoginForm from "./scenes/login";
+import User from "./model/User";
 
 export const UserContext = createContext();
 export const PayrollContext = createContext();
@@ -46,45 +47,7 @@ function App() {
     document.title = "Ason Payroll";
   }, []);
 
-  const [user, setUser] = useState({
-    loaded: false,
-    isAuthenticated: false,
-    userEmail: "",
-    // userId: "10",
-    // employeeId: "10",
-    // tenantId: "5",
-    // divisionId: "6",
-    // currentPayrollId: "6",
-    // currentPayrollName: "CaseDefPayroll.Derived",
-    userId: "1",
-    employeeId: "1",
-    tenantId: "1",
-    divisionId: "1",
-    currentPayrollId: "1",
-    currentPayrollName: "CH",
-    availablePayrolls: [
-      // {
-      //   payrollId: "6",
-      //   payrollName: "CaseDefPayroll.Derived",
-      // },
-      {
-        payrollId: "1",
-        payrollName: "CH",
-      },
-      {
-        payrollId: "2",
-        payrollName: "AT",
-      },
-      {
-        payrollId: "3",
-        payrollName: "BH",
-      },
-      {
-        payrollId: "4",
-        payrollName: "Demo Switzerland AG",
-      },
-    ],
-  });
+  const [user, setUser] = useState(User(1, 1, 1));
 
   const logout = () => {
     setUser((current) => ({
