@@ -16,6 +16,7 @@
 import superagent from "superagent";
 import querystring from "querystring";
 
+
 /**
 * @module ApiClient
 * @version 1.0.11
@@ -125,8 +126,14 @@ export class ApiClient {
         if (!path.match(/^\//)) {
             path = '/' + path;
         }
-
-        var url = this.basePath + '/' + tenantId +  path;
+        let url = path;
+        if(this.basePath) {
+            if (tenantId) {
+                url = this.basePath + "/" + tenantId + url;
+            } else {
+                url = this.basePath + url;
+            }
+        }
         url = url.replace(/\{([\w-]+)\}/g, (fullMatch, key) => {
             var value;
             if (pathParams.hasOwnProperty(key)) {
@@ -303,6 +310,11 @@ export class ApiClient {
     * @param {Array.<String>} authNames An array of authentication method names.
     */
     applyAuthToRequest(request, authNames) {
+
+        const accessToken = localStorage.getItem("ason_access_token");
+        if (accessToken) {
+            request.set({'Authorization': 'Bearer ' + accessToken});
+        }
         authNames.forEach((authName) => {
             var auth = this.authentications[authName];
             switch (auth.type) {
