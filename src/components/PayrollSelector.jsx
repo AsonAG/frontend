@@ -11,6 +11,7 @@ export default function PayrollSelector() {
   });
 
   const handleChange = (e) => {
+    console.log("User has changed.");
     setUser((current) => ({
       ...current,
       currentPayrollName: user.availablePayrolls.find(
@@ -18,7 +19,7 @@ export default function PayrollSelector() {
       ).payrollName,
       currentDivisionId: user.availablePayrolls.find(
         (payroll) => payroll.payrollId === e.target.value
-      ).divisionName,
+      ).divisionId,
       currentPayrollId: e.target.value,
     }));
   };

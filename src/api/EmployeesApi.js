@@ -14,9 +14,12 @@ export class EmployeesApi {
     * default to {@link module:ApiClient#instanc
     e} if unspecified.
     */
-  constructor(apiClient, tenantId) {
+  constructor(apiClient, user) {
     this.apiClient = apiClient || ApiClient.instance;
-    this.tenantId = tenantId;
+    this.tenantId = user.tenantId;
+    this.divisionId = user.currentDivisionId;
+    console.log("my user in api: ", JSON.stringify(user));
+
   }
 
   /**
@@ -33,10 +36,12 @@ export class EmployeesApi {
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
   getEmployees(callback) {
+
     let postBody = null;
 
     let pathParams = {};
     let queryParams = {
+      divisionId: this.divisionId
     };
     let headerParams = {
     };

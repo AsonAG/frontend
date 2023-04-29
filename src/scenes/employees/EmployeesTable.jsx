@@ -22,8 +22,15 @@ const EmployeesTable = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
-  const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user.tenantId), [user]);
+  const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
   const [employee, setEmployee] = useSessionStorage('employee', {});
+
+  useEffect(() => {
+    setEmployeeData([]);
+    setEmployeeDataLoaded(false);
+    setEmployeeDataFiltered([]);
+    employeesApi.getEmployees(callback);
+  }, [user]);
 
 /**
  * set Employee object in session storage
@@ -62,10 +69,6 @@ const handleEmployeeSelection = (employee) => {
       setEmployeeDataFiltered(tableData);
     }
   };
-
-  useEffect(() => {
-    employeesApi.getEmployees(callback);
-  }, []);
 
   // const handleRowClick = (params) => {
   //   console.log(params.row.caseName + " row clicked.");
