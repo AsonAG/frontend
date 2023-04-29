@@ -14,11 +14,9 @@ export class EmployeesApi {
     * default to {@link module:ApiClient#instanc
     e} if unspecified.
     */
-  constructor(apiClient, user) {
+  constructor(apiClient, tenantId) {
     this.apiClient = apiClient || ApiClient.instance;
-    this.tenantId = user.tenantId;
-    // this.userId = user.userId;
-    // this.employeeId = user.employeeId;
+    this.tenantId = tenantId;
   }
 
   /**
@@ -30,8 +28,7 @@ export class EmployeesApi {
    */
 
   /**
-   * Gets a list of tasks
-   * Gets a list of employee tasks.
+   * Gets a list of employees.
    * @param {module:api/EmployeesApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
@@ -52,6 +49,45 @@ export class EmployeesApi {
 
     return this.apiClient.callApi(
       "employees",
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      callback,
+      this.tenantId
+    );
+  }
+  /**
+   * Gets details for employee.
+   * @param employeeId 
+   * @param {module:api/EmployeesApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
+   * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
+   */
+  getEmployee(employeeId, callback) {
+    let postBody = null;
+
+    let pathParams = {
+      employeeId: employeeId,
+    };
+    let queryParams = {
+    };
+    let headerParams = {
+    };
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = null;
+
+    return this.apiClient.callApi(
+      "employees/{employeeId}",
       "GET",
       pathParams,
       queryParams,

@@ -22,7 +22,7 @@ const EmployeesTable = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
-  const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
+  const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user.tenantId), [user]);
   const [employee, setEmployee] = useSessionStorage('employee', {});
 
 /**
@@ -32,7 +32,6 @@ const handleEmployeeSelection = (employee) => {
   setEmployee(employee)
   // window.sessionStorage.setItem("employee", JSON.stringify(employee));
 };
-
 
   const callback = function (error, data, response) {
     let tableData = [];

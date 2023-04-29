@@ -5,29 +5,35 @@ import { UserContext } from "../App";
 export default function PayrollSelector() {
   const { user, setUser } = useContext(UserContext);
   const [payroll, setPayroll] = useState({
-        currentPayrollName: "",
-        currentPayrollId: ""
+    currentPayrollName: "",
+    currentPayrollId: "",
+    currentDivisionId: "",
   });
 
   const handleChange = (e) => {
     setUser((current) => ({
       ...current,
-      currentPayrollName: user.availablePayrolls.find((payroll) => 
-        payroll.payrollId === e.target.value).payrollName,
+      currentPayrollName: user.availablePayrolls.find(
+        (payroll) => payroll.payrollId === e.target.value
+      ).payrollName,
+      currentDivisionId: user.availablePayrolls.find(
+        (payroll) => payroll.payrollId === e.target.value
+      ).divisionName,
       currentPayrollId: e.target.value,
     }));
   };
 
-  useEffect(()=>{
-        setPayroll({
-                currentPayrollName: user?.currentPayrollName,
-                currentPayrollId: user?.currentPayrollId
-          })
-  },[user]);
+  useEffect(() => {
+    setPayroll({
+      currentPayrollName: user?.currentPayrollName,
+      currentPayrollId: user?.currentPayrollId,
+      currentDivisionId: user?.currentDivisionId,
+    });
+  }, [user]);
 
   return (
     <Box>
-      <FormControl variant="filled" size="small">
+      <FormControl variant="filled" fullWidth>
         <Select
           variant="outlined"
           id="payroll-main-select"

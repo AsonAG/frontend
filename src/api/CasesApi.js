@@ -23,7 +23,7 @@ export class CasesApi {
     this.tenantId = user.tenantId;
     this.userId = user.userId;
     // this.employeeId = user.employeeId;
-    this.divisionId = user.divisionId;
+    this.divisionId = user.currentDivisionId;
     this.payrollId = user.currentPayrollId;
 
     this.payrollPath = "/payrolls/" + this.payrollId + "/";

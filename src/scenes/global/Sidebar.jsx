@@ -178,7 +178,7 @@ const Sidebar = ({ isCollapsed }) => {
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 /> */}
                 </Box>
-                <Box textAlign="left" sx={{ m: "0 10px 20px 30px" }}>
+                <Box textAlign="left" sx={{ m: "0 30px 20px " }}>
                   {/* <Typography variant="h5" color={colors.greenAccent[500]}>
                     {user.payrollName}
                   </Typography> */}
