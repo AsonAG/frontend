@@ -138,20 +138,12 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
             <Menu
               id="menu-appbar"
               anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
               keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>Settings</MenuItem>
+              {/* <MenuItem onClick={handleClose}>Profile</MenuItem> */}
+              {/* <MenuItem onClick={handleClose}>Settings</MenuItem> */}
               <MenuItem onClick={handleClose}>Switch tenant</MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
