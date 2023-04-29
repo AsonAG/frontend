@@ -51,7 +51,9 @@ function App() {
     User({
       tenantId: 1,
       userId: 1,
-      employeeId: 1,
+      employee: {
+        employeeId: 1,
+      }
     })
   );
 

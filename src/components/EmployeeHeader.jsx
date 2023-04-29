@@ -1,6 +1,6 @@
 import Header from "./Header";
 
-function EmployeeHeader(employee) {
+function EmployeeHeader({employee}) {
   return (
     <Header
       title={employee.firstName + " " + employee.lastName}

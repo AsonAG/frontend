@@ -1,6 +1,6 @@
 import ApiClient from "../api/ApiClient";
 
-const User = ({ tenantId, userId, employeeId }) => {
+const User = ({ tenantId, userId, employee }) => {
   // const caseName = window.sessionStorage.getItem("caseName");
 
   return {
@@ -10,7 +10,7 @@ const User = ({ tenantId, userId, employeeId }) => {
 
     tenantId,
     userId,
-    employeeId,
+    employee,
 
     divisionId: "1", // TODO: redefine
     currentPayrollId: "1",

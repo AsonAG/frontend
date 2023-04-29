@@ -19,7 +19,7 @@ import { UserContext } from "../../App";
 
 export const CaseContext = createContext();
 
-const CasesForm = (employee, navigateTo) => {
+const CasesForm = ({employee, navigateTo}) => {
   const caseName = window.sessionStorage.getItem("caseName");
 
   const theme = useTheme();
