@@ -47,13 +47,19 @@ function App() {
     document.title = "Ason Payroll";
   }, []);
 
-  const [user, setUser] = useState(User(1, 1, 1));
+  const [user, setUser] = useState(
+    User({
+      tenantId: 1,
+      userId: 1,
+      employeeId: 1,
+    })
+  );
 
   const logout = () => {
     setUser((current) => ({
       ...current,
       isAuthenticated: false,
-      loaded: false
+      loaded: false,
     }));
     navigate("/login");
   };
@@ -70,9 +76,9 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <UserContext.Provider value={{ user, setUser }}>
-            <Box 
-              className="app" 
-              // display="flex" 
+            <Box
+              className="app"
+              // display="flex"
               // flexDirection="column"
             >
               <Topbar
@@ -88,45 +94,21 @@ function App() {
               >
                 <Sidebar isCollapsed={isSidebarCollapsed} />
                 <main className="content">
-                    <Routes>
-                      <Route path="/" element={<Dashboard />} />
-                      <Route
-                        path="/tasks"
-                        element={<Tasks />}
-                      />
-                      <Route
-                        path="/company"
-                        element={<CompanyCases />}
-                      />
-                      <Route
-                        path="/employees"
-                        element={<Employees />}
-                      />
-                      <Route
-                        path="/employee"
-                        element={<EmployeeCases />}
-                      />
-                      <Route
-                        path="/personalCase"
-                        element={<PersonalCase />}
-                      />
-                      <Route
-                        path="/employeeCase"
-                        element={<EmployeeCase />}
-                      />
-                      <Route
-                        path="/companyCase"
-                        element={<CompanyCase />}
-                      />
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/tasks" element={<Tasks />} />
+                    <Route path="/company" element={<CompanyCases />} />
+                    <Route path="/employees" element={<Employees />} />
+                    <Route path="/employee" element={<EmployeeCases />} />
+                    <Route path="/personalCase" element={<PersonalCase />} />
+                    <Route path="/employeeCase" element={<EmployeeCase />} />
+                    <Route path="/companyCase" element={<CompanyCase />} />
 
-                      <Route path="/dossier" element={<Dossier />} />
-                      <Route
-                        path="/reporting"
-                        element={<PersonalCases />}
-                      />
+                    <Route path="/dossier" element={<Dossier />} />
+                    <Route path="/reporting" element={<PersonalCases />} />
 
-                      <Route path="/login" element={<LoginForm />} />
-                    </Routes>
+                    <Route path="/login" element={<LoginForm />} />
+                  </Routes>
                 </main>
               </Box>
             </Box>

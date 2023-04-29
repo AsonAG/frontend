@@ -13,13 +13,7 @@ import { tokens } from "../../theme";
 import EmployeesSplitButton from "./EmployeesSplitButton";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
-
-/**
- * set Employee object in session storage
- */
-const handleEmployeeSelection = (employee) => {
-  window.sessionStorage.setItem("employee", JSON.stringify(employee));
-};
+import { useSessionStorage } from "usehooks-ts";
 
 
 const EmployeesTable = () => {
@@ -29,6 +23,16 @@ const EmployeesTable = () => {
   const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
   const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
+  const [employee, setEmployee] = useSessionStorage('employee', {});
+
+/**
+ * set Employee object in session storage
+ */
+const handleEmployeeSelection = (employee) => {
+  setEmployee(employee)
+  // window.sessionStorage.setItem("employee", JSON.stringify(employee));
+};
+
 
   const callback = function (error, data, response) {
     let tableData = [];

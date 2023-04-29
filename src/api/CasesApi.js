@@ -22,7 +22,7 @@ export class CasesApi {
 
     this.tenantId = user.tenantId;
     this.userId = user.userId;
-    this.employeeId = user.employeeId;
+    // this.employeeId = user.employeeId;
     this.divisionId = user.divisionId;
     this.payrollId = user.currentPayrollId;
 
@@ -141,7 +141,7 @@ export class CasesApi {
     };
     let queryParams = {
       userId: this.userId,
-      employeeId: employeeId ? employeeId : this.employeeId,
+      employeeId: employeeId,
       // caseType: "Employee",
     };
     let headerParams = {};
@@ -189,7 +189,7 @@ export class CasesApi {
       true
     );
     postBody.userId = this.userId;
-    postBody.employeeId = employeeId ? employeeId : this.employeeId;
+    postBody.employeeId = employeeId;
     postBody.divisionId = this.divisionId;
 
     console.log("Request body: " + JSON.stringify(postBody, null, 2));
@@ -236,7 +236,7 @@ export class CasesApi {
     let pathParams = {};
     let queryParams = {
       userId: this.userId,
-      employeeId: employeeId ? employeeId : this.employeeId,
+      employeeId: employeeId,
       caseType: caseType,
       clusterSetName: clusterName
     };

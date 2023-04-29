@@ -4,22 +4,21 @@ import Header from "../../components/Header";
 import { EmployeeContext } from "../../App";
 import { useContext } from "react";
 import CasesForm from "../global/CasesForm";
+import EmployeeHeader from "../../components/EmployeeHeader";
+import { useSessionStorage } from "usehooks-ts";
 
 const EmployeeCase = () => {
   // const caseName = window.sessionStorage.getItem("caseName");
   // const caseDetails = window.sessionStorage.getItem("caseDetails");
-  const employee = JSON.parse(window.sessionStorage.getItem("employee"));
+
+  // const employee = JSON.parse(window.sessionStorage.getItem("employee"));
+  const [employee, setEmployee] = useSessionStorage('employee', {});
+
 
   return (
     <Box m="25px" display="flex" flexDirection="column" >
-        {/* <Header
-          title={caseName}
-          subtitle={caseDetails}
-        /> */}
-      <Header   
-          title={ employee?.firstName + ' ' + employee?.lastName }
-          subtitle={ employee?.divisions?.join(", ") }
-      />
+      <EmployeeHeader employee={employee} />
+      
       <CasesForm 
         employee={employee} 
         navigateTo={"/employee"}/>

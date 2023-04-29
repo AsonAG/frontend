@@ -1,17 +1,15 @@
 import { Box } from "@mui/material";
 import CasesTable from "../../global/CasesTable";
-import Header from "../../../components/Header";
-import { useEffect, useState } from "react";
+import EmployeeHeader from "../../../components/EmployeeHeader";
+import { useSessionStorage } from "usehooks-ts";
 
 const EmployeeCases = () => {
-  const employee = JSON.parse(window.sessionStorage.getItem("employee"));
+  // const employee = JSON.parse(window.sessionStorage.getItem("employee"));
+  const [employee, setEmployee] = useSessionStorage('employee', {});
 
-  return (
+  return employee && (
     <Box m="25px">
-      <Header   
-          title={ employee?.firstName + ' ' + employee?.lastName }
-          subtitle={ employee?.divisions?.join(", ") }
-      />
+      <EmployeeHeader employee={employee} />
       <CasesTable 
           caseType={'Employee'}
           employee={employee}    

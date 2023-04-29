@@ -381,7 +381,7 @@ export class ApiClient {
         var url = this.buildUrl(path, pathParams, tenantId);
         var request = superagent(httpMethod, url);
 
-        console.log("Sending "+httpMethod+" request to:", url);
+        console.log("Sending "+httpMethod+" request to:", url, " with params: ", JSON.stringify(pathParams), JSON.stringify(queryParams)) ;
         
         // apply authentications
         this.applyAuthToRequest(request, authNames);
