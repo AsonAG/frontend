@@ -1,29 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Box, FormControl, MenuItem, Select, TextField } from "@mui/material";
+import React, { useContext } from "react";
+import { Box, FormControl, MenuItem, Select } from "@mui/material";
 import { UserContext } from "../App";
 
 export default function PayrollSelector() {
   const { user, setUser } = useContext(UserContext);
-  const [payroll, setPayroll] = useState({
-        currentPayrollName: "",
-        currentPayrollId: ""
-  });
-
   const handleChange = (e) => {
+    let payroll = user.availablePayrolls.find((payroll) => payroll.payrollId === e.target.value);
     setUser((current) => ({
       ...current,
-      currentPayrollName: user.availablePayrolls.find((payroll) => 
-        payroll.payrollId === e.target.value).payrollName,
-      currentPayrollId: e.target.value,
+      currentPayrollName: payroll.payrollName,
+      currentPayrollId: payroll.payrollId,
+      divisionId: payroll.divisionId,
     }));
   };
 
-  useEffect(()=>{
-        setPayroll({
-                currentPayrollName: user?.currentPayrollName,
-                currentPayrollId: user?.currentPayrollId
-          })
-  },[user]);
+  if (!user?.currentPayrollId) {
+    return null;
+  }
 
   return (
     <Box>
@@ -33,9 +26,9 @@ export default function PayrollSelector() {
           id="payroll-main-select"
           label="Payroll"
           onChange={handleChange}
-          value={payroll.currentPayrollId}
+          value={user.currentPayrollId}
         >
-          {user?.availablePayrolls?.map((option) => {
+          {user.availablePayrolls?.map((option) => {
             return (
               <MenuItem
                 key={"payroll-select-item-" + option.payrollId}

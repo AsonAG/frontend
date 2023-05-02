@@ -58,7 +58,7 @@ function App() {
     userId: "7",
     employeeId: "11",
     tenantId: null,
-    divisionId: "7",
+    divisionId: null,
     currentPayrollId: "",
     currentPayrollName: "",
     availablePayrolls: [],
@@ -82,15 +82,18 @@ function App() {
       let currentPayrollId = current.currentPayrollId
       // TODO AJO is name necessary?
       let currentPayrollName = current.currentPayrollName;
+      let divisionId = current.divisionId;
       if (!currentPayrollId && data.length > 0) {
         currentPayrollId = data[0].id;
         currentPayrollName = data[0].name;
+        divisionId = data[0].divisionId;
       }
       return {
         ...current,
         currentPayrollId,
         currentPayrollName,
-        availablePayrolls: data.map(payroll => ({payrollId: payroll.id, payrollName: payroll.name}))
+        divisionId,
+        availablePayrolls: data.map(payroll => ({payrollId: payroll.id, payrollName: payroll.name, divisionId: payroll.divisionId}))
       }
     });
   }

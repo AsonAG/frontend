@@ -164,7 +164,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
               <MenuItem onClick={handleClose}>Profile</MenuItem>
               <MenuItem onClick={handleClose}>Settings</MenuItem>
               <MenuItem onClick={handleSwitchTenant}>Switch tenant</MenuItem>
-              <MenuItem onClick={() => auth.signOut()}>Logout</MenuItem>
+              <MenuItem onClick={() => { auth.signOut();handleLogout();}}>Logout</MenuItem>
             </Menu>
           </Box>
         </Toolbar>
