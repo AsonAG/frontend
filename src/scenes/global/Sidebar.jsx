@@ -14,12 +14,14 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { UserContext } from "../../App";
 import PayrollSelector from "../../components/PayrollSelector";
+import { useAuth } from "oidc-react";
 
 const Sidebar = ({ isCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [selected, setSelected] = useState("Dashboard");
   const minWidth = useMediaQuery("(min-width:600px)");
+  const auth = useAuth();
   const { user, setUser } = useContext(UserContext);
 
   const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -189,7 +191,15 @@ const Sidebar = ({ isCollapsed }) => {
                     // fontWeight="bold"
                     m="0 0px 12px 0px"
                   >
-                    {user.userEmail}
+                    {auth.userData?.profile?.email}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    color={colors.grey[100]}
+                    // fontWeight="bold"
+                    m="0 0px 12px 0px"
+                  >
+                    Tenant: {user.tenantIdentifier}
                   </Typography>
 
                   <PayrollSelector />

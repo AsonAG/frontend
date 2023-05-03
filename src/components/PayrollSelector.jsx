@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Box, FormControl, MenuItem, Select, TextField } from "@mui/material";
+import React, { useContext } from "react";
+import { Box, FormControl, MenuItem, Select } from "@mui/material";
 import { UserContext } from "../App";
 
 export default function PayrollSelector() {
@@ -40,9 +40,9 @@ export default function PayrollSelector() {
           id="payroll-main-select"
           label="Payroll"
           onChange={handleChange}
-          value={payroll.currentPayrollId}
+          value={user.currentPayrollId}
         >
-          {user?.availablePayrolls?.map((option) => {
+          {user.availablePayrolls?.map((option) => {
             return (
               <MenuItem
                 key={"payroll-select-item-" + option.payrollId}

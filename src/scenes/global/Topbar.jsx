@@ -23,6 +23,8 @@ import Logo from "../../components/Logo";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Link } from "react-router-dom";
 import PayrollSelector from "../../components/PayrollSelector";
+import { useAuth } from "oidc-react";
+import { UserContext } from "../../App";
 
 const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
   const theme = useTheme();
@@ -30,7 +32,8 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
   const colorMode = useContext(ColorModeContext);
 
   const [anchorEl, setAnchorEl] = useState(null);
-
+  const auth = useAuth();
+  const { user, setUser } = useContext(UserContext);
   const handleChange = (event) => {
     // setAuth(event.target.checked);
   };
@@ -41,6 +44,14 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleSwitchTenant = () => {
+    setUser(current => ({
+      ...current,
+      tenantId: null
+    }));
+    handleClose();
   };
 
   return (
@@ -142,10 +153,10 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              {/* <MenuItem onClick={handleClose}>Profile</MenuItem> */}
-              {/* <MenuItem onClick={handleClose}>Settings</MenuItem> */}
-              <MenuItem onClick={handleClose}>Switch tenant</MenuItem>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              <MenuItem onClick={handleClose}>Profile</MenuItem>
+              <MenuItem onClick={handleClose}>Settings</MenuItem>
+              <MenuItem onClick={handleSwitchTenant}>Switch tenant</MenuItem>
+              <MenuItem onClick={() => { auth.signOut();handleLogout();}}>Logout</MenuItem>
             </Menu>
           </Box>
         </Toolbar>
