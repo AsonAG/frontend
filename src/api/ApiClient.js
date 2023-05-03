@@ -36,16 +36,6 @@ export class ApiClient {
          * @type {String}
          * @default https://localhost:44354/api/tenants/3/payrolls/4/cases/sets
          */
-        // this.userSettings = ['1', '1', '1', '1', '1'];
-        // this.userSettings = ['3', '4', '8', '51', '3'];
-        // this.userSettings = ['2', '3', '7', '4', '3'];
-        // this.userSettings = ['5', '6', '10', '10', '6']; // CaseDef
-        
-        // this.tenantId = this.userSettings[0];
-        // this.payrollId = this.userSettings[1];
-        // this.userId = this.userSettings[2]; 
-        // this.employeeId = this.userSettings[3];
-        // this.divisionId = this.userSettings[4];
         this.basePath = 'https://localhost:44354/api/tenants/'.replace(/\/+$/, ''); 
 
         /**
@@ -184,16 +174,13 @@ export class ApiClient {
     * @returns {Boolean} <code>true</code> if <code>param</code> represents a file.
     */
     isFileParam(param) {
-        // fs.ReadStream in Node.js and Electron (but not in runtime like browserify)
-        if (typeof require === 'function') {
-            let fs;
-            try {
-                fs = require('fs');
-            } catch (err) {}
-            if (fs && fs.ReadStream && param instanceof fs.ReadStream) {
-                return true;
-            }
-        }
+        // TODO: write logic for eading fileParams 
+        // // fs.ReadStream in Node.js and Electron (but not in runtime like browserify)
+        // if (typeof require === 'function') {
+        //     if (fs && fs.ReadStream && param instanceof fs.ReadStream) {
+        //         return true;
+        //     }
+        // }
 
         // Buffer in Node.js
         if (typeof Buffer === 'function' && param instanceof Buffer) {
@@ -406,7 +393,7 @@ export class ApiClient {
         var url = this.buildUrl(path, pathParams, tenantId);
         var request = superagent(httpMethod, url);
 
-        console.log("Sending "+httpMethod+" request to:", url);
+        console.log("Sending "+httpMethod+" request to:", url, " with params: ", JSON.stringify(pathParams), JSON.stringify(queryParams)) ;
         
         // apply authentications
         this.applyAuthToRequest(request, authNames);

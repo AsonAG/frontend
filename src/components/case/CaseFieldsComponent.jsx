@@ -7,21 +7,37 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Field from "./Field";
+import FieldComponent, { getFieldKey } from "./FieldComponent";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 
 function CaseNameHeader(caseBase) {
   return (
-    <Typography variant="h4" fontWeight="bold" key={"casename_" + caseBase.id}>
-      {caseBase?.caseSlot
-        ? caseBase?.displayName + " " + caseBase?.caseSlot
-        : caseBase?.displayName}
-    </Typography>
+    <Box display="flex" alignItems="baseline">
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        key={"casename_" + caseBase.id}
+        sx={{ 
+          marginRight: "20px", 
+          flexShrink: 0 }}
+      >
+        {caseBase?.caseSlot
+          ? caseBase?.displayName + " " + caseBase?.caseSlot
+          : caseBase?.displayName}
+      </Typography>
+
+      <Typography
+        variant="h5"
+        sx={{ color: "text.secondary" }}
+        key={"casename_desc_" + caseBase.id}
+      >
+        {caseBase?.description}
+      </Typography>
+    </Box>
   );
 }
 
-
-const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
+const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
@@ -30,9 +46,11 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
     // update output cases
     setOutputCases((prevState) => ({
       ...prevState,
-      [caseBase.caseSlot
-        ? caseBase.name + "_" + caseBase.caseSlot
-        : caseBase.name]: {
+      // [caseBase.caseSlot
+      //   ? caseBase.name + "_" + caseBase.caseSlot
+      //   : caseBase.name]: 
+      [getFieldKey(caseBase.name, caseBase.id)]:
+        {
         caseName: caseBase.name,
         values: caseFieldsList,
         caseSlot: caseBase.caseSlot,
@@ -107,7 +125,7 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
             key={"fieldswrapper_" + caseBase.id}
           >
             {caseBase?.fields?.map((field, i) => (
-              <Field
+              <FieldComponent
                 field={field}
                 onChange={handleFieldChange}
                 key={"field_" + field.id}
@@ -116,15 +134,14 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
           </Box>
 
           {isBase ? (
-            // skip base related cases, they are already considered in the Parent component 
+            // skip base related cases, they are already considered in the Parent component
             <></>
           ) : (
             <Box>
               {caseBase?.relatedCases?.map((relatedCase, i) => (
-                <CaseFieldsForm
+                <CaseFieldsComponent
                   isBase={false}
                   caseBase={relatedCase}
-                  outputCases={outputCases}
                   setOutputCases={setOutputCases}
                   key={"case_related" + i + relatedCase.id}
                 />
@@ -137,4 +154,4 @@ const CaseFieldsForm = ({ caseBase, isBase, outputCases, setOutputCases }) => {
   );
 };
 
-export default CaseFieldsForm;
+export default CaseFieldsComponent;

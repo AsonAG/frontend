@@ -13,15 +13,32 @@ import { tokens } from "../../theme";
 import EmployeesSplitButton from "./EmployeesSplitButton";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
+import { useSessionStorage } from "usehooks-ts";
 
 
-const EmployeesTable = ({ updateCaseName }) => {
+const EmployeesTable = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [employeeDataLoaded, setEmployeeDataLoaded] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
   const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
+  const [employee, setEmployee] = useSessionStorage('employee', {});
+
+  useEffect(() => {
+    setEmployeeData([]);
+    setEmployeeDataLoaded(false);
+    setEmployeeDataFiltered([]);
+    employeesApi.getEmployees(callback);
+  }, [user]);
+
+/**
+ * set Employee object in session storage
+ */
+const handleEmployeeSelection = (employee) => {
+  setEmployee(employee)
+  // window.sessionStorage.setItem("employee", JSON.stringify(employee));
+};
 
   const callback = function (error, data, response) {
     let tableData = [];
@@ -52,10 +69,6 @@ const EmployeesTable = ({ updateCaseName }) => {
       setEmployeeDataFiltered(tableData);
     }
   };
-
-  useEffect(() => {
-    employeesApi.getEmployees(callback);
-  }, []);
 
   // const handleRowClick = (params) => {
   //   console.log(params.row.caseName + " row clicked.");
@@ -95,7 +108,7 @@ const EmployeesTable = ({ updateCaseName }) => {
         return (
           <EmployeesSplitButton
             employee={employeeData.find((x) => x.employeeId === employeeId)}
-            updateCaseName={updateCaseName}
+            setEmployeeChoice={handleEmployeeSelection}
           ></EmployeesSplitButton>
         );
       },

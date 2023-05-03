@@ -7,23 +7,22 @@ import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
-import Reporting from "./scenes/reporting";
-import CaseForm from "./components/case/CaseForm";
+import PersonalCases from "./scenes/personalCases";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Box, height } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
 import Employees from "./scenes/employees";
-import EmployeeCases from "./scenes/employeeCases";
+import EmployeeCases from "./scenes/employees/employeeCases";
+import EmployeeCase from "./scenes/case/EmployeeCase";
+import PersonalCase from "./scenes/case/PersonalCase";
+import CompanyCase from "./scenes/case/CompanyCase";
 import { useEffect } from "react";
 // import { useAuth, useLoginWithRedirect, ContextHolder } from "@frontegg/react";
 import { AuthProvider } from "oidc-react";
 import LoginForm from "./scenes/login";
-import Tenants from "./scenes/tenants";
-import { PayrollsApi } from "./api/PayrollsApi";
-import { ApiClient } from "./api/ApiClient";
+import User from "./model/User";
 
-export const EmployeeContext = createContext();
 export const UserContext = createContext();
 export const PayrollContext = createContext();
 
@@ -31,8 +30,7 @@ export const PayrollContext = createContext();
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [caseName, setCaseName] = useState("");
-  const [employeeChoice, setEmployeeChoice] = useState({});
+  // const [caseName, onCaseSelect] = useState("");
   const navigate = useNavigate();
 
   // const { user, isAuthenticated } = useAuth();
@@ -51,18 +49,15 @@ function App() {
     document.title = "Ason Payroll";
   }, []);
 
-  const [user, setUser] = useState({
-    loaded: false,
-    isAuthenticated: false,
-    userEmail: "",
-    userId: "7",
-    employeeId: "11",
-    tenantId: null,
-    divisionId: null,
-    currentPayrollId: "",
-    currentPayrollName: "",
-    availablePayrolls: [],
-  });
+  const [user, setUser] = useState(
+    User({
+      tenantId: 1,
+      userId: 1,
+      employee: {
+        employeeId: 1,
+      }
+    })
+  );
 
   useEffect(() => {
     if (!user.tenantId) return;
@@ -122,7 +117,7 @@ function App() {
     setUser((current) => ({
       ...current,
       isAuthenticated: false,
-      loaded: false
+      loaded: false,
     }));
     navigate("/login");
   };

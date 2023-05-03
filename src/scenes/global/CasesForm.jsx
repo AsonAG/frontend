@@ -1,20 +1,27 @@
 import { useTheme } from "@emotion/react";
-import { useMemo, useRef, useState, useContext, createContext, useEffect } from "react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+} from "react";
 import { tokens } from "../../theme";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
-import Header from "../Header";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
-import CaseFieldsForm from "./CaseFieldsForm";
+import CaseFieldsComponent from "../../components/case/CaseFieldsComponent";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 import { UserContext } from "../../App";
 
-
 export const CaseContext = createContext();
 
-const CaseForm = (props) => {
+const CasesForm = ({employee, navigateTo}) => {
+  const caseName = window.sessionStorage.getItem("caseName");
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
@@ -27,13 +34,15 @@ const CaseForm = (props) => {
 
   const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
 
+  const handleSubmit = (event) => { 
+    event.preventDefault();
 
-  const handleSubmit = (event) => {
-    // event.preventDefault();
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
-      casesApi.saveCase(outputCase, relatedCases, caseSaveCallback);
-    } else console.log("form INVALID");
+      casesApi.saveCase(outputCase, relatedCases, caseSaveCallback, employee?.employeeId ); 
+    } else {
+      console.log("form INVALID");
+    }
   };
 
   const caseSaveCallback = function (error, data, response) {
@@ -43,10 +52,10 @@ const CaseForm = (props) => {
     } else {
       console.log(
         "Case saved successfully. Response: " +
-          JSON.stringify(response, null, 2) +
-          "Exiting page..."
+          JSON.stringify(response, null, 2)
       );
-      navigate("/tasks");
+      console.log("Navigating to: " + navigateTo);
+      navigate(navigateTo);
     }
   };
 
@@ -63,43 +72,32 @@ const CaseForm = (props) => {
   };
 
   useDidMountEffect(() => {
-    console.log(
-      "Making api Request for a case fields update: " +
-        props.caseName +
-        JSON.stringify(outputCase, null, 2) +
-        " ___related_cases___  " +
-        JSON.stringify(relatedCases, null, 2)
-    );
-    // create request body
-    casesApi.getCaseFields(
-      props.caseName,
-      callback,
-      outputCase,
-      relatedCases
-    );
+    // console.log(
+    //   "Making api Request for a case fields update: " +
+    //     caseName +
+    //     JSON.stringify(outputCase, null, 2) +
+    //     " ___related_cases___  " +
+    //     JSON.stringify(relatedCases, null, 2)
+    // );
+
+    casesApi.getCaseFields(caseName, callback, outputCase, relatedCases, employee?.employeeId);
   }, [outputCase, relatedCases]);
 
-  useEffect(()=>{
-    console.log("User changed - Refresh");
+  useEffect(() => {
+    console.log("User changed.");
   }, [user]);
 
   return (
-    props.caseName && (
-      <Box m="25px" display="flex" flexDirection="column" alignItems="left">
-        {/* HEADER */}
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          {/* <Header title={props.caseName} subtitle="Fulfill the case details" /> */}
-          <Header title={caseDetails?.displayName} subtitle="Fulfill the case details" />
-        </Box>
-
-        <form ref={formRef}>
-          <CaseContext.Provider value={{isSaveButtonClicked, setIsSaveButtonClicked}}>
+    caseName && (
+      <form ref={formRef}>
+        <CaseContext.Provider
+          value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
+        >
           <Box>
             {caseDetails && (
-              <CaseFieldsForm
+              <CaseFieldsComponent
                 caseBase={caseDetails}
                 isBase={true}
-                outputCases={outputCase}
                 setOutputCases={setOutputCase}
                 key={"case_main"}
               />
@@ -108,34 +106,35 @@ const CaseForm = (props) => {
 
           <Box>
             {caseDetails?.relatedCases?.map((relatedCase, i) => (
-              <CaseFieldsForm
+              <CaseFieldsComponent
                 caseBase={relatedCase}
-                outputCases={relatedCases}
                 setOutputCases={setRelatedCases}
                 key={"case_related" + i + relatedCase.id}
               />
             ))}
           </Box>
 
-          <Box mt="20px" mb="30px">
+          <Box mt="20px" mb="30px" display="flex" flexDirection="row-reverse">
+            <Box width="240px" >
             <Button
+              // disable={}
               disableRipple
+              fullWidth
               type="submit"
               variant="contained"
               color="secondary"
               size="large"
               onClick={handleSubmit}
-              to="/status"
               endIcon={<SendIcon />}
             >
               Send
             </Button>
+            </Box>
           </Box>
-          </CaseContext.Provider>
-        </form>
-      </Box>
+        </CaseContext.Provider>
+      </form>
     )
   );
 };
 
-export default CaseForm;
+export default CasesForm;
