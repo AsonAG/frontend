@@ -22,28 +22,17 @@ import { useEffect } from "react";
 import { AuthProvider } from "oidc-react";
 import LoginForm from "./scenes/login";
 import User from "./model/User";
+import ApiClient from "./api/ApiClient";
+import { PayrollsApi } from "./api/PayrollsApi";
+import CasesForm from "./scenes/global/CasesForm";
+import Tenants from "./scenes/tenants";
 
 export const UserContext = createContext();
-export const PayrollContext = createContext();
-
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  // const [caseName, onCaseSelect] = useState("");
   const navigate = useNavigate();
-
-  // const { user, isAuthenticated } = useAuth();
-  // const loginWithRedirect = useLoginWithRedirect();
-  // const logout = () => {
-  //   const baseUrl = ContextHolder.getContext().baseUrl;
-  //   window.location.href = `${baseUrl}/oauth/logout?post_logout_redirect_uri=${window.location}`;
-  // };
-  // useEffect(() => {
-  //   if (!isAuthenticated) {
-  //     loginWithRedirect();
-  //   }
-  // }, [isAuthenticated, loginWithRedirect]);
 
   useEffect(() => {
     document.title = "Ason Payroll";
@@ -51,10 +40,10 @@ function App() {
 
   const [user, setUser] = useState(
     User({
-      tenantId: 1,
-      userId: 1,
+      tenantId: null,
+      userId: 17,
       employee: {
-        employeeId: 1,
+        employeeId: 15,
       }
     })
   );
@@ -62,9 +51,8 @@ function App() {
   useEffect(() => {
     if (!user.tenantId) return;
 
-    const apiClient = new ApiClient();
-    apiClient.basePath = 'https://localhost:44354';
-    var payrollsApi = new PayrollsApi(apiClient);
+    ApiClient.basePath = 'https://localhost:44354';
+    var payrollsApi = new PayrollsApi(ApiClient);
     payrollsApi.queryPayrolls(user.tenantId, null, onQueryPayrolls);
   }, [user.tenantId]);
   
@@ -87,7 +75,7 @@ function App() {
         ...current,
         currentPayrollId,
         currentPayrollName,
-        divisionId,
+        currentDivisionId: divisionId,
         availablePayrolls: data.map(payroll => ({payrollId: payroll.id, payrollName: payroll.name, divisionId: payroll.divisionId}))
       }
     });
@@ -152,42 +140,21 @@ function App() {
           >
             <Sidebar isCollapsed={isSidebarCollapsed} />
             <main className="content">
-              <EmployeeContext.Provider
-                value={{ employeeChoice, setEmployeeChoice }}
-              >
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route
-                    path="/tasks"
-                    element={<Tasks updateCaseName={setCaseName} />}
-                  />
-                  <Route
-                    path="/company"
-                    element={<CompanyCases updateCaseName={setCaseName} />}
-                  />
-                  <Route
-                    path="/employee"
-                    element={<EmployeeCases updateCaseName={setCaseName} />}
-                  />
-                  <Route
-                    path="/case"
-                    element={<CaseForm caseName={caseName} />}
-                  />
+            <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/tasks" element={<Tasks />} />
+                    <Route path="/company" element={<CompanyCases />} />
+                    <Route path="/employees" element={<Employees />} />
+                    <Route path="/employee" element={<EmployeeCases />} />
+                    <Route path="/personalCase" element={<PersonalCase />} />
+                    <Route path="/employeeCase" element={<EmployeeCase />} />
+                    <Route path="/companyCase" element={<CompanyCase />} />
 
-                  <Route
-                    path="/employees"
-                    element={<Employees updateCaseName={setCaseName} />}
-                  />
+                    <Route path="/dossier" element={<Dossier />} />
+                    <Route path="/reporting" element={<PersonalCases />} />
 
-                  <Route path="/dossier" element={<Dossier />} />
-                  <Route
-                    path="/reporting"
-                    element={<Reporting updateCaseName={setCaseName} />}
-                  />
-
-                  <Route path="/login" element={<LoginForm />} />
-                </Routes>
-              </EmployeeContext.Provider>
+                    <Route path="/login" element={<LoginForm />} />
+                  </Routes>
             </main>
           </Box>
         </Box>

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, FormControl, MenuItem, Select } from "@mui/material";
 import { UserContext } from "../App";
 
@@ -12,15 +12,12 @@ export default function PayrollSelector() {
 
   const handleChange = (e) => {
     console.log("User has changed.");
+    let payroll = user.availablePayrolls.find((payroll) => payroll.payrollId === e.target.value);
     setUser((current) => ({
       ...current,
-      currentPayrollName: user.availablePayrolls.find(
-        (payroll) => payroll.payrollId === e.target.value
-      ).payrollName,
-      currentDivisionId: user.availablePayrolls.find(
-        (payroll) => payroll.payrollId === e.target.value
-      ).divisionId,
-      currentPayrollId: e.target.value,
+      currentPayrollName: payroll.payrollName,
+      currentPayrollId: payroll.payrollId,
+      currentDivisionId: payroll.divisionId,
     }));
   };
 
@@ -31,7 +28,10 @@ export default function PayrollSelector() {
       currentDivisionId: user?.currentDivisionId,
     });
   }, [user]);
-
+  
+  if (!user?.currentPayrollId) {
+    return null;
+  }
   return (
     <Box>
       <FormControl variant="filled" fullWidth>

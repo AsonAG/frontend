@@ -1,32 +1,32 @@
 import { useEffect, useMemo, useState} from "react";
 import ApiClient from "../api/ApiClient";
-import PayrollsApi from "../api/PayrollsApi";
+import { PayrollsApi } from "../api/PayrollsApi";
 
 const User = ({ tenantId, userId, employee }) => {
   // const caseName = window.sessionStorage.getItem("caseName");
   const payrollsApi = useMemo(() => new PayrollsApi(ApiClient, tenantId), [tenantId]);
   const [payrolls, setPayrolls] = useState(
     [
-      {
-        payrollId: "1",
-        payrollName: "CH",
-        divisionId: "1"
-      },
-      {
-        payrollId: "2",
-        payrollName: "AT",
-        divisionId: "2",
-      },
-      {
-        payrollId: "3",
-        payrollName: "BH",
-        divisionId: "3",
-      },
-      {
-        payrollId: "4",
-        payrollName: "Demo Switzerland AG",
-        divisionId: "4",
-      },
+      // {
+      //   payrollId: "1",
+      //   payrollName: "CH",
+      //   divisionId: "1"
+      // },
+      // {
+      //   payrollId: "2",
+      //   payrollName: "AT",
+      //   divisionId: "2",
+      // },
+      // {
+      //   payrollId: "3",
+      //   payrollName: "BH",
+      //   divisionId: "3",
+      // },
+      // {
+      //   payrollId: "4",
+      //   payrollName: "Demo Switzerland AG",
+      //   divisionId: "4",
+      // },
     ]
     );
 
