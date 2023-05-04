@@ -49,7 +49,7 @@ function App() {
 
   useEffect(() => {
     if (!user.tenantId) {
-      navigate("/");
+      // navigate("/");
       return;
     } else {
       usersApi.getUsers(onGetUsersCallback);
@@ -72,11 +72,11 @@ function App() {
 
   const onGetUsersCallback = (error, data, response) => {
     if (error) {
-      console.log(error);
+      console.error(error);
       return;
     }
-    setUser((current) => ({
-      ...current,
+    setUser({
+      ...user,
       userId: data[0].id,
       culture: data[0].culture,
       language: data[0].language,
@@ -85,30 +85,32 @@ function App() {
         // TODO, get employee from the request instead
         employeeId: 15,
       },
-    }));
+    });
   };
 
   const onGetPayrollsCallback = (error, data, response) => {
     if (error) {
-      console.log(error);
+      console.error(error);
       return;
     }
-    setUser((current) => {
-      let currentPayrollId = current.currentPayrollId;
-      let currentPayrollName = current.currentPayrollName;
-      let currentDivisionId = current.currentDivisionId;
+    console.log(JSON.stringify(data));
+    setUser(() => {
+      let currentPayrollId = user.currentPayrollId;
+      let currentPayrollName = user.currentPayrollName;
+      let currentDivisionId = user.currentDivisionId;
 
       let userPayrolls = data.filter(
-        (payroll) => payroll.name in current.attributes.payrolls
+        (payroll) => user.attributes.payrolls.includes(payroll.name)
       );
 
       if (!currentPayrollId && userPayrolls.length > 0) {
+        // TODO: current payroll choice based on attribute.startPayroll
         currentPayrollId = userPayrolls[0].id;
         currentPayrollName = userPayrolls[0].name;
         currentDivisionId = userPayrolls[0].divisionId;
       }
       return {
-        ...current,
+        ...user,
         currentPayrollId,
         currentPayrollName,
         currentDivisionId,
@@ -146,6 +148,7 @@ function App() {
       isAuthenticated: false,
       loaded: false,
     }));
+    // TODO: logout
     navigate("/login");
   };
   let content;
