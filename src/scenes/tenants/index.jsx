@@ -1,22 +1,32 @@
-import { Box, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { React, useEffect, useContext, useState, useMemo } from "react";
 import Header from "../../components/Header";
 import TenantsApi from "../../api/TenantsApi";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
+import Logo from "../../components/Logo";
 
 const Tenants = () => {
   const { user, setUser } = useContext(UserContext);
   const [tenants, setTenants] = useState([]);
-  const tenantsEffectKey = tenants.map(t => t.id).join(',');
+  const tenantsEffectKey = tenants.map((t) => t.id).join(",");
   const api = useMemo(() => new TenantsApi(ApiClient), []);
-
 
   useEffect(() => {
     api.userTenants(callback);
   }, [tenantsEffectKey]);
 
-  const callback = function(error, data, response) {
+  const callback = function (error, data, response) {
     if (error) {
       console.log(error);
       return;
@@ -24,27 +34,44 @@ const Tenants = () => {
     setTenants(data);
   };
 
-  const onSelectTenant = function(tenant) {
+  const onSelectTenant = function (tenant) {
     console.log("selected tenant", tenant);
-    setUser(current => ({
+    setUser((current) => ({
       ...current,
       tenantId: tenant.id,
-      tenantIdentifier: tenant.identifier
+      tenantIdentifier: tenant.identifier,
     }));
-  }
+  };
 
   return (
-    <Box m="25px">
-      <Header title="Tenants" subtitle="Select tenant" />
-      <List>
-        {tenants.map(tenant => (
-          <ListItem key={tenant.id} disablePadding>
-            <ListItemButton onClick={() => onSelectTenant(tenant)}>
-              <ListItemText primary={tenant.identifier} />
-            </ListItemButton>
-          </ListItem>
+<Box 
+      m="25px"
+      >
+    <Logo />
+    <Box
+      mt="25vh"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      minWidth="90vw"
+    >
+        <Header title="Tenants" subtitle="Select tenant" />
+        {tenants.map((tenant) => (
+          <Card sx={{ 
+            maxWidth: '445px',
+            minWidth: '345px'
+             }} key={tenant.id}>
+            <CardActionArea>
+              <CardContent onClick={() => onSelectTenant(tenant)}>
+                <Typography gutterBottom variant="h5" component="div">
+                  {tenant.identifier}
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
         ))}
-      </List>
+      </Box>
     </Box>
   );
 };
