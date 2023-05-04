@@ -1,11 +1,11 @@
 import { ApiClient } from "./ApiClient";
 
 /**
- * Payrolls service.
- * @module api/PayrollsApi
+ * Users service.
+ * @module api/UsersApi
  * @version 1.0.11
  */
-export class PayrollsApi {
+export class UsersApi {
 
   constructor(apiClient, tenantId) {
     this.apiClient = apiClient || ApiClient.instance;
@@ -13,14 +13,14 @@ export class PayrollsApi {
   }
 
   /**
-   * Gets a list of payrolls.
-   * @param {module:api/PayrollsApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
+   * Gets a list of users.
+   * @param {module:api/UsersApi~getCaseTasksCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getPayrolls(callback) {
+  getUsers(callback, userIdentifier) {
     let postBody = null;
 
-    // TODO: consider inactive payrolls filter
+    // TODO: consider inactive users filter
     let pathParams = {};
     let queryParams = {
     };
@@ -34,7 +34,7 @@ export class PayrollsApi {
     let returnType = null;
 
     return this.apiClient.callApi(
-      "/payrolls",
+      "/users",
       "GET",
       pathParams,
       queryParams,
@@ -52,4 +52,4 @@ export class PayrollsApi {
 
 }
 
-export default PayrollsApi;
+export default UsersApi;

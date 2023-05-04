@@ -95,7 +95,8 @@ export class EmployeesApi {
       "/employees/{employeeId}",
       "GET",
       pathParams,
-      queryParams,
+    // TODO: consider inactive payrolls filter
+    queryParams,
       headerParams,
       formParams,
       postBody,

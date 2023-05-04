@@ -18,7 +18,6 @@ import EmployeeCase from "./scenes/case/EmployeeCase";
 import PersonalCase from "./scenes/case/PersonalCase";
 import CompanyCase from "./scenes/case/CompanyCase";
 import { useEffect } from "react";
-// import { useAuth, useLoginWithRedirect, ContextHolder } from "@frontegg/react";
 import { AuthProvider } from "oidc-react";
 import LoginForm from "./scenes/login";
 import User from "./model/User";
@@ -26,6 +25,7 @@ import ApiClient from "./api/ApiClient";
 import PayrollsApi from "./api/PayrollsApi";
 import CasesForm from "./scenes/global/CasesForm";
 import Tenants from "./scenes/tenants";
+import UsersApi from "./api/UsersApi";
 
 export const UserContext = createContext();
 
@@ -33,62 +33,103 @@ function App() {
   const [theme, colorMode] = useMode();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
-  const [user, setUser] = useState(
-    User({
-      userId: 17,
-      employee: {
-        employeeId: 15,
-      }
-    })
+  const [user, setUser] = useState({});
+  const payrollsApi = useMemo(
+    () => new PayrollsApi(ApiClient, user.tenantId),
+    [user.tenantId]
   );
-  const payrollsApi = useMemo(() => new PayrollsApi(ApiClient, user.tenantId), [user.tenantId]);
-
+  const usersApi = useMemo(
+    () => new UsersApi(ApiClient, user.tenantId),
+    [user.tenantId]
+  );
 
   useEffect(() => {
     document.title = "Ason Payroll";
   }, []);
 
+  useEffect(() => {
+    if (!user.tenantId) {
+      navigate("/");
+      return;
+    } else {
+      usersApi.getUsers(onGetUsersCallback);
+    }
+  }, [user.tenantId]);
 
   useEffect(() => {
-    if (!user.tenantId) return;
-    payrollsApi.getPayrolls(onGetPayrolls);
-  }, [user.tenantId]);
-  
-  const onGetPayrolls = function(error, data, response) {
+    if (!user.attributes) {
+      return;
+    } else {
+      payrollsApi.getPayrolls(onGetPayrollsCallback);
+    }
+  }, [user.attributes]);
+
+  // useEffect(() => {
+  //   if (!user.tenantId) return;
+  //   usersApi.getUsers(onGetUsersCallback);
+  //   payrollsApi.getPayrolls(onGetPayrollsCallback);
+  // }, [user.attributes.payrolls]);
+
+  const onGetUsersCallback = (error, data, response) => {
     if (error) {
       console.log(error);
       return;
     }
-    setUser(current => {
-      let currentPayrollId = current.currentPayrollId
-      // TODO AJO is name necessary?
+    setUser((current) => ({
+      ...current,
+      userId: data[0].id,
+      culture: data[0].culture,
+      language: data[0].language,
+      attributes: data[0].attributes,
+      employee: {
+        // TODO, get employee from the request instead
+        employeeId: 15,
+      },
+    }));
+  };
+
+  const onGetPayrollsCallback = (error, data, response) => {
+    if (error) {
+      console.log(error);
+      return;
+    }
+    setUser((current) => {
+      let currentPayrollId = current.currentPayrollId;
       let currentPayrollName = current.currentPayrollName;
-      let divisionId = current.divisionId;
-      if (!currentPayrollId && data.length > 0) {
-        currentPayrollId = data[0].id;
-        currentPayrollName = data[0].name;
-        divisionId = data[0].divisionId;
+      let currentDivisionId = current.currentDivisionId;
+
+      let userPayrolls = data.filter(
+        (payroll) => payroll.name in current.attributes.payrolls
+      );
+
+      if (!currentPayrollId && userPayrolls.length > 0) {
+        currentPayrollId = userPayrolls[0].id;
+        currentPayrollName = userPayrolls[0].name;
+        currentDivisionId = userPayrolls[0].divisionId;
       }
       return {
         ...current,
         currentPayrollId,
         currentPayrollName,
-        currentDivisionId: divisionId,
-        availablePayrolls: data.map(payroll => ({payrollId: payroll.id, payrollName: payroll.name, divisionId: payroll.divisionId}))
-      }
+        currentDivisionId,
+        availablePayrolls: userPayrolls.map((payroll) => ({
+          payrollId: payroll.id,
+          payrollName: payroll.name,
+          divisionId: payroll.divisionId,
+        })),
+      };
     });
-  }
-
+  };
 
   const oidcConfig = {
-    onSignIn: async(response) => {
+    onSignIn: async (response) => {
       localStorage.setItem("ason_access_token", response.access_token);
       setUser({
         userEmail: response.email,
         // TODO UserId
         loaded: true,
         isAuthenticated: true,
-        ...user
+        ...user,
       });
       window.location.hash = "";
     },
@@ -96,7 +137,7 @@ function App() {
     clientId: "210272222781178113@ason",
     responseType: "code",
     redirectUri: "http://localhost:3003/",
-    scope: "openid profile email"
+    scope: "openid profile email",
   };
 
   const logout = () => {
@@ -107,12 +148,6 @@ function App() {
     }));
     navigate("/login");
   };
-  // useEffect(() => {
-  //   console.log(user.currentPayrollId);
-  //   if (user.isAuthenticated) {
-  //     // navigate("/");
-  //   } else navigate("/login");
-  // }, [user]);
   let content;
 
   console.log("rerender");
@@ -120,49 +155,40 @@ function App() {
 
   if (user.tenantId) {
     content = (
-      <Box 
-          className="app" 
-          // display="flex" 
-          // flexDirection="column"
-        >
-          <Topbar
-            isCollapsed={isSidebarCollapsed}
-            setIsCollapsed={setIsSidebarCollapsed}
-            handleLogout={logout}
-          />
-          <Box
-            display="flex"
-            flexDirection="row"
-            width="100%"
-            marginTop="60px"
-          >
-            <Sidebar isCollapsed={isSidebarCollapsed} />
-            <main className="content">
+      <Box
+        className="app"
+        // display="flex"
+        // flexDirection="column"
+      >
+        <Topbar
+          isCollapsed={isSidebarCollapsed}
+          setIsCollapsed={setIsSidebarCollapsed}
+          handleLogout={logout}
+        />
+        <Box display="flex" flexDirection="row" width="100%" marginTop="60px">
+          <Sidebar isCollapsed={isSidebarCollapsed} />
+          <main className="content">
             <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/tasks" element={<Tasks />} />
-                    <Route path="/company" element={<CompanyCases />} />
-                    <Route path="/employees" element={<Employees />} />
-                    <Route path="/employee" element={<EmployeeCases />} />
-                    <Route path="/personalCase" element={<PersonalCase />} />
-                    <Route path="/employeeCase" element={<EmployeeCase />} />
-                    <Route path="/companyCase" element={<CompanyCase />} />
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/company" element={<CompanyCases />} />
+              <Route path="/employees" element={<Employees />} />
+              <Route path="/employee" element={<EmployeeCases />} />
+              <Route path="/personalCase" element={<PersonalCase />} />
+              <Route path="/employeeCase" element={<EmployeeCase />} />
+              <Route path="/companyCase" element={<CompanyCase />} />
 
-                    <Route path="/dossier" element={<Dossier />} />
-                    <Route path="/reporting" element={<PersonalCases />} />
+              <Route path="/dossier" element={<Dossier />} />
+              <Route path="/reporting" element={<PersonalCases />} />
 
-                    <Route path="/login" element={<LoginForm />} />
-                  </Routes>
-            </main>
-          </Box>
+              <Route path="/login" element={<LoginForm />} />
+            </Routes>
+          </main>
         </Box>
-    )
-  }
-  else 
-  {
-    content = (
-      <Tenants />
-    )
+      </Box>
+    );
+  } else {
+    content = <Tenants />;
   }
 
   return (
