@@ -53,7 +53,7 @@ export class EmployeesApi {
     let returnType = null;
 
     return this.apiClient.callApi(
-      "employees",
+      "/employees",
       "GET",
       pathParams,
       queryParams,
@@ -92,7 +92,7 @@ export class EmployeesApi {
     let returnType = null;
 
     return this.apiClient.callApi(
-      "employees/{employeeId}",
+      "/employees/{employeeId}",
       "GET",
       pathParams,
       queryParams,

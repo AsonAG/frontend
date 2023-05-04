@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState} from "react";
 import ApiClient from "../api/ApiClient";
-import { PayrollsApi } from "../api/PayrollsApi";
+import PayrollsApi from "../api/PayrollsApi";
 
 const User = ({ tenantId, userId, employee }) => {
   // const caseName = window.sessionStorage.getItem("caseName");

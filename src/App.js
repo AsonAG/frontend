@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useMemo } from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
@@ -23,7 +23,7 @@ import { AuthProvider } from "oidc-react";
 import LoginForm from "./scenes/login";
 import User from "./model/User";
 import ApiClient from "./api/ApiClient";
-import { PayrollsApi } from "./api/PayrollsApi";
+import PayrollsApi from "./api/PayrollsApi";
 import CasesForm from "./scenes/global/CasesForm";
 import Tenants from "./scenes/tenants";
 
@@ -33,30 +33,28 @@ function App() {
   const [theme, colorMode] = useMode();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    document.title = "Ason Payroll";
-  }, []);
-
   const [user, setUser] = useState(
     User({
-      tenantId: null,
       userId: 17,
       employee: {
         employeeId: 15,
       }
     })
   );
+  const payrollsApi = useMemo(() => new PayrollsApi(ApiClient, user.tenantId), [user.tenantId]);
+
+
+  useEffect(() => {
+    document.title = "Ason Payroll";
+  }, []);
+
 
   useEffect(() => {
     if (!user.tenantId) return;
-
-    ApiClient.basePath = 'https://localhost:44354';
-    var payrollsApi = new PayrollsApi(ApiClient);
-    payrollsApi.queryPayrolls(user.tenantId, null, onQueryPayrolls);
+    payrollsApi.getPayrolls(onGetPayrolls);
   }, [user.tenantId]);
   
-  const onQueryPayrolls = function(error, data, response) {
+  const onGetPayrolls = function(error, data, response) {
     if (error) {
       console.log(error);
       return;

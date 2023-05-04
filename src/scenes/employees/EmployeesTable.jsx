@@ -1,11 +1,8 @@
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import {
   DataGrid,
   GridToolbarQuickFilter,
   GridToolbar,
 } from "@mui/x-data-grid";
-import { Link } from "react-router-dom";
-import SendIcon from "@mui/icons-material/Send";
 import { Box, IconButton, useTheme } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import EmployeesApi from "../../api/EmployeesApi";

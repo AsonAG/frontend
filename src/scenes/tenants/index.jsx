@@ -1,20 +1,18 @@
 import { Box, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
-import { React, useEffect, useContext, useState } from "react";
+import { React, useEffect, useContext, useState, useMemo } from "react";
 import Header from "../../components/Header";
-import { IntegrationApi } from "../../api/IntegrationApi";
+import TenantsApi from "../../api/TenantsApi";
 import { UserContext } from "../../App";
-import { ApiClient } from "../../api/ApiClient";
+import ApiClient from "../../api/ApiClient";
 
 const Tenants = () => {
-
   const { user, setUser } = useContext(UserContext);
   const [tenants, setTenants] = useState([]);
   const tenantsEffectKey = tenants.map(t => t.id).join(',');
+  const api = useMemo(() => new TenantsApi(ApiClient), []);
+
 
   useEffect(() => {
-    const apiClient = new ApiClient();
-    apiClient.basePath = 'https://localhost:44354';
-    const api = new IntegrationApi(apiClient);
     api.userTenants(callback);
   }, [tenantsEffectKey]);
 
