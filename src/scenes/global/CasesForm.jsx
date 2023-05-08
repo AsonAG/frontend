@@ -16,6 +16,7 @@ import CasesApi from "../../api/CasesApi";
 import CaseFieldsComponent from "../../components/case/CaseFieldsComponent";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
 import { UserContext } from "../../App";
+import { useUpdateEffect } from "usehooks-ts";
 
 export const CaseContext = createContext();
 
@@ -62,16 +63,17 @@ const CasesForm = ({employee, navigateTo}) => {
   const callback = function (error, data, response) {
     if (error) {
       console.error(error);
-    } else {
-      console.log(
-        "API called successfully. Returned CaseForm data: " +
-          JSON.stringify(data, null, 2)
-      );
-    }
+    } 
+    // else {
+    //   console.log(
+    //     "API called successfully. Returned CaseForm data: " +
+    //       JSON.stringify(data, null, 2)
+    //   );
+    // }
     setCaseDetails(data);
   };
 
-  useDidMountEffect(() => {
+  useEffect(() => {
     // console.log(
     //   "Making api Request for a case fields update: " +
     //     caseName +

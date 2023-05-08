@@ -1,6 +1,5 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
-import { deDE } from '@mui/x-date-pickers/locales';
 
 // color design tokens export
 export const tokens = (mode) => ({

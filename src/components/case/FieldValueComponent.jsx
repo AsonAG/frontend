@@ -70,10 +70,7 @@ const FieldValueComponent = ({
     if (error) {
       console.error(error);
     } else {
-      console.log(
-        "API called successfully. Returned Lookups data: " +
-          JSON.stringify(data, null, 2)
-      );
+      // console.log("API called successfully. Returned Lookups data: " +JSON.stringify(data, null, 2));
     }
     setLookupOptions(data[0].values);
     console.log("Lookups: " + JSON.stringify(data[0].values, null, 2));
@@ -110,7 +107,7 @@ const FieldValueComponent = ({
   /* Handlers         =================================== START =============================== */
   const handleTextValueChange = (e) => {
     setFieldValue(e.target.value);
-    console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
+    // console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
     onChange(e.target.value);
   };
 

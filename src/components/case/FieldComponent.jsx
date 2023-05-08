@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Box, IconButton } from "@mui/material";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -20,6 +20,17 @@ const FieldComponent = ({ field, onChange }) => {
   const [fieldEndDate, setFieldEndDate] = useState(
     field.end ? new Date(field.end) : null
   );
+
+  useEffect(()=>{
+    onChange(
+      fieldKey,
+      fieldName,
+      fieldValue,
+      fieldStartDate,
+      fieldEndDate,
+      field.caseSlot
+    );
+  }, [])
 
   const onValueChange = (value) => {
     onChange(

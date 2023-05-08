@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FieldComponent, { getFieldKey } from "./FieldComponent";
 import useDidMountEffect from "../../hooks/useDidMountEffect";
+import { useUpdateEffect } from "usehooks-ts";
 
 function CaseNameHeader(caseBase) {
   return (
@@ -42,7 +43,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
 
-  useDidMountEffect(() => {
+  useUpdateEffect(() => {
     // update output cases
     setOutputCases((prevState) => ({
       ...prevState,
@@ -140,6 +141,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
             ))}
           </Box>
 
+        {/***************************** Related Cases *****************************/}
           {isBase ? (
             // skip base related cases, they are already considered in the Parent component
             <></>
