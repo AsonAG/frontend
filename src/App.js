@@ -25,6 +25,7 @@ import PayrollsApi from "./api/PayrollsApi";
 import CasesForm from "./scenes/global/CasesForm";
 import Tenants from "./scenes/tenants";
 import UsersApi from "./api/UsersApi";
+import de from "date-fns/locale/de";
 
 export const UserContext = createContext();
 
@@ -189,7 +190,10 @@ function App() {
 
   return (
     <AuthProvider {...oidcConfig}>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider 
+        dateAdapter={AdapterDateFns}
+        adapterLocale={de} // TODO: user default selection and manual selection option
+        >
         <ColorModeContext.Provider value={colorMode}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
