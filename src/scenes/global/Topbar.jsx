@@ -98,14 +98,10 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
     >
       <AppBar>
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Box display="flex" flexDirection="row" paddingLeft="15px">
+          <Box display="flex" flexDirection="row" >
             {/* LOGO AND MENU ICON */}
             <MenuItem
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              // icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
               style={{
-                // margin: "10px 0 20px 0px",
-                // marginBottom: "15px",
                 color: colors.grey[100],
               }}
             >
@@ -115,12 +111,19 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
                 color="inherit"
                 aria-label="menu"
                 onClick={() => setIsCollapsed(!isCollapsed)}
+                sx={{
+                  margin: "0"
+                }}
               >
                 <MenuOutlinedIcon />
               </IconButton>
             </MenuItem>
 
-            <MenuItem>
+            <MenuItem
+            sx={{
+              margin: "0 0"
+            }}
+            >
                 <Logo />
             </MenuItem>
           </Box>
@@ -153,7 +156,6 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
               <MenuItem onClick={handleClose}>Settings</MenuItem>
               <MenuItem onClick={handleSwitchTenant}>Switch tenant</MenuItem>
               <MenuItem onClick={() => { auth.signOut();handleLogout();}}>Logout</MenuItem>

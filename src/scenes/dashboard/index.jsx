@@ -21,27 +21,7 @@ const Dashboard = () => {
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
       </Box>
       <Box mt="25px">
-        <Typography variant="h5">Payroll Services</Typography>
 
-        <Card sx={{ mt: "10px", maxWidth: 345 }}>
-          <CardActionArea>
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                Payroll 1
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-
-        <Card sx={{ maxWidth: 345 }}>
-          <CardActionArea>
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
-                Payroll 2
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
       </Box>
     </Box>
   );

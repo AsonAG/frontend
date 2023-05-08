@@ -177,8 +177,6 @@ function App() {
 
               <Route path="/dossier" element={<Dossier />} />
               <Route path="/reporting" element={<PersonalCases />} />
-
-              <Route path="/login" element={<LoginForm />} />
             </Routes>
           </main>
         </Box>

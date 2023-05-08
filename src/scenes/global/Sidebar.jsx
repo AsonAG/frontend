@@ -1,6 +1,13 @@
 import { useContext, useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Tooltip, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -15,6 +22,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { UserContext } from "../../App";
 import PayrollSelector from "../../components/PayrollSelector";
 import { useAuth } from "oidc-react";
+import { Stack } from "@mui/system";
 
 const Sidebar = ({ isCollapsed }) => {
   const theme = useTheme();
@@ -180,30 +188,30 @@ const Sidebar = ({ isCollapsed }) => {
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 /> */}
                 </Box>
-                <Box textAlign="left" sx={{ m: "0 30px 20px " }}>
-                  {/* <Typography variant="h5" color={colors.greenAccent[500]}>
-                    {user.payrollName}
-                  </Typography> */}
-
-                  <Typography
-                    variant="h6"
-                    color={colors.grey[100]}
-                    // fontWeight="bold"
-                    m="0 0px 12px 0px"
+                <Stack 
+                  sx={{ m: "0 30px 20px " }}
+                  spacing={3}
                   >
-                    {auth.userData?.profile?.email}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color={colors.grey[100]}
-                    // fontWeight="bold"
-                    m="0 0px 12px 0px"
-                  >
-                    Tenant: {user.tenantIdentifier}
-                  </Typography>
 
-                  <PayrollSelector />
-                </Box>
+<PayrollSelector />
+
+                  <TextField
+                    id="user-email"
+                    label="User"
+                    variant="standard"
+                    disabled
+                    defaultValue={auth.userData?.profile?.email}
+                  />
+
+                  <TextField
+                    id="user-tenant"
+                    label="Tenant"
+                    variant="standard"
+                    disabled
+                    defaultValue={user.tenantIdentifier}
+                  />
+
+                </Stack>
               </Box>
             )}
           </Box>

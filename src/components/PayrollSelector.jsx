@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, FormControl, MenuItem, Select } from "@mui/material";
+import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { UserContext } from "../App";
 
 export default function PayrollSelector() {
@@ -12,7 +12,9 @@ export default function PayrollSelector() {
 
   const handleChange = (e) => {
     console.log("User has changed.");
-    let payroll = user.availablePayrolls.find((payroll) => payroll.payrollId === e.target.value);
+    let payroll = user.availablePayrolls.find(
+      (payroll) => payroll.payrollId === e.target.value
+    );
     setUser((current) => ({
       ...current,
       currentPayrollName: payroll.payrollName,
@@ -28,17 +30,21 @@ export default function PayrollSelector() {
       currentDivisionId: user?.currentDivisionId,
     });
   }, [user]);
-  
+
   if (!user?.currentPayrollId) {
     return null;
   }
   return (
     <Box>
-      <FormControl variant="filled" fullWidth>
+      <FormControl fullWidth>
+        <InputLabel color="primary" id="payroll-selection-label">
+          Payroll
+        </InputLabel>
         <Select
-          variant="outlined"
+          variant="standard"
           id="payroll-main-select"
           label="Payroll"
+          labelId="payroll-selection-label"
           onChange={handleChange}
           value={user.currentPayrollId}
         >

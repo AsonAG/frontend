@@ -194,7 +194,7 @@ export const themeSettings = (mode) => {
         fontFamily: ["Made outer sans", "sans-serif"].join(","),
         fontSize: 14,
       },
-    },
+    }
     // button: {
     //   fontSize: 26,
     //   fontWeight: 700,
