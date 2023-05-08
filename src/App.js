@@ -20,7 +20,6 @@ import CompanyCase from "./scenes/case/CompanyCase";
 import { useEffect } from "react";
 import { AuthProvider } from "oidc-react";
 import LoginForm from "./scenes/login";
-import User from "./model/User";
 import ApiClient from "./api/ApiClient";
 import PayrollsApi from "./api/PayrollsApi";
 import CasesForm from "./scenes/global/CasesForm";
@@ -63,12 +62,6 @@ function App() {
       payrollsApi.getPayrolls(onGetPayrollsCallback);
     }
   }, [user.attributes]);
-
-  // useEffect(() => {
-  //   if (!user.tenantId) return;
-  //   usersApi.getUsers(onGetUsersCallback);
-  //   payrollsApi.getPayrolls(onGetPayrollsCallback);
-  // }, [user.attributes.payrolls]);
 
   const onGetUsersCallback = (error, data, response) => {
     if (error) {

@@ -74,12 +74,19 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
         caseName: caseBase.name,
         caseFieldName: fieldName,
         value: fieldValue,
-        start: fieldStartDate ? new Date(fieldStartDate).toISOString() : null,
-        end: fieldEndDate ? new Date(fieldEndDate).toISOString() : null,
+        start: isoDateWithoutTimeZone(fieldStartDate),
+        end: isoDateWithoutTimeZone(fieldEndDate),
         caseSlot: fieldCaseSlot,
       },
     }));
   };
+
+  function isoDateWithoutTimeZone(date) {
+    if (date == null) return date;
+    let timestamp = date.getTime() - date.getTimezoneOffset() * 60000;
+    let correctDate = new Date(timestamp);
+    return correctDate.toISOString();
+  }
 
   return (
     <Box borderBottom={1} key={"casebox_" + caseBase.id}>
