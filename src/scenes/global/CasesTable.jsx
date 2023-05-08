@@ -28,7 +28,7 @@ const CasesTable = ({ caseType, employee, clusterName, navigateTo }) => {
 
   useEffect(() => {
     setCaseData([]);
-    casesApi.getCases(callback, caseType, employee.employeeId, clusterName);
+    casesApi.getCases(callback, caseType, employee?.employeeId, clusterName);
   }, [user]);
 
   const callback = function (error, data, response) {

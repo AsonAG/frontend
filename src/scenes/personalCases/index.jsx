@@ -12,7 +12,7 @@ const PersonalCases = () => {
   return (
     <Box m="25px">
       <Header
-        title="Cases"
+        title="CASES"
         subtitle="Find what you want to report to the HR department"
       />
       <CasesTable
