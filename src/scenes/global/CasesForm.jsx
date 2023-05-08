@@ -14,7 +14,6 @@ import SendIcon from "@mui/icons-material/Send";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
 import CaseFieldsComponent from "../../components/case/CaseFieldsComponent";
-import useDidMountEffect from "../../hooks/useDidMountEffect";
 import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
 

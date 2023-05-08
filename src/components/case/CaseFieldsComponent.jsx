@@ -8,7 +8,6 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FieldComponent, { getFieldKey } from "./FieldComponent";
-import useDidMountEffect from "../../hooks/useDidMountEffect";
 import { useUpdateEffect } from "usehooks-ts";
 
 function CaseNameHeader(caseBase) {
