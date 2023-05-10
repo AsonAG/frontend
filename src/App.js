@@ -19,21 +19,30 @@ import PersonalCase from "./scenes/case/PersonalCase";
 import CompanyCase from "./scenes/case/CompanyCase";
 import { useEffect } from "react";
 import { AuthProvider } from "oidc-react";
-import LoginForm from "./scenes/login";
 import ApiClient from "./api/ApiClient";
 import PayrollsApi from "./api/PayrollsApi";
 import CasesForm from "./scenes/global/CasesForm";
 import Tenants from "./scenes/tenants";
 import UsersApi from "./api/UsersApi";
 import de from "date-fns/locale/de";
+import { useSessionStorage } from "usehooks-ts";
+import EmployeesApi from "./api/EmployeesApi";
 
 export const UserContext = createContext();
+export const UserEmployeeContext = createContext();
+export const EmployeeSelectionContext = createContext();
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
+  const [employee, setEmployee] = useSessionStorage("employee_selection", {});
+  const [userEmployee, setUserEmployee] = useSessionStorage(
+    "user_employee",
+    {}
+  );
   const [user, setUser] = useState({});
+  
   const payrollsApi = useMemo(
     () => new PayrollsApi(ApiClient, user.tenantId),
     [user.tenantId]
@@ -42,6 +51,7 @@ function App() {
     () => new UsersApi(ApiClient, user.tenantId),
     [user.tenantId]
   );
+  const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
 
   useEffect(() => {
     document.title = "Ason Payroll";
@@ -61,6 +71,7 @@ function App() {
       return;
     } else {
       payrollsApi.getPayrolls(onGetPayrollsCallback);
+      employeesApi.getEmployees(onGetEmployeesCallbck);
     }
   }, [user.attributes]);
 
@@ -75,10 +86,6 @@ function App() {
       culture: data[0].culture,
       language: data[0].language,
       attributes: data[0].attributes,
-      employee: {
-        // TODO, get employee from the request instead
-        employeeId: 15,
-      },
     });
   };
 
@@ -93,8 +100,8 @@ function App() {
       let currentPayrollName = user.currentPayrollName;
       let currentDivisionId = user.currentDivisionId;
 
-      let userPayrolls = data.filter(
-        (payroll) => user.attributes.payrolls.includes(payroll.name)
+      let userPayrolls = data.filter((payroll) =>
+        user.attributes.payrolls.includes(payroll.name)
       );
 
       if (!currentPayrollId && userPayrolls.length > 0) {
@@ -115,6 +122,20 @@ function App() {
         })),
       };
     });
+  };
+
+  const onGetEmployeesCallbck = (error, data, response) => {
+    let employee;
+
+    if (error) {
+      console.error(error);
+    } else {
+      employee = data.find(
+        (element) => element.identifier === user.attributes.employee
+      );
+      employee.employeeId = employee.id;
+      setUserEmployee(employee);
+    }
   };
 
   const oidcConfig = {
@@ -188,15 +209,21 @@ function App() {
 
   return (
     <AuthProvider {...oidcConfig}>
-      <LocalizationProvider 
+      <LocalizationProvider
         dateAdapter={AdapterDateFns}
         adapterLocale={de} // TODO: user default selection and manual selection option
-        >
+      >
         <ColorModeContext.Provider value={colorMode}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <UserContext.Provider value={{ user, setUser }}>
-              {content}
+              <EmployeeSelectionContext.Provider
+                value={{ employee, setEmployee }}
+              >
+                <UserEmployeeContext.Provider value={userEmployee}>
+                  {content}
+                </UserEmployeeContext.Provider>
+              </EmployeeSelectionContext.Provider>
             </UserContext.Provider>
           </ThemeProvider>
         </ColorModeContext.Provider>

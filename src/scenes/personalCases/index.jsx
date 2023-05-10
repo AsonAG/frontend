@@ -3,11 +3,11 @@ import { tokens } from "../../theme";
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
 import CasesTable from "../global/CasesTable";
-import { EmployeeContext, UserContext } from "../../App";
+import { EmployeeContext, UserContext, UserEmployeeContext } from "../../App";
 import { useContext } from "react";
 
 const PersonalCases = () => {
-  const { user, setUser } = useContext(UserContext);
+  const userEmployee = useContext(UserEmployeeContext);
 
   return (
     <Box m="25px">
@@ -16,7 +16,7 @@ const PersonalCases = () => {
         subtitle="Find what you want to report to the HR department"
       />
       <CasesTable
-        employee={user.employee}
+        employeeId={userEmployee.employeeId}
         caseType={"Employee"}
         clusterName={"ESS"}
         navigateTo={"/personalCase"}

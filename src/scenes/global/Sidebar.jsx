@@ -19,7 +19,7 @@ import TaskIcon from "@mui/icons-material/Task";
 import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { UserContext } from "../../App";
+import { UserContext, UserEmployeeContext } from "../../App";
 import PayrollSelector from "../../components/PayrollSelector";
 import { useAuth } from "oidc-react";
 import { Stack } from "@mui/system";
@@ -31,6 +31,7 @@ const Sidebar = ({ isCollapsed }) => {
   const minWidth = useMediaQuery("(min-width:600px)");
   const auth = useAuth();
   const { user, setUser } = useContext(UserContext);
+  const userEmployee = useContext(UserEmployeeContext);
 
   const Item = ({ title, to, icon, selected, setSelected }) => {
     const theme = useTheme();
@@ -188,19 +189,15 @@ const Sidebar = ({ isCollapsed }) => {
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 /> */}
                 </Box>
-                <Stack 
-                  sx={{ m: "0 30px 20px " }}
-                  spacing={3}
-                  >
-
-<PayrollSelector />
+                <Stack sx={{ m: "0 30px 20px " }} spacing={3}>
+                  <PayrollSelector />
 
                   <TextField
                     id="user-email"
                     label="User"
                     variant="standard"
                     disabled
-                    defaultValue={auth.userData?.profile?.email}
+                    defaultValue={userEmployee.identifier}
                   />
 
                   <TextField
@@ -210,7 +207,6 @@ const Sidebar = ({ isCollapsed }) => {
                     disabled
                     defaultValue={user.tenantIdentifier}
                   />
-
                 </Stack>
               </Box>
             )}

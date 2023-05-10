@@ -4,6 +4,7 @@ import { Box, Button, TextField } from "@mui/material";
 import { UserContext } from "../../App";
 import { useNavigate } from "react-router";
 
+// DEPRECATED
 export default function LoginForm() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();

@@ -15,7 +15,7 @@ import { UserContext } from "../../App";
  * @param caseType of CaseType type [Employee/Company/Global/National].
  * @returns {CasesTable} The a table component representation of list of available cases.
  */
-const CasesTable = ({ caseType, employee, clusterName, navigateTo }) => {
+const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const [caseData, setCaseData] = useState([]);
   const [caseDataLoaded, setCaseDataLoaded] = useState(false);
   const theme = useTheme();
@@ -28,7 +28,7 @@ const CasesTable = ({ caseType, employee, clusterName, navigateTo }) => {
 
   useEffect(() => {
     setCaseData([]);
-    casesApi.getCases(callback, caseType, employee?.employeeId, clusterName);
+    casesApi.getCases(callback, caseType, employeeId, clusterName);
   }, [user]);
 
   const callback = function (error, data, response) {
