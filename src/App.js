@@ -153,7 +153,8 @@ function App() {
     authority: "https://ason-01-p4mk1f.zitadel.cloud",
     clientId: "210272222781178113@ason",
     responseType: "code",
-    redirectUri: "http://localhost:3003/",
+    // redirectUri: "http://localhost:3003/",
+    redirectUri: "https://purple-plant-038025a03.3.azurestaticapps.net",
     scope: "openid profile email",
   };
 
