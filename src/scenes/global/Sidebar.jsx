@@ -198,6 +198,7 @@ const Sidebar = ({ isCollapsed }) => {
                     variant="standard"
                     disabled
                     defaultValue={userEmployee.identifier}
+                    // defaultValue={auth.userData?.profile?.email}
                   />
 
                   <TextField

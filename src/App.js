@@ -10,7 +10,7 @@ import Tasks from "./scenes/tasks";
 import PersonalCases from "./scenes/personalCases";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { Box, height } from "@mui/system";
+import { Box } from "@mui/system";
 import CompanyCases from "./scenes/companyCases";
 import Employees from "./scenes/employees";
 import EmployeeCases from "./scenes/employees/employeeCases";
@@ -25,7 +25,7 @@ import CasesForm from "./scenes/global/CasesForm";
 import Tenants from "./scenes/tenants";
 import UsersApi from "./api/UsersApi";
 import de from "date-fns/locale/de";
-import { useSessionStorage } from "usehooks-ts";
+import { useLocalStorage, useSessionStorage } from "usehooks-ts";
 import EmployeesApi from "./api/EmployeesApi";
 
 export const UserContext = createContext();
@@ -37,12 +37,12 @@ function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const [employee, setEmployee] = useSessionStorage("employee_selection", {});
-  const [userEmployee, setUserEmployee] = useSessionStorage(
+  const [userEmployee, setUserEmployee] = useLocalStorage(
     "user_employee",
     {}
   );
   const [user, setUser] = useState({});
-  
+
   const payrollsApi = useMemo(
     () => new PayrollsApi(ApiClient, user.tenantId),
     [user.tenantId]
