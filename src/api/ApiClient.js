@@ -34,9 +34,10 @@ export class ApiClient {
         /**
          * The base URL against which to resolve every API call's (relative) path.
          * @type {String}
-         * @default https://localhost:44354/api/tenants/3/payrolls/4/cases/sets
+         * @default https://localhost:44354/api/tenants
          */
-        this.basePath = 'https://localhost:44354/api/tenants'.replace(/\/+$/, ''); 
+        // this.basePath = 'https://localhost:44354/api/tenants'.replace(/\/+$/, ''); 
+        this.basePath = 'https://demogroupapi.azurewebsites.net/api/tenants'.replace(/\/+$/, ''); 
 
         /**
          * The authentication methods to be included for all API calls.
