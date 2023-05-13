@@ -53,9 +53,13 @@ function App() {
   );
   const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
 
+  // TODO: change title dependently on a chosen Route path
   useEffect(() => {
-    document.title = "Ason Payroll";
-  }, []);
+    document.title = 
+      user.currentPayrollName ?
+      "Ason - " + user.currentPayrollName
+      : "Ason - Tenants";
+  }, [user.currentPayrollName]);
 
   useEffect(() => {
     if (!user.tenantId) {
