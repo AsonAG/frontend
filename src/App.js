@@ -154,11 +154,10 @@ function App() {
       });
       window.location.hash = "";
     },
-    authority: "https://ason-01-p4mk1f.zitadel.cloud",
+    authority: process.env.REACT_APP_AUTHORITY_URL,
     clientId: "210272222781178113@ason",
     responseType: "code",
-    // redirectUri: "http://localhost:3003/",
-    redirectUri: "https://purple-plant-038025a03.3.azurestaticapps.net",
+    redirectUri: process.env.REACT_APP_REDIRECT_URL,
     scope: "openid profile email",
   };
 
@@ -174,7 +173,7 @@ function App() {
   let content;
 
   console.log("rerender");
-  console.log(user);
+  // console.log(JSON.stringify(user));
 
   if (user.tenantId) {
     content = (

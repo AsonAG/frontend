@@ -18,8 +18,6 @@ export class EmployeesApi {
     this.apiClient = apiClient || ApiClient.instance;
     this.tenantId = user.tenantId;
     this.divisionId = user.currentDivisionId;
-    console.log("my user in api: ", JSON.stringify(user));
-
   }
 
   /**
