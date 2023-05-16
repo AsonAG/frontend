@@ -31,9 +31,17 @@ const FieldValueComponent = ({
   setFieldValue,
   fieldValueType,
   onChange,
-  required=true,
-  lookupSettings
+  required = true,
+  lookupSettings,
+  small = true,
 }) => {
+  const slotInputProps = small
+    ? {
+        fullWidth: true,
+        textField: { size: "small" },
+        size: "small",
+      }
+    : {};
   /* Validation options               =============================== START =============================== */
   // const [fieldVisited, setFieldVisited] = useState(false);
   // const [isFieldValid, setFieldValid] = useState((fieldValue ? true : !required));
@@ -51,10 +59,7 @@ const FieldValueComponent = ({
     if (!lookupLoading) {
       return undefined;
     }
-    casesApi.getCaseFieldLookups(
-      lookupSettings.lookupName,
-      callbackLookups
-    );
+    casesApi.getCaseFieldLookups(lookupSettings.lookupName, callbackLookups);
     return () => {
       active = false;
     };
@@ -93,9 +98,9 @@ const FieldValueComponent = ({
 
   // const dateSlotProps = () => {
   //   return fieldVisited && !isFieldValid
-  //     ? { textField: { 
-  //         error: true, 
-  //         helperText: "Field can not be empty" 
+  //     ? { textField: {
+  //         error: true,
+  //         helperText: "Field can not be empty"
   //       } } // TODO: Change error message
   //     : null;
   // };
@@ -118,10 +123,10 @@ const FieldValueComponent = ({
   };
 
   /**
-   * if dateValue is a Date class - updates fieldValue 
+   * if dateValue is a Date class - updates fieldValue
    */
   const handleDateValueChange = (dateValue) => {
-    if (dateValue == null || isValidDate(dateValue)){
+    if (dateValue == null || isValidDate(dateValue)) {
       let newDate = dateValue ? new Date(dateValue) : null;
       setFieldValue(newDate);
       onChange(newDate);
@@ -129,7 +134,11 @@ const FieldValueComponent = ({
   };
 
   function isValidDate(date) {
-    return date && Object.prototype.toString.call(date) === "[object Date]" && !isNaN(date);
+    return (
+      date &&
+      Object.prototype.toString.call(date) === "[object Date]" &&
+      !isNaN(date)
+    );
   }
 
   /* Handlers         ================================ END ================================ */
@@ -159,8 +168,8 @@ const FieldValueComponent = ({
         loading={lookupLoading}
         renderInput={(params) => (
           <TextField
-          key={fieldKey}
-
+            key={fieldKey}
+            {...slotInputProps}
             {...params}
             label={fieldDisplayName}
             InputProps={{
@@ -192,7 +201,7 @@ const FieldValueComponent = ({
       case "Date":
         return (
           <DatePicker
-            fullWidth
+            slotProps={{ ...slotInputProps }}
             label={fieldDisplayName + (required ? "*" : "")}
             helperText={fieldDescription}
             value={fieldValue ? new Date(fieldValue) : null}
@@ -206,7 +215,7 @@ const FieldValueComponent = ({
       case "DateTime":
         return (
           <DateTimePicker
-            fullWidth
+            slotProps={{ ...slotInputProps }}
             label={fieldDisplayName + (required ? "*" : "")}
             helperText={fieldDescription}
             value={fieldValue ? new Date(fieldValue) : null}
@@ -230,7 +239,7 @@ const FieldValueComponent = ({
                     fieldValue ? fieldValue.toLowerCase?.() === "true" : false
                   }
                   onChange={handleBooleanValueChange}
-            key={fieldKey}
+                  key={fieldKey}
                 />
               }
             />
@@ -240,7 +249,7 @@ const FieldValueComponent = ({
       default: //TextField
         return (
           <TextField
-            fullWidth
+            {...slotInputProps}
             label={fieldDisplayName}
             helperText={fieldDescription}
             required={required}

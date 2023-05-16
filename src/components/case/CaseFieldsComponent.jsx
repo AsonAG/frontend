@@ -14,12 +14,13 @@ function CaseNameHeader(caseBase) {
   return (
     <Box display="flex" alignItems="baseline">
       <Typography
-        variant="h4"
+        variant="h5"
         fontWeight="bold"
         key={"casename_" + caseBase.id}
         sx={{ 
           marginRight: "20px", 
-          flexShrink: 0 }}
+          flexShrink: 0 
+        }}
       >
         {caseBase?.caseSlot
           ? caseBase?.displayName + " " + caseBase?.caseSlot
@@ -27,7 +28,7 @@ function CaseNameHeader(caseBase) {
       </Typography>
 
       <Typography
-        variant="h5"
+        variant="h6"
         sx={{ color: "text.secondary" }}
         key={"casename_desc_" + caseBase.id}
       >
@@ -46,9 +47,6 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
     // update output cases
     setOutputCases((prevState) => ({
       ...prevState,
-      // [caseBase.caseSlot
-      //   ? caseBase.name + "_" + caseBase.caseSlot
-      //   : caseBase.name]: 
       [getFieldKey(caseBase.name, caseBase.id)]:
         {
         caseName: caseBase.name,
@@ -92,7 +90,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
     <Box borderBottom={1} key={"casebox_" + caseBase.id}>
       <Accordion
         defaultExpanded={true}
-        elevation={5}
+        // elevation={5}
         key={"caseaccordion_" + caseBase.id}
       >
         {/***************************** Case Header ****************************/}
@@ -111,7 +109,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
             expandIcon={<ExpandMoreIcon />}
             sx={{
               backgroundColor: colors.primary[400],
-              marginTop: "18px",
+              marginTop: "10px",
             }}
             key={"casesummary_" + caseBase.id}
           >
@@ -128,7 +126,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
         >
           <Box
             borderTop={1}
-            paddingTop="16px"
+            paddingTop="6px"
             key={"fieldswrapper_" + caseBase.id}
           >
             {caseBase?.fields?.map((field, i) => (
