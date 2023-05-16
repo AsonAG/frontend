@@ -14,10 +14,11 @@ function CaseNameHeader(caseBase) {
   return (
     <Box display="flex" alignItems="baseline">
       <Typography
-        variant="h5"
+        variant="h4"
         fontWeight="bold"
         key={"casename_" + caseBase.id}
         sx={{ 
+          marginLeft: "6px", 
           marginRight: "20px", 
           flexShrink: 0 
         }}
@@ -28,7 +29,7 @@ function CaseNameHeader(caseBase) {
       </Typography>
 
       <Typography
-        variant="h6"
+        variant="h5"
         sx={{ color: "text.secondary" }}
         key={"casename_desc_" + caseBase.id}
       >
@@ -87,7 +88,24 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
   }
 
   return (
-    <Box borderBottom={1} key={"casebox_" + caseBase.id}>
+    <Box 
+      key={"casebox_" + caseBase.id}
+      sx={{
+        "& .MuiAccordionDetails-root": {
+          padding: "0px 10px"
+        },
+        "& .MuiAccordionSummary-root": {
+          minHeight: "48px !important"
+        },
+        "& .MuiAccordionSummary-content.Mui-expanded": {
+          margin: "0"
+      }
+      }}
+    >
+
+
+
+
       <Accordion
         defaultExpanded={true}
         // elevation={5}
@@ -125,8 +143,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
           key={"fields_" + caseBase.id}
         >
           <Box
-            borderTop={1}
-            paddingTop="6px"
+            // paddingTop="6px"
             key={"fieldswrapper_" + caseBase.id}
           >
             {caseBase?.fields?.map((field, i) => (

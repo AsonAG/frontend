@@ -33,7 +33,7 @@ const FieldValueComponent = ({
   onChange,
   required = true,
   lookupSettings,
-  small = true,
+  small,
 }) => {
   const slotInputProps = small
     ? {

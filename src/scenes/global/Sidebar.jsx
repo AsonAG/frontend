@@ -73,7 +73,11 @@ const Sidebar = ({ isCollapsed }) => {
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
         },
+        "& .pro-sidebar": {
+          color: colors.grey[100] + " !important"
+        },
         "& .pro-inner-item": {
+          color: colors.grey[100] + " !important"
           // padding: "0px 20px 10px 20px !important",
         },
         "& .pro-inner-item:hover": {
