@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { ProSidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import {
   Box,
   IconButton,
@@ -11,9 +11,11 @@ import {
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
+import PersonIcon from "@mui/icons-material/Person";
+import WorkIcon from "@mui/icons-material/Work";
 import CasesOutlinedIcon from "@mui/icons-material/CasesOutlined";
 import TaskIcon from "@mui/icons-material/Task";
 import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
@@ -24,7 +26,7 @@ import PayrollSelector from "../../components/PayrollSelector";
 import { useAuth } from "oidc-react";
 import { Stack } from "@mui/system";
 
-const Item = ({ title, to, icon, selected, setSelected, isCollapsed}) => {
+const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
@@ -60,28 +62,27 @@ const Sidebar = ({ isCollapsed }) => {
   return (
     (minWidth || !isCollapsed) && (
       <Box
-        sx={{
-          "& .pro-sidebar-inner": {
-            background: `${colors.primary[400]} !important`,
-            // position: "-webkit-sticky",
-            // position: 'sticky !important',
-            // top: "0",
-            // maxWidth: "250px",
-          },
-          "& .pro-icon-wrapper": {
-            backgroundColor: "transparent !important",
-          },
-          "& .pro-inner-item": {
-            padding: "0px 20px 10px 20px !important",
-            // padding: "0px 10px 16px 20px !important",
-          },
-          "& .pro-inner-item:hover": {
-            color: "#868dfb !important",
-          },
-          "& .pro-menu-item.active": {
-            color: "#6870fa !important",
-          },
-        }}
+      sx={{
+        "& .pro-sidebar-inner": {
+          background: `${colors.primary[400]} !important`,
+          // position: "-webkit-sticky",
+          // position: 'sticky !important',
+          // top: "0",
+          // maxWidth: "250px",
+        },
+        "& .pro-icon-wrapper": {
+          backgroundColor: "transparent !important",
+        },
+        "& .pro-inner-item": {
+          // padding: "0px 20px 10px 20px !important",
+        },
+        "& .pro-inner-item:hover": {
+          color: "#868dfb !important",
+        },
+        "& .pro-menu-item.active": {
+          color: "#6870fa !important",
+        },
+      }}
       >
         <ProSidebar collapsed={isCollapsed}>
           <Box
@@ -92,11 +93,11 @@ const Sidebar = ({ isCollapsed }) => {
             justifyContent="space-between"
           >
             <Menu>
-              <Box marginTop="20px">
+              <Box marginTop="10px">
                 <Item
                   title="Dashboard"
                   to="/"
-                  icon={<HomeOutlinedIcon />}
+                  icon={<HomeIcon />}
                   selected={selected}
                   setSelected={setSelected}
                   isCollapsed={isCollapsed}
@@ -105,69 +106,45 @@ const Sidebar = ({ isCollapsed }) => {
                 <Typography
                   variant="h5"
                   color={colors.grey[300]}
-                  sx={{ m: "10px 0" }}
+                  // sx={{ m: "10px 0" }}
                   textAlign="center"
-                >
-                  Employee
-                </Typography>
-                <Item
-                  title="Tasks"
-                  to="/tasks"
-                  icon={<TaskIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                  isCollapsed={isCollapsed}
-                />
-                <Item
-                  title="Cases"
-                  to="/reporting"
-                  // icon={<PeopleOutlinedIcon />}
-                  icon={<ContactsOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                  isCollapsed={isCollapsed}
-                />
+                ></Typography>
 
-                <Typography
-                  variant="h5"
-                  color={colors.grey[300]}
-                  sx={{ m: "10px 0" }}
-                  textAlign="center"
-                >
-                  HR
-                </Typography>
-                <Item
-                  title="Employees"
-                  to="/employees"
-                  icon={<PeopleOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                  isCollapsed={isCollapsed}
-                />
-                <Item
-                  title="Company Cases"
-                  to="/company"
-                  icon={<CasesOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                  isCollapsed={isCollapsed}
-                />
-                <Item
-                  title="Company Data"
-                  to="/companyData"
-                  icon={<ApartmentOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                  isCollapsed={isCollapsed}
-                />
-                <Item
-                  title="Documents"
-                  to="/form"
-                  icon={<DescriptionOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                  isCollapsed={isCollapsed}
-                />
+                <SubMenu defaultOpen icon={<WorkIcon />} title="HR">
+                  <Item
+                    title="Employees"
+                    to="/employees"
+                    icon={<PeopleOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+                  <Item
+                    title="Company Cases"
+                    to="/company"
+                    icon={<CasesOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+                  <Item
+                    title="Company Data"
+                    to="/companyData"
+                    icon={<ApartmentOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+                  <Item
+                    title="Documents"
+                    to="/form"
+                    icon={<DescriptionOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+                </SubMenu>
+
                 {/* <Item
                 title="Calendar"
                 to="/calendar"
@@ -175,13 +152,34 @@ const Sidebar = ({ isCollapsed }) => {
                 selected={selected}
                 setSelected={setSelected}
               />
-              <Item
-                title="FAQ Page"
-                to="/faq"
-                icon={<HelpOutlineOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              /> */}
+               */}
+
+                <SubMenu icon={<PersonIcon />} title="Employee">
+                  <Item
+                    title="Tasks"
+                    to="/tasks"
+                    icon={<TaskIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+                  <Item
+                    title="Cases"
+                    to="/reporting"
+                    // icon={<PeopleOutlinedIcon />}
+                    icon={<ContactsOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+
+                  <Typography
+                    variant="h5"
+                    color={colors.grey[300]}
+                    sx={{ m: "10px 0" }}
+                    textAlign="center"
+                  ></Typography>
+                </SubMenu>
               </Box>
             </Menu>
 
@@ -196,7 +194,7 @@ const Sidebar = ({ isCollapsed }) => {
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 /> */}
                 </Box>
-                <Stack sx={{ m: "0 30px 20px " }} spacing={3}>
+                <Stack sx={{ m: "0 30px 20px " }} spacing={1.5}>
                   <PayrollSelector />
 
                   <TextField
