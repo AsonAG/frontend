@@ -24,6 +24,30 @@ import PayrollSelector from "../../components/PayrollSelector";
 import { useAuth } from "oidc-react";
 import { Stack } from "@mui/system";
 
+const Item = ({ title, to, icon, selected, setSelected, isCollapsed}) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  return (
+    <MenuItem
+      active={selected === title}
+      style={{
+        color: colors.grey[100],
+      }}
+      onClick={() => setSelected(title)}
+      icon={icon}
+    >
+      {!isCollapsed && (
+        <div>
+          <Typography>{title}</Typography>
+        </div>
+      )}
+      <Tooltip title={title}>
+        <Link to={to} />
+      </Tooltip>
+    </MenuItem>
+  );
+};
+
 const Sidebar = ({ isCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -32,30 +56,6 @@ const Sidebar = ({ isCollapsed }) => {
   const auth = useAuth();
   const { user, setUser } = useContext(UserContext);
   const userEmployee = useContext(UserEmployeeContext);
-
-  const Item = ({ title, to, icon, selected, setSelected }) => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-    return (
-      <MenuItem
-        active={selected === title}
-        style={{
-          color: colors.grey[100],
-        }}
-        onClick={() => setSelected(title)}
-        icon={icon}
-      >
-        {!isCollapsed && (
-          <div>
-            <Typography>{title}</Typography>
-          </div>
-        )}
-        <Tooltip title={title}>
-          <Link to={to} />
-        </Tooltip>
-      </MenuItem>
-    );
-  };
 
   return (
     (minWidth || !isCollapsed) && (
@@ -99,6 +99,7 @@ const Sidebar = ({ isCollapsed }) => {
                   icon={<HomeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  isCollapsed={isCollapsed}
                 />
 
                 <Typography
@@ -115,6 +116,7 @@ const Sidebar = ({ isCollapsed }) => {
                   icon={<TaskIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  isCollapsed={isCollapsed}
                 />
                 <Item
                   title="Cases"
@@ -123,6 +125,7 @@ const Sidebar = ({ isCollapsed }) => {
                   icon={<ContactsOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  isCollapsed={isCollapsed}
                 />
 
                 <Typography
@@ -139,6 +142,7 @@ const Sidebar = ({ isCollapsed }) => {
                   icon={<PeopleOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  isCollapsed={isCollapsed}
                 />
                 <Item
                   title="Company Cases"
@@ -146,6 +150,7 @@ const Sidebar = ({ isCollapsed }) => {
                   icon={<CasesOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  isCollapsed={isCollapsed}
                 />
                 <Item
                   title="Company Data"
@@ -153,6 +158,7 @@ const Sidebar = ({ isCollapsed }) => {
                   icon={<ApartmentOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  isCollapsed={isCollapsed}
                 />
                 <Item
                   title="Documents"
@@ -160,6 +166,7 @@ const Sidebar = ({ isCollapsed }) => {
                   icon={<DescriptionOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
+                  isCollapsed={isCollapsed}
                 />
                 {/* <Item
                 title="Calendar"
@@ -197,7 +204,8 @@ const Sidebar = ({ isCollapsed }) => {
                     label="User"
                     variant="standard"
                     disabled
-                    defaultValue={userEmployee.identifier}
+                    InputLabelProps={{ shrink: true }}
+                    value={user.identifier}
                     // defaultValue={auth.userData?.profile?.email}
                   />
 
@@ -206,6 +214,7 @@ const Sidebar = ({ isCollapsed }) => {
                     label="Tenant"
                     variant="standard"
                     disabled
+                    InputLabelProps={{ shrink: true }}
                     defaultValue={user.tenantIdentifier}
                   />
                 </Stack>

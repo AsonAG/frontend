@@ -2,40 +2,38 @@ import {
   Box,
   IconButton,
   useTheme,
-  Autocomplete,
-  TextField,
   AppBar,
   Toolbar,
   Menu,
   MenuItem,
-  Select,
 } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
-import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import { AccountCircle } from "@mui/icons-material";
 import Logo from "../../components/Logo";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import { Link } from "react-router-dom";
-import PayrollSelector from "../../components/PayrollSelector";
 import { useAuth } from "oidc-react";
 import { UserContext } from "../../App";
+import UsersApi from "../../api/UsersApi";
+import ApiClient from "../../api/ApiClient";
 
-const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
+const Topbar = ({ isCollapsed, setIsCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-
   const [anchorEl, setAnchorEl] = useState(null);
   const auth = useAuth();
   const { user, setUser } = useContext(UserContext);
+
   const handleChange = (event) => {
     // setAuth(event.target.checked);
+  };
+
+  const handleLogout = () => {
+    setUser({});
+    auth.signOut();
   };
 
   const handleMenu = (event) => {
@@ -47,9 +45,9 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
   };
 
   const handleSwitchTenant = () => {
-    setUser(current => ({
+    setUser((current) => ({
       ...current,
-      tenantId: null
+      tenantId: null,
     }));
     handleClose();
   };
@@ -98,7 +96,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
     >
       <AppBar>
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Box display="flex" flexDirection="row" >
+          <Box display="flex" flexDirection="row">
             {/* LOGO AND MENU ICON */}
             <MenuItem
               style={{
@@ -112,7 +110,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
                 aria-label="menu"
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 sx={{
-                  margin: "0"
+                  margin: "0",
                 }}
               >
                 <MenuOutlinedIcon />
@@ -120,11 +118,11 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
             </MenuItem>
 
             <MenuItem
-            sx={{
-              margin: "0 0"
-            }}
+              sx={{
+                margin: "0 0",
+              }}
             >
-                <Logo />
+              <Logo />
             </MenuItem>
           </Box>
 
@@ -158,7 +156,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, handleLogout }) => {
             >
               <MenuItem onClick={handleClose}>Settings</MenuItem>
               <MenuItem onClick={handleSwitchTenant}>Switch tenant</MenuItem>
-              <MenuItem onClick={() => { auth.signOut();handleLogout();}}>Logout</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </Box>
         </Toolbar>

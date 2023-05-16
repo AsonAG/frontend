@@ -18,15 +18,16 @@ import EmployeeCase from "./scenes/case/EmployeeCase";
 import PersonalCase from "./scenes/case/PersonalCase";
 import CompanyCase from "./scenes/case/CompanyCase";
 import { useEffect } from "react";
-import { AuthProvider } from "oidc-react";
+import { AuthProvider, useAuth } from "oidc-react";
 import ApiClient from "./api/ApiClient";
 import PayrollsApi from "./api/PayrollsApi";
-import CasesForm from "./scenes/global/CasesForm";
 import Tenants from "./scenes/tenants";
 import UsersApi from "./api/UsersApi";
 import de from "date-fns/locale/de";
 import { useLocalStorage, useSessionStorage } from "usehooks-ts";
 import EmployeesApi from "./api/EmployeesApi";
+import authConfig from "./authConfig";
+import Login from "./scenes/login";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
@@ -35,12 +36,9 @@ export const EmployeeSelectionContext = createContext();
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const navigate = useNavigate();
   const [employee, setEmployee] = useSessionStorage("employee_selection", {});
-  const [userEmployee, setUserEmployee] = useLocalStorage(
-    "user_employee",
-    {}
-  );
+  const [userEmployee, setUserEmployee] = useLocalStorage("user_employee", {});
+  const [authUserIdentifier, setAuthUserIdentifier] = useLocalStorage("authUserIdentifier", {});
   const [user, setUser] = useState({});
 
   const payrollsApi = useMemo(
@@ -55,25 +53,21 @@ function App() {
 
   // TODO: change title dependently on a chosen Route path
   useEffect(() => {
-    document.title = 
-      user.currentPayrollName ?
-      "Ason - " + user.currentPayrollName
+    document.title = user.currentPayrollName
+      ? "Ason - " + user.currentPayrollName
       : "Ason - Tenants";
   }, [user.currentPayrollName]);
 
   useEffect(() => {
-    if (!user.tenantId) {
-      // navigate("/");
-      return;
-    } else {
+    if (user.tenantId && authUserIdentifier) {
+      setEmployee({});
+      setUserEmployee({});
       usersApi.getUsers(onGetUsersCallback);
     }
-  }, [user.tenantId]);
+  }, [user.tenantId, authUserIdentifier]);
 
   useEffect(() => {
-    if (!user.attributes) {
-      return;
-    } else {
+    if (user.attributes) {
       payrollsApi.getPayrolls(onGetPayrollsCallback);
       employeesApi.getEmployees(onGetEmployeesCallbck);
     }
@@ -84,12 +78,18 @@ function App() {
       console.error(error);
       return;
     }
+    let userData = data.find(
+      // (element) => element.identifier === auth.userData?.profile?.email
+      (element) => element.identifier === authUserIdentifier
+    );
+
     setUser({
       ...user,
-      userId: data[0].id,
-      culture: data[0].culture,
-      language: data[0].language,
-      attributes: data[0].attributes,
+      identifier: authUserIdentifier,
+      userId: userData.id,
+      culture: userData.culture,
+      language: userData.language,
+      attributes: userData.attributes,
     });
   };
 
@@ -142,39 +142,9 @@ function App() {
     }
   };
 
-  const oidcConfig = {
-    onSignIn: async (response) => {
-      localStorage.setItem("ason_access_token", response.access_token);
-      setUser({
-        userEmail: response.email,
-        // TODO UserId
-        loaded: true,
-        isAuthenticated: true,
-        ...user,
-      });
-      window.location.hash = "";
-    },
-    authority: process.env.REACT_APP_AUTHORITY_URL,
-    clientId: "210272222781178113@ason",
-    responseType: "code",
-    redirectUri: process.env.REACT_APP_REDIRECT_URL,
-    scope: "openid profile email",
-  };
-
-  const logout = () => {
-    setUser((current) => ({
-      ...current,
-      isAuthenticated: false,
-      loaded: false,
-    }));
-    // TODO: logout
-    navigate("/login");
-  };
   let content;
 
-  console.log("rerender");
-  // console.log(JSON.stringify(user));
-
+  console.log("Rerender with user: " + JSON.stringify(user));
   if (user.tenantId) {
     content = (
       <Box
@@ -185,7 +155,6 @@ function App() {
         <Topbar
           isCollapsed={isSidebarCollapsed}
           setIsCollapsed={setIsSidebarCollapsed}
-          handleLogout={logout}
         />
         <Box display="flex" flexDirection="row" width="100%" marginTop="60px">
           <Sidebar isCollapsed={isSidebarCollapsed} />
@@ -212,7 +181,7 @@ function App() {
   }
 
   return (
-    <AuthProvider {...oidcConfig}>
+    <AuthProvider {...authConfig(setAuthUserIdentifier)}>
       <LocalizationProvider
         dateAdapter={AdapterDateFns}
         adapterLocale={de} // TODO: user default selection and manual selection option
