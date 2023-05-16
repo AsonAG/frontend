@@ -1,9 +1,9 @@
 import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
+import { tokens } from "../../../theme";
 import { Box } from "@mui/material";
-import Header from "../../components/Header";
-import CasesTable from "../global/CasesTable";
-import { EmployeeContext, UserContext, UserEmployeeContext } from "../../App";
+import Header from "../../../components/Header";
+import CasesTable from "../../global/CasesTable";
+import { EmployeeContext, UserContext, UserEmployeeContext } from "../../../App";
 import { useContext } from "react";
 
 const PersonalCases = () => {

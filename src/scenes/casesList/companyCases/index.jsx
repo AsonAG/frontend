@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import { React } from "react";
-import Header from "../../components/Header";
-import CasesTable from "../global/CasesTable";
-import { EmployeeContext } from "../../App";
+import Header from "../../../components/Header";
+import CasesTable from "../../global/CasesTable";
+import { EmployeeContext } from "../../../App";
 import { useContext } from "react";
 
 const CompanyCases = () => {
