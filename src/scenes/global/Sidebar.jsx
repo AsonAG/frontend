@@ -1,12 +1,16 @@
 import { useContext, useState } from "react";
 import { ProSidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import {
+  AppBar,
   Box,
   IconButton,
   TextField,
   Tooltip,
   Typography,
+  Toolbar,
   useTheme,
+  Drawer,
+  Divider,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
@@ -62,13 +66,14 @@ const Sidebar = ({ isCollapsed }) => {
   return (
     (minWidth || !isCollapsed) && (
       <Box
+      // display="flex" flexDirection="row"
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
-          // position: "-webkit-sticky",
+          position: "-webkit-sticky",
           // position: 'sticky !important',
           // top: "0",
-          // maxWidth: "250px",
+          maxWidth: "250px",
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
@@ -88,16 +93,32 @@ const Sidebar = ({ isCollapsed }) => {
         },
       }}
       >
+
+      
+{/*  TODO: use Drawer for mobile devices
+        <Drawer
+          variant="permanent"
+          // flexShrink="10"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': { 
+              boxSizing: 'border-box', 
+            // width: drawerWidth 
+          },
+          }}
+          open
+        > */}
         <ProSidebar collapsed={isCollapsed}>
           <Box
             height="100%"
-            position="sticky"
+            // position="sticky"
+            position= "-webkit-sticky"
             display="flex"
             flexDirection="column"
             justifyContent="space-between"
           >
             <Menu>
-              <Box marginTop="10px">
+              <Box>
                 <Item
                   title="Dashboard"
                   to="/"
@@ -107,12 +128,7 @@ const Sidebar = ({ isCollapsed }) => {
                   isCollapsed={isCollapsed}
                 />
 
-                <Typography
-                  variant="h5"
-                  color={colors.grey[300]}
-                  // sx={{ m: "10px 0" }}
-                  textAlign="center"
-                ></Typography>
+                <Divider />
 
                 <SubMenu defaultOpen icon={<WorkIcon />} title="HR">
                   <Item
@@ -157,6 +173,7 @@ const Sidebar = ({ isCollapsed }) => {
                 setSelected={setSelected}
               />
                */}
+                <Divider />
 
                 <SubMenu icon={<PersonIcon />} title="Employee">
                   <Item
@@ -177,12 +194,6 @@ const Sidebar = ({ isCollapsed }) => {
                     isCollapsed={isCollapsed}
                   />
 
-                  <Typography
-                    variant="h5"
-                    color={colors.grey[300]}
-                    sx={{ m: "10px 0" }}
-                    textAlign="center"
-                  ></Typography>
                 </SubMenu>
               </Box>
             </Menu>
@@ -224,7 +235,9 @@ const Sidebar = ({ isCollapsed }) => {
             )}
           </Box>
         </ProSidebar>
+
       </Box>
+
     )
   );
 };

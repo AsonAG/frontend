@@ -8,7 +8,7 @@ import {
   useEffect,
 } from "react";
 import { tokens } from "../../theme";
-import { Box, Button } from "@mui/material";
+import { Box, Button, CircularProgress, LinearProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import ApiClient from "../../api/ApiClient";
@@ -89,7 +89,7 @@ const CasesForm = ({employee, navigateTo}) => {
   }, [user]);
 
   return (
-    caseName && (
+    caseName ? (
       <form ref={formRef}>
         <CaseContext.Provider
           value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
@@ -135,6 +135,8 @@ const CasesForm = ({employee, navigateTo}) => {
         </CaseContext.Provider>
       </form>
     )
+    :
+    <CircularProgress />
   );
 };
 

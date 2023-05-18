@@ -87,14 +87,16 @@ const Topbar = ({ isCollapsed, setIsCollapsed }) => {
       sx={{
         "& .MuiToolbar-root": {
           background: `${colors.primary[400]} !important`,
-          padding: "0 22px 0 0px !important",
+          padding: "0 22px 0 0 !important",
         },
         "& .MuiButtonBase-root:hover": {
           color: "#868dfb !important",
         },
       }}
     >
-      <AppBar>
+      <AppBar
+      position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box display="flex" flexDirection="row">
             {/* LOGO AND MENU ICON */}
