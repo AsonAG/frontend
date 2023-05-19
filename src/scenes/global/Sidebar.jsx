@@ -67,8 +67,6 @@ const Sidebar = ({ isCollapsed }) => {
     (minWidth || !isCollapsed) && (
       <Box
       // display="flex" flexDirection="row"
-      // maxWidth={false}
-      // borderRight={3}
       sx={{
         "& .pro-sidebar-inner": {
           // overflowY: "scroll", 
@@ -111,7 +109,9 @@ const Sidebar = ({ isCollapsed }) => {
           }}
           open
         > */}
-        <ProSidebar collapsed={isCollapsed}>
+        <ProSidebar 
+        
+        collapsed={isCollapsed}>
           <Box
             height="100%"
             // position="sticky"
@@ -238,7 +238,6 @@ const Sidebar = ({ isCollapsed }) => {
             )}
           </Box>
         </ProSidebar>
-
       </Box>
 
     )

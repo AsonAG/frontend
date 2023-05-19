@@ -157,7 +157,7 @@ function App() {
           setIsCollapsed={setIsSidebarCollapsed}
         />
 
-        <Box display="flex" flexDirection="row" width="100%" marginTop="60px">
+        <Box display="flex" flexDirection="row" width="100%" height="100%" paddingTop="60px">
           <Sidebar isCollapsed={isSidebarCollapsed} />
           <main className="content">
             <Routes>

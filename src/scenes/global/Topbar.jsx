@@ -95,7 +95,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed }) => {
       }}
     >
       <AppBar
-      position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      // position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box display="flex" flexDirection="row">

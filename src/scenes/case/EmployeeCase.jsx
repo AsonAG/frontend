@@ -10,7 +10,7 @@ const EmployeeCase = () => {
   const { employee, setEmployee } = useContext(EmployeeSelectionContext);
 
   return (
-    <CasesFormWrapper
+    <CasesForm
       title={employee.firstName + " " + employee.lastName}
       employee={employee}
       navigateTo={"/employee"}

@@ -16,10 +16,11 @@ import CasesApi from "../../api/CasesApi";
 import CaseFieldsComponent from "../../components/case/CaseFieldsComponent";
 import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
+import CasesFormWrapper from "./CasesFormWrapper";
 
 export const CaseContext = createContext();
 
-const CasesForm = ({employee, navigateTo}) => {
+const CasesForm = ({employee, navigateTo, title}) => {
   const caseName = window.sessionStorage.getItem("caseName");
 
   const theme = useTheme();
@@ -89,7 +90,11 @@ const CasesForm = ({employee, navigateTo}) => {
   }, [user]);
 
   return (
-    (
+      <CasesFormWrapper
+      title={title}
+        onSubmit={handleSubmit}
+      >
+
       <form ref={formRef}>
         <CaseContext.Provider
           value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
@@ -115,26 +120,10 @@ const CasesForm = ({employee, navigateTo}) => {
             ))}
           </Box>
 
-          {/* <Box mt="20px" mb="30px" display="flex" flexDirection="row-reverse">
-            <Box width="240px" >
-            <Button
-              // disable={}
-              disableRipple
-              fullWidth
-              type="submit"
-              variant="contained"
-              color="secondary"
-              size="large"
-              onClick={handleSubmit}
-              endIcon={<SendIcon />}
-            >
-              Send
-            </Button>
-            </Box>
-          </Box> */}
         </CaseContext.Provider>
       </form>
-    )
+
+      </CasesFormWrapper>
     // <CircularProgress color="neutral" variant="soft" size="lg"/>
   );
 };

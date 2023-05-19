@@ -11,7 +11,7 @@ const CompanyCase = () => {
   const userEmployee = useContext(UserEmployeeContext);
 
   return (
-    <CasesFormWrapper
+    <CasesForm
       title={user.currentPayrollName}
       employee={userEmployee}
       navigateTo={"/company"}
