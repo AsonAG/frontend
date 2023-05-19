@@ -89,7 +89,7 @@ const CasesForm = ({employee, navigateTo}) => {
   }, [user]);
 
   return (
-    caseName ? (
+    (
       <form ref={formRef}>
         <CaseContext.Provider
           value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
@@ -115,7 +115,7 @@ const CasesForm = ({employee, navigateTo}) => {
             ))}
           </Box>
 
-          <Box mt="20px" mb="30px" display="flex" flexDirection="row-reverse">
+          {/* <Box mt="20px" mb="30px" display="flex" flexDirection="row-reverse">
             <Box width="240px" >
             <Button
               // disable={}
@@ -131,12 +131,11 @@ const CasesForm = ({employee, navigateTo}) => {
               Send
             </Button>
             </Box>
-          </Box>
+          </Box> */}
         </CaseContext.Provider>
       </form>
     )
-    :
-    <CircularProgress />
+    // <CircularProgress color="neutral" variant="soft" size="lg"/>
   );
 };
 

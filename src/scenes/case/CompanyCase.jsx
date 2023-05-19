@@ -4,22 +4,18 @@ import { UserContext, UserEmployeeContext } from "../../App";
 import { useContext } from "react";
 import CasesForm from "../global/CasesForm";
 import Header from "../../components/Header";
+import CasesFormWrapper from "../global/CasesFormWrapper";
 
 const CompanyCase = () => {
   const { user, setUser } = useContext(UserContext);
   const userEmployee = useContext(UserEmployeeContext);
-  
 
   return (
-    <Box m="25px" display="flex" flexDirection="column" >
-        <Header
-          title={user.currentPayrollName}
-          subtitle={'PAYROLL'}
-        />
-      <CasesForm 
-        employee={userEmployee}
-        navigateTo={"/company"}/>
-    </Box>
+    <CasesFormWrapper
+      title={user.currentPayrollName}
+      employee={userEmployee}
+      navigateTo={"/company"}
+    />
   );
 };
 
