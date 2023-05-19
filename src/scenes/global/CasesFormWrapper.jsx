@@ -1,76 +1,88 @@
-import { Box, Button, Drawer, List, ListItem, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Drawer,
+  List,
+  ListItem,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { React, useContext } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import CasesForm from "./CasesForm";
+import { useTheme } from "@emotion/react";
+import { tokens } from "../../theme";
 
-const CasesFormWrapper = ( props) => {
+const CasesFormWrapper = (props) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  let onSubmit;
+
   return (
-        
-    <Box margin="0" display="flex" flexDirection="row" width="100%">
-    {/* <EmployeeHeader employee={employee} /> */}
-
-    <Paper
-      style={{
-        // maxHeight: "80vh",
-        height: "100%",
-        width: "100%",
-        overflow: "auto",
-        margin: "25px",
-      }}
+    <Box
+      margin="0"
+      display="flex"
+      flexDirection="row"
+      //     width="100%"
+      height='calc(100vh - 90px)'
     >
-      <CasesForm {...props} />
-        
-        </Paper>
+      {/* <EmployeeHeader employee={employee} /> */}
 
-      <Box 
-        margin="0px 0"
-        width="260px" 
-        height="90vh"
-        display="flex" flexDirection="column" 
+      <Paper
+        style={{
+          height: "100%",
+          width: "100%",
+          overflow: "auto",
+          margin: "25px",
+        }}
+      >
+        <CasesForm {...props} />
+      </Paper>
+
+      <Box
+        width="260px"
+        display="flex"
+        flexDirection="column"
         justifyContent="space-between"
-        alignItems="flex-start">
+        // alignItems="flex-start"
+        margin="20px 20px 20px 0"
+        // sx={{ backgroundColor: colors.primary[400] }}
+      >
         {/* <Header title={employee.firstName + " " + employee.lastName} /> */}
 
         <List>
           <ListItem>
-            <Typography variant="h3" fontWeight="bold">
+            <Typography variant="h4" fontWeight="bold">
               {props.title}
             </Typography>
           </ListItem>
 
           <ListItem>
-            <Typography>Case 1</Typography>
-          </ListItem>
-
-          <ListItem>
-            <Typography>Case 2</Typography>
-          </ListItem>
-          <ListItem>
-            <Typography>Case 3</Typography>
-          </ListItem>
-          <ListItem>
-            <Typography>Case 4</Typography>
+            <Typography variant="h5" >Case 1</Typography>
           </ListItem>
         </List>
 
-        
-            <Button
-              // disable={}
-              disableRipple
-              fullWidth
-              type="submit"
-              variant="contained"
-              color="secondary"
-              size="large"
-        //       onClick={onSubmit}
-              endIcon={<SendIcon />}
-            >
-              Send
-            </Button>
+<Box 
+display="flex"
+justifyContent="center"
+>
+        <Button
+          // disable={}
+        //   fullWidth
+          disableRipple
+          type="submit"
+          variant="contained"
+          color="secondary"
+          size="large"
+          //   onClick={onSubmit}
+          endIcon={<SendIcon />}
+        >
+          <Typography fontWeight="bold">Send</Typography>
+        </Button>
+        </Box>
       </Box>
-
     </Box>
   );
-}
+};
 
 export default CasesFormWrapper;

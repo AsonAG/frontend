@@ -67,10 +67,13 @@ const Sidebar = ({ isCollapsed }) => {
     (minWidth || !isCollapsed) && (
       <Box
       // display="flex" flexDirection="row"
+      // maxWidth={false}
+      // borderRight={3}
       sx={{
         "& .pro-sidebar-inner": {
+          // overflowY: "scroll", 
           background: `${colors.primary[400]} !important`,
-          position: "-webkit-sticky",
+          // position: "-webkit-sticky",
           // position: 'sticky !important',
           // top: "0",
           maxWidth: "250px",
