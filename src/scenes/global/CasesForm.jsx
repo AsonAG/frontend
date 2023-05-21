@@ -20,7 +20,7 @@ import CasesFormWrapper from "./CasesFormWrapper";
 
 export const CaseContext = createContext();
 
-const CasesForm = ({employee, navigateTo, title}) => {
+const CasesForm = ({ employee, navigateTo, title }) => {
   const caseName = window.sessionStorage.getItem("caseName");
 
   const theme = useTheme();
@@ -32,15 +32,20 @@ const CasesForm = ({employee, navigateTo, title}) => {
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
+  // const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
+  const [casesTableOfContents, setCasesTableOfContents] = useState({});
 
-  const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
-
-  const handleSubmit = (event) => { 
+  const handleSubmit = (event) => {
     event.preventDefault();
 
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
-      casesApi.saveCase(outputCase, relatedCases, caseSaveCallback, employee?.employeeId ); 
+      casesApi.saveCase(
+        outputCase,
+        relatedCases,
+        caseSaveCallback,
+        employee?.employeeId
+      );
     } else {
       console.log("form INVALID");
     }
@@ -49,7 +54,7 @@ const CasesForm = ({employee, navigateTo, title}) => {
   const caseSaveCallback = function (error, data, response) {
     if (error) {
       console.error(error);
-      setIsSaveButtonClicked(true);
+      // setIsSaveButtonClicked(true);
     } else {
       console.log(
         "Case saved successfully. Response: " +
@@ -63,7 +68,7 @@ const CasesForm = ({employee, navigateTo, title}) => {
   const callback = function (error, data, response) {
     if (error) {
       console.error(error);
-    } 
+    }
     // else {
     //   console.log(
     //     "API called successfully. Returned CaseForm data: " +
@@ -82,7 +87,13 @@ const CasesForm = ({employee, navigateTo, title}) => {
     //     JSON.stringify(relatedCases, null, 2)
     // );
 
-    casesApi.getCaseFields(caseName, callback, outputCase, relatedCases, employee?.employeeId);
+    casesApi.getCaseFields(
+      caseName,
+      callback,
+      outputCase,
+      relatedCases,
+      employee?.employeeId
+    );
   }, [outputCase, relatedCases]);
 
   useEffect(() => {
@@ -90,15 +101,12 @@ const CasesForm = ({employee, navigateTo, title}) => {
   }, [user]);
 
   return (
-      <CasesFormWrapper
-      title={title}
-        onSubmit={handleSubmit}
-      >
-
-      <form ref={formRef}>
-        <CaseContext.Provider
-          value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
-        >
+    <CaseContext.Provider
+      // value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
+      value={{ casesTableOfContents, setCasesTableOfContents }}
+    >
+      <CasesFormWrapper title={title} onSubmit={handleSubmit}>
+        <form ref={formRef}>
           <Box>
             {caseDetails && (
               <CaseFieldsComponent
@@ -119,11 +127,9 @@ const CasesForm = ({employee, navigateTo, title}) => {
               />
             ))}
           </Box>
-
-        </CaseContext.Provider>
-      </form>
-
+        </form>
       </CasesFormWrapper>
+    </CaseContext.Provider>
     // <CircularProgress color="neutral" variant="soft" size="lg"/>
   );
 };

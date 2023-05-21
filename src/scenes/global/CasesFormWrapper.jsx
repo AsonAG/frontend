@@ -1,21 +1,24 @@
 import {
   Box,
   Button,
+  Divider,
   Drawer,
   List,
   ListItem,
   Paper,
   Typography,
 } from "@mui/material";
-import { React, useContext } from "react";
+import { React, useContext, useEffect, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
-import CasesForm from "./CasesForm";
+import CasesForm, { CaseContext } from "./CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 
 const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { casesTableOfContents, setCasesTableOfContents } =
+    useContext(CaseContext);
 
   return (
     <Box
@@ -32,8 +35,14 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
           height: "100%",
           width: "100%",
           overflow: "auto",
-          paddingTop: "25px",
-          margin: "0 25px",
+          paddingTop: "5px",
+          margin: "0 8px 0 0px",
+        }}
+        sx={{
+          // TODO: fix background color
+          "& .MuiPaper-root": {
+            backgroundColor: colors.primary[300],
+          },
         }}
       >
         {children}
@@ -48,7 +57,6 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
         margin="20px 20px 40px 0px"
         // sx={{ backgroundColor: colors.primary[400] }}
       >
-
         <List>
           <ListItem>
             <Typography variant="h4" fontWeight="bold">
@@ -56,9 +64,13 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
             </Typography>
           </ListItem>
 
-          <ListItem>
-            <Typography variant="h5">Case 1</Typography>
-          </ListItem>
+        <Divider />
+
+          {Object.values(casesTableOfContents).map((caseAccordion) => (
+            <ListItem>
+              <Typography variant="h5" fontWeight="bold">{caseAccordion.displayName}</Typography>
+            </ListItem>
+          ))}
         </List>
 
         <Box display="flex" justifyContent="center">

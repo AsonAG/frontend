@@ -1,7 +1,7 @@
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
-import { useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import { Box, Divider } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -9,31 +9,30 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FieldComponent, { getFieldKey } from "./FieldComponent";
 import { useUpdateEffect } from "usehooks-ts";
+import { CaseContext } from "../../scenes/global/CasesForm";
 
-function CaseNameHeader(caseBase) {
+function CaseNameHeader(caseDetails) {
   return (
     <Box display="flex" alignItems="baseline">
       <Typography
         variant="h4"
         fontWeight="bold"
-        key={"casename_" + caseBase.id}
+        key={"casename_" + caseDetails.id}
         sx={{ 
           marginLeft: "6px", 
           marginRight: "20px", 
           flexShrink: 0 
         }}
       >
-        {caseBase?.caseSlot
-          ? caseBase?.displayName + " " + caseBase?.caseSlot
-          : caseBase?.displayName}
+        {caseDetails.displayName}
       </Typography>
 
       <Typography
         variant="h5"
         sx={{ color: "text.secondary" }}
-        key={"casename_desc_" + caseBase.id}
+        key={"casename_desc_" + caseDetails.id}
       >
-        {caseBase?.description}
+        {caseDetails.description}
       </Typography>
     </Box>
   );
@@ -43,6 +42,17 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
+  const {casesTableOfContents, setCasesTableOfContents} = useContext(CaseContext);
+
+  useEffect(() => {
+  setCasesTableOfContents((current) => ({
+    ...current,
+    [caseBase.id] : {
+     displayName: caseBase.displayName,
+     expanded: true
+    }
+   }));
+  }, [])
 
   useUpdateEffect(() => {
     // update output cases
@@ -80,11 +90,21 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
     }));
   };
 
-  function isoDateWithoutTimeZone(date) {
+  const isoDateWithoutTimeZone = (date) => {
     if (date == null) return date;
     let timestamp = date.getTime() - date.getTimezoneOffset() * 60000;
     let correctDate = new Date(timestamp);
     return correctDate.toISOString();
+  }
+
+  const handleAccordionChange = (caseDetails) => (event, isExpanded) => {
+    setCasesTableOfContents((current) => ({
+      ...current,
+      [caseDetails.id] : {
+       displayName: caseDetails.displayName,
+       expanded: isExpanded
+      }
+     }));
   }
 
   return (
@@ -103,42 +123,29 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
       }}
     >
 
-
-
-
       <Accordion
-        defaultExpanded={true}
-        // elevation={5}
+        // defaultExpanded={true}
+        elevation={3}
         key={"caseaccordion_" + caseBase.id}
+        expanded={casesTableOfContents[caseBase.id] ? casesTableOfContents[caseBase.id].expanded : true } // todo: add "else return false"
+        onChange={handleAccordionChange(caseBase)}
       >
         {/***************************** Case Header ****************************/}
-        {isBase ? (
           <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
+          expandIcon={<ExpandMoreIcon />}
             sx={{
               backgroundColor: colors.primary[300],
+              marginTop: "8px",
             }}
             key={"casesummary_" + caseBase.id}
           >
             {CaseNameHeader(caseBase)}
           </AccordionSummary>
-        ) : (
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            sx={{
-              backgroundColor: colors.primary[400],
-              marginTop: "10px",
-            }}
-            key={"casesummary_" + caseBase.id}
-          >
-            {CaseNameHeader(caseBase)}
-          </AccordionSummary>
-        )}
 
         {/***************************** Case Fields *****************************/}
         <AccordionDetails
           sx={{
-            backgroundColor: colors.primary[400],
+            backgroundColor: colors.primary[300],
           }}
           key={"fields_" + caseBase.id}
         >
@@ -146,6 +153,8 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
             // paddingTop="6px"
             key={"fieldswrapper_" + caseBase.id}
           >
+      <Divider />
+
             {caseBase?.fields?.map((field, i) => (
               <FieldComponent
                 field={field}
