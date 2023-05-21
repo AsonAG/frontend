@@ -18,10 +18,10 @@ function CaseNameHeader(caseDetails) {
         variant="h4"
         fontWeight="bold"
         key={"casename_" + caseDetails.id}
-        sx={{ 
-          marginLeft: "6px", 
-          marginRight: "20px", 
-          flexShrink: 0 
+        sx={{
+          marginLeft: "6px",
+          marginRight: "20px",
+          flexShrink: 0,
         }}
       >
         {caseDetails.displayName}
@@ -42,24 +42,25 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
-  const {casesTableOfContents, setCasesTableOfContents} = useContext(CaseContext);
+  const { casesTableOfContents, setCasesTableOfContents } =
+    useContext(CaseContext);
 
   useEffect(() => {
-  setCasesTableOfContents((current) => ({
-    ...current,
-    [caseBase.id] : {
-     displayName: caseBase.displayName,
-     expanded: true
-    }
-   }));
-  }, [])
+    setCasesTableOfContents((current) => ({
+      ...current,
+      [caseBase.id]: {
+        displayName: caseBase.displayName,
+        id: caseBase.id,
+        expanded: true,
+      },
+    }));
+  }, []);
 
   useUpdateEffect(() => {
     // update output cases
     setOutputCases((prevState) => ({
       ...prevState,
-      [getFieldKey(caseBase.name, caseBase.id)]:
-        {
+      [getFieldKey(caseBase.name, caseBase.id)]: {
         caseName: caseBase.name,
         values: caseFieldsList,
         caseSlot: caseBase.caseSlot,
@@ -95,52 +96,55 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
     let timestamp = date.getTime() - date.getTimezoneOffset() * 60000;
     let correctDate = new Date(timestamp);
     return correctDate.toISOString();
-  }
+  };
 
   const handleAccordionChange = (caseDetails) => (event, isExpanded) => {
     setCasesTableOfContents((current) => ({
       ...current,
-      [caseDetails.id] : {
-       displayName: caseDetails.displayName,
-       expanded: isExpanded
-      }
-     }));
-  }
+      [caseDetails.id]: {
+        displayName: caseDetails.displayName,
+        expanded: isExpanded,
+      },
+    }));
+  };
 
   return (
-    <Box 
+    <Box
       key={"casebox_" + caseBase.id}
       sx={{
         "& .MuiAccordionDetails-root": {
-          padding: "0px 10px"
+          padding: "0px 10px",
         },
         "& .MuiAccordionSummary-root": {
-          minHeight: "48px !important"
+          minHeight: "48px !important",
         },
         "& .MuiAccordionSummary-content.Mui-expanded": {
-          margin: "0"
-      }
+          margin: "0",
+        },
       }}
     >
-
       <Accordion
         // defaultExpanded={true}
         elevation={3}
         key={"caseaccordion_" + caseBase.id}
-        expanded={casesTableOfContents[caseBase.id] ? casesTableOfContents[caseBase.id].expanded : true } // todo: add "else return false"
+        expanded={
+          casesTableOfContents[caseBase.id]
+            ? casesTableOfContents[caseBase.id].expanded
+            : true
+        } // todo: add "else return false"
         onChange={handleAccordionChange(caseBase)}
       >
         {/***************************** Case Header ****************************/}
-          <AccordionSummary
+        <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
-            sx={{
-              backgroundColor: colors.primary[300],
-              marginTop: "8px",
-            }}
-            key={"casesummary_" + caseBase.id}
-          >
-            {CaseNameHeader(caseBase)}
-          </AccordionSummary>
+          sx={{
+            backgroundColor: colors.primary[300],
+            marginTop: "8px",
+          }}
+          key={"casesummary_" + caseBase.id}
+        >
+          {CaseNameHeader(caseBase)}
+        </AccordionSummary>
 
         {/***************************** Case Fields *****************************/}
         <AccordionDetails
@@ -153,7 +157,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
             // paddingTop="6px"
             key={"fieldswrapper_" + caseBase.id}
           >
-      <Divider />
+            <Divider />
 
             {caseBase?.fields?.map((field, i) => (
               <FieldComponent
@@ -164,7 +168,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
             ))}
           </Box>
 
-        {/***************************** Related Cases *****************************/}
+          {/***************************** Related Cases *****************************/}
           {isBase ? (
             // skip base related cases, they are already considered in the Parent component
             <></>

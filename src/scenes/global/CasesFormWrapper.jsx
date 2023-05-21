@@ -5,6 +5,8 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
+  ListItemText,
   Paper,
   Typography,
 } from "@mui/material";
@@ -19,6 +21,18 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   const colors = tokens(theme.palette.mode);
   const { casesTableOfContents, setCasesTableOfContents } =
     useContext(CaseContext);
+
+    const handleTableOfContentsItemClick = (event, caseBase) => {
+        console.log("asdasdasd", caseBase.id);
+        setCasesTableOfContents((current) => ({
+                ...current,
+                [caseBase.id] : {
+                 displayName: caseBase.displayName,
+                 id: caseBase.id,
+                 expanded: ! caseBase.expanded
+                }
+               }));
+        };
 
   return (
     <Box
@@ -67,9 +81,13 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
         <Divider />
 
           {Object.values(casesTableOfContents).map((caseAccordion) => (
-            <ListItem>
-              <Typography variant="h5" fontWeight="bold">{caseAccordion.displayName}</Typography>
-            </ListItem>
+              <ListItemButton
+                onClick={(event) => handleTableOfContentsItemClick(event, caseAccordion)}
+                >
+                        <ListItemText>
+                        {caseAccordion.displayName}
+                        </ListItemText>
+                </ListItemButton>
           ))}
         </List>
 
