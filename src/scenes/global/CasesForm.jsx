@@ -88,6 +88,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     // );
 
     casesApi.getCaseFields(
+      //TODO: add logic to check if cases changed before sending a request
       caseName,
       callback,
       outputCase,
@@ -105,7 +106,12 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       // value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
       value={{ casesTableOfContents, setCasesTableOfContents }}
     >
-      <CasesFormWrapper title={title} onSubmit={handleSubmit}>
+      <CasesFormWrapper
+        title={title}
+        onSubmit={handleSubmit}
+        caseDetails={caseDetails}
+        setRelatedCases={setRelatedCases}
+      >
         <form ref={formRef}>
           <Box>
             {caseDetails && (
