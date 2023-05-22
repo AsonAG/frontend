@@ -35,6 +35,38 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   // const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
   const [casesTableOfContents, setCasesTableOfContents] = useState({});
 
+  const updateCasesTableOfContents = () => {
+    let accordionCase = {};
+    if (caseDetails && ! ('case_' + caseDetails.id in casesTableOfContents)) {
+      accordionCase['case_' + caseDetails.id] = {
+        displayName: caseDetails.displayName,
+        id: caseDetails.id,
+        expanded: true,
+      };
+
+      for (let idx = 0; idx < caseDetails.relatedCases.length; idx++) {
+        const relatedCase = caseDetails.relatedCases[idx];
+        if (relatedCase && ! ('case_' + relatedCase.id in casesTableOfContents)) {
+          // TODO: add another loop for relatedCases of relatedCases
+          accordionCase['case_' + relatedCase.id] = {
+            displayName: relatedCase.displayName,
+            id: relatedCase.id,
+            expanded: true,
+          };
+        }
+      }
+
+      setCasesTableOfContents((current) => ({
+        ...current,
+        ...accordionCase,
+      }));
+    }
+  };
+
+  useUpdateEffect(() => {
+    updateCasesTableOfContents();
+  }, [caseDetails]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -69,24 +101,10 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     if (error) {
       console.error(error);
     }
-    // else {
-    //   console.log(
-    //     "API called successfully. Returned CaseForm data: " +
-    //       JSON.stringify(data, null, 2)
-    //   );
-    // }
     setCaseDetails(data);
   };
 
   useEffect(() => {
-    // console.log(
-    //   "Making api Request for a case fields update: " +
-    //     caseName +
-    //     JSON.stringify(outputCase, null, 2) +
-    //     " ___related_cases___  " +
-    //     JSON.stringify(relatedCases, null, 2)
-    // );
-
     casesApi.getCaseFields(
       //TODO: add logic to check if cases changed before sending a request
       caseName,
@@ -106,12 +124,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       // value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
       value={{ casesTableOfContents, setCasesTableOfContents }}
     >
-      <CasesFormWrapper
-        title={title}
-        onSubmit={handleSubmit}
-        caseDetails={caseDetails}
-        setRelatedCases={setRelatedCases}
-      >
+      <CasesFormWrapper title={title} onSubmit={handleSubmit}>
         <form ref={formRef}>
           <Box>
             {caseDetails && (

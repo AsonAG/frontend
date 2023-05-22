@@ -12,9 +12,24 @@ import {
 } from "@mui/material";
 import { React, useContext, useEffect, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
-import CasesForm, { CaseContext } from "./CasesForm";
+import { CaseContext } from "./CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
+
+const CasesTableOfContentComponent = ({casesTableOfContents, onClick}) => {
+  return Object.values(casesTableOfContents).map((caseAccordion) => (
+    <ListItemButton
+      onClick={(event) => onClick(event, caseAccordion)}
+      key={"casesTableOfContent_caseButton_" + caseAccordion.id}
+    >
+      <ListItemText
+        key={"casesTableOfContent_caseButtonText_" + caseAccordion.id}
+      >
+        {caseAccordion.displayName}
+      </ListItemText>
+    </ListItemButton>
+  ));
+};
 
 const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   const theme = useTheme();
@@ -22,17 +37,16 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   const { casesTableOfContents, setCasesTableOfContents } =
     useContext(CaseContext);
 
-    const handleTableOfContentsItemClick = (event, caseBase) => {
-        console.log("asdasdasd", caseBase.id);
-        setCasesTableOfContents((current) => ({
-                ...current,
-                [caseBase.id] : {
-                 displayName: caseBase.displayName,
-                 id: caseBase.id,
-                 expanded: ! caseBase.expanded
-                }
-               }));
-        };
+  const handleTableOfContentsItemClick = (event, caseBase) => {
+    setCasesTableOfContents((current) => ({
+      ...current,
+      ["case_" + caseBase.id]: {
+        displayName: caseBase.displayName,
+        id: caseBase.id,
+        expanded: !caseBase.expanded,
+      },
+    }));
+  };
 
   return (
     <Box
@@ -43,7 +57,6 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
       //       height='calc(100vh - 90px)'
     >
       {/* <EmployeeHeader employee={employee} /> */}
-
       <Paper
         style={{
           height: "100%",
@@ -78,17 +91,11 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
             </Typography>
           </ListItem>
 
-        <Divider />
-
-          {Object.values(casesTableOfContents).map((caseAccordion) => (
-              <ListItemButton
-                onClick={(event) => handleTableOfContentsItemClick(event, caseAccordion)}
-                >
-                        <ListItemText>
-                        {caseAccordion.displayName}
-                        </ListItemText>
-                </ListItemButton>
-          ))}
+          <Divider />
+          <CasesTableOfContentComponent
+            casesTableOfContents={casesTableOfContents}
+            onClick={handleTableOfContentsItemClick}
+          />
         </List>
 
         <Box display="flex" justifyContent="center">

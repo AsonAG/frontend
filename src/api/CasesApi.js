@@ -123,7 +123,7 @@ export class CasesApi {
       );
     }
 
-    let shouldIncludeBody = baseCase?.values || 
+    let shouldIncludeBody =
       JSON.stringify(baseCase) != "{}" &&
       JSON.stringify(Object.values(baseCase)[0]?.values) != "{}";
     // build a case body if case fields are provided

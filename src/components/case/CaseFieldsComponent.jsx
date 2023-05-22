@@ -36,25 +36,15 @@ function CaseNameHeader(caseDetails) {
       </Typography>
     </Box>
   );
-}
+} 
 
 const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [caseFieldsList, setCaseFieldsList] = useState({});
-  // const { casesTableOfContents, setCasesTableOfContents } =
-  //   useContext(CaseContext);
-
-  // useEffect(() => {
-  //   setCasesTableOfContents((current) => ({
-  //     ...current,
-  //     [caseBase.id]: {
-  //       displayName: caseBase.displayName,
-  //       id: caseBase.id,
-  //       expanded: true,
-  //     },
-  //   }));
-  // }, []);
+  const { casesTableOfContents, setCasesTableOfContents } =
+    useContext(CaseContext);
+  const [caseExpanded, setCaseExpanded] = useState(false);
 
   useUpdateEffect(() => {
     // update output cases
@@ -64,7 +54,6 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
         caseName: caseBase.name,
         values: caseFieldsList,
         caseSlot: caseBase.caseSlot,
-        expanded: caseBase.expanded,
       },
     }));
   }, [caseFieldsList]);
@@ -98,21 +87,18 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
     let correctDate = new Date(timestamp);
     return correctDate.toISOString();
   };
+  
+  useUpdateEffect(() => {
+    setCaseExpanded(casesTableOfContents['case_' + caseBase.id].expanded);
+  }, [casesTableOfContents['case_' + caseBase.id]]);
 
-  const handleAccordionChange = (caseBase) => (event, isExpanded) => {
-    // setCasesTableOfContents((current) => ({
-    //   ...current,
-    //   [caseDetails.id]: {
-    //     displayName: caseDetails.displayName,
-    //     expanded: isExpanded,
-    //   },
-    // }));
-    setOutputCases((prevState) => ({
-      ...prevState,
-      [getFieldKey(caseBase.name, caseBase.id)]: {
-        caseName: caseBase.name,
-        values: caseBase.values,
-        caseSlot: caseBase.caseSlot,
+
+  const handleAccordionChange = (caseDetails) => (event, isExpanded) => {
+    setCasesTableOfContents((current) => ({
+      ...current,
+      ['case_' + caseDetails.id]: {
+        displayName: caseDetails.displayName,
+        id: caseDetails.id,
         expanded: isExpanded,
       },
     }));
@@ -137,11 +123,7 @@ const CaseFieldsComponent = ({ caseBase, isBase, setOutputCases }) => {
         // defaultExpanded={true}
         elevation={3}
         key={"caseaccordion_" + caseBase.id}
-        expanded={caseBase.expanded
-          // casesTableOfContents[caseBase.id]
-          //   ? casesTableOfContents[caseBase.id].expanded
-          //   : true
-        }
+        expanded={caseExpanded}
         onChange={handleAccordionChange(caseBase)}
       >
         {/***************************** Case Header ****************************/}
