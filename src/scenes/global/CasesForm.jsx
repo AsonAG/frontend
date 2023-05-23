@@ -35,33 +35,20 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   // const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
   const [casesTableOfContents, setCasesTableOfContents] = useState({});
 
-  const updateCasesTableOfContents = () => {
-    let accordionCase = {};
-    if (caseDetails && ! ('case_' + caseDetails.id in casesTableOfContents)) {
-      accordionCase['case_' + caseDetails.id] = {
-        displayName: caseDetails.displayName,
-        id: caseDetails.id,
-        expanded: true,
-      };
+  useEffect(() => {
+    casesApi.getCaseFields(
+      //TODO: add logic to check if cases changed before sending a request
+      caseName,
+      getFieldsCallback,
+      outputCase,
+      relatedCases,
+      employee?.employeeId
+    );
+  }, [outputCase, relatedCases]);
 
-      for (let idx = 0; idx < caseDetails.relatedCases.length; idx++) {
-        const relatedCase = caseDetails.relatedCases[idx];
-        if (relatedCase && ! ('case_' + relatedCase.id in casesTableOfContents)) {
-          // TODO: add another loop for relatedCases of relatedCases
-          accordionCase['case_' + relatedCase.id] = {
-            displayName: relatedCase.displayName,
-            id: relatedCase.id,
-            expanded: true,
-          };
-        }
-      }
-
-      setCasesTableOfContents((current) => ({
-        ...current,
-        ...accordionCase,
-      }));
-    }
-  };
+  useEffect(() => {
+    console.log("User changed.");
+  }, [user]);
 
   useUpdateEffect(() => {
     updateCasesTableOfContents();
@@ -83,6 +70,12 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     }
   };
 
+  const getFieldsCallback = function (error, data, response) {
+    if (error) {
+      console.error(error);
+    }
+    setCaseDetails(data);
+  };
   const caseSaveCallback = function (error, data, response) {
     if (error) {
       console.error(error);
@@ -97,27 +90,36 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     }
   };
 
-  const callback = function (error, data, response) {
-    if (error) {
-      console.error(error);
+  const updateCasesTableOfContents = () => {
+    let accordionCase = {};
+    if (caseDetails && !("case_" + caseDetails.id in casesTableOfContents)) {
+      accordionCase["case_" + caseDetails.id] = {
+        displayName: caseDetails.displayName,
+        id: caseDetails.id,
+        expanded: true,
+      };
+
+      for (let idx = 0; idx < caseDetails.relatedCases.length; idx++) {
+        const relatedCase = caseDetails.relatedCases[idx];
+        if (
+          relatedCase &&
+          !("case_" + relatedCase.id in casesTableOfContents)
+        ) {
+          // TODO: add another loop for relatedCases of relatedCases
+          accordionCase["case_" + relatedCase.id] = {
+            displayName: relatedCase.displayName,
+            id: relatedCase.id,
+            expanded: true,
+          };
+        }
+      }
+
+      setCasesTableOfContents((current) => ({
+        ...current,
+        ...accordionCase,
+      }));
     }
-    setCaseDetails(data);
   };
-
-  useEffect(() => {
-    casesApi.getCaseFields(
-      //TODO: add logic to check if cases changed before sending a request
-      caseName,
-      callback,
-      outputCase,
-      relatedCases,
-      employee?.employeeId
-    );
-  }, [outputCase, relatedCases]);
-
-  useEffect(() => {
-    console.log("User changed.");
-  }, [user]);
 
   return (
     <CaseContext.Provider

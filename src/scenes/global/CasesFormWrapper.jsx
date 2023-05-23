@@ -16,21 +16,6 @@ import { CaseContext } from "./CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 
-const CasesTableOfContentComponent = ({casesTableOfContents, onClick}) => {
-  return Object.values(casesTableOfContents).map((caseAccordion) => (
-    <ListItemButton
-      onClick={(event) => onClick(event, caseAccordion)}
-      key={"casesTableOfContent_caseButton_" + caseAccordion.id}
-    >
-      <ListItemText
-        key={"casesTableOfContent_caseButtonText_" + caseAccordion.id}
-      >
-        {caseAccordion.displayName}
-      </ListItemText>
-    </ListItemButton>
-  ));
-};
-
 const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -116,6 +101,21 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
       </Box>
     </Box>
   );
+};
+
+const CasesTableOfContentComponent = ({casesTableOfContents, onClick}) => {
+  return Object.values(casesTableOfContents).map((caseAccordion) => (
+    <ListItemButton
+      onClick={(event) => onClick(event, caseAccordion)}
+      key={"casesTableOfContent_caseButton_" + caseAccordion.id}
+    >
+      <ListItemText
+        key={"casesTableOfContent_caseButtonText_" + caseAccordion.id}
+      >
+        {caseAccordion.displayName}
+      </ListItemText>
+    </ListItemButton>
+  ));
 };
 
 export default CasesFormWrapper;
