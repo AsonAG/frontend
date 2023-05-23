@@ -98,6 +98,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
         id: caseDetails.id,
         expanded: true,
       };
+    }
 
       for (let idx = 0; idx < caseDetails.relatedCases.length; idx++) {
         const relatedCase = caseDetails.relatedCases[idx];
@@ -118,7 +119,6 @@ const CasesForm = ({ employee, navigateTo, title }) => {
         ...current,
         ...accordionCase,
       }));
-    }
   };
 
   return (

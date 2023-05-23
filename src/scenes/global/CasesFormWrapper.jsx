@@ -103,7 +103,7 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   );
 };
 
-const CasesTableOfContentComponent = ({casesTableOfContents, onClick}) => {
+const CasesTableOfContentComponent = ({ casesTableOfContents, onClick }) => {
   return Object.values(casesTableOfContents).map((caseAccordion) => (
     <ListItemButton
       onClick={(event) => onClick(event, caseAccordion)}
