@@ -208,6 +208,11 @@ const handleEmployeeSelection = (employee) => {
             clearSearch: () => requestSearch(""),
           },
         }}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: "firstName", sort: "asc" }],
+          },
+        }}
       />
     </Box>
   );

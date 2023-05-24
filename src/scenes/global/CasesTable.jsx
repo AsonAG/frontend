@@ -23,7 +23,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const navigate = useNavigate();
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
     handleCaseSelection(params.row.caseName);
     navigate(navigateTo);
   };
-  
+
   const columns = [
     {
       field: "displayName",
@@ -95,11 +95,11 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
         );
       },
     },
-  ];  
+  ];
 
   const requestSearch = (searchValue) => {
     setSearchText(searchValue);
-    const searchRegex = new RegExp(escapeRegExp(searchValue), 'i');
+    const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
     const filteredRows = caseData.filter((row) => {
       return Object.keys(row).some((field) => {
         return searchRegex.test(row[field].toString());
@@ -158,7 +158,12 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
           toolbar: {
             value: searchText,
             onChange: (event) => requestSearch(event.target.value),
-            clearSearch: () => requestSearch(''),
+            clearSearch: () => requestSearch(""),
+          },
+        }}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: "displayName", sort: "asc" }],
           },
         }}
       />
@@ -177,10 +182,10 @@ function QuickSearchToolbar() {
       <GridToolbarQuickFilter />
     </Box>
   );
-};
+}
 
 function escapeRegExp(value) {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
 
 export default CasesTable;

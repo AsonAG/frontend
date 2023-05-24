@@ -21,6 +21,7 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { UserContext } from "../../App";
+import FieldValueTextComponent from "./FieldValueTextComponent";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -281,70 +282,5 @@ const FieldValueComponent = ({
     }
   /* Return any other type  =============================== END =============================== */
 };
-
-const getInputTypeFromJsonType = (jsonType) => {
-  switch (jsonType) {
-    case "String":
-      return "text";
-    case "Boolean":
-      return "Boolean";
-    case "Number":
-      return "numeric";
-    case "Decimal":
-      return "numeric";
-    default:
-      return jsonType;
-  }
-};
-
-const getAdornmentFromJsonType = (jsonType, fieldId) => {
-  let adornment;
-  switch (jsonType) {
-    case "Money":
-      adornment = "CHF";
-      break;
-    case "Percent":
-      adornment = "%";
-      break;
-    case "Distance":
-      adornment = "m";
-      break;
-    default:
-      return <></>;
-  }
-  return (
-    <InputAdornment key={"numbertype_adornment_" + fieldId} position="end">
-      {adornment}
-    </InputAdornment>
-  );
-};
-
-function FieldValueTextComponent(
-  fieldDisplayName,
-  fieldDescription,
-  required,
-  fieldValue,
-  handleTextValueChange,
-  fieldValueType,
-  fieldKey,
-  slotInputProps
-) {
-  return (
-    <TextField
-      {...slotInputProps}
-      label={fieldDisplayName}
-      helperText={fieldDescription}
-      required={required}
-      value={fieldValue ? fieldValue : ""}
-      onChange={handleTextValueChange}
-      type={getInputTypeFromJsonType(fieldValueType)}
-      name={fieldKey}
-      key={fieldKey}
-      InputProps={{
-        endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
-      }}
-    />
-  );
-}
 
 export default FieldValueComponent;
