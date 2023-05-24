@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Divider,
   Drawer,
   List,
@@ -77,10 +78,21 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
           </ListItem>
 
           <Divider />
-          <CasesTableOfContentComponent
-            casesTableOfContents={casesTableOfContents}
-            onClick={handleTableOfContentsItemClick}
-          />
+          {Object.keys(casesTableOfContents).length > 0 ? (
+            <CasesTableOfContentComponent
+              casesTableOfContents={casesTableOfContents}
+              onClick={handleTableOfContentsItemClick}
+            />
+          ) : (
+            // TODO: fix circular progress display
+            <Box sx={{ display: "flex" }}>
+              <CircularProgress
+                disableShrink={true}
+                color="neutral"
+                size="lg"
+              />
+            </Box>
+          )}
         </List>
 
         <Box display="flex" justifyContent="center">

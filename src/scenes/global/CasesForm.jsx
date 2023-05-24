@@ -75,7 +75,9 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       console.error(error);
     }
     setCaseDetails(data);
+    // console.log(JSON.stringify(data, null, 2))
   };
+
   const caseSaveCallback = function (error, data, response) {
     if (error) {
       console.error(error);

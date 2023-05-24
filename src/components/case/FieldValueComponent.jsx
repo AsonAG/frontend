@@ -11,6 +11,8 @@ import {
   FormControlLabel,
   FormHelperText,
   Typography,
+  Link,
+  Stack,
 } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -246,22 +248,35 @@ const FieldValueComponent = ({
             <FormHelperText>{fieldDescription}</FormHelperText>
           </FormControl>
         );
-      default: //TextField
+      case "WebResource":
         return (
-          <TextField
-            {...slotInputProps}
-            label={fieldDisplayName}
-            helperText={fieldDescription}
-            required={required}
-            value={fieldValue ? fieldValue : ""}
-            onChange={handleTextValueChange}
-            type={getInputTypeFromJsonType(fieldValueType)}
-            name={fieldKey}
-            key={fieldKey}
-            InputProps={{
-              endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
-            }}
-          />
+          <Stack>
+            {FieldValueTextComponent(
+              fieldDisplayName,
+              fieldDescription,
+              required,
+              fieldValue,
+              handleTextValueChange,
+              fieldValueType,
+              fieldKey,
+              slotInputProps
+            )}
+            <Box m="6px">
+            <Link href={fieldValue} target="_blank" rel="noopener">{fieldValue}</Link>
+            </Box>
+          </Stack>
+        );
+
+      default: //TextField
+        return FieldValueTextComponent(
+          fieldDisplayName,
+          fieldDescription,
+          required,
+          fieldValue,
+          handleTextValueChange,
+          fieldValueType,
+          fieldKey,
+          slotInputProps
         );
     }
   /* Return any other type  =============================== END =============================== */
@@ -303,5 +318,33 @@ const getAdornmentFromJsonType = (jsonType, fieldId) => {
     </InputAdornment>
   );
 };
+
+function FieldValueTextComponent(
+  fieldDisplayName,
+  fieldDescription,
+  required,
+  fieldValue,
+  handleTextValueChange,
+  fieldValueType,
+  fieldKey,
+  slotInputProps
+) {
+  return (
+    <TextField
+      {...slotInputProps}
+      label={fieldDisplayName}
+      helperText={fieldDescription}
+      required={required}
+      value={fieldValue ? fieldValue : ""}
+      onChange={handleTextValueChange}
+      type={getInputTypeFromJsonType(fieldValueType)}
+      name={fieldKey}
+      key={fieldKey}
+      InputProps={{
+        endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
+      }}
+    />
+  );
+}
 
 export default FieldValueComponent;

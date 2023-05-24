@@ -104,7 +104,8 @@ const FieldComponent = ({ field, onChange }) => {
             display="flex"
             flexDirection="row-reverse"
             marginBottom="22px"
-          >
+            height="50px"
+            >
             <IconButton
               onClick={handleTimingButtonClick}
               key={"icon_" + field.id}
