@@ -96,6 +96,7 @@ const FieldComponent = ({ field, onChange }) => {
           fieldValueType={field.valueType}
           onChange={onValueChange}
           lookupSettings={field.lookupSettings}
+          attributes={field.attributes}
         />
 
         {field.timeType != "Timeless" && (
@@ -124,14 +125,6 @@ const FieldComponent = ({ field, onChange }) => {
             paddingLeft="10px"
             // justifyContent="space-between"
           >
-            {/* <DatePicker
-              name={field.name + "start"}
-              label="Start"
-              value={fieldStartDate}
-              onChange={handleInputStartDateChange}
-              key={"field_textfield_startdate" + field.id}
-            /> */}
-
             <FieldValueComponent
               fieldDisplayName={"Start"}
               fieldKey={fieldKey + "_start"}

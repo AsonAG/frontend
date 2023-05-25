@@ -36,6 +36,7 @@ const FieldValueComponent = ({
   onChange,
   required = true,
   lookupSettings,
+  attributes,
   small,
 }) => {
   const slotInputProps = small
@@ -260,14 +261,14 @@ const FieldValueComponent = ({
               handleTextValueChange,
               fieldValueType,
               fieldKey,
-              slotInputProps
+              slotInputProps,
+              attributes
             )}
             <Box m="6px">
             <Link href={fieldValue} target="_blank" rel="noopener">{fieldValue}</Link>
             </Box>
           </Stack>
         );
-
       default: //TextField
         return FieldValueTextComponent(
           fieldDisplayName,
@@ -277,7 +278,8 @@ const FieldValueComponent = ({
           handleTextValueChange,
           fieldValueType,
           fieldKey,
-          slotInputProps
+          slotInputProps,
+          attributes
         );
     }
   /* Return any other type  =============================== END =============================== */
