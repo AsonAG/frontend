@@ -214,6 +214,8 @@ const FieldValueComponent = ({
             name={fieldKey}
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
+            hidden={attributes?.["input.hidden"]}
+            disabled={attributes?.["input.readOnly"]}
           ></DatePicker>
         );
       case "DateTime":
@@ -228,6 +230,8 @@ const FieldValueComponent = ({
             name={fieldKey}
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
+            hidden={attributes?.["input.hidden"]}
+            disabled={attributes?.["input.readOnly"]}
           ></DateTimePicker>
         );
       case "Boolean":
@@ -244,6 +248,8 @@ const FieldValueComponent = ({
                   }
                   onChange={handleBooleanValueChange}
                   key={fieldKey}
+                  hidden={attributes?.["input.hidden"]}
+                  disabled={attributes?.["input.readOnly"]}
                 />
               }
             />

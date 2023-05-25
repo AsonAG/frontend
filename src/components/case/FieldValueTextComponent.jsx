@@ -25,10 +25,10 @@ const FieldValueTextComponent = (
       InputProps={{
         endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
       }}
-      multiline={attributes["input.multiLine"]}
+      multiline={attributes?.["input.multiLine"]}
       minRows={2}
-      hidden={attributes["input.hidden"]}
-      disabled={attributes["input.readOnly"]}
+      hidden={attributes?.["input.hidden"]}
+      disabled={attributes?.["input.readOnly"]}
     />
   );
 };
