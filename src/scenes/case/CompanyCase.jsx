@@ -4,7 +4,6 @@ import { UserContext, UserEmployeeContext } from "../../App";
 import { useContext } from "react";
 import CasesForm from "../global/CasesForm";
 import Header from "../../components/Header";
-import CasesFormWrapper from "../global/CasesFormWrapper";
 
 const CompanyCase = () => {
   const { user, setUser } = useContext(UserContext);

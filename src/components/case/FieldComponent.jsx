@@ -84,7 +84,7 @@ const FieldComponent = ({ field, onChange }) => {
       <Box
         display="grid"
         gridTemplateColumns="1fr 40px 1fr"
-        padding="8px"
+        padding="2px 8px"
         key={"field_inline_" + field.id}
       >
         <FieldValueComponent

@@ -13,10 +13,10 @@ import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
-import CaseFieldsComponent from "../../components/case/CaseFieldsComponent";
+import CaseComponent from "../../components/case/CaseFieldsComponent";
 import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
-import CasesFormWrapper from "./CasesFormWrapper";
+import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
 
 export const CaseContext = createContext();
 
@@ -132,7 +132,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
         <form ref={formRef}>
           <Box>
             {caseDetails && (
-              <CaseFieldsComponent
+              <CaseComponent
                 caseBase={caseDetails}
                 isBase={true}
                 setOutputCases={setOutputCase}
@@ -143,7 +143,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
           <Box>
             {caseDetails?.relatedCases?.map((relatedCase, i) => (
-              <CaseFieldsComponent
+              <CaseComponent
                 caseBase={relatedCase}
                 setOutputCases={setRelatedCases}
                 key={"case_related" + i + relatedCase.id}

@@ -13,9 +13,10 @@ import {
 } from "@mui/material";
 import { React, useContext, useEffect, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
-import { CaseContext } from "./CasesForm";
+import { CaseContext } from "../../scenes/global/CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
+import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
 
 const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   const theme = useTheme();
@@ -115,19 +116,5 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   );
 };
 
-const CasesTableOfContentComponent = ({ casesTableOfContents, onClick }) => {
-  return Object.values(casesTableOfContents).map((caseAccordion) => (
-    <ListItemButton
-      onClick={(event) => onClick(event, caseAccordion)}
-      key={"casesTableOfContent_caseButton_" + caseAccordion.id}
-    >
-      <ListItemText
-        key={"casesTableOfContent_caseButtonText_" + caseAccordion.id}
-      >
-        {caseAccordion.displayName}
-      </ListItemText>
-    </ListItemButton>
-  ));
-};
 
 export default CasesFormWrapper;

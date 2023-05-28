@@ -4,7 +4,6 @@ import CasesForm from "../global/CasesForm";
 import EmployeeHeader from "../../components/EmployeeHeader";
 import { EmployeeSelectionContext } from "../../App";
 import Header from "../../components/Header";
-import CasesFormWrapper from "../global/CasesFormWrapper";
 
 const EmployeeCase = () => {
   const { employee, setEmployee } = useContext(EmployeeSelectionContext);
