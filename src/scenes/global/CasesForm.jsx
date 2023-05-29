@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import SendIcon from "@mui/icons-material/Send";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
-import CaseComponent from "../../components/case/CaseFieldsComponent";
+import CaseComponent from "../../components/case/CaseComponent";
 import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
 import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
@@ -50,9 +50,9 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     console.log("User changed.");
   }, [user]);
 
-  useUpdateEffect(() => {
-    updateCasesTableOfContents();
-  }, [caseDetails]);
+  // useUpdateEffect(() => {
+  //   updateCasesTableOfContents();
+  // }, [caseDetails]);
 
   const handleSubmit = (event) => {
     event.preventDefault();

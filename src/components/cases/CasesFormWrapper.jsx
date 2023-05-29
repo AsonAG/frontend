@@ -25,14 +25,9 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
     useContext(CaseContext);
 
   const handleTableOfContentsItemClick = (event, caseBase) => {
-    setCasesTableOfContents((current) => ({
-      ...current,
-      ["case_" + caseBase.id]: {
-        displayName: caseBase.displayName,
-        id: caseBase.id,
-        expanded: !caseBase.expanded,
-      },
-    }));
+    console.log("Focus invoked: ", casesTableOfContents["case_" + caseBase.id].ref.current);
+    casesTableOfContents["case_" + caseBase.id].ref.current.scrollIntoView(); 
+    casesTableOfContents["case_" + caseBase.id].ref.current.focus(); 
   };
 
   return (

@@ -1,6 +1,6 @@
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Box, Divider, Paper } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -11,39 +11,6 @@ import FieldComponent, { getFieldKey } from "./FieldComponent";
 import { useUpdateEffect } from "usehooks-ts";
 import { CaseContext } from "../../scenes/global/CasesForm";
 
-function CaseNameHeader(caseDetails) {
-  return (
-    <Box display="flex" alignItems="baseline"
-    
-    sx={{
-      // backgroundColor: colors.primary[300],
-      margin: "8px 0",
-    }}
-    key={"casesummary_" + caseDetails.id}
-    >
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        key={"casename_" + caseDetails.id}
-        sx={{
-          marginLeft: "6px",
-          marginRight: "20px",
-          flexShrink: 0,
-        }}
-      >   
-        {caseDetails.displayName}
-      </Typography>
-
-      <Typography
-        variant="h5"
-        sx={{ color: "text.secondary" }}
-        key={"casename_desc_" + caseDetails.id}
-      >
-        {caseDetails.description}
-      </Typography>
-    </Box>
-  );
-} 
 
 const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
   const theme = useTheme();
@@ -51,7 +18,8 @@ const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
   const [caseFieldsList, setCaseFieldsList] = useState({});
   const { casesTableOfContents, setCasesTableOfContents } =
     useContext(CaseContext);
-  const [caseExpanded, setCaseExpanded] = useState(false);
+  const caseRef = useRef(null)
+
 
   useUpdateEffect(() => {
     // update output cases
@@ -95,9 +63,9 @@ const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
     return correctDate.toISOString();
   };
   
-  useUpdateEffect(() => {
-    setCaseExpanded(casesTableOfContents['case_' + caseBase.id].expanded);
-  }, [casesTableOfContents['case_' + caseBase.id]]);
+  // useUpdateEffect(() => {
+  //   setCaseExpanded(casesTableOfContents['case_' + caseBase.id].expanded); /// co to jest?
+  // }, [casesTableOfContents['case_' + caseBase.id]]);
 
 
   const handleAccordionChange = (caseDetails) => (event, isExpanded) => {
@@ -107,10 +75,15 @@ const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
         displayName: caseDetails.displayName,
         id: caseDetails.id,
         expanded: isExpanded,
+        ref: caseRef
       },
     }));
   };
 
+  useEffect(() => {
+    handleAccordionChange(caseBase);
+  }, [caseBase])
+  
   return (
     <Box
       key={"casebox_" + caseBase.id}
@@ -130,8 +103,8 @@ const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
         // defaultExpanded={true}
         elevation={3}
         key={"caseaccordion_" + caseBase.id}
-        expanded={caseExpanded}
         onChange={handleAccordionChange(caseBase)}
+        ref={caseRef}
       >
           {CaseNameHeader(caseBase)}
 
@@ -178,5 +151,39 @@ const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
     </Box>
   );
 };
+
+function CaseNameHeader(caseDetails) {
+  return (
+    <Box display="flex" alignItems="baseline"
+    
+    sx={{
+      // backgroundColor: colors.primary[300],
+      margin: "8px 0",
+    }}
+    key={"casesummary_" + caseDetails.id}
+    >
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        key={"casename_" + caseDetails.id}
+        sx={{
+          marginLeft: "6px",
+          marginRight: "20px",
+          flexShrink: 0,
+        }}
+      >   
+        {caseDetails.displayName}
+      </Typography>
+
+      <Typography
+        variant="h5"
+        sx={{ color: "text.secondary" }}
+        key={"casename_desc_" + caseDetails.id}
+      >
+        {caseDetails.description}
+      </Typography>
+    </Box>
+  );
+} 
 
 export default CaseComponent;
