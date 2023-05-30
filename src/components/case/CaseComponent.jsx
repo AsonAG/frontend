@@ -20,6 +20,7 @@ const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
     useContext(CaseContext);
   const caseRef = useRef(null)
 
+  const [outputRelatedCases, setOutputRelatedCases] = useState({});
 
   useUpdateEffect(() => {
     // update output cases
@@ -29,9 +30,10 @@ const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
         caseName: caseBase.name,
         values: caseFieldsList,
         caseSlot: caseBase.caseSlot,
+        relatedCases: outputRelatedCases,
       },
     }));
-  }, [caseFieldsList]);
+  }, [caseFieldsList, outputRelatedCases]);
 
   const handleFieldChange = (
     fieldId,
@@ -140,7 +142,7 @@ const CaseComponent = ({ caseBase, isBase, setOutputCases }) => {
                 <CaseComponent
                   isBase={false}
                   caseBase={relatedCase}
-                  setOutputCases={setOutputCases}
+                  setOutputCases={setOutputRelatedCases}
                   key={"case_related" + i + relatedCase.id}
                 />
               ))}

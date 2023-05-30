@@ -66,38 +66,44 @@ export class CasesApi {
   //   };
   // }
 
-  generateCasesBodyFromCasesObj(mainCase, relatedMainCases, shouldIncludeBody) {
+  generateCasesBodyFromCasesObj(mainCase, shouldIncludeBody) {
     if (
       shouldIncludeBody
       // JSON.stringify(mainCase) != "{}"
     ) {
       // remove case name key
       let baseCase = JSON.parse(JSON.stringify(Object.values(mainCase)[0])); // TODO: remove cloning object later and move body creating logic to CaseForm
-      let relatedCases = Object.values(relatedMainCases);
+      let relatedCases = Object.values(baseCase.relatedCases);
       let filteredRelatedCases = [];
 
       baseCase.values = JSON.parse(
         JSON.stringify(Object.values(Object.values(mainCase)[0].values))
       );
 
-      relatedCases.map(
-        (relatedCase) =>
-          Object.values(relatedCase.values).forEach((field, i) => {
-            // relatedCase.values[i] = Object.values(field)
-            // if (Object.values(relatedCase.values).length > 0 )
-            filteredRelatedCases.push(JSON.parse(JSON.stringify(field)));
-          })
-      );
+      this.filterRelatedCases(relatedCases, filteredRelatedCases);
 
       if (baseCase.values.length === 0) delete baseCase.values;
 
-      // baseCase.relatedCases = filteredRelatedCases;
-      baseCase.values = baseCase.values.concat(filteredRelatedCases);
+      baseCase.relatedCases = filteredRelatedCases;
+      // baseCase.values = baseCase.values.concat(filteredRelatedCases);
 
       return {
         case: baseCase,
       };
     } else return null;
+  }
+
+  filterRelatedCases(relatedCases, filteredRelatedCases) {
+    if (relatedCases.length > 0)
+    relatedCases.map(
+      (relatedCase) => Object.values(relatedCase.values).forEach((field, i) => {
+        // relatedCase.values[i] = Object.values(field)
+        // if (Object.values(relatedCase.values).length > 0 )
+        filteredRelatedCases.push(JSON.parse(JSON.stringify(field)));
+        // TODO:
+        // this.filterRelatedCases(relatedCase.relatedCases, filteredRelatedCases);
+      })
+    );
   }
 
   /**
@@ -115,7 +121,7 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCaseFieldsCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseFields(caseName, callback, baseCase, relatedCases, employeeId) {
+  getCaseFields(caseName, callback, baseCase, employeeId) {
     // verify the required parameter 'caseName' is set
     if (caseName === undefined || caseName === null) {
       throw new Error(
@@ -130,7 +136,6 @@ export class CasesApi {
     // let postBody = caseFields.length > 0 ?
     let postBody = this.generateCasesBodyFromCasesObj(
       baseCase,
-      relatedCases,
       shouldIncludeBody
     );
 
@@ -177,7 +182,7 @@ export class CasesApi {
    * @param {module:model/CaseFieldBasic} opts.body
    * @param {module:api/CasesApi~saveCaseCallback} callback The callback function, accepting three arguments: error, data, response
    */
-  saveCase(baseCase, relatedCases, callback, employeeId, opts) {
+  saveCase(baseCase, callback, employeeId, opts) {
     opts = opts || {};
     // let postBody =
     //   JSON.stringify(caseFields[0]) != "{}"
@@ -185,7 +190,6 @@ export class CasesApi {
     //     : null;
     let postBody = this.generateCasesBodyFromCasesObj(
       baseCase,
-      relatedCases,
       true
     );
     postBody.userId = this.userId;

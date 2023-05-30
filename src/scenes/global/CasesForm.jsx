@@ -41,7 +41,6 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       caseName,
       getFieldsCallback,
       outputCase,
-      relatedCases,
       employee?.employeeId
     );
   }, [outputCase, relatedCases]);
@@ -61,7 +60,6 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       console.log("form is valid");
       casesApi.saveCase(
         outputCase,
-        relatedCases,
         caseSaveCallback,
         employee?.employeeId
       );
@@ -81,6 +79,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   const caseSaveCallback = function (error, data, response) {
     if (error) {
       console.error(error);
+      // TODO: add popup error message display on code:400 
       // setIsSaveButtonClicked(true);
     } else {
       console.log(
@@ -141,7 +140,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
             )}
           </Box>
 
-          <Box>
+          {/* <Box>
             {caseDetails?.relatedCases?.map((relatedCase, i) => (
               <CaseComponent
                 caseBase={relatedCase}
@@ -149,7 +148,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
                 key={"case_related" + i + relatedCase.id}
               />
             ))}
-          </Box>
+          </Box> */}
         </form>
       </CasesFormWrapper>
     </CaseContext.Provider>
