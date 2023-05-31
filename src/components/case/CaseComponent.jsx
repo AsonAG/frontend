@@ -2,22 +2,18 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Box, Divider, Paper } from "@mui/material";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useUpdateEffect } from "usehooks-ts";
 import { CaseContext } from "../../scenes/global/CasesForm";
-import { CaseValueSetup } from "../../generated_model/CaseValueSetup";
 import FieldComponent from "./FieldComponent";
+import CaseFields from "./CaseFields";
 
 export const getCasedKey = (_case) => "case_" + _case.name + "_" + _case.id;
 
-const CaseComponent = ({ caseBase, setOutputCase }) => {
+const CaseComponent = ({ inputCase, setOutputCase }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [caseFieldsList, setCaseFieldsList] = useState({});
+  const [outputCaseFields, setOutputCaseFields] = useState({});
   const [outputRelatedCases, setOutputRelatedCases] = useState({});
 
   const { casesTableOfContents, setCasesTableOfContents } =
@@ -28,32 +24,13 @@ const CaseComponent = ({ caseBase, setOutputCase }) => {
     // update output cases
     setOutputCase((prevState) => ({
       ...prevState,
-      [getCasedKey(caseBase)]: {
-        caseName: caseBase.name,
-        values: caseFieldsList,
+      [getCasedKey(inputCase)]: {
+        caseName: inputCase.name,
+        values: outputCaseFields,
         relatedCases: outputRelatedCases,
       },
     }));
-  }, [caseFieldsList, outputRelatedCases]);
-
-  const handleFieldChange = (
-    fieldId,
-    fieldName,
-    fieldValue,
-    fieldStartDate,
-    fieldEndDate
-  ) => {
-    setCaseFieldsList((current) => ({
-      ...current,
-      [fieldId]: {
-        caseName: caseBase.name,
-        caseFieldName: fieldName,
-        value: fieldValue,
-        start: isoDateWithoutTimeZone(fieldStartDate),
-        end: isoDateWithoutTimeZone(fieldEndDate),
-      },
-    }));
-  };
+  }, [outputCaseFields, outputRelatedCases]);
 
   const handleRelatedCaseChange = (relatedCase) => {
     setOutputRelatedCases((current) => ({
@@ -79,12 +56,12 @@ const CaseComponent = ({ caseBase, setOutputCase }) => {
   };
 
   useEffect(() => {
-    // handleAccordionChange(caseBase);
-  }, [caseBase]);
+    // handleAccordionChange(inputCase);
+  }, [inputCase]);
 
   return (
     <Box
-      key={"casebox_" + caseBase.id}
+      key={"casebox_" + inputCase.id}
       sx={{
         "& .MuiAccordionDetails-root": {
           padding: "0px 10px",
@@ -100,39 +77,32 @@ const CaseComponent = ({ caseBase, setOutputCase }) => {
       <Paper
         // defaultExpanded={true}
         elevation={3}
-        key={"caseaccordion_" + caseBase.id}
-        onChange={handleAccordionChange(caseBase)}
+        key={"caseaccordion_" + inputCase.id}
+        onChange={handleAccordionChange(inputCase)}
         ref={caseRef}
       >
-        {CaseNameHeader(caseBase)}
+        {CaseNameHeader(inputCase)}
 
         <Box
           sx={{ backgroundColor: colors.primary[300] }}
-          key={"fields_" + caseBase.id}
+          key={"fields_" + inputCase.id}
         >
           <Divider />
 
           {/***************************** Case Fields *****************************/}
-          <Box paddingTop="6px" key={"fieldswrapper_" + caseBase.id}>
-            {caseBase?.fields?.map((field) => (
-              <FieldComponent
-                field={field}
-                onChange={handleFieldChange}
-                key={"field_" + field.id}
-              />
-            ))}
+          <Box paddingTop="6px" key={"fieldswrapper_" + inputCase.id}>
+            <CaseFields
+              inputCase={inputCase}
+              setOutputCaseFields={setOutputCaseFields}
+            />
           </Box>
 
           {/***************************** Related Cases *****************************/}
-          <Box>
-            {caseBase?.relatedCases?.map((relatedCase) => (
+          <Box key={"relatedcases_fieldswrapper_" + inputCase.id}>
+            {inputCase?.relatedCases?.map((relatedCase) => (
               <CaseComponent
-                caseBase={relatedCase}
-                setOutputCase={
-                  // (relatedCase) =>
-                  setOutputRelatedCases
-                  // (relatedCase)
-                }
+                inputCase={relatedCase}
+                setOutputCase={setOutputRelatedCases}
                 key={"case_related" + relatedCase.id}
               />
             ))}
@@ -177,12 +147,4 @@ function CaseNameHeader(caseDetails) {
     </Box>
   );
 }
-
-const isoDateWithoutTimeZone = (date) => {
-  if (date == null) return date;
-  let timestamp = date.getTime() - date.getTimezoneOffset() * 60000;
-  let correctDate = new Date(timestamp);
-  return correctDate.toISOString();
-};
-
 export default CaseComponent;

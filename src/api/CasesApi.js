@@ -14,8 +14,7 @@ export class CasesApi {
     * @alias module:api/CasesApi
     * @class
     * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
-    * default to {@link module:ApiClient#instanc
-    e} if unspecified.
+    * default to {@link module:ApiClient#instance} if unspecified.
     */
   constructor(apiClient, user) {
     this.apiClient = apiClient || ApiClient.instance;
@@ -52,36 +51,19 @@ export class CasesApi {
       },
     };
   }
-  // buildRequestBodyCaseSave(caseName, caseFields) {
-  //   return {
-  //     userId: this.userId,
-  //     employeeId: this.employeeId,
-  //     divisionId: this.divisionId,
-  //     case: {
-  //       caseName: caseName,
-  //       values: this.buildCaseFieldValues(caseName, caseFields[0]),
-  //       // relatedCases:
-  //       //   JSON.stringify(caseFields[1]) != '{}' ? this.buildCaseFieldValues(caseName, caseFields[1]) : '[]',
-  //     },
-  //   };
-  // }
 
   generateCasesBodyFromCasesObj(mainCase, shouldIncludeBody) {
-    if (
-      shouldIncludeBody
-      // JSON.stringify(mainCase) != "{}"
-    ) {
-      // remove case name key
+    if (shouldIncludeBody) {
+      // removing case name key
       let baseCase = JSON.parse(JSON.stringify(Object.values(mainCase)[0])); // TODO: remove cloning object later and move body creating logic to CaseForm
-
+      // TODO: replace deepclone for .values 
       baseCase.values = JSON.parse(
         JSON.stringify(Object.values(Object.values(mainCase)[0].values))
       );
-
-      if (baseCase.values.length === 0) delete baseCase.values;
-
       baseCase.relatedCases = this.filterRelatedCases(baseCase.relatedCases);
       // baseCase.values = baseCase.values.concat(filteredRelatedCases);
+
+      if (baseCase.values.length === 0) delete baseCase.values;
 
       return {
         case: baseCase,

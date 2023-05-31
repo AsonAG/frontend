@@ -26,8 +26,8 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const [caseInput, setCaseInput] = useState();
-  const [caseOutput, setCaseOutput] = useState({});
+  const [inputCase, setInputCase] = useState();
+  const [outputCase, setOutputCase] = useState({});
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
@@ -38,10 +38,10 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       //TODO: add logic to check if cases changed before sending a request
       caseName,
       getFieldsCallback,
-      caseOutput,
+      outputCase,
       employee?.employeeId
     );
-  }, [caseOutput]);
+  }, [outputCase]);
 
   useEffect(() => {
     console.log("User changed.");
@@ -56,7 +56,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
-      casesApi.saveCase(caseOutput, caseSaveCallback, employee?.employeeId);
+      casesApi.saveCase(outputCase, caseSaveCallback, employee?.employeeId);
     } else {
       console.log("form INVALID");
     }
@@ -66,7 +66,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     if (error) {
       console.error(error);
     }
-    setCaseInput(data);
+    setInputCase(data);
     console.log(JSON.stringify(data, null, 2));
   };
 
@@ -86,16 +86,16 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
   const updateCasesTableOfContents = () => {
     let accordionCase = {};
-    if (caseInput && !("case_" + caseInput.id in casesTableOfContents)) {
-      accordionCase["case_" + caseInput.id] = {
-        displayName: caseInput.displayName,
-        id: caseInput.id,
+    if (inputCase && !("case_" + inputCase.id in casesTableOfContents)) {
+      accordionCase["case_" + inputCase.id] = {
+        displayName: inputCase.displayName,
+        id: inputCase.id,
         expanded: true,
       };
     }
 
-    for (let idx = 0; idx < caseInput.relatedCases.length; idx++) {
-      const relatedCase = caseInput.relatedCases[idx];
+    for (let idx = 0; idx < inputCase.relatedCases.length; idx++) {
+      const relatedCase = inputCase.relatedCases[idx];
       if (relatedCase && !("case_" + relatedCase.id in casesTableOfContents)) {
         // TODO: add another loop for relatedCases of relatedCases
         accordionCase["case_" + relatedCase.id] = {
@@ -120,10 +120,10 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       <CasesFormWrapper title={title} onSubmit={handleSubmit}>
         <form ref={formRef}>
           <Box>
-            {caseInput && (
+            {inputCase && (
               <CaseComponent
-                caseBase={caseInput}
-                setOutputCase={setCaseOutput}
+                inputCase={inputCase}
+                setOutputCase={setOutputCase}
               />
             )}
           </Box>
