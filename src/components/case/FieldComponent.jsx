@@ -28,7 +28,6 @@ const FieldComponent = ({ field, onChange }) => {
       fieldValue,
       fieldStartDate,
       fieldEndDate,
-      field.caseSlot
     );
   }, [])
 
@@ -39,7 +38,6 @@ const FieldComponent = ({ field, onChange }) => {
       value ? value : fieldValue,
       fieldStartDate,
       fieldEndDate,
-      field.caseSlot
     );
   };
 
@@ -52,7 +50,6 @@ const FieldComponent = ({ field, onChange }) => {
       fieldValue,
       newDate,
       fieldEndDate,
-      field.caseSlot
     );
   };
 
@@ -65,7 +62,6 @@ const FieldComponent = ({ field, onChange }) => {
       fieldValue,
       fieldStartDate,
       newDate,
-      field.caseSlot
     );
   };
 

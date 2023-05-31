@@ -26,13 +26,11 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
-  const [caseDetails, setCaseDetails] = useState();
-  const [outputCase, setOutputCase] = useState({});
-  const [relatedCases, setRelatedCases] = useState({});
+  const [caseInput, setCaseInput] = useState();
+  const [caseOutput, setCaseOutput] = useState({});
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
-  // const [isSaveButtonClicked, setIsSaveButtonClicked] = useState(false);
   const [casesTableOfContents, setCasesTableOfContents] = useState({});
 
   useEffect(() => {
@@ -40,10 +38,10 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       //TODO: add logic to check if cases changed before sending a request
       caseName,
       getFieldsCallback,
-      outputCase,
+      caseOutput,
       employee?.employeeId
     );
-  }, [outputCase, relatedCases]);
+  }, [caseOutput]);
 
   useEffect(() => {
     console.log("User changed.");
@@ -58,11 +56,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
-      casesApi.saveCase(
-        outputCase,
-        caseSaveCallback,
-        employee?.employeeId
-      );
+      casesApi.saveCase(caseOutput, caseSaveCallback, employee?.employeeId);
     } else {
       console.log("form INVALID");
     }
@@ -72,15 +66,14 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     if (error) {
       console.error(error);
     }
-    setCaseDetails(data);
-    console.log(JSON.stringify(data, null, 2))
+    setCaseInput(data);
+    console.log(JSON.stringify(data, null, 2));
   };
 
   const caseSaveCallback = function (error, data, response) {
     if (error) {
       console.error(error);
-      // TODO: add popup error message display on code:400 
-      // setIsSaveButtonClicked(true);
+      // TODO: add popup error message display on code:400
     } else {
       console.log(
         "Case saved successfully. Response: " +
@@ -93,33 +86,30 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
   const updateCasesTableOfContents = () => {
     let accordionCase = {};
-    if (caseDetails && !("case_" + caseDetails.id in casesTableOfContents)) {
-      accordionCase["case_" + caseDetails.id] = {
-        displayName: caseDetails.displayName,
-        id: caseDetails.id,
+    if (caseInput && !("case_" + caseInput.id in casesTableOfContents)) {
+      accordionCase["case_" + caseInput.id] = {
+        displayName: caseInput.displayName,
+        id: caseInput.id,
         expanded: true,
       };
     }
 
-      for (let idx = 0; idx < caseDetails.relatedCases.length; idx++) {
-        const relatedCase = caseDetails.relatedCases[idx];
-        if (
-          relatedCase &&
-          !("case_" + relatedCase.id in casesTableOfContents)
-        ) {
-          // TODO: add another loop for relatedCases of relatedCases
-          accordionCase["case_" + relatedCase.id] = {
-            displayName: relatedCase.displayName,
-            id: relatedCase.id,
-            expanded: true,
-          };
-        }
+    for (let idx = 0; idx < caseInput.relatedCases.length; idx++) {
+      const relatedCase = caseInput.relatedCases[idx];
+      if (relatedCase && !("case_" + relatedCase.id in casesTableOfContents)) {
+        // TODO: add another loop for relatedCases of relatedCases
+        accordionCase["case_" + relatedCase.id] = {
+          displayName: relatedCase.displayName,
+          id: relatedCase.id,
+          expanded: true,
+        };
       }
+    }
 
-      setCasesTableOfContents((current) => ({
-        ...current,
-        ...accordionCase,
-      }));
+    setCasesTableOfContents((current) => ({
+      ...current,
+      ...accordionCase,
+    }));
   };
 
   return (
@@ -130,25 +120,13 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       <CasesFormWrapper title={title} onSubmit={handleSubmit}>
         <form ref={formRef}>
           <Box>
-            {caseDetails && (
+            {caseInput && (
               <CaseComponent
-                caseBase={caseDetails}
-                isBase={true}
-                setOutputCases={setOutputCase}
-                key={"case_main"}
+                caseBase={caseInput}
+                setOutputCase={setCaseOutput}
               />
             )}
           </Box>
-
-          {/* <Box>
-            {caseDetails?.relatedCases?.map((relatedCase, i) => (
-              <CaseComponent
-                caseBase={relatedCase}
-                setOutputCases={setRelatedCases}
-                key={"case_related" + i + relatedCase.id}
-              />
-            ))}
-          </Box> */}
         </form>
       </CasesFormWrapper>
     </CaseContext.Provider>

@@ -73,18 +73,14 @@ export class CasesApi {
     ) {
       // remove case name key
       let baseCase = JSON.parse(JSON.stringify(Object.values(mainCase)[0])); // TODO: remove cloning object later and move body creating logic to CaseForm
-      let relatedCases = Object.values(baseCase.relatedCases);
-      let filteredRelatedCases = [];
 
       baseCase.values = JSON.parse(
         JSON.stringify(Object.values(Object.values(mainCase)[0].values))
       );
 
-      this.filterRelatedCases(relatedCases, filteredRelatedCases);
-
       if (baseCase.values.length === 0) delete baseCase.values;
 
-      baseCase.relatedCases = filteredRelatedCases;
+      baseCase.relatedCases = this.filterRelatedCases(baseCase.relatedCases);
       // baseCase.values = baseCase.values.concat(filteredRelatedCases);
 
       return {
@@ -93,17 +89,18 @@ export class CasesApi {
     } else return null;
   }
 
-  filterRelatedCases(relatedCases, filteredRelatedCases) {
-    if (relatedCases.length > 0)
-    relatedCases.map(
-      (relatedCase) => Object.values(relatedCase.values).forEach((field, i) => {
-        // relatedCase.values[i] = Object.values(field)
-        // if (Object.values(relatedCase.values).length > 0 )
-        filteredRelatedCases.push(JSON.parse(JSON.stringify(field)));
-        // TODO:
-        // this.filterRelatedCases(relatedCase.relatedCases, filteredRelatedCases);
+  filterRelatedCases(relatedCases) {
+    let filteredRelatedCases = [];
+
+
+    Object.values(relatedCases).map((caseObj) => {
+        caseObj.values = Object.values(caseObj.values)
+        caseObj.relatedCases = this.filterRelatedCases(caseObj.relatedCases);
+
+        filteredRelatedCases.push(JSON.parse(JSON.stringify(caseObj)));
       })
-    );
+
+    return filteredRelatedCases;
   }
 
   /**
@@ -113,7 +110,6 @@ export class CasesApi {
    * @param {module:model/CaseDetails{ data The data returned by the service call.
    * @param {String} response The complete HTTP response.
    */
-
   /**
    * Build a case and Get case fields
    * Returs case fields and values along with related cases fields and values. Running this request is required to build a case, before saving it with &#x60;cases/{caseName}/save&#x60;.
