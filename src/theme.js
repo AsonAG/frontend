@@ -184,7 +184,7 @@ export const themeSettings = (mode) => {
       },
       h4: {
         fontFamily: ["Made outer sans", "sans-serif"].join(","),
-        fontSize: 20,
+        fontSize: 18,
       },
       h5: {
         fontFamily: ["Made outer sans", "sans-serif"].join(","),

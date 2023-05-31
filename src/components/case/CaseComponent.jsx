@@ -2,10 +2,9 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Box, Divider, Paper } from "@mui/material";
-import Typography from "@mui/material/Typography";
 import { useUpdateEffect } from "usehooks-ts";
 import { CaseContext } from "../../scenes/global/CasesForm";
-import FieldComponent from "./FieldComponent";
+import CaseNameHeader from "../../scenes/global/CaseNameHeader";
 import CaseFields from "./CaseFields";
 
 export const getCasedKey = (_case) => "case_" + _case.name + "_" + _case.id;
@@ -81,7 +80,7 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
         onChange={handleAccordionChange(inputCase)}
         ref={caseRef}
       >
-        {CaseNameHeader(inputCase)}
+        <CaseNameHeader caseDetails={inputCase} />
 
         <Box
           sx={{ backgroundColor: colors.primary[300] }}
@@ -113,38 +112,4 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
   );
 };
 
-function CaseNameHeader(caseDetails) {
-  return (
-    <Box
-      display="flex"
-      alignItems="baseline"
-      sx={{
-        // backgroundColor: colors.primary[300],
-        margin: "8px 0",
-      }}
-      key={"casesummary_" + caseDetails.id}
-    >
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        key={"casename_" + caseDetails.id}
-        sx={{
-          marginLeft: "6px",
-          marginRight: "20px",
-          flexShrink: 0,
-        }}
-      >
-        {caseDetails.displayName}
-      </Typography>
-
-      <Typography
-        variant="h5"
-        sx={{ color: "text.secondary" }}
-        key={"casename_desc_" + caseDetails.id}
-      >
-        {caseDetails.description}
-      </Typography>
-    </Box>
-  );
-}
 export default CaseComponent;
