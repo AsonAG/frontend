@@ -2,7 +2,7 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Box, Divider, Paper } from "@mui/material";
-import { useUpdateEffect } from "usehooks-ts";
+import { useEffectOnce, useUpdateEffect } from "usehooks-ts";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import CaseNameHeader from "../../scenes/global/CaseNameHeader";
 import CaseFields from "./CaseFields";
@@ -18,6 +18,11 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
   const { casesTableOfContents, setCasesTableOfContents } =
     useContext(CaseContext);
   const caseRef = useRef(null);
+
+  useEffectOnce(() => {
+    setOutputCaseFields({});
+    setOutputRelatedCases({});
+  })
 
   useUpdateEffect(() => {
     // update output cases
@@ -80,7 +85,9 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
         onChange={handleAccordionChange(inputCase)}
         ref={caseRef}
       >
-        <CaseNameHeader caseDetails={inputCase} />
+        <CaseNameHeader caseDetails={inputCase} 
+                key={'casenameheader_'+inputCase.id}
+        />
 
         <Box
           sx={{ backgroundColor: colors.primary[300] }}
@@ -93,6 +100,7 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
             <CaseFields
               inputCase={inputCase}
               setOutputCaseFields={setOutputCaseFields}
+              key={'casefields_'+inputCase.id}
             />
           </Box>
 

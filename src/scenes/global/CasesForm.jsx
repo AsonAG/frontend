@@ -34,14 +34,15 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   const [casesTableOfContents, setCasesTableOfContents] = useState({});
 
   useEffect(() => {
+    // isFieldChanged ? 
     casesApi.getCaseFields(
-      //TODO: add logic to check if cases changed before sending a request
+      //TODO: add logic to check if cases changed before sending a request !!!!!
       caseName,
       getFieldsCallback,
       outputCase,
       employee?.employeeId
     );
-  }, [outputCase]);
+  }, [outputCase]); 
 
   useEffect(() => {
     console.log("User changed.");
@@ -118,12 +119,17 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       value={{ casesTableOfContents, setCasesTableOfContents }}
     >
       <CasesFormWrapper title={title} onSubmit={handleSubmit}>
-        <form ref={formRef}>
-          <Box>
+        <form ref={formRef}
+              key={'caseform_'+inputCase?.id}
+        >
+          <Box
+              key={'casebox_'+inputCase?.id}
+              >
             {inputCase && (
               <CaseComponent
                 inputCase={inputCase}
                 setOutputCase={setOutputCase}
+                key={'basecase_'+inputCase?.id}
               />
             )}
           </Box>
