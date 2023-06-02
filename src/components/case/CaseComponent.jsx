@@ -1,6 +1,6 @@
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Divider, Paper } from "@mui/material";
 import { useEffectOnce, useUpdateEffect } from "usehooks-ts";
 import { CaseContext } from "../../scenes/global/CasesForm";
@@ -15,16 +15,43 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
   const [outputCaseFields, setOutputCaseFields] = useState({});
   const [outputRelatedCases, setOutputRelatedCases] = useState({});
 
-  const { casesTableOfContents, setCasesTableOfContents } =
+  const caseFields = useMemo(
+    () => (
+      <CaseFields
+        inputCase={inputCase}
+        setOutputCaseFields={setOutputCaseFields}
+        key={"casefields_" + inputCase.id}
+      />
+    ),
+    [inputCase]
+  );
+  const relatedCases = useMemo(
+    () => (
+      <Box key={"relatedcases_fieldswrapper_" + inputCase.id}>
+        {inputCase.relatedCases?.map((relatedCase) => (
+          <CaseComponent
+            inputCase={relatedCase}
+            setOutputCase={setOutputRelatedCases}
+            key={"case_related" + relatedCase.id}
+          />
+        ))}
+      </Box>
+    ),
+    [inputCase.relatedCases]
+  );
+
+  const { casesTableOfContents, setCasesTableOfContents, handleFieldChange } =
     useContext(CaseContext);
   const caseRef = useRef(null);
 
   useEffectOnce(() => {
-    setOutputCaseFields({});
-    setOutputRelatedCases({});
-  })
+    // setOutputCaseFields({});
+    // setOutputRelatedCases({});
+    // handleFieldChange();
+  });
 
   useUpdateEffect(() => {
+    // useEffect(() => {
     // update output cases
     setOutputCase((prevState) => ({
       ...prevState,
@@ -59,9 +86,9 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
     }));
   };
 
-  useEffect(() => {
-    // handleAccordionChange(inputCase);
-  }, [inputCase]);
+  // useEffect(() => {
+  // handleAccordionChange(inputCase);
+  // }, [inputCase]);
 
   return (
     <Box
@@ -85,8 +112,9 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
         onChange={handleAccordionChange(inputCase)}
         ref={caseRef}
       >
-        <CaseNameHeader caseDetails={inputCase} 
-                key={'casenameheader_'+inputCase.id}
+        <CaseNameHeader
+          caseDetails={inputCase}
+          key={"casenameheader_" + inputCase.id}
         />
 
         <Box
@@ -97,23 +125,11 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
 
           {/***************************** Case Fields *****************************/}
           <Box paddingTop="6px" key={"fieldswrapper_" + inputCase.id}>
-            <CaseFields
-              inputCase={inputCase}
-              setOutputCaseFields={setOutputCaseFields}
-              key={'casefields_'+inputCase.id}
-            />
+            {caseFields}
           </Box>
 
           {/***************************** Related Cases *****************************/}
-          <Box key={"relatedcases_fieldswrapper_" + inputCase.id}>
-            {inputCase?.relatedCases?.map((relatedCase) => (
-              <CaseComponent
-                inputCase={relatedCase}
-                setOutputCase={setOutputRelatedCases}
-                key={"case_related" + relatedCase.id}
-              />
-            ))}
-          </Box>
+          {relatedCases}
         </Box>
       </Paper>
     </Box>

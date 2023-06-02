@@ -34,23 +34,32 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   const [casesTableOfContents, setCasesTableOfContents] = useState({});
 
   useEffect(() => {
-    // isFieldChanged ? 
-    casesApi.getCaseFields(
-      //TODO: add logic to check if cases changed before sending a request !!!!!
-      caseName,
-      getFieldsCallback,
-      outputCase,
-      employee?.employeeId
-    );
-  }, [outputCase]); 
-
-  useEffect(() => {
     console.log("User changed.");
   }, [user]);
 
   // useUpdateEffect(() => {
   //   updateCasesTableOfContents();
   // }, [caseDetails]);
+
+  useEffect(() => {
+      // setOutputCase({});
+      casesApi.getCaseFields(
+        //TODO: add logic to check if cases changed before sending a request !!!!!
+        caseName,
+        getFieldsCallback,
+        outputCase,
+        employee?.employeeId
+      );
+  }, [outputCase]);
+
+  const getFieldsCallback = function (error, data, response) {
+    if (error) {
+      console.error(error);
+    }
+    // setOutputCase({});
+    setInputCase(data);
+    console.log(JSON.stringify(data, null, 2));
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -61,14 +70,6 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     } else {
       console.log("form INVALID");
     }
-  };
-
-  const getFieldsCallback = function (error, data, response) {
-    if (error) {
-      console.error(error);
-    }
-    setInputCase(data);
-    console.log(JSON.stringify(data, null, 2));
   };
 
   const caseSaveCallback = function (error, data, response) {
@@ -119,17 +120,13 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       value={{ casesTableOfContents, setCasesTableOfContents }}
     >
       <CasesFormWrapper title={title} onSubmit={handleSubmit}>
-        <form ref={formRef}
-              key={'caseform_'+inputCase?.id}
-        >
-          <Box
-              key={'casebox_'+inputCase?.id}
-              >
+        <form ref={formRef} key={"caseform_" + inputCase?.id}>
+          <Box key={"casebox_" + inputCase?.id}>
             {inputCase && (
               <CaseComponent
                 inputCase={inputCase}
                 setOutputCase={setOutputCase}
-                key={'basecase_'+inputCase?.id}
+                key={"basecase_" + inputCase?.id}
               />
             )}
           </Box>

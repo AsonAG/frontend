@@ -21,15 +21,15 @@ const FieldComponent = ({ field, onChange }) => {
     field.end ? new Date(field.end) : null
   );
 
-  useEffect(()=>{
-    onChange(
-      fieldKey,
-      fieldName,
-      fieldValue,
-      fieldStartDate,
-      fieldEndDate,
-    );
-  }, [])
+  // useEffect(()=>{
+  //   onChange(
+  //     fieldKey,
+  //     fieldName,
+  //     fieldValue,
+  //     fieldStartDate,
+  //     fieldEndDate,
+  //   );
+  // }, [])
 
   const onValueChange = (value) => {
     onChange(
@@ -76,7 +76,6 @@ const FieldComponent = ({ field, onChange }) => {
   };
 
   return (
-    field && (
       <Box
         display="grid"
         gridTemplateColumns="1fr 40px 1fr"
@@ -93,6 +92,7 @@ const FieldComponent = ({ field, onChange }) => {
           onChange={onValueChange}
           lookupSettings={field.lookupSettings}
           attributes={field.attributes}
+          key={"field_valuecomponent_" + field.id}
         />
 
         {field.timeType != "Timeless" && (
@@ -128,7 +128,8 @@ const FieldComponent = ({ field, onChange }) => {
               setFieldValue={setFieldStartDate}
               fieldValueType={"Date"}
               onChange={handleInputStartDateChange}
-            />
+          key={"field_startdate" + field.id}
+          />
 
             {field.timeType != "Moment" && (
               <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
@@ -140,14 +141,14 @@ const FieldComponent = ({ field, onChange }) => {
                   fieldValueType={"Date"}
                   onChange={handleInputEndDateChange}
                   required={field.endMandatory}
-                />
+          key={"field_enddate" + field.id}
+          />
               </Box>
             )}
           </Box>
         )}
       </Box>
     )
-  );
 };
 
 export default FieldComponent;
