@@ -11,7 +11,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { React, useContext, useEffect, useState } from "react";
+import { React, useContext, useEffect, useRef, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { useTheme } from "@emotion/react";
@@ -21,14 +21,39 @@ import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
 const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const { casesTableOfContents, setCasesTableOfContents } =
     useContext(CaseContext);
 
   const handleTableOfContentsItemClick = (event, caseBase) => {
-    console.log("Focus invoked: ", casesTableOfContents["case_" + caseBase.id].ref.current);
-    casesTableOfContents["case_" + caseBase.id].ref.current.scrollIntoView(); 
-    // casesTableOfContents["case_" + caseBase.id].ref.current.focus(); 
+    console.log(
+      "Focus invoked: ",
+      casesTableOfContents["case_" + caseBase.id].ref.current
+    );
+    casesTableOfContents["case_" + caseBase.id].ref.current.scrollIntoView();
+    // casesTableOfContents["case_" + caseBase.id].ref.current.focus();
   };
+
+  const handleScroll = event => {
+    console.log("Scroll: ", event.currentTarget.scrollTop);
+    setScrollPosition(event.currentTarget.scrollTop);
+  };
+
+  useEffect(() => {
+  
+    window.addEventListener('scroll', handleScroll);
+  
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+// useEffect(() => {
+//   getscroll();
+//   window.addEventListener("scroll", getscroll);
+//   return () => {
+//     window.removeEventListener("scroll", getscroll);
+//   };
+//   }, []);
 
   return (
     <Box
@@ -43,7 +68,7 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
         style={{
           height: "100%",
           width: "100%",
-          overflow: "auto",
+          overflow: "scroll",
           paddingTop: "5px",
           margin: "0 8px 0 0px",
         }}
@@ -53,6 +78,7 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
             backgroundColor: colors.primary[300],
           },
         }}
+        onScroll={handleScroll}
       >
         {children}
       </Paper>
@@ -78,6 +104,7 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
             <CasesTableOfContentComponent
               casesTableOfContents={casesTableOfContents}
               onClick={handleTableOfContentsItemClick}
+              scrollPosition={scrollPosition}
             />
           ) : (
             // TODO: fix circular progress display
@@ -110,6 +137,5 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
     </Box>
   );
 };
-
 
 export default CasesFormWrapper;

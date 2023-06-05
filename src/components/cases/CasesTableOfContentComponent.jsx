@@ -1,24 +1,41 @@
 import TreeView from "@mui/lab/TreeView";
 import TreeItem from "@mui/lab/TreeItem";
-import { Box, ListItemButton, ListItemText } from "@mui/material";
+import { Box, ListItem, ListItemButton, ListItemText } from "@mui/material";
 
-const CasesTableOfContentComponent = ({ casesTableOfContents, onClick }) => {
+const CasesTableOfContentComponent = ({ casesTableOfContents, onClick, scrollPosition }) => {
+  const cases = Object.values(casesTableOfContents);
+  const idItems = cases.map((_case) => "case_item_" + _case.id);
+
   return (
     <Box>
-      {Object.values(casesTableOfContents).map((caseAccordion) => (
-        <ListItemButton
-          onClick={(event) => onClick(event, caseAccordion)}
-          key={"casesTableOfContent_caseButton_" + caseAccordion.id}
-        >
-          <ListItemText
-            key={"casesTableOfContent_caseButtonText_" + caseAccordion.id}
-          >
-            {caseAccordion.displayName}
-          </ListItemText>
-        </ListItemButton>
+      {cases.map((_case) => (
+        <ListItem >
+            {/* <ListItemButton
+            onClick={(event) => onClick(event, _case)}
+            key={"casesTableOfContent_caseButton_" + _case.id}
+          > */}
+          <ListItemButton
+              data-to-scrollspy-id={"case_item_" + _case.id}
+              key={"casesTableOfContent_caseButton_" + _case.id}
+              className="nav__item"
+              onClick={(event) => onClick(event, _case)}
+              >
+            <ListItemText
+              key={"casesTableOfContent_caseButtonText_" + _case.id}
+              sx={scrollPosition > _case.ref.current.offsetTop ? 
+                {
+                  fontSize: 20
+                }
+                 : {} }
+            >
+              {_case.displayName}
+            </ListItemText>
+            </ListItemButton>
+            {/* </ListItemButton> */}
+        </ListItem>
       ))}
 
-      <TreeView
+      {/* <TreeView
         expanded={true}
         // selected={selected}
         // onNodeToggle={handleToggle}
@@ -29,8 +46,8 @@ const CasesTableOfContentComponent = ({ casesTableOfContents, onClick }) => {
           <TreeItem nodeId="3" label="Chrome" />
           <TreeItem nodeId="4" label="Webstorm" />
         </TreeItem>
-      </TreeView>
-    </Box>
+      </TreeView> */}
+      </Box>
   );
 };
 

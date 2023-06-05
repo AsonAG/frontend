@@ -37,9 +37,9 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     console.log("User changed.");
   }, [user]);
 
-  // useUpdateEffect(() => {
-  //   updateCasesTableOfContents();
-  // }, [caseDetails]);
+  useUpdateEffect(() => {
+    updateCasesTableOfContents();
+  }, [inputCase]);
 
   useEffect(() => {
       // setOutputCase({});

@@ -74,21 +74,20 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
   //   setCaseExpanded(casesTableOfContents['case_' + caseBase.id].expanded); /// co to jest?
   // }, [casesTableOfContents['case_' + caseBase.id]]);
 
-  const handleAccordionChange = (caseDetails) => (event, isExpanded) => {
+  const setCaseRef = ()  => {
     setCasesTableOfContents((current) => ({
       ...current,
-      ["case_" + caseDetails.id]: {
-        displayName: caseDetails.displayName,
-        id: caseDetails.id,
-        expanded: isExpanded,
+      ["case_" + inputCase.id]: {
+        displayName: inputCase.displayName,
+        id: inputCase.id,
         ref: caseRef,
       },
     }));
   };
 
-  // useEffect(() => {
-  // handleAccordionChange(inputCase);
-  // }, [inputCase]);
+  useEffect(() => {
+    setCaseRef();
+  }, [inputCase]);
 
   return (
     <Box
@@ -105,11 +104,13 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
         },
       }}
     >
+      <section
+        id={'case_item_'+inputCase.id}
+        >
       <Paper
         // defaultExpanded={true}
         elevation={3}
         key={"caseaccordion_" + inputCase.id}
-        onChange={handleAccordionChange(inputCase)}
         ref={caseRef}
       >
         <CaseNameHeader
@@ -132,6 +133,7 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
           {relatedCases}
         </Box>
       </Paper>
+      </section>
     </Box>
   );
 };
