@@ -37,19 +37,19 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     console.log("User changed.");
   }, [user]);
 
-  useUpdateEffect(() => {
-    updateCasesTableOfContents();
-  }, [inputCase]);
+  // useUpdateEffect(() => {
+  //   buildCasesTableOfContents();
+  // }, [inputCase]);
 
   useEffect(() => {
-      // setOutputCase({});
-      casesApi.getCaseFields(
-        //TODO: add logic to check if cases changed before sending a request !!!!!
-        caseName,
-        getFieldsCallback,
-        outputCase,
-        employee?.employeeId
-      );
+    // setOutputCase({});
+    casesApi.getCaseFields(
+      //TODO: add logic to check if cases changed before sending a request !!!!!
+      caseName,
+      getFieldsCallback,
+      outputCase,
+      employee?.employeeId
+    );
   }, [outputCase]);
 
   const getFieldsCallback = function (error, data, response) {
@@ -86,32 +86,41 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     }
   };
 
-  const updateCasesTableOfContents = () => {
-    let accordionCase = {};
-    if (inputCase && !("case_" + inputCase.id in casesTableOfContents)) {
-      accordionCase["case_" + inputCase.id] = {
+  const buildCasesTableOfContents = () => {
+    let _case = {};
+
+    if (inputCase) {
+      _case["case_" + inputCase.id] = {
         displayName: inputCase.displayName,
         id: inputCase.id,
         expanded: true,
+        relatedCases: getRelatedCasesContents(_case),
       };
-    }
-
-    for (let idx = 0; idx < inputCase.relatedCases.length; idx++) {
-      const relatedCase = inputCase.relatedCases[idx];
-      if (relatedCase && !("case_" + relatedCase.id in casesTableOfContents)) {
-        // TODO: add another loop for relatedCases of relatedCases
-        accordionCase["case_" + relatedCase.id] = {
-          displayName: relatedCase.displayName,
-          id: relatedCase.id,
-          expanded: true,
-        };
-      }
     }
 
     setCasesTableOfContents((current) => ({
       ...current,
-      ...accordionCase,
+      ..._case,
     }));
+  };
+
+  const getRelatedCasesContents = (_case) => {
+    let relatedCases = {};
+    if (_case.relatedCases) {
+      for (let idx = 0; idx < _case.relatedCases?.length; idx++) {
+        const relatedCase = _case.relatedCases[idx];
+        if (relatedCase) {
+          // TODO: add another loop for relatedCases of relatedCases
+          relatedCases["case_" + relatedCase.id] = {
+            displayName: relatedCase.displayName,
+            id: relatedCase.id,
+            expanded: true,
+            relatedCases: getRelatedCasesContents(relatedCase),
+          };
+        }
+      }
+    }
+    return relatedCases;
   };
 
   return (
@@ -119,7 +128,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       // value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
       value={{ casesTableOfContents, setCasesTableOfContents }}
     >
-      <CasesFormWrapper title={title} onSubmit={handleSubmit}>
+      <CasesFormWrapper title={title} onSubmit={handleSubmit} outputCase={outputCase}>
         <form ref={formRef} key={"caseform_" + inputCase?.id}>
           <Box key={"casebox_" + inputCase?.id}>
             {inputCase && (

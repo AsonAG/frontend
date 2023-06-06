@@ -58,6 +58,9 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
         caseName: inputCase.name,
         values: outputCaseFields,
         relatedCases: outputRelatedCases,
+
+        ref: caseRef,
+        displayName: inputCase.displayName,
       },
     }));
   }, [outputCaseFields, outputRelatedCases]);
@@ -80,13 +83,14 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
         displayName: inputCase.displayName,
         id: inputCase.id,
         ref: caseRef,
+        relatedCases: inputCase.relatedCases,
       },
     }));
   };
 
-  useEffect(() => {
-    setCaseRef();
-  }, [inputCase]);
+  // useEffect(() => {
+  //   setCaseRef();
+  // }, [inputCase]);
 
   return (
     <Box

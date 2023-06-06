@@ -2,6 +2,7 @@ import { ApiClient } from "./ApiClient";
 import { CaseDetails } from "../generated_model/CaseDetails";
 import { CaseFieldBasic } from "../generated_model/CaseFieldBasic";
 import { CasesArray } from "../generated_model/CasesArray";
+import cloneDeep from 'lodash/cloneDeep';
 
 /**
  * Cases service.
@@ -54,19 +55,18 @@ export class CasesApi {
 
   generateCasesBodyFromCasesObj(mainCase, shouldIncludeBody) {
     if (shouldIncludeBody) {
-      // removing case name key
-      let baseCase = JSON.parse(JSON.stringify(Object.values(mainCase)[0])); // TODO: remove cloning object later and move body creating logic to CaseForm
-      // TODO: replace deepclone for .values 
-      baseCase.values = JSON.parse(
-        JSON.stringify(Object.values(Object.values(mainCase)[0].values))
-      );
-      baseCase.relatedCases = this.filterRelatedCases(baseCase.relatedCases);
+      let outputCase = {};
+      let baseCase = Object.values(mainCase)[0];
+
+      outputCase.caseName = baseCase.caseName
+      outputCase.values = (Object.values(Object.values(mainCase)[0].values));
+      outputCase.relatedCases = this.filterRelatedCases(baseCase.relatedCases);
       // baseCase.values = baseCase.values.concat(filteredRelatedCases);
 
-      if (baseCase.values.length === 0) delete baseCase.values;
+      if (outputCase.values.length === 0) delete outputCase.values;
 
       return {
-        case: baseCase,
+        case: outputCase,
       };
     } else return null;
   }
@@ -74,12 +74,13 @@ export class CasesApi {
   filterRelatedCases(relatedCases) {
     let filteredRelatedCases = [];
 
+    Object.values(relatedCases).map((relatedCase) => {
+        let caseObj = {};
+        caseObj.caseName = relatedCase.caseName;
+        caseObj.values = Object.values(relatedCase.values);
+        caseObj.relatedCases = this.filterRelatedCases(relatedCase.relatedCases);
 
-    Object.values(relatedCases).map((caseObj) => {
-        caseObj.values = Object.values(caseObj.values)
-        caseObj.relatedCases = this.filterRelatedCases(caseObj.relatedCases);
-
-        filteredRelatedCases.push(JSON.parse(JSON.stringify(caseObj)));
+        filteredRelatedCases.push(caseObj);
       })
 
     return filteredRelatedCases;
@@ -107,9 +108,8 @@ export class CasesApi {
       );
     }
 
-    let shouldIncludeBody =
-      JSON.stringify(baseCase) != "{}" &&
-      JSON.stringify(Object.values(baseCase)[0]?.values) != "{}";
+    let shouldIncludeBody = Object.values(baseCase).length > 0 && Object.values(Object.values(baseCase)[0]?.values).length > 0
+      // JSON.stringify(baseCase) != "{}" &&  JSON.stringify(Object.values(baseCase)[0]?.values) != "{}";
     // build a case body if case fields are provided
     // let postBody = caseFields.length > 0 ?
     let postBody = this.generateCasesBodyFromCasesObj(

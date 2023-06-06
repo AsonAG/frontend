@@ -18,24 +18,21 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
 
-const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
+const CasesFormWrapper = ({ title, items, onSubmit, children, outputCase }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const { casesTableOfContents, setCasesTableOfContents } =
-    useContext(CaseContext);
 
   const handleTableOfContentsItemClick = (event, caseBase) => {
     console.log(
       "Focus invoked: ",
-      casesTableOfContents["case_" + caseBase.id].ref.current
+      outputCase["case_" + caseBase.id].ref.current
     );
-    casesTableOfContents["case_" + caseBase.id].ref.current.scrollIntoView();
+    outputCase["case_" + caseBase.id].ref.current.scrollIntoView();
     // casesTableOfContents["case_" + caseBase.id].ref.current.focus();
   };
 
   const handleScroll = event => {
-    console.log("Scroll: ", event.currentTarget.scrollTop);
     setScrollPosition(event.currentTarget.scrollTop);
   };
 
@@ -92,17 +89,16 @@ const CasesFormWrapper = ({ title, items, onSubmit, children }) => {
         margin="20px 20px 40px 0px"
         // sx={{ backgroundColor: colors.primary[400] }}
       >
-        <List>
+        <List disablePadding>
           <ListItem>
             <Typography variant="h4" fontWeight="bold">
               {title}
             </Typography>
           </ListItem>
 
-          <Divider />
-          {Object.keys(casesTableOfContents).length > 0 ? (
+          {Object.keys(outputCase).length > 0 ? (
             <CasesTableOfContentComponent
-              casesTableOfContents={casesTableOfContents}
+              casesTableOfContents={outputCase}
               onClick={handleTableOfContentsItemClick}
               scrollPosition={scrollPosition}
             />

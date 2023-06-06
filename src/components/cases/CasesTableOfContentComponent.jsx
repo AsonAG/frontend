@@ -16,14 +16,17 @@ const CasesTableOfContentComponent = ({
   let isTopCase = true;
 
   return (
-    <Box>
+    <Box
+    >
       {cases.map((_case) => {
         const isActive =
           isTopCase && scrollPosition < _case.ref.current.offsetTop;
         if (isActive) isTopCase = false;
 
         return (
-          <ListItem>
+          <ListItem
+          
+          >
             {/* <ListItemButton
             onClick={(event) => onClick(event, _case)}
             key={"casesTableOfContent_caseButton_" + _case.id}
@@ -33,9 +36,11 @@ const CasesTableOfContentComponent = ({
               key={"casesTableOfContent_caseButton_" + _case.id}
               className="nav__item"
               onClick={(event) => onClick(event, _case)}
+
             >
               <Typography
                 key={"casesTableOfContent_caseButtonText_" + _case.id}
+                variant="h5" 
                 sx={
                   // scrollPosition < _case.ref.current.getBoundingClientRect().top //+30
                   isActive
