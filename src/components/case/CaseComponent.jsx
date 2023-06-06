@@ -40,14 +40,13 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
     [inputCase.relatedCases]
   );
 
-  const { casesTableOfContents, setCasesTableOfContents, handleFieldChange } =
+  const { casesTableOfContents, setCasesTableOfContents } =
     useContext(CaseContext);
   const caseRef = useRef(null);
 
   useEffectOnce(() => {
     // setOutputCaseFields({});
     // setOutputRelatedCases({});
-    // handleFieldChange();
   });
 
   useUpdateEffect(() => {
