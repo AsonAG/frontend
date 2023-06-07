@@ -18,12 +18,17 @@ const CasesTableOfContentComponent = ({
     // casesTableOfContents["case_" + caseBase.id].ref.current.focus();
   };
 
-  const isActive =
-    // isTopCaseParam && 
-    scrollPosition < caseBase?.ref?.current.offsetTop
-    &&
-    scrollPosition + window.innerHeight > 
-    caseBase?.ref?.current.offsetTop;
+  let isActive = false;
+ try {
+     // isTopCaseParam && 
+     isActive =
+     scrollPosition < caseBase?.ref?.current.offsetTop
+     &&
+     scrollPosition + window.innerHeight > 
+     caseBase?.ref?.current.offsetTop;
+ } catch (error) {
+    console.error(JSON.stringify(error));
+ }
 
 
   return (

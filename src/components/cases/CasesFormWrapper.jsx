@@ -37,13 +37,6 @@ const CasesFormWrapper = ({ title, items, onSubmit, children, outputCase }) => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-// useEffect(() => {
-//   getscroll();
-//   window.addEventListener("scroll", getscroll);
-//   return () => {
-//     window.removeEventListener("scroll", getscroll);
-//   };
-//   }, []);
 
   return (
     <Box
@@ -53,14 +46,13 @@ const CasesFormWrapper = ({ title, items, onSubmit, children, outputCase }) => {
       height="100%"
       //       height='calc(100vh - 90px)'
     >
-      {/* <EmployeeHeader employee={employee} /> */}
       <Paper
         style={{
           height: "100%",
           width: "100%",
           overflow: "scroll",
           paddingTop: "5px",
-          margin: "0 8px 0 0px",
+          margin: "0 16px 0 8px",
         }}
         sx={{
           // TODO: fix background color
@@ -74,7 +66,7 @@ const CasesFormWrapper = ({ title, items, onSubmit, children, outputCase }) => {
       </Paper>
 
       <Box
-        width="260px"
+        width="250px"
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
