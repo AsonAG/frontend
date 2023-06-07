@@ -2,7 +2,7 @@ import { ApiClient } from "./ApiClient";
 import { CaseDetails } from "../generated_model/CaseDetails";
 import { CaseFieldBasic } from "../generated_model/CaseFieldBasic";
 import { CasesArray } from "../generated_model/CasesArray";
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from "lodash/cloneDeep";
 
 /**
  * Cases service.
@@ -11,12 +11,12 @@ import cloneDeep from 'lodash/cloneDeep';
  */
 export class CasesApi {
   /**
-    * Constructs a new CasesApi. 
-    * @alias module:api/CasesApi
-    * @class
-    * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
-    * default to {@link module:ApiClient#instance} if unspecified.
-    */
+   * Constructs a new CasesApi.
+   * @alias module:api/CasesApi
+   * @class
+   * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
+   * default to {@link module:ApiClient#instance} if unspecified.
+   */
   constructor(apiClient, user) {
     this.apiClient = apiClient || ApiClient.instance;
 
@@ -56,10 +56,10 @@ export class CasesApi {
   generateCasesBodyFromCasesObj(mainCase, shouldIncludeBody) {
     if (shouldIncludeBody) {
       let outputCase = {};
-      let baseCase = Object.values(mainCase)[0];
+      let baseCase = getMainCaseObject(mainCase);
 
-      outputCase.caseName = baseCase.caseName
-      outputCase.values = (Object.values(Object.values(mainCase)[0].values));
+      outputCase.caseName = baseCase.caseName;
+      outputCase.values = Object.values(baseCase.values); //TODO: filter values and related cases (if they are in inputCase or not)
       outputCase.relatedCases = this.filterRelatedCases(baseCase.relatedCases);
       // baseCase.values = baseCase.values.concat(filteredRelatedCases);
 
@@ -75,13 +75,13 @@ export class CasesApi {
     let filteredRelatedCases = [];
 
     Object.values(relatedCases).map((relatedCase) => {
-        let caseObj = {};
-        caseObj.caseName = relatedCase.caseName;
-        caseObj.values = Object.values(relatedCase.values);
-        caseObj.relatedCases = this.filterRelatedCases(relatedCase.relatedCases);
+      let caseObj = {};
+      caseObj.caseName = relatedCase.caseName;
+      caseObj.values = Object.values(relatedCase.values);
+      caseObj.relatedCases = this.filterRelatedCases(relatedCase.relatedCases);
 
-        filteredRelatedCases.push(caseObj);
-      })
+      filteredRelatedCases.push(caseObj);
+    });
 
     return filteredRelatedCases;
   }
@@ -108,8 +108,9 @@ export class CasesApi {
       );
     }
 
-    let shouldIncludeBody = Object.values(baseCase).length > 0 && Object.values(Object.values(baseCase)[0]?.values).length > 0
-      // JSON.stringify(baseCase) != "{}" &&  JSON.stringify(Object.values(baseCase)[0]?.values) != "{}";
+    let shouldIncludeBody =
+      Object.values(baseCase).length > 0 &&
+      Object.values(getMainCaseObject(baseCase)?.values).length > 0;
     // build a case body if case fields are provided
     // let postBody = caseFields.length > 0 ?
     let postBody = this.generateCasesBodyFromCasesObj(
@@ -166,10 +167,7 @@ export class CasesApi {
     //   JSON.stringify(caseFields[0]) != "{}"
     //     ? this.buildRequestBodyCaseSave(caseName, caseFields)
     //     : null;
-    let postBody = this.generateCasesBodyFromCasesObj(
-      baseCase,
-      true
-    );
+    let postBody = this.generateCasesBodyFromCasesObj(baseCase, true);
     postBody.userId = this.userId;
     postBody.employeeId = employeeId;
     postBody.divisionId = this.divisionId;
@@ -220,7 +218,7 @@ export class CasesApi {
       userId: this.userId,
       employeeId: employeeId,
       caseType: caseType,
-      clusterSetName: clusterName
+      clusterSetName: clusterName,
     };
     let headerParams = {};
     let formParams = {};
@@ -246,7 +244,6 @@ export class CasesApi {
       this.tenantId
     );
   }
-
 
   /**
    * Gets case field dropdown options.
@@ -346,5 +343,8 @@ export class CasesApi {
   }
 }
 
-export default CasesApi;
+export function getMainCaseObject(mainCase) {
+  return Object.values(mainCase)[0];
+}
 
+export default CasesApi;

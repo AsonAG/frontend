@@ -1,76 +1,73 @@
 import {
   Box,
+  List,
   ListItem,
   ListItemButton,
   ListItemText,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
 
 const CasesTableOfContentComponent = ({
-  casesTableOfContents,
-  onClick,
+  caseBase,
   scrollPosition,
 }) => {
-  const cases = Object.values(casesTableOfContents);
-  // const idItems = cases.map((_case) => "case_item_" + _case.id);
-  let isTopCase = true;
+  const handleTableOfContentsItemClick = (event, caseBase) => {
+    console.log("Focus invoked: ", caseBase.ref.current);
+    caseBase.ref.current.scrollIntoView();
+    // casesTableOfContents["case_" + caseBase.id].ref.current.focus();
+  };
+
+  const isActive =
+    // isTopCaseParam && 
+    scrollPosition < caseBase?.ref?.current.offsetTop;
 
   return (
-    <Box
-    >
-      {cases.map((_case) => {
-        const isActive =
-          isTopCase && scrollPosition < _case.ref.current.offsetTop;
-        if (isActive) isTopCase = false;
-
-        return (
-          <ListItem
-          
-          >
-            {/* <ListItemButton
+    <>
+      <ListItem>
+        {/* <ListItemButton
             onClick={(event) => onClick(event, _case)}
             key={"casesTableOfContent_caseButton_" + _case.id}
           > */}
-            <ListItemButton
-              data-to-scrollspy-id={"case_item_" + _case.id}
-              key={"casesTableOfContent_caseButton_" + _case.id}
-              className="nav__item"
-              onClick={(event) => onClick(event, _case)}
+        <ListItemButton
+          data-to-scrollspy-id={"case_item_" + caseBase.id}
+          key={"casesTableOfContent_caseButton_" + caseBase.id}
+          className="nav__item"
+          onClick={(event) => handleTableOfContentsItemClick(event, caseBase)}
+        >
+          <Typography
+            key={"casesTableOfContent_caseButtonText_" + caseBase.id}
+            fontSize="0.9rem"
+            sx={
+              // scrollPosition < _case.ref.current.getBoundingClientRect().top //+30
+              isActive
+                ? {
+                    fontWeight: "bold",
+                    textDecoration: "underline"
+                  }
+                : {}
+            }
+          >
+            {caseBase.displayName}
+          </Typography>
+        </ListItemButton>
+      </ListItem>
 
-            >
-              <Typography
-                key={"casesTableOfContent_caseButtonText_" + _case.id}
-                variant="h5" 
-                sx={
-                  // scrollPosition < _case.ref.current.getBoundingClientRect().top //+30
-                  isActive
-                    ? {
-                        fontWeight: "bold",
-                      }
-                    : {}
-                }
-              >
-                {_case.displayName}
-              </Typography>
-            </ListItemButton>
-            {/* </ListItemButton> */}
-          </ListItem>
-        );
-      })}
-
-      {/* <TreeView
-        expanded={true}
-        // selected={selected}
-        // onNodeToggle={handleToggle}
-        // onNodeSelect={handleSelect}
-      >
-        <TreeItem nodeId="1" label="Applications">
-          <TreeItem nodeId="2" label="Calendar" />
-          <TreeItem nodeId="3" label="Chrome" />
-          <TreeItem nodeId="4" label="Webstorm" />
-        </TreeItem>
-      </TreeView> */}
-    </Box>
+      {caseBase.relatedCases ? (
+        <ListItem>
+          <List dense disablePadding>
+            {Object.values(caseBase.relatedCases).map((relatedCase) => (
+              <CasesTableOfContentComponent
+                caseBase={relatedCase}
+                scrollPosition={scrollPosition}
+              />
+            ))}
+          </List>
+        </ListItem>
+      ) : (
+        <></>
+      )}
+    </>
   );
 };
 

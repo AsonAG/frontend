@@ -9,35 +9,28 @@ import {
   ListItemButton,
   ListItemText,
   Paper,
+  Stack,
   Typography,
 } from "@mui/material";
-import { React, useContext, useEffect, useRef, useState } from "react";
+import { React, createContext, useContext, useEffect, useRef, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
+import { getMainCaseObject } from "../../api/CasesApi";
 
 const CasesFormWrapper = ({ title, items, onSubmit, children, outputCase }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [scrollPosition, setScrollPosition] = useState(0);
-
-  const handleTableOfContentsItemClick = (event, caseBase) => {
-    console.log(
-      "Focus invoked: ",
-      outputCase["case_" + caseBase.id].ref.current
-    );
-    outputCase["case_" + caseBase.id].ref.current.scrollIntoView();
-    // casesTableOfContents["case_" + caseBase.id].ref.current.focus();
-  };
+  const [isTopCaseSet, setIsTopCaseSet] = useState(false);
 
   const handleScroll = event => {
     setScrollPosition(event.currentTarget.scrollTop);
   };
 
   useEffect(() => {
-  
     window.addEventListener('scroll', handleScroll);
   
     return () => {
@@ -86,20 +79,21 @@ const CasesFormWrapper = ({ title, items, onSubmit, children, outputCase }) => {
         flexDirection="column"
         justifyContent="space-between"
         // alignItems="flex-start"
-        margin="20px 20px 40px 0px"
+        margin="20px 20px 40px 5px"
         // sx={{ backgroundColor: colors.primary[400] }}
       >
-        <List disablePadding>
-          <ListItem>
-            <Typography variant="h4" fontWeight="bold">
-              {title}
-            </Typography>
-          </ListItem>
+      <Stack spacing={2}>
+      <Typography variant="h4" fontWeight="bold">
+        {title}
+      </Typography>
 
+        <List 
+          dense
+          disablePadding
+        >
           {Object.keys(outputCase).length > 0 ? (
             <CasesTableOfContentComponent
-              casesTableOfContents={outputCase}
-              onClick={handleTableOfContentsItemClick}
+              caseBase={getMainCaseObject(outputCase)}
               scrollPosition={scrollPosition}
             />
           ) : (
@@ -113,6 +107,7 @@ const CasesFormWrapper = ({ title, items, onSubmit, children, outputCase }) => {
             </Box>
           )}
         </List>
+        </Stack>  
 
         <Box display="flex" justifyContent="center">
           <Button
