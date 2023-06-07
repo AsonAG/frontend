@@ -20,7 +20,11 @@ const CasesTableOfContentComponent = ({
 
   const isActive =
     // isTopCaseParam && 
-    scrollPosition < caseBase?.ref?.current.offsetTop;
+    scrollPosition < caseBase?.ref?.current.offsetTop
+    &&
+    scrollPosition + window.innerHeight > 
+    caseBase?.ref?.current.offsetTop;
+
 
   return (
     <>
@@ -43,7 +47,7 @@ const CasesTableOfContentComponent = ({
               isActive
                 ? {
                     fontWeight: "bold",
-                    textDecoration: "underline"
+                    // textDecoration: "underline"
                   }
                 : {}
             }
