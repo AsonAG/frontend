@@ -9,6 +9,7 @@ import ApiClient from "../../api/ApiClient";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../../App";
+import { useErrorBoundary } from "react-error-boundary";
 
 /**
  * Returns a table component representation of list of available cases.
@@ -25,6 +26,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
+  const { showError } = useErrorBoundary();
 
   useEffect(() => {
     setCaseData([]);
@@ -34,7 +36,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const callback = function (error, data, response) {
     let tableData = [];
     if (error) {
-      console.error(error);
+      showError(error);
     } else {
       data.forEach((element, index) => {
         tableData = [

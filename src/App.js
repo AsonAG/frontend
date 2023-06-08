@@ -27,7 +27,8 @@ import de from "date-fns/locale/de";
 import { useLocalStorage, useSessionStorage } from "usehooks-ts";
 import EmployeesApi from "./api/EmployeesApi";
 import authConfig from "./authConfig";
-import Login from "./scenes/login";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorBar from "./components/errors/ErrorBar";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
@@ -160,6 +161,10 @@ function App() {
         <Box display="flex" flexDirection="row" width="100%" height="100%" paddingTop="60px">
           <Sidebar isCollapsed={isSidebarCollapsed} />
           <main className="content">
+            <ErrorBoundary
+              FallbackComponent={ErrorBar}
+              onError={(error) => console.error(JSON.stringify(error, 2))}
+            >
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/tasks" element={<Tasks />} />
@@ -173,6 +178,7 @@ function App() {
               <Route path="/dossier" element={<Dossier />} />
               <Route path="/reporting" element={<PersonalCases />} />
             </Routes>
+            </ErrorBoundary>
           </main>
         </Box>
       </Box>

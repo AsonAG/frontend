@@ -17,6 +17,7 @@ import CaseComponent from "../../components/case/CaseComponent";
 import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
 import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
+import { useErrorBoundary } from "react-error-boundary";
 
 export const CaseContext = createContext();
 
@@ -32,6 +33,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
   const [casesTableOfContents, setCasesTableOfContents] = useState({});
+  const { showBoundary } = useErrorBoundary();
 
   useEffect(() => {
     console.log("User changed.");
@@ -54,7 +56,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
   const getFieldsCallback = function (error, data, response) {
     if (error) {
-      console.error(error);
+      showBoundary(error);
     }
     // setOutputCase({});
     setInputCase(data);
@@ -74,8 +76,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
   const caseSaveCallback = function (error, data, response) {
     if (error) {
-      console.error(error);
-      // TODO: add popup error message display on code:400
+      showBoundary(error);
     } else {
       console.log(
         "Case saved successfully. Response: " +

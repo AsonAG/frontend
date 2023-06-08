@@ -20,7 +20,7 @@ import { tokens } from "../../theme";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
 import { getMainCaseObject } from "../../api/CasesApi";
 
-const CasesFormWrapper = ({ title, items, onSubmit, children, outputCase }) => {
+const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [scrollPosition, setScrollPosition] = useState(0);
