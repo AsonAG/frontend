@@ -29,10 +29,12 @@ import EmployeesApi from "./api/EmployeesApi";
 import authConfig from "./authConfig";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorBar from "./components/errors/ErrorBar";
+import UnknownErrorPage from "./components/errors/UnknownErrorPage";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
 export const EmployeeSelectionContext = createContext();
+export const ErrorBarContext = createContext();
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -41,6 +43,7 @@ function App() {
   const [userEmployee, setUserEmployee] = useLocalStorage("user_employee", {});
   const [authUserIdentifier, setAuthUserIdentifier] = useLocalStorage("authUserIdentifier", {});
   const [user, setUser] = useState({});
+  const [error, setError] = useState();
 
   const payrollsApi = useMemo(
     () => new PayrollsApi(ApiClient, user.tenantId),
@@ -161,10 +164,10 @@ function App() {
         <Box display="flex" flexDirection="row" width="100%" height="100%" paddingTop="60px">
           <Sidebar isCollapsed={isSidebarCollapsed} />
           <main className="content">
-            <ErrorBoundary
-              FallbackComponent={ErrorBar}
+            {/* <ErrorBoundary
+              FallbackComponent={UnknownErrorPage}
               onError={(error) => console.error(JSON.stringify(error, 2))}
-            >
+            > */}
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/tasks" element={<Tasks />} />
@@ -178,7 +181,6 @@ function App() {
               <Route path="/dossier" element={<Dossier />} />
               <Route path="/reporting" element={<PersonalCases />} />
             </Routes>
-            </ErrorBoundary>
           </main>
         </Box>
       </Box>

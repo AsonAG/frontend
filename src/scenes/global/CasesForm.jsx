@@ -18,6 +18,7 @@ import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
 import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
 import { useErrorBoundary } from "react-error-boundary";
+import ErrorBar from "../../components/errors/ErrorBar";
 
 export const CaseContext = createContext();
 
@@ -33,7 +34,8 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
   const [casesTableOfContents, setCasesTableOfContents] = useState({});
-  const { showBoundary } = useErrorBoundary();
+  // const { showBoundary } = useErrorBoundary();
+  const [error, setError] = useState();
 
   useEffect(() => {
     console.log("User changed.");
@@ -56,7 +58,8 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
   const getFieldsCallback = function (error, data, response) {
     if (error) {
-      showBoundary(error);
+      setError(error);
+      console.error(JSON.stringify(error, null, 2));
     }
     // setOutputCase({});
     setInputCase(data);
@@ -76,7 +79,9 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
   const caseSaveCallback = function (error, data, response) {
     if (error) {
-      showBoundary(error);
+      // showBoundary(error);
+      console.error(JSON.stringify(error, null, 2));
+      setError(error);
     } else {
       console.log(
         "Case saved successfully. Response: " +
@@ -129,7 +134,13 @@ const CasesForm = ({ employee, navigateTo, title }) => {
       // value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
       value={{ casesTableOfContents, setCasesTableOfContents }}
     >
-      <CasesFormWrapper title={title} onSubmit={handleSubmit} outputCase={outputCase}>
+      <CasesFormWrapper
+        title={title}
+        onSubmit={handleSubmit}
+        outputCase={outputCase}
+      >
+      {error && <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />}
+
         <form ref={formRef} key={"caseform_" + inputCase?.id}>
           <Box key={"casebox_" + inputCase?.id}>
             {inputCase && (

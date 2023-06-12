@@ -26,7 +26,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
-  const { showError } = useErrorBoundary();
+  // const { showBoundary } = useErrorBoundary();
 
   useEffect(() => {
     setCaseData([]);
@@ -36,7 +36,8 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const callback = function (error, data, response) {
     let tableData = [];
     if (error) {
-      showError(error);
+      // showBoundary(error);
+      console.error(error);
     } else {
       data.forEach((element, index) => {
         tableData = [
