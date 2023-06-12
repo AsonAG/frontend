@@ -5,7 +5,6 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
-import Dossier from "./scenes/dossier";
 import Tasks from "./scenes/tasks";
 import PersonalCases from "./scenes/casesList/personalCases";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -30,6 +29,8 @@ import authConfig from "./authConfig";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorBar from "./components/errors/ErrorBar";
 import UnknownErrorPage from "./components/errors/UnknownErrorPage";
+import CompanyData from "./scenes/data/companyData";
+import EmployeeData from "./scenes/data/employeeData";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
@@ -156,6 +157,10 @@ function App() {
         // display="flex"
         // flexDirection="column"
       >
+      {/* <ErrorBoundary
+        FallbackComponent={UnknownErrorPage}
+        onError={(error) => console.error(JSON.stringify(error, null, 2))}
+      > */}
         <Topbar
           isCollapsed={isSidebarCollapsed}
           setIsCollapsed={setIsSidebarCollapsed}
@@ -164,25 +169,25 @@ function App() {
         <Box display="flex" flexDirection="row" width="100%" height="100%" paddingTop="60px">
           <Sidebar isCollapsed={isSidebarCollapsed} />
           <main className="content">
-            {/* <ErrorBoundary
-              FallbackComponent={UnknownErrorPage}
-              onError={(error) => console.error(JSON.stringify(error, 2))}
-            > */}
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/tasks" element={<Tasks />} />
               <Route path="/company" element={<CompanyCases />} />
               <Route path="/employees" element={<Employees />} />
               <Route path="/employee" element={<EmployeeCases />} />
               <Route path="/personalCase" element={<PersonalCase />} />
               <Route path="/employeeCase" element={<EmployeeCase />} />
               <Route path="/companyCase" element={<CompanyCase />} />
+              <Route path="/companyData" element={<CompanyData />} />
 
-              <Route path="/dossier" element={<Dossier />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/employeeData" element={<EmployeeData />} />
               <Route path="/reporting" element={<PersonalCases />} />
+
+              {/* <Route path="/documents" element={<Documents />} /> */}
             </Routes>
           </main>
         </Box>
+            {/* </ErrorBoundary> */}
       </Box>
     );
   } else {

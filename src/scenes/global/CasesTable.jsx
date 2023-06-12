@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../../App";
 import { useErrorBoundary } from "react-error-boundary";
+import ErrorBar from "../../components/errors/ErrorBar";
 
 /**
  * Returns a table component representation of list of available cases.
@@ -26,7 +27,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
-  // const { showBoundary } = useErrorBoundary();
+  const [error, setError] = useState();
 
   useEffect(() => {
     setCaseData([]);
@@ -36,8 +37,9 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const callback = function (error, data, response) {
     let tableData = [];
     if (error) {
-      // showBoundary(error);
+      setError(error);
       console.error(JSON.stringify(error, null, 2));
+      setCaseDataLoaded(true);
     } else {
       data.forEach((element, index) => {
         tableData = [
@@ -113,9 +115,6 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
 
   return (
     <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
       height="75vh"
       // width="55vw"
       sx={{
@@ -148,6 +147,9 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
         },
       }}
     >
+      {error && (
+          <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
+        )}
       <DataGrid
         disableSelectionOnClick
         loading={!caseDataLoaded}

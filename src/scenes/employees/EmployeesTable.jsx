@@ -10,7 +10,7 @@ import { tokens } from "../../theme";
 import EmployeesSplitButton from "./EmployeesSplitButton";
 import { EmployeeSelectionContext, UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
-
+import ErrorBar from "../../components/errors/ErrorBar";
 
 const EmployeesTable = () => {
   const [employeeData, setEmployeeData] = useState([]);
@@ -18,9 +18,9 @@ const EmployeesTable = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
-  const {employee, setEmployee} = useContext(EmployeeSelectionContext);
+  const { employee, setEmployee } = useContext(EmployeeSelectionContext);
   const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
-
+  const [error, setError] = useState();
 
   useEffect(() => {
     setEmployeeData([]);
@@ -29,18 +29,20 @@ const EmployeesTable = () => {
     employeesApi.getEmployees(callback);
   }, [user]);
 
-/**
- * set Employee object in session storage
- */
-const handleEmployeeSelection = (employee) => {
-  setEmployee(employee)
-  // window.sessionStorage.setItem("employee", JSON.stringify(employee));
-};
+  /**
+   * set Employee object in session storage
+   */
+  const handleEmployeeSelection = (employee) => {
+    setEmployee(employee);
+    // window.sessionStorage.setItem("employee", JSON.stringify(employee));
+  };
 
   const callback = function (error, data, response) {
     let tableData = [];
     if (error) {
       console.error(error);
+      setError(error);
+      setEmployeeDataLoaded(true);
     } else {
       data.forEach((element, index) => {
         tableData = [
@@ -146,9 +148,6 @@ const handleEmployeeSelection = (employee) => {
 
   return (
     <Box
-      //       display="flex"
-      justifyContent="space-between"
-      alignItems="center"
       height="75vh"
       sx={{
         "& .MuiDataGrid-root": {
@@ -180,6 +179,9 @@ const handleEmployeeSelection = (employee) => {
         },
       }}
     >
+      {error && (
+        <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
+      )}
       <DataGrid
         // disableSelectionOnClick
         // disableColumnFilter

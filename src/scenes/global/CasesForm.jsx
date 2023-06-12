@@ -1,4 +1,3 @@
-import { useTheme } from "@emotion/react";
 import {
   useMemo,
   useRef,
@@ -7,17 +6,14 @@ import {
   createContext,
   useEffect,
 } from "react";
-import { tokens } from "../../theme";
 import { Box, Button, CircularProgress, LinearProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import SendIcon from "@mui/icons-material/Send";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
 import CaseComponent from "../../components/case/CaseComponent";
 import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
 import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
-import { useErrorBoundary } from "react-error-boundary";
 import ErrorBar from "../../components/errors/ErrorBar";
 
 export const CaseContext = createContext();
@@ -25,8 +21,6 @@ export const CaseContext = createContext();
 const CasesForm = ({ employee, navigateTo, title }) => {
   const caseName = window.sessionStorage.getItem("caseName");
 
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
   const [inputCase, setInputCase] = useState();
   const [outputCase, setOutputCase] = useState({});

@@ -160,7 +160,7 @@ const Sidebar = ({ isCollapsed }) => {
                   />
                   <Item
                     title="Documents"
-                    to="/form"
+                    to="/documents"
                     icon={<DescriptionOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
@@ -180,7 +180,7 @@ const Sidebar = ({ isCollapsed }) => {
 
                 <SubMenu icon={<PersonIcon />} title="Employee">
                   <Item
-                    title="Tasks"
+                    title="My Tasks"
                     to="/tasks"
                     icon={<TaskIcon />}
                     selected={selected}
@@ -188,9 +188,16 @@ const Sidebar = ({ isCollapsed }) => {
                     isCollapsed={isCollapsed}
                   />
                   <Item
-                    title="Cases"
+                    title="My Profile"
+                    to="/employeeData"
+                    icon={<PeopleOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+                  <Item
+                    title="New Case"
                     to="/reporting"
-                    // icon={<PeopleOutlinedIcon />}
                     icon={<ContactsOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
