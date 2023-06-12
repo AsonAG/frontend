@@ -33,25 +33,21 @@ const CasesForm = ({ employee, navigateTo, title }) => {
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
-  const [casesTableOfContents, setCasesTableOfContents] = useState({});
   // const { showBoundary } = useErrorBoundary();
   const [error, setError] = useState();
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     console.log("User changed.");
   }, [user]);
-
-  // useUpdateEffect(() => {
-  //   buildCasesTableOfContents();
-  // }, [inputCase]);
 
   useEffect(() => {
     // setOutputCase({});
     casesApi.getCaseFields(
-      //TODO: add logic to check if cases changed before sending a request !!!!!
+      //TODO: add logic to check if cases changed before sending a request 
       caseName,
-      getFieldsCallback,
+      inputCase,
       outputCase,
+      getFieldsCallback,
       employee?.employeeId
     );
   }, [outputCase]);
@@ -71,7 +67,12 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
     if (formRef.current.reportValidity()) {
       console.log("form is valid");
-      casesApi.saveCase(outputCase, caseSaveCallback, employee?.employeeId);
+      casesApi.saveCase(
+        inputCase,
+        outputCase,
+        caseSaveCallback,
+        employee?.employeeId
+      );
     } else {
       console.log("form INVALID");
     }
@@ -92,54 +93,18 @@ const CasesForm = ({ employee, navigateTo, title }) => {
     }
   };
 
-  const buildCasesTableOfContents = () => {
-    let _case = {};
-
-    if (inputCase) {
-      _case["case_" + inputCase.id] = {
-        displayName: inputCase.displayName,
-        id: inputCase.id,
-        expanded: true,
-        relatedCases: getRelatedCasesContents(_case),
-      };
-    }
-
-    setCasesTableOfContents((current) => ({
-      ...current,
-      ..._case,
-    }));
-  };
-
-  const getRelatedCasesContents = (_case) => {
-    let relatedCases = {};
-    if (_case.relatedCases) {
-      for (let idx = 0; idx < _case.relatedCases?.length; idx++) {
-        const relatedCase = _case.relatedCases[idx];
-        if (relatedCase) {
-          // TODO: add another loop for relatedCases of relatedCases
-          relatedCases["case_" + relatedCase.id] = {
-            displayName: relatedCase.displayName,
-            id: relatedCase.id,
-            expanded: true,
-            relatedCases: getRelatedCasesContents(relatedCase),
-          };
-        }
-      }
-    }
-    return relatedCases;
-  };
-
   return (
     <CaseContext.Provider
-      // value={{ isSaveButtonClicked, setIsSaveButtonClicked }}
-      value={{ casesTableOfContents, setCasesTableOfContents }}
+      // value={{ casesTableOfContents, setCasesTableOfContents }}
     >
       <CasesFormWrapper
         title={title}
         onSubmit={handleSubmit}
         outputCase={outputCase}
       >
-      {error && <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />}
+        {error && (
+          <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
+        )}
 
         <form ref={formRef} key={"caseform_" + inputCase?.id}>
           <Box key={"casebox_" + inputCase?.id}>

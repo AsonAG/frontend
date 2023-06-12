@@ -29,38 +29,17 @@ export class CasesApi {
     this.payrollPath = "/payrolls/" + this.payrollId + "/";
   }
 
-  buildCaseFieldValues(caseName, caseFields) {
-    return Object.keys(caseFields).map((id) => ({
-      caseName: caseName,
-      caseFieldName: caseFields[id].caseFieldName,
-      value: caseFields[id].value,
-      start: caseFields[id].start,
-      end: caseFields[id].end,
-      caseSlot: caseFields[id].caseSlot,
-    }));
-  }
-  buildRequestBodyCaseBuild(caseName, caseFields) {
-    return {
-      case: {
-        caseName: caseName,
-        values: this.buildCaseFieldValues(caseName, caseFields[0]),
-
-        relatedCases: caseFields[1].map((relatedCase, i) => ({
-          caseName: relatedCase.caseName,
-          values: this.buildCaseFieldValues(relatedCase.caseName, relatedCase),
-        })),
-      },
-    };
-  }
-
-  generateCasesBodyFromCasesObj(mainCase, shouldIncludeBody) {
+  buildCasesBody(outputCaseMap, shouldIncludeBody) {
     if (shouldIncludeBody) {
       let outputCase = {};
-      let baseCase = getMainCaseObject(mainCase);
+      let baseCase = getMainCaseObject(outputCaseMap);
 
       outputCase.caseName = baseCase.caseName;
-      outputCase.values = Object.values(baseCase.values); //TODO: filter values and related cases (if they are in inputCase or not)
-      outputCase.relatedCases = this.filterRelatedCases(baseCase.relatedCases);
+      outputCase.values = Object.values(baseCase.values);
+      //TODO: filter values and related cases (if they are in inputCase or not)
+      outputCase.relatedCases = this.buildRelatedCasesBody(
+        baseCase.relatedCases
+      );
       // baseCase.values = baseCase.values.concat(filteredRelatedCases);
 
       if (outputCase.values.length === 0) delete outputCase.values;
@@ -71,19 +50,43 @@ export class CasesApi {
     } else return null;
   }
 
-  filterRelatedCases(relatedCases) {
+  buildRelatedCasesBody(relatedCases) {
     let filteredRelatedCases = [];
 
     Object.values(relatedCases).map((relatedCase) => {
       let caseObj = {};
       caseObj.caseName = relatedCase.caseName;
       caseObj.values = Object.values(relatedCase.values);
-      caseObj.relatedCases = this.filterRelatedCases(relatedCase.relatedCases);
+      caseObj.relatedCases = this.buildRelatedCasesBody(
+        relatedCase.relatedCases
+      );
 
       filteredRelatedCases.push(caseObj);
     });
 
     return filteredRelatedCases;
+  }
+
+  filterBody(inputCaseSchema, outputCase) {
+    // fields filter
+    let valuesSchema = inputCaseSchema.fields.map((field) => field.name);
+    outputCase.values = outputCase.values.filter((val) =>
+      valuesSchema.includes(val.caseFieldName)
+    );
+    // related cases filter
+    let relatedCasesSchema = inputCaseSchema.relatedCases.map(
+      (relCase) => relCase.name
+    );
+    outputCase.relatedCases = outputCase.relatedCases.filter((rel) =>
+      relatedCasesSchema.includes(rel.caseName)
+    );
+    // related cases values filter
+    inputCaseSchema.relatedCases?.forEach((relSchema) => {
+      let relatedCase = outputCase.relatedCases.find(
+        (rel) => rel.caseName === relSchema.name
+      );
+      relatedCase && this.filterBody(relSchema, relatedCase);
+    });
   }
 
   /**
@@ -100,7 +103,7 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCaseFieldsCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseFields(caseName, callback, baseCase, employeeId) {
+  getCaseFields(caseName, inputCase, outputCase, callback, employeeId) {
     // verify the required parameter 'caseName' is set
     if (caseName === undefined || caseName === null) {
       throw new Error(
@@ -109,15 +112,12 @@ export class CasesApi {
     }
 
     let shouldIncludeBody =
-      Object.values(baseCase).length > 0 &&
-      Object.values(getMainCaseObject(baseCase)?.values).length > 0;
+      Object.values(outputCase).length > 0 &&
+      Object.values(getMainCaseObject(outputCase)?.values).length > 0;
     // build a case body if case fields are provided
-    // let postBody = caseFields.length > 0 ?
-    let postBody = this.generateCasesBodyFromCasesObj(
-      baseCase,
-      shouldIncludeBody
-    );
+    let postBody = this.buildCasesBody(outputCase, shouldIncludeBody);
 
+    if (shouldIncludeBody) this.filterBody(inputCase, postBody.case);
     console.log("Request body: " + JSON.stringify(postBody, null, 2));
 
     let pathParams = {
@@ -161,17 +161,18 @@ export class CasesApi {
    * @param {module:model/CaseFieldBasic} opts.body
    * @param {module:api/CasesApi~saveCaseCallback} callback The callback function, accepting three arguments: error, data, response
    */
-  saveCase(baseCase, callback, employeeId, opts) {
+  saveCase(inputCase, outputCase, callback, employeeId, opts) {
     opts = opts || {};
     // let postBody =
     //   JSON.stringify(caseFields[0]) != "{}"
     //     ? this.buildRequestBodyCaseSave(caseName, caseFields)
     //     : null;
-    let postBody = this.generateCasesBodyFromCasesObj(baseCase, true);
+    let postBody = this.buildCasesBody(outputCase, true);
     postBody.userId = this.userId;
     postBody.employeeId = employeeId;
     postBody.divisionId = this.divisionId;
 
+    this.filterBody(inputCase, postBody.case);
     console.log("Request body: " + JSON.stringify(postBody, null, 2));
 
     let pathParams = {};
@@ -288,13 +289,6 @@ export class CasesApi {
       this.tenantId
     );
   }
-  /**
-   * Callback function to receive the result of the getCaseFieldCurrentValues operation.
-   * @callback moduleapi/CasesApi~getCaseFieldCurrentValuesCallback
-   * @param {String} error Error message, if any.
-   * @param {module:model/CaseFieldBasic{ data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
 
   /**
    * Gets case fields with their current values.

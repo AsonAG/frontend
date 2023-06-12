@@ -14,6 +14,7 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
   const colors = tokens(theme.palette.mode);
   const [outputCaseFields, setOutputCaseFields] = useState({});
   const [outputRelatedCases, setOutputRelatedCases] = useState({});
+  const caseRef = useRef(null);
 
   const caseFields = useMemo(
     () => (
@@ -40,15 +41,6 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
     [inputCase.relatedCases]
   );
 
-  const { casesTableOfContents, setCasesTableOfContents } =
-    useContext(CaseContext);
-  const caseRef = useRef(null);
-
-  useEffectOnce(() => {
-    // setOutputCaseFields({});
-    // setOutputRelatedCases({});
-  });
-
   useUpdateEffect(() => {
     // useEffect(() => {
     // update output cases
@@ -64,33 +56,6 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
       },
     }));
   }, [outputCaseFields, outputRelatedCases]);
-
-  const handleRelatedCaseChange = (relatedCase) => {
-    setOutputRelatedCases((current) => ({
-      ...current,
-      [getCasedKey(relatedCase)]: relatedCase,
-    }));
-  };
-
-  // useUpdateEffect(() => {
-  //   setCaseExpanded(casesTableOfContents['case_' + caseBase.id].expanded); /// co to jest?
-  // }, [casesTableOfContents['case_' + caseBase.id]]);
-
-  const setCaseRef = ()  => {
-    setCasesTableOfContents((current) => ({
-      ...current,
-      ["case_" + inputCase.id]: {
-        displayName: inputCase.displayName,
-        id: inputCase.id,
-        ref: caseRef,
-        relatedCases: inputCase.relatedCases,
-      },
-    }));
-  };
-
-  // useEffect(() => {
-  //   setCaseRef();
-  // }, [inputCase]);
 
   return (
     <Box

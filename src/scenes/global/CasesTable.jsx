@@ -37,7 +37,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
     let tableData = [];
     if (error) {
       // showBoundary(error);
-      console.error(error);
+      console.error(JSON.stringify(error, null, 2));
     } else {
       data.forEach((element, index) => {
         tableData = [
