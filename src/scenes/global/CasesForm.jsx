@@ -18,7 +18,7 @@ import ErrorBar from "../../components/errors/ErrorBar";
 
 export const CaseContext = createContext();
 
-const CasesForm = ({ employee, navigateTo, title }) => {
+const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
   const caseName = window.sessionStorage.getItem("caseName");
 
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ const CasesForm = ({ employee, navigateTo, title }) => {
 
   return (
     <CaseContext.Provider
-      // value={{ casesTableOfContents, setCasesTableOfContents }}
+      value={ readOnly }
     >
       <CasesFormWrapper
         title={title}

@@ -15,7 +15,7 @@ const EmployeeData = () => {
         employeeId={userEmployee.employeeId}
         caseType={"Employee"}
         clusterName={"EmployeeData"}
-        navigateTo={"/employeeData"}
+        navigateTo={"/employeeDataCase"}
       />
     </Box>
   );

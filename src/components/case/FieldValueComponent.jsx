@@ -18,8 +18,6 @@ import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../scenes/global/CasesForm";
-import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
 import { UserContext } from "../../App";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 
@@ -57,6 +55,7 @@ const FieldValueComponent = ({
 
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
+  const caseIsReadOnly = useContext(CaseContext);
 
   useEffect(() => {
     let active = true;
@@ -215,7 +214,7 @@ const FieldValueComponent = ({
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
             hidden={attributes?.["input.hidden"]}
-            disabled={attributes?.["input.readOnly"]}
+            disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
           ></DatePicker>
         );
       case "DateTime":
@@ -231,7 +230,7 @@ const FieldValueComponent = ({
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
             hidden={attributes?.["input.hidden"]}
-            disabled={attributes?.["input.readOnly"]}
+            disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
           ></DateTimePicker>
         );
       case "Boolean":
@@ -249,7 +248,7 @@ const FieldValueComponent = ({
                   onChange={handleBooleanValueChange}
                   key={fieldKey}
                   hidden={attributes?.["input.hidden"]}
-                  disabled={attributes?.["input.readOnly"]}
+                  disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
                 />
               }
             />

@@ -31,6 +31,8 @@ import ErrorBar from "./components/errors/ErrorBar";
 import UnknownErrorPage from "./components/errors/UnknownErrorPage";
 import CompanyData from "./scenes/data/companyData";
 import EmployeeData from "./scenes/data/employeeData";
+import CompanyDataCase from "./scenes/data/dataCases/CompanyDataCase";
+import EmployeeDataCase from "./scenes/data/dataCases/EmployeeDataCase";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
@@ -182,6 +184,9 @@ function App() {
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/employeeData" element={<EmployeeData />} />
               <Route path="/reporting" element={<PersonalCases />} />
+
+              <Route path="/companyDataCase" element={<CompanyDataCase />} />
+              <Route path="/employeeDataCase" element={<EmployeeDataCase />} />
 
               {/* <Route path="/documents" element={<Documents />} /> */}
             </Routes>

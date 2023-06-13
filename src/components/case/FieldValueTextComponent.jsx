@@ -1,4 +1,6 @@
 import { InputAdornment, TextField } from "@mui/material";
+import { CaseContext } from "../../scenes/global/CasesForm";
+import { useContext } from "react";
 
 const FieldValueTextComponent = (
   fieldDisplayName,
@@ -11,6 +13,8 @@ const FieldValueTextComponent = (
   slotInputProps,
   attributes
 ) => {
+  const caseIsReadOnly = useContext(CaseContext);
+
   return (
     <TextField
       {...slotInputProps}
@@ -28,7 +32,7 @@ const FieldValueTextComponent = (
       multiline={attributes?.["input.multiLine"]}
       minRows={2}
       hidden={attributes?.["input.hidden"]}
-      disabled={attributes?.["input.readOnly"]}
+      disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
     />
   );
 };

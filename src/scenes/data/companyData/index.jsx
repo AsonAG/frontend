@@ -11,7 +11,7 @@ const CompanyData = () => {
       <CasesTable
         caseType={"Company"}
         clusterName={"CompanyData"}
-        navigateTo={"/companyData"}
+        navigateTo={"/companyDataCase"}
       />
     </Box>
   );
