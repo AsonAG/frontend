@@ -7,7 +7,7 @@ const Employees = () => {
   return (
     <Box m="25px">
       <Header
-        title="EMPLOYEES"
+        title="Employees"
         subtitle="Choose an employee and proceed with employee case"
       />
       <EmployeesTable />

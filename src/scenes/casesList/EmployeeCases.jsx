@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
-import CasesTable from "../../global/CasesTable";
-import EmployeeHeader from "../../../components/EmployeeHeader";
+import CasesTable from "../global/CasesTable";
+import EmployeeHeader from "../../components/EmployeeHeader";
 import { useSessionStorage } from "usehooks-ts";
 import { useContext } from "react";
-import { EmployeeSelectionContext } from "../../../App";
+import { EmployeeSelectionContext } from "../../App";
 
 const EmployeeCases = () => {
   // const employee = JSON.parse(window.sessionStorage.getItem("employee"));

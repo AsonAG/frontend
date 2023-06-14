@@ -1,13 +1,13 @@
 import { Box } from "@mui/material";
 import { React } from "react";
-import Header from "../../../components/Header";
-import CasesTable from "../../global/CasesTable";
+import Header from "../../components/Header";
+import CasesTable from "../global/CasesTable";
 
 const CompanyData = () => {
 
   return (
     <Box m="25px">
-      <Header title="COMPANY DATA" />
+      <Header title="Company Data" />
       <CasesTable
         caseType={"Company"}
         clusterName={"CompanyData"}

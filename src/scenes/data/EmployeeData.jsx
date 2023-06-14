@@ -1,18 +1,18 @@
 import { Box } from "@mui/material";
 import { React } from "react";
 import { useContext } from "react";
-import { UserEmployeeContext } from "../../../App";
-import Header from "../../../components/Header";
-import CasesTable from "../../global/CasesTable";
+import { EmployeeSelectionContext } from "../../App";
+import CasesTable from "../global/CasesTable";
+import EmployeeHeader from "../../components/EmployeeHeader";
 
 const EmployeeData = () => {
-  const userEmployee = useContext(UserEmployeeContext);
+  const {employee, setEmployee} = useContext(EmployeeSelectionContext);
 
   return (
     <Box m="25px">
-      <Header title="MY PROFILE DETAILS" />
+      <EmployeeHeader employee={employee} />
       <CasesTable
-        employeeId={userEmployee.employeeId}
+        employeeId={employee.employeeId}
         caseType={"Employee"}
         clusterName={"EmployeeData"}
         navigateTo={"/employeeDataCase"}

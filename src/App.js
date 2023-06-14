@@ -6,13 +6,13 @@ import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Tasks from "./scenes/tasks";
-import PersonalCases from "./scenes/casesList/personalCases";
+import PersonalCases from "./scenes/casesList/PersonalCases";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Box } from "@mui/system";
-import CompanyCases from "./scenes/casesList/companyCases";
+import CompanyCases from "./scenes/casesList/CompanyCases";
 import Employees from "./scenes/employees";
-import EmployeeCases from "./scenes/casesList/employeeCases";
+import EmployeeCases from "./scenes/casesList/EmployeeCases";
 import EmployeeCase from "./scenes/case/EmployeeCase";
 import PersonalCase from "./scenes/case/PersonalCase";
 import CompanyCase from "./scenes/case/CompanyCase";
@@ -29,10 +29,12 @@ import authConfig from "./authConfig";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorBar from "./components/errors/ErrorBar";
 import UnknownErrorPage from "./components/errors/UnknownErrorPage";
-import CompanyData from "./scenes/data/companyData";
-import EmployeeData from "./scenes/data/employeeData";
-import CompanyDataCase from "./scenes/data/dataCases/CompanyDataCase";
-import EmployeeDataCase from "./scenes/data/dataCases/EmployeeDataCase";
+import CompanyData from "./scenes/data/CompanyData";
+import EmployeeData from "./scenes/data/EmployeeData";
+import CompanyDataCase from "./scenes/data/dataCase/CompanyDataCase";
+import EmployeeDataCase from "./scenes/data/dataCase/EmployeeDataCase";
+import PersonalData from "./scenes/data/PersonalData";
+import PersonalDataCase from "./scenes/data/dataCase/PersonalDataCase";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
@@ -173,20 +175,25 @@ function App() {
           <main className="content">
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/company" element={<CompanyCases />} />
               <Route path="/employees" element={<Employees />} />
+
               <Route path="/employee" element={<EmployeeCases />} />
+              <Route path="/company" element={<CompanyCases />} />
+
               <Route path="/personalCase" element={<PersonalCase />} />
               <Route path="/employeeCase" element={<EmployeeCase />} />
               <Route path="/companyCase" element={<CompanyCase />} />
+
+              <Route path="/personalData" element={<PersonalData />} />
+              <Route path="/employeeData" element={<EmployeeData />} />
               <Route path="/companyData" element={<CompanyData />} />
 
-              <Route path="/tasks" element={<Tasks />} />
-              <Route path="/employeeData" element={<EmployeeData />} />
-              <Route path="/reporting" element={<PersonalCases />} />
-
+              <Route path="/personalDataCase" element={<PersonalDataCase />} />
               <Route path="/companyDataCase" element={<CompanyDataCase />} />
               <Route path="/employeeDataCase" element={<EmployeeDataCase />} />
+              
+              <Route path="/ECT" element={<Tasks />} />
+              <Route path="/ESS" element={<PersonalCases />} />
 
               {/* <Route path="/documents" element={<Documents />} /> */}
             </Routes>

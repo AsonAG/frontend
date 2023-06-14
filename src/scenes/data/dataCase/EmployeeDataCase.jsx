@@ -1,4 +1,4 @@
-import { React, useContext } from "react";
+import { useContext } from "react";
 import { EmployeeSelectionContext } from "../../../App";
 import CasesForm from "../../global/CasesForm";
 
@@ -9,7 +9,7 @@ const EmployeeDataCase = () => {
     <CasesForm
       title={employee.firstName + " " + employee.lastName}
       employee={employee}
-      navigateTo={"/employeeDataCase"}
+      navigateTo={"/employeeData"}
       readOnly={true}
     />
   );

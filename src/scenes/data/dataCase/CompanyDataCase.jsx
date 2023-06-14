@@ -12,7 +12,7 @@ const CompanyDataCase = () => {
     <CasesForm
       title={user.currentPayrollName}
       employee={userEmployee}
-      navigateTo={"/companyDataCase"}
+      navigateTo={"/companyData"}
       readOnly={true}
     />
   );

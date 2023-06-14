@@ -29,6 +29,9 @@ import { UserContext, UserEmployeeContext } from "../../App";
 import PayrollSelector from "../../components/PayrollSelector";
 import { useAuth } from "oidc-react";
 import { Stack } from "@mui/system";
+import { InsertCommentOutlined } from "@mui/icons-material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
   const theme = useTheme();
@@ -66,37 +69,35 @@ const Sidebar = ({ isCollapsed }) => {
   return (
     (minWidth || !isCollapsed) && (
       <Box
-      // display="flex" flexDirection="row"
-      sx={{
-        "& .pro-sidebar-inner": {
-          // overflowY: "scroll", 
-          background: `${colors.primary[400]} !important`,
-          // position: "-webkit-sticky",
-          // position: 'sticky !important',
-          // top: "0",
-          maxWidth: "250px",
-        },
-        "& .pro-icon-wrapper": {
-          backgroundColor: "transparent !important",
-        },
-        "& .pro-sidebar": {
-          color: colors.grey[100] + " !important"
-        },
-        "& .pro-inner-item": {
-          color: colors.grey[100] + " !important"
-          // padding: "0px 20px 10px 20px !important",
-        },
-        "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
-        },
-        "& .pro-menu-item.active": {
-          color: "#6870fa !important",
-        },
-      }}
+        // display="flex" flexDirection="row"
+        sx={{
+          "& .pro-sidebar-inner": {
+            // overflowY: "scroll",
+            background: `${colors.primary[400]} !important`,
+            // position: "-webkit-sticky",
+            // position: 'sticky !important',
+            // top: "0",
+            maxWidth: "250px",
+          },
+          "& .pro-icon-wrapper": {
+            backgroundColor: "transparent !important",
+          },
+          "& .pro-sidebar": {
+            color: colors.grey[100] + " !important",
+          },
+          "& .pro-inner-item": {
+            color: colors.grey[100] + " !important",
+            // padding: "0px 20px 10px 20px !important",
+          },
+          "& .pro-inner-item:hover": {
+            color: "#868dfb !important",
+          },
+          "& .pro-menu-item.active": {
+            color: "#6870fa !important",
+          },
+        }}
       >
-
-      
-{/*  TODO: use Drawer for mobile devices
+        {/*  TODO: use Drawer for mobile devices
         <Drawer
           variant="permanent"
           // flexShrink="10"
@@ -109,13 +110,11 @@ const Sidebar = ({ isCollapsed }) => {
           }}
           open
         > */}
-        <ProSidebar 
-        
-        collapsed={isCollapsed}>
+        <ProSidebar collapsed={isCollapsed}>
           <Box
             height="100%"
             // position="sticky"
-            position= "-webkit-sticky"
+            position="-webkit-sticky"
             display="flex"
             flexDirection="column"
             justifyContent="space-between"
@@ -180,9 +179,9 @@ const Sidebar = ({ isCollapsed }) => {
 
                 <SubMenu icon={<PersonIcon />} title="Employee">
                   <Item
-                    title="My Tasks"
-                    to="/tasks"
-                    icon={<TaskIcon />}
+                    title="New Event"
+                    to="/ESS"
+                    icon={<AddCircleOutlineIcon />}
                     selected={selected}
                     setSelected={setSelected}
                     isCollapsed={isCollapsed}
@@ -196,14 +195,13 @@ const Sidebar = ({ isCollapsed }) => {
                     isCollapsed={isCollapsed}
                   />
                   <Item
-                    title="New Case"
-                    to="/reporting"
-                    icon={<ContactsOutlinedIcon />}
+                    title="My Tasks"
+                    to="/ECT"
+                    icon={<FormatListBulletedIcon />}
                     selected={selected}
                     setSelected={setSelected}
                     isCollapsed={isCollapsed}
                   />
-
                 </SubMenu>
               </Box>
             </Menu>
@@ -246,7 +244,6 @@ const Sidebar = ({ isCollapsed }) => {
           </Box>
         </ProSidebar>
       </Box>
-
     )
   );
 };

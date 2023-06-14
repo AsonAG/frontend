@@ -10,7 +10,7 @@ const Tasks = () => {
 
   return (
     <Box m="25px">
-      <Header title="TASKS" subtitle="Finish your tasks" />
+      <Header title="Tasks" subtitle="Finish your case tasks" />
       <CasesTable
         employeeId={userEmployee.employeeId}
         caseType={"Employee"}
