@@ -188,7 +188,7 @@ const Sidebar = ({ isCollapsed }) => {
                   />
                   <Item
                     title="My Profile"
-                    to="/employeeData"
+                    to="/personalData"
                     icon={<PeopleOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
