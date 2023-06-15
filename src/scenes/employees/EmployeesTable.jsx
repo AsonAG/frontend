@@ -7,7 +7,7 @@ import { Box, IconButton, useTheme } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import EmployeesApi from "../../api/EmployeesApi";
 import { tokens } from "../../theme";
-import EmployeesSplitButton from "./EmployeesSplitButton";
+import EmployeesSplitButton from "../../components/buttons/EmployeesSplitButton";
 import { EmployeeSelectionContext, UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import ErrorBar from "../../components/errors/ErrorBar";
@@ -19,7 +19,10 @@ const EmployeesTable = () => {
   const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
   const { employee, setEmployee } = useContext(EmployeeSelectionContext);
-  const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
+  const employeesApi = useMemo(
+    () => new EmployeesApi(ApiClient, user.tenantId, user.CurrentDivisionId),
+    [user]
+  );
   const [error, setError] = useState();
 
   useEffect(() => {

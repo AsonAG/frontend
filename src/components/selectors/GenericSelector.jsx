@@ -1,11 +1,9 @@
 import * as React from "react";
-import SplitButton from "./SplitButton";
+import SplitButton from "../SplitButton";
 import useDidMountEffect from "../hooks/useDidMountEffect";
-import { useNavigate } from "react-router-dom";
 
-export default function EmployeesSplitButton({ setPayrollId }) {
+export default function GenericSelector() {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const navigate = useNavigate();
 
   const options = [
     "Employee cases",

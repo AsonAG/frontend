@@ -1,9 +1,8 @@
 import * as React from "react";
-import SplitButton from "../../components/SplitButton";
+import SplitButton from "./SplitButton";
 import { useNavigate } from "react-router-dom";
 
 export default function EmployeesSplitButton(params) {
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
   const navigate = useNavigate();
 
   const options = [
@@ -13,7 +12,7 @@ export default function EmployeesSplitButton(params) {
     "Deactivate employee",
   ];
 
-  const handleClick = () => {
+  const handleClick = (selectedIndex) => {
     console.info(
       `You clicked ${options[selectedIndex]}, for employee id: ${params.employee.employeeId}`
     );
@@ -26,6 +25,8 @@ export default function EmployeesSplitButton(params) {
 
       case 1:
         console.log("Option 1: " + options[1]);
+        params.setEmployeeChoice(params.employee);
+        navigate("/employeeData");
         break;
 
       default:
@@ -38,8 +39,6 @@ export default function EmployeesSplitButton(params) {
     <SplitButton
       options={options}
       handleClick={handleClick}
-      selectedIndex={selectedIndex}
-      setSelectedIndex={setSelectedIndex}
     ></SplitButton>
   );
 }

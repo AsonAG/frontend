@@ -26,7 +26,7 @@ import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { UserContext, UserEmployeeContext } from "../../App";
-import PayrollSelector from "../../components/PayrollSelector";
+import PayrollSelector from "../../components/selectors/PayrollSelector";
 import { useAuth } from "oidc-react";
 import { Stack } from "@mui/system";
 import { InsertCommentOutlined } from "@mui/icons-material";
