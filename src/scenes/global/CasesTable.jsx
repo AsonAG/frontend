@@ -59,6 +59,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
       setCaseData(tableData);
       setCaseDataLoaded(true);
       setCaseDataFiltered(tableData);
+      setError(null);
     }
   };
 

@@ -15,12 +15,14 @@ import TenantsApi from "../../api/TenantsApi";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import Logo from "../../components/Logo";
+import { useNavigate } from "react-router-dom";
 
 const Tenants = () => {
   const { user, setUser } = useContext(UserContext);
   const [tenants, setTenants] = useState([]);
   const tenantsEffectKey = tenants.map((t) => t.id).join(",");
   const api = useMemo(() => new TenantsApi(ApiClient), []);
+  const navigate = useNavigate();
 
   useEffect(() => {
     api.userTenants(callback);
@@ -37,10 +39,11 @@ const Tenants = () => {
   const onSelectTenant = function (tenant) {
     console.log("selected tenant", tenant);
     setUser((current) => ({
-      ...current,
+      // ...current,
       tenantId: tenant.id,
       tenantIdentifier: tenant.identifier,
     }));
+    navigate("/");
   };
 
   return (

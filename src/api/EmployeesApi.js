@@ -14,10 +14,10 @@ export class EmployeesApi {
     * default to {@link module:ApiClient#instanc
     e} if unspecified.
     */
-  constructor(apiClient, user) {
+  constructor(apiClient, userTenantId, userCurrentDivisionId) {
     this.apiClient = apiClient || ApiClient.instance;
-    this.tenantId = user.tenantId;
-    this.divisionId = user.currentDivisionId;
+    this.tenantId = userTenantId;
+    this.divisionId = userCurrentDivisionId;
   }
 
   /**

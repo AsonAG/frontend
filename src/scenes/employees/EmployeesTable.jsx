@@ -66,6 +66,7 @@ const EmployeesTable = () => {
       setEmployeeData(tableData);
       setEmployeeDataLoaded(true);
       setEmployeeDataFiltered(tableData);
+      setError(null);
     }
   };
 

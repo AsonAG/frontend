@@ -23,7 +23,7 @@ import PayrollsApi from "./api/PayrollsApi";
 import Tenants from "./scenes/tenants";
 import UsersApi from "./api/UsersApi";
 import de from "date-fns/locale/de";
-import { useLocalStorage, useSessionStorage } from "usehooks-ts";
+import { useLocalStorage, useSessionStorage, useUpdateEffect } from "usehooks-ts";
 import EmployeesApi from "./api/EmployeesApi";
 import authConfig from "./authConfig";
 import { ErrorBoundary } from "react-error-boundary";
@@ -46,39 +46,38 @@ function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [employee, setEmployee] = useSessionStorage("employee_selection", {});
   const [userEmployee, setUserEmployee] = useLocalStorage("user_employee", {});
-  const [authUserIdentifier, setAuthUserIdentifier] = useLocalStorage("authUserIdentifier", {});
+  const [authUserIdentifier, setAuthUserIdentifier] = useLocalStorage(
+    "authUserIdentifier",
+    {}
+  );
   const [user, setUser] = useState({});
-  const [error, setError] = useState();
 
-  const payrollsApi = useMemo(
-    () => new PayrollsApi(ApiClient, user.tenantId),
-    [user.tenantId]
-  );
-  const usersApi = useMemo(
-    () => new UsersApi(ApiClient, user.tenantId),
-    [user.tenantId]
-  );
-  const employeesApi = useMemo(() => new EmployeesApi(ApiClient, user), [user]);
-
-  // TODO: change title dependently on a chosen Route path
   useEffect(() => {
     document.title = user.currentPayrollName
       ? "Ason - " + user.currentPayrollName
       : "Ason - Tenants";
   }, [user.currentPayrollName]);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
+    console.log("Use effect invoked on: [user.tenantId, authUserIdentifier]");
     if (user.tenantId && authUserIdentifier) {
-      setEmployee({});
-      setUserEmployee({});
+      const usersApi = new UsersApi(ApiClient, user.tenantId);
       usersApi.getUsers(onGetUsersCallback);
+    } else {
+      // setEmployee({});
+      // setUserEmployee({});
     }
   }, [user.tenantId, authUserIdentifier]);
 
-  useEffect(() => {
-    if (user.attributes) {
+  useUpdateEffect(() => {
+    console.log("Use effect invoked on: [user.attributes]");
+    if (user.tenantId && user.attributes) {
+      const payrollsApi = new PayrollsApi(ApiClient, user.tenantId);
+      const employeesApi = new EmployeesApi(ApiClient, user.tenantId, user.currentDivisionId);
       payrollsApi.getPayrolls(onGetPayrollsCallback);
       employeesApi.getEmployees(onGetEmployeesCallbck);
+    } else {
+      console.warn("User tenant or attributes are not set!");
     }
   }, [user.attributes]);
 
@@ -93,12 +92,14 @@ function App() {
     );
 
     setUser({
-      ...user,
+      // ...user,
       identifier: authUserIdentifier,
       userId: userData.id,
       culture: userData.culture,
       language: userData.language,
       attributes: userData.attributes,
+      tenantId: user.tenantId,
+      tenantIdentifier: user.identifier,
     });
   };
 
@@ -108,23 +109,27 @@ function App() {
       return;
     }
     console.log(JSON.stringify(data));
-    setUser(() => {
-      let currentPayrollId = user.currentPayrollId;
-      let currentPayrollName = user.currentPayrollName;
-      let currentDivisionId = user.currentDivisionId;
+    let currentPayrollId = user.currentPayrollId;
+    let currentPayrollName = user.currentPayrollName;
+    let currentDivisionId = user.currentDivisionId;
 
-      let userPayrolls = data.filter((payroll) =>
-        user.attributes.payrolls.includes(payroll.name)
-      );
+    let userPayrolls = data.filter((payroll) =>
+      user.attributes.payrolls.includes(payroll.name)
+    );
 
-      if (!currentPayrollId && userPayrolls.length > 0) {
-        // TODO: current payroll choice based on attribute.startPayroll
-        currentPayrollId = userPayrolls[0].id;
-        currentPayrollName = userPayrolls[0].name;
-        currentDivisionId = userPayrolls[0].divisionId;
-      }
-      return {
-        ...user,
+    let startupPayroll = userPayrolls.find(
+      (payroll) => user.attributes.startupPayroll === payroll.name
+    );
+
+    if (startupPayroll) {
+      currentPayrollId = startupPayroll.id;
+      currentPayrollName = startupPayroll.name;
+      currentDivisionId = startupPayroll.divisionId;
+    }
+
+    if (userPayrolls.length > 0)
+      setUser((current) => ({
+        ...current,
         currentPayrollId,
         currentPayrollName,
         currentDivisionId,
@@ -133,17 +138,17 @@ function App() {
           payrollName: payroll.name,
           divisionId: payroll.divisionId,
         })),
-      };
-    });
+      }));
+      else {
+        console.warn("No payrolls set in user attributes.");
+      }
   };
 
   const onGetEmployeesCallbck = (error, data, response) => {
-    let employee;
-
     if (error) {
       console.error(error);
     } else {
-      employee = data.find(
+      let employee = data.find(
         (element) => element.identifier === user.attributes.employee
       );
       employee.employeeId = employee.id;
@@ -161,7 +166,7 @@ function App() {
         // display="flex"
         // flexDirection="column"
       >
-      {/* <ErrorBoundary
+        {/* <ErrorBoundary
         FallbackComponent={UnknownErrorPage}
         onError={(error) => console.error(JSON.stringify(error, null, 2))}
       > */}
@@ -170,7 +175,13 @@ function App() {
           setIsCollapsed={setIsSidebarCollapsed}
         />
 
-        <Box display="flex" flexDirection="row" width="100%" height="100%" paddingTop="60px">
+        <Box
+          display="flex"
+          flexDirection="row"
+          width="100%"
+          height="100%"
+          paddingTop="60px"
+        >
           <Sidebar isCollapsed={isSidebarCollapsed} />
           <main className="content">
             <Routes>
@@ -191,7 +202,7 @@ function App() {
               <Route path="/personalDataCase" element={<PersonalDataCase />} />
               <Route path="/companyDataCase" element={<CompanyDataCase />} />
               <Route path="/employeeDataCase" element={<EmployeeDataCase />} />
-              
+
               <Route path="/ECT" element={<Tasks />} />
               <Route path="/ESS" element={<PersonalCases />} />
 
@@ -199,7 +210,7 @@ function App() {
             </Routes>
           </main>
         </Box>
-            {/* </ErrorBoundary> */}
+        {/* </ErrorBoundary> */}
       </Box>
     );
   } else {

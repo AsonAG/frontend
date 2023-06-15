@@ -5,13 +5,12 @@ import { useContext } from "react";
 import CasesForm from "../global/CasesForm";
 
 const PersonalCase = () => {
-  // const { user, setUser } = useContext(UserContext);
   const userEmployee = useContext(UserEmployeeContext);
 
   return (
       <CasesForm 
         employee={userEmployee}
-        navigateTo={"/tasks"}/>
+        navigateTo={"/"}/>
   );
 };
 
