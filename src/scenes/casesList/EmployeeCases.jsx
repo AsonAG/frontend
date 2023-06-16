@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import CasesTable from "../global/CasesTable";
+import CasesTable from "../../components/tables/CasesTable";
 import EmployeeHeader from "../../components/EmployeeHeader";
 import { useSessionStorage } from "usehooks-ts";
 import { useContext } from "react";

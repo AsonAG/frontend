@@ -7,58 +7,48 @@ import { Box, IconButton, useTheme } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import EmployeesApi from "../../api/EmployeesApi";
 import { tokens } from "../../theme";
-import EmployeesSplitButton from "../../components/buttons/EmployeesSplitButton";
+import EmployeesSplitButton from "../buttons/EmployeesSplitButton";
 import { EmployeeSelectionContext, UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
-import ErrorBar from "../../components/errors/ErrorBar";
+import ErrorBar from "../errors/ErrorBar";
+import CasesApi from "../../api/CasesApi";
+import { format } from "date-fns";
 
-const EmployeesTable = () => {
-  const [employeeData, setEmployeeData] = useState([]);
-  const [employeeDataLoaded, setEmployeeDataLoaded] = useState(false);
+const EventsTable = ({ caseType, employeeId, clusterName }) => {
+  const [caseData, setCaseData] = useState([]);
+  const [caseDataLoaded, setCaseDataLoaded] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
-  const { employee, setEmployee } = useContext(EmployeeSelectionContext);
-  const employeesApi = useMemo(
-    () => new EmployeesApi(ApiClient, user.tenantId, user.CurrentDivisionId),
-    [user]
-  );
+  const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const [error, setError] = useState();
+  const [searchText, setSearchText] = useState("");
+  const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
 
   useEffect(() => {
-    setEmployeeData([]);
-    setEmployeeDataLoaded(false);
-    setEmployeeDataFiltered([]);
-    employeesApi.getEmployees(callback);
+    setCaseData([]);
+    casesApi.getCaseValues(callback, caseType, employeeId, clusterName);
   }, [user]);
-
-  /**
-   * set Employee object in session storage
-   */
-  const handleEmployeeSelection = (employee) => {
-    setEmployee(employee);
-    // window.sessionStorage.setItem("employee", JSON.stringify(employee));
-  };
 
   const callback = function (error, data, response) {
     let tableData = [];
     if (error) {
-      console.error(error);
       setError(error);
-      setEmployeeDataLoaded(true);
+      console.error(JSON.stringify(error, null, 2));
+      setCaseDataLoaded(true);
     } else {
       data.forEach((element, index) => {
         tableData = [
           ...tableData,
           {
-            id: element["id"],
-            employeeId: element["id"],
-            firstName: element["firstName"],
-            lastName: element["lastName"],
-            divisions: element["divisions"],
-            statuts: element["statuts"],
-            email: element["identifier"],
-            // ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
+            id: index,
+            caseName: element["caseName"],
+            caseFieldName: element["caseFieldName"],
+            value: element["value"],
+            valueType: element["valueType"],
+            start: element["start"],
+            end: element["end"],
+            created: element["created"],
           },
         ];
       });
@@ -66,58 +56,60 @@ const EmployeesTable = () => {
         "API called successfully. Table data loaded: " +
           JSON.stringify(tableData, null, 2)
       );
-      setEmployeeData(tableData);
-      setEmployeeDataLoaded(true);
-      setEmployeeDataFiltered(tableData);
+      setCaseData(tableData);
+      setCaseDataLoaded(true);
+      setCaseDataFiltered(tableData);
       setError(null);
     }
   };
 
-  // const handleRowClick = (params) => {
-  //   console.log(params.row.caseName + " row clicked.");
-  //   updateCaseName(params.row.caseName);
-  //   navigate("/case");
-  // };
+  const dateTimeFormatter = (params) =>
+    format(new Date(params?.value), "yyyy-MM-dd hh:mm");
+
+  const dateFormatter = (params) =>
+    format(new Date(params?.value), "yyyy-MM-dd");
 
   const columns = [
     {
-      field: "firstName",
-      headerName: "First name",
+      field: "caseName",
+      headerName: "Case",
       flex: 3,
       cellClassName: "name-column--cell",
     },
     {
-      field: "lastName",
-      headerName: "Last name",
+      field: "caseFieldName",
+      headerName: "Field",
       flex: 3,
     },
     {
-      field: "email",
-      headerName: "Email",
+      field: "value",
+      headerName: "Value",
       flex: 3,
     },
+//     {
+//       field: "valueType",
+//       headerName: "Value Type",
+//       flex: 3,
+//     },
     {
-      field: "divisions",
-      headerName: "Division",
+      field: "start",
+      headerName: "Start",
       flex: 3,
+      valueFormatter: dateFormatter,
     },
     {
-      field: "employeeId",
-      headerName: "Cases",
+      field: "end",
+      headerName: "End",
       flex: 3,
-      headerAlign: "left",
-      align: "center",
-      renderCell: ({ row: { employeeId } }) => {
-        return (
-          <EmployeesSplitButton
-            employee={employeeData.find((x) => x.employeeId === employeeId)}
-            setEmployeeChoice={handleEmployeeSelection}
-          ></EmployeesSplitButton>
-        );
-      },
+      valueFormatter: dateFormatter,
+    },
+    {
+      field: "created",
+      headerName: "created",
+      flex: 3,
+      valueFormatter: dateTimeFormatter,
     },
   ];
-
   function QuickSearchToolbar() {
     return (
       <Box
@@ -135,19 +127,15 @@ const EmployeesTable = () => {
     return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
   }
 
-  const [searchText, setSearchText] = useState("");
-  const [employeeDataFiltered, setEmployeeDataFiltered] =
-    useState(employeeData);
-
   const requestSearch = (searchValue) => {
     setSearchText(searchValue);
     const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
-    const filteredRows = employeeData.filter((row) => {
+    const filteredRows = caseData.filter((row) => {
       return Object.keys(row).some((field) => {
         return searchRegex.test(row[field].toString());
       });
     });
-    setEmployeeDataFiltered(filteredRows);
+    setCaseDataFiltered(filteredRows);
   };
 
   return (
@@ -187,25 +175,13 @@ const EmployeesTable = () => {
         <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
       )}
       <DataGrid
-        // disableSelectionOnClick
-        // disableColumnFilter
-        disableColumnSelector
-        disableDensitySelector
-        loading={!employeeDataLoaded}
-        rows={employeeDataFiltered}
+        // disableColumnSelector
+        // disableDensitySelector
+        loading={!caseDataLoaded}
+        rows={caseDataFiltered}
         columns={columns}
         justifyContent="center"
         alignItems="center"
-        // slots={{
-        //   Toolbar: GridToolbar
-        // // toolbar: QuickSearchToolbar
-        // }}
-        // slotProps={{
-        //   toolbar: {
-        //     showQuickFilter: true,
-        //     quickFilterProps: { debounceMs: 500 },
-        //   },
-        // }}
         components={{ Toolbar: QuickSearchToolbar }}
         componentsProps={{
           toolbar: {
@@ -216,12 +192,14 @@ const EmployeesTable = () => {
         }}
         initialState={{
           sorting: {
-            sortModel: [{ field: "firstName", sort: "asc" }],
+            sortModel: [{ field: "created", sort: "asc" }],
           },
         }}
+        rowHeight={25}
+        // getRowHeight={() => 'auto'}
       />
     </Box>
   );
 };
 
-export default EmployeesTable;
+export default EventsTable;

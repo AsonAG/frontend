@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../../App";
 import { useErrorBoundary } from "react-error-boundary";
-import ErrorBar from "../../components/errors/ErrorBar";
+import ErrorBar from "../errors/ErrorBar";
 
 /**
  * Returns a table component representation of list of available cases.

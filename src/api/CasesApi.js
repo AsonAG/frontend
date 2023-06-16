@@ -297,30 +297,26 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCaseFieldCurrentValuesCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseFieldCurrentValues(caseName, callback) {
-    // TODO: Implement values logic
+  getCaseValues(callback, caseType, employeeId, clusterName) {
     let postBody = null;
-    // verify the required parameter 'caseName' is set
-    if (caseName === undefined || caseName === null) {
-      throw new Error(
-        "Missing the required parameter 'caseName' when calling getCaseFieldCurrentValues"
-      );
-    }
 
-    let pathParams = {
-      caseName: caseName,
+    let pathParams = {};
+    let queryParams = {
+      userId: this.userId,
+      employeeId,
+      caseType,
+      clusterSetName: clusterName,
     };
-    let queryParams = {};
     let headerParams = {};
     let formParams = {};
 
     let authNames = [];
     let contentTypes = [];
     let accepts = ["application/json"];
-    let returnType = CaseFieldBasic;
+    let returnType = CasesArray;
 
     return this.apiClient.callApi(
-      this.payrollPath + "cases/{caseName}/currentValues",
+      this.payrollPath + "cases/values/time",
       "GET",
       pathParams,
       queryParams,

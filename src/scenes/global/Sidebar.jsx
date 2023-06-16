@@ -32,6 +32,7 @@ import { Stack } from "@mui/system";
 import { InsertCommentOutlined } from "@mui/icons-material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
   const theme = useTheme();
@@ -153,6 +154,14 @@ const Sidebar = ({ isCollapsed }) => {
                     title="Company Data"
                     to="/companyData"
                     icon={<ApartmentOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+                  <Item
+                    title="Comapny Events"
+                    to="/companyEvents"
+                    icon={<WorkHistoryOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
                     isCollapsed={isCollapsed}

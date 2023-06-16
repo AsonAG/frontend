@@ -3,7 +3,7 @@ import { React } from "react";
 import { useContext } from "react";
 import { UserEmployeeContext } from "../../App";
 import Header from "../../components/Header";
-import CasesTable from "../global/CasesTable";
+import CasesTable from "../../components/tables/CasesTable";
 
 const PersonalData = () => {
   const userEmployee = useContext(UserEmployeeContext);

@@ -35,6 +35,8 @@ import CompanyDataCase from "./scenes/data/dataCase/CompanyDataCase";
 import EmployeeDataCase from "./scenes/data/dataCase/EmployeeDataCase";
 import PersonalData from "./scenes/data/PersonalData";
 import PersonalDataCase from "./scenes/data/dataCase/PersonalDataCase";
+import EmployeeEvents from "./scenes/events/EmployeeEvents";
+import CompanyEvents from "./scenes/events/CompanyEvents";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
@@ -202,6 +204,9 @@ function App() {
               <Route path="/personalDataCase" element={<PersonalDataCase />} />
               <Route path="/companyDataCase" element={<CompanyDataCase />} />
               <Route path="/employeeDataCase" element={<EmployeeDataCase />} />
+
+              <Route path="/employeeEvents" element={<EmployeeEvents />} />
+              <Route path="/companyEvents" element={<CompanyEvents />} />
 
               <Route path="/ECT" element={<Tasks />} />
               <Route path="/ESS" element={<PersonalCases />} />

@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { React } from "react";
 import Header from "../../components/Header";
-import EmployeesTable from "./EmployeesTable";
+import EmployeesTable from "../../components/tables/EmployeesTable";
 
 const Employees = () => {
   return (

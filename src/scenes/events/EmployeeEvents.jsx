@@ -4,21 +4,21 @@ import { useContext } from "react";
 import { EmployeeSelectionContext } from "../../App";
 import CasesTable from "../../components/tables/CasesTable";
 import EmployeeHeader from "../../components/EmployeeHeader";
+import EventsTable from "../../components/tables/EventsTable";
 
-const EmployeeData = () => {
+const EmployeeEvents = () => {
   const {employee, setEmployee} = useContext(EmployeeSelectionContext);
 
   return (
     <Box m="25px">
       <EmployeeHeader employee={employee} />
-      <CasesTable
+      <EventsTable 
         employeeId={employee.employeeId}
         caseType={"Employee"}
-        clusterName={"EmployeeData"}
-        navigateTo={"/employeeDataCase"}
-      />
+        // clusterName={"EmployeeEvents"}
+        />
     </Box>
   );
 };
 
-export default EmployeeData;
+export default EmployeeEvents;
