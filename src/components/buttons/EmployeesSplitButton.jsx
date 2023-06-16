@@ -8,6 +8,7 @@ export default function EmployeesSplitButton(params) {
   const options = [
     "Employee cases",
     "Employee data",
+    "Employee events",
     "Assign tasks",
     "Deactivate employee",
   ];
@@ -29,6 +30,12 @@ export default function EmployeesSplitButton(params) {
         navigate("/employeeData");
         break;
 
+      case 2:
+        console.log("Option 2: " + options[2]);
+        params.setEmployeeChoice(params.employee);
+        navigate("/employeeEvents");
+        break;
+
       default:
         console.log("Option default");
         break;
@@ -36,9 +43,6 @@ export default function EmployeesSplitButton(params) {
   };
 
   return (
-    <SplitButton
-      options={options}
-      handleClick={handleClick}
-    ></SplitButton>
+    <SplitButton options={options} handleClick={handleClick}></SplitButton>
   );
 }

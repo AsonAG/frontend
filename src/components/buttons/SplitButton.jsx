@@ -71,7 +71,7 @@ export default function SplitButton( {options, handleClick} ) {
                   {options.map((option, index) => (
                     <MenuItem
                       key={option}
-                      disabled={index === 3}
+                      disabled={index ===  4}
                       selected={index === selectedIndex}
                       onClick={(event) => handleMenuItemClick(event, index)}
                     >
