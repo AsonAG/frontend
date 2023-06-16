@@ -1,8 +1,8 @@
 import * as React from "react";
-import SplitButton from "./SplitButton";
+import EmployeeSelector from "./EmployeeSelector";
 import { useNavigate } from "react-router-dom";
 
-export default function EmployeesSplitButton(params) {
+export default function EmployeeSelectorOptions(params) {
   const navigate = useNavigate();
 
   const options = [
@@ -43,6 +43,6 @@ export default function EmployeesSplitButton(params) {
   };
 
   return (
-    <SplitButton options={options} handleClick={handleClick}></SplitButton>
+    <EmployeeSelector options={options} handleClick={handleClick}></EmployeeSelector>
   );
 }

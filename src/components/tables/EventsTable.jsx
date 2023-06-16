@@ -1,24 +1,19 @@
 import {
   DataGrid,
   GridToolbarQuickFilter,
-  GridToolbar,
 } from "@mui/x-data-grid";
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
-import EmployeesApi from "../../api/EmployeesApi";
-import { tokens } from "../../theme";
-import EmployeesSplitButton from "../buttons/EmployeesSplitButton";
-import { EmployeeSelectionContext, UserContext } from "../../App";
+import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import ErrorBar from "../errors/ErrorBar";
 import CasesApi from "../../api/CasesApi";
 import { format } from "date-fns";
+import TableWrapper from "./TableWrapper";
 
 const EventsTable = ({ caseType, employeeId, clusterName }) => {
   const [caseData, setCaseData] = useState([]);
   const [caseDataLoaded, setCaseDataLoaded] = useState(false);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const [error, setError] = useState();
@@ -105,7 +100,7 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
     },
     {
       field: "created",
-      headerName: "created",
+      headerName: "Created",
       flex: 3,
       valueFormatter: dateTimeFormatter,
     },
@@ -139,38 +134,7 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
   };
 
   return (
-    <Box
-      height="75vh"
-      sx={{
-        "& .MuiDataGrid-root": {
-          border: "none",
-        },
-        "& .MuiDataGrid-cell": {
-          // borderBottom: "none",
-        },
-        "& .name-column--cell": {
-          // color: colors.greenAccent[300],
-          marginLeft: "5px",
-        },
-        "& .MuiDataGrid-columnHeaderTitle": {
-          marginLeft: "5px",
-        },
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: colors.blueAccent[800],
-          borderBottom: "none",
-        },
-        "& .MuiDataGrid-virtualScroller": {
-          backgroundColor: colors.primary[400],
-        },
-        "& .MuiDataGrid-footerContainer": {
-          borderTop: "none",
-          backgroundColor: colors.blueAccent[800],
-        },
-        "& .MuiCheckbox-root": {
-          color: `${colors.greenAccent[200]} !important`,
-        },
-      }}
-    >
+    <TableWrapper>
       {error && (
         <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
       )}
@@ -180,8 +144,6 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
         loading={!caseDataLoaded}
         rows={caseDataFiltered}
         columns={columns}
-        justifyContent="center"
-        alignItems="center"
         components={{ Toolbar: QuickSearchToolbar }}
         componentsProps={{
           toolbar: {
@@ -192,13 +154,13 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
         }}
         initialState={{
           sorting: {
-            sortModel: [{ field: "created", sort: "asc" }],
+            sortModel: [{ field: "created", sort: "desc" }],
           },
         }}
         rowHeight={25}
         // getRowHeight={() => 'auto'}
       />
-    </Box>
+    </TableWrapper>
   );
 };
 

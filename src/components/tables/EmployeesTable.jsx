@@ -7,16 +7,15 @@ import { Box, IconButton, useTheme } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import EmployeesApi from "../../api/EmployeesApi";
 import { tokens } from "../../theme";
-import EmployeesSplitButton from "../buttons/EmployeesSplitButton";
+import EmployeeSelectorOptions from "../selectors/EmployeeSelectorOptions";
 import { EmployeeSelectionContext, UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import ErrorBar from "../errors/ErrorBar";
+import TableWrapper from "./TableWrapper";
 
 const EmployeesTable = () => {
   const [employeeData, setEmployeeData] = useState([]);
   const [employeeDataLoaded, setEmployeeDataLoaded] = useState(false);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
   const { employee, setEmployee } = useContext(EmployeeSelectionContext);
   const employeesApi = useMemo(
@@ -106,13 +105,13 @@ const EmployeesTable = () => {
       headerName: "Cases",
       flex: 3,
       headerAlign: "left",
-      align: "center",
+      align: "left",
       renderCell: ({ row: { employeeId } }) => {
         return (
-          <EmployeesSplitButton
+          <EmployeeSelectorOptions
             employee={employeeData.find((x) => x.employeeId === employeeId)}
             setEmployeeChoice={handleEmployeeSelection}
-          ></EmployeesSplitButton>
+          ></EmployeeSelectorOptions>
         );
       },
     },
@@ -151,51 +150,20 @@ const EmployeesTable = () => {
   };
 
   return (
-    <Box
-      height="75vh"
-      sx={{
-        "& .MuiDataGrid-root": {
-          border: "none",
-        },
-        "& .MuiDataGrid-cell": {
-          // borderBottom: "none",
-        },
-        "& .name-column--cell": {
-          // color: colors.greenAccent[300],
-          marginLeft: "5px",
-        },
-        "& .MuiDataGrid-columnHeaderTitle": {
-          marginLeft: "5px",
-        },
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: colors.blueAccent[800],
-          borderBottom: "none",
-        },
-        "& .MuiDataGrid-virtualScroller": {
-          backgroundColor: colors.primary[400],
-        },
-        "& .MuiDataGrid-footerContainer": {
-          borderTop: "none",
-          backgroundColor: colors.blueAccent[800],
-        },
-        "& .MuiCheckbox-root": {
-          color: `${colors.greenAccent[200]} !important`,
-        },
-      }}
-    >
+    <TableWrapper>
       {error && (
         <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
       )}
       <DataGrid
         // disableSelectionOnClick
         // disableColumnFilter
-        disableColumnSelector
-        disableDensitySelector
+        // disableColumnSelector
+        // disableDensitySelector
         loading={!employeeDataLoaded}
         rows={employeeDataFiltered}
         columns={columns}
-        justifyContent="center"
-        alignItems="center"
+        // justifyContent="center"
+        // alignItems="center"
         // slots={{
         //   Toolbar: GridToolbar
         // // toolbar: QuickSearchToolbar
@@ -220,7 +188,7 @@ const EmployeesTable = () => {
           },
         }}
       />
-    </Box>
+    </TableWrapper>
   );
 };
 

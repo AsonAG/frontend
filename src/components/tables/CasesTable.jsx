@@ -11,6 +11,7 @@ import { useContext } from "react";
 import { UserContext } from "../../App";
 import { useErrorBoundary } from "react-error-boundary";
 import ErrorBar from "../errors/ErrorBar";
+import TableWrapper from "./TableWrapper";
 
 /**
  * Returns a table component representation of list of available cases.
@@ -20,8 +21,6 @@ import ErrorBar from "../errors/ErrorBar";
 const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const [caseData, setCaseData] = useState([]);
   const [caseDataLoaded, setCaseDataLoaded] = useState(false);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const navigate = useNavigate();
@@ -85,7 +84,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
       field: "caseName",
       headerName: "Proceed",
       flex: 2,
-      align: "center",
+      // align: "center",
       renderCell: ({ row: { caseName } }) => {
         return (
           <IconButton
@@ -115,39 +114,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   };
 
   return (
-    <Box
-      height="75vh"
-      // width="55vw"
-      sx={{
-        "& .MuiDataGrid-root": {
-          border: "none",
-        },
-        "& .MuiDataGrid-cell": {
-          // borderBottom: "none",
-        },
-        "& .name-column--cell": {
-          // color: colors.greenAccent[300],
-          marginLeft: "5px",
-        },
-        "& .MuiDataGrid-columnHeaderTitle": {
-          marginLeft: "5px",
-        },
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: colors.blueAccent[800],
-          borderBottom: "none",
-        },
-        "& .MuiDataGrid-virtualScroller": {
-          backgroundColor: colors.primary[400],
-        },
-        "& .MuiDataGrid-footerContainer": {
-          borderTop: "none",
-          backgroundColor: colors.blueAccent[800],
-        },
-        "& .MuiCheckbox-root": {
-          color: `${colors.greenAccent[200]} !important`,
-        },
-      }}
-    >
+    <TableWrapper>
       {error && (
           <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
         )}
@@ -156,8 +123,8 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
         loading={!caseDataLoaded}
         rows={caseData}
         columns={columns}
-        justifyContent="center"
-        alignItems="center"
+        // justifyContent="center"
+        // alignItems="center"
         onRowClick={handleRowClick}
         components={{ Toolbar: QuickSearchToolbar }}
         componentsProps={{
@@ -173,7 +140,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
           },
         }}
       />
-    </Box>
+    </TableWrapper>
   );
 };
 
