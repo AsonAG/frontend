@@ -1,13 +1,18 @@
+import { useTheme } from "@emotion/react";
 import { Box } from "@mui/material";
 import Typography from "@mui/material/Typography";
+import { tokens } from "../../theme";
 
 function CaseNameHeader({ caseDetails }) {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  
   return (
     <Box
       display="flex"
       alignItems="baseline"
       sx={{
-        // backgroundColor: colors.primary[300],
+        backgroundColor: colors.primary[400],
         padding: "14px 14px",
       }}
       key={"casesummary_" + caseDetails.id}

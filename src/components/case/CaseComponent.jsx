@@ -60,17 +60,7 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
   return (
     <Box
       key={"casebox_" + inputCase.id}
-      sx={{
-        "& .MuiAccordionDetails-root": {
-          padding: "0px 10px",
-        },
-        "& .MuiAccordionSummary-root": {
-          minHeight: "48px !important",
-        },
-        "& .MuiAccordionSummary-content.Mui-expanded": {
-          margin: "0",
-        },
-      }}
+      margin="5px 0 0 0"
     >
       <section
         id={'case_item_'+inputCase.id}
@@ -87,13 +77,13 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
         />
 
         <Box
-          sx={{ backgroundColor: colors.primary[300] }}
+          sx={{ backgroundColor: colors.primary[500] }}
           key={"fields_" + inputCase.id}
         >
           <Divider />
 
           {/***************************** Case Fields *****************************/}
-          <Box paddingTop="6px" key={"fieldswrapper_" + inputCase.id}>
+          <Box margin="10px 0 0 10px" key={"fieldswrapper_" + inputCase.id}>
             {caseFields}
           </Box>
 

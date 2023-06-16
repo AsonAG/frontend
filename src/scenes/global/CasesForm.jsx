@@ -27,8 +27,8 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
-  // const { showBoundary } = useErrorBoundary();
   const [error, setError] = useState();
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useUpdateEffect(() => {
     console.log("User changed.");
@@ -47,6 +47,7 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
   }, [outputCase]);
 
   const getFieldsCallback = function (error, data, response) {
+    setIsDataLoaded(true);
     if (error) {
       setError(error);
       console.error(JSON.stringify(error, null, 2));
@@ -112,8 +113,9 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
           </Box>
         </form>
       </CasesFormWrapper>
+    { !isDataLoaded && <CircularProgress color="secondary" variant="soft" size="lg"/>}
+
     </CaseContext.Provider>
-    // <CircularProgress color="neutral" variant="soft" size="lg"/>
   );
 };
 

@@ -59,13 +59,13 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
           height: "100%",
           width: "100%",
           overflow: "scroll",
-          paddingTop: "5px",
-          margin: "0 16px 0 8px",
+          paddingTop: "6px",
+          // margin: "0 16px 0 8px",
         }}
         sx={{
           // TODO: fix background color
           "& .MuiPaper-root": {
-            backgroundColor: colors.primary[300],
+            // backgroundColor: colors.primary[500],
           },
         }}
         onScroll={handleScroll}
@@ -74,16 +74,21 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
       </Paper>
 
       <Box
-        width="250px"
+        width="270px"
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
         // alignItems="flex-start"
-        margin="20px 20px 40px 5px"
+        margin="20px 20px 40px 12px"
         // sx={{ backgroundColor: colors.primary[400] }}
       >
         <Stack spacing={2}>
-          <Typography variant="h4" fontWeight="bold">
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            color={colors.blueAccent}
+            marginLeft="12px"
+          >
             {title}
           </Typography>
 
@@ -97,6 +102,7 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
               // TODO: fix circular progress display
               <Box sx={{ display: "flex" }}>
                 <CircularProgress
+                  variant="indeterminate"
                   disableShrink={true}
                   color="neutral"
                   size="lg"

@@ -11,8 +11,8 @@ export const tokens = (mode) => ({
           700: "#3d3d3d",
         },
         primary: {
-          100: "#1e4187",
-          200: "#1f3561",
+          // 100: "#1e4187",
+          // 200: "#1f3561",
           300: "#141b2d",
           400: "#1F2A40", // menu color
           500: "#141b2d", // background 
@@ -26,13 +26,12 @@ export const tokens = (mode) => ({
           700: "#e0e0e0",
         },
         primary: {
-          100: "#141b2d",
-          200: "#a1a4ab",
+          // 100: "#141b2d",
+          // 200: "#a1a4ab",
           300: "#ffffff",
           400: "#f2f0f0", 
           // 500: "#fcfcfc",
           500: "#ffffff",
-          // 500: "#5d6785",
         },
         // blueAccent: "#4985e2",
         blueAccent: "#461eb7"

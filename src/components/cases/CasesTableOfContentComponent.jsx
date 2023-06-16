@@ -1,3 +1,4 @@
+import { useTheme } from "@emotion/react";
 import {
   Box,
   List,
@@ -7,11 +8,12 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { tokens } from "../../theme";
 
-const CasesTableOfContentComponent = ({
-  caseBase,
-  scrollPosition,
-}) => {
+const CasesTableOfContentComponent = ({ caseBase, scrollPosition }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
   const handleTableOfContentsItemClick = (event, caseBase) => {
     console.log("Focus invoked: ", caseBase.ref.current);
     caseBase.ref.current.scrollIntoView();
@@ -19,20 +21,21 @@ const CasesTableOfContentComponent = ({
   };
 
   let isActive = false;
- try {
-     // isTopCaseParam && 
-     isActive =
-     scrollPosition < caseBase?.ref?.current.offsetTop
-     &&
-     scrollPosition + window.innerHeight > 
-     caseBase?.ref?.current.offsetTop;
- } catch (error) {
+  try {
+    // isTopCaseParam &&
+    isActive =
+      scrollPosition < caseBase?.ref?.current.offsetTop &&
+      scrollPosition + window.innerHeight > caseBase?.ref?.current.offsetTop;
+  } catch (error) {
     console.error(JSON.stringify(error));
- }
-
+  }
 
   return (
-    <>
+    <Box sx={{
+      "& .MuiListItem-root": {
+        paddingRight: '4px'
+      }
+    }}>
       <ListItem>
         {/* <ListItemButton
             onClick={(event) => onClick(event, _case)}
@@ -52,6 +55,7 @@ const CasesTableOfContentComponent = ({
               isActive
                 ? {
                     fontWeight: "bold",
+                    color: colors.blueAccent,
                     // textDecoration: "underline"
                   }
                 : {}
@@ -76,7 +80,7 @@ const CasesTableOfContentComponent = ({
       ) : (
         <></>
       )}
-    </>
+    </Box>
   );
 };
 

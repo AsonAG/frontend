@@ -72,13 +72,15 @@ const Sidebar = ({ isCollapsed }) => {
       <Box
         // display="flex" flexDirection="row"
         sx={{
+          "& .pro-sidebar": {
+            maxWidth: "250px",
+          },
           "& .pro-sidebar-inner": {
             // overflowY: "scroll",
             background: `${colors.primary[400]} !important`,
             // position: "-webkit-sticky",
             // position: 'sticky !important',
             // top: "0",
-            maxWidth: "250px",
           },
           "& .pro-icon-wrapper": {
             backgroundColor: "transparent !important",
