@@ -13,7 +13,7 @@ export const tokens = (mode) => ({
         primary: {
           // 100: "#1e4187",
           // 200: "#1f3561",
-          300: "#141b2d",
+          300: "#e0e0e0",
           400: "#1F2A40", // menu color
           500: "#141b2d", // background 
         },
@@ -28,7 +28,7 @@ export const tokens = (mode) => ({
         primary: {
           // 100: "#141b2d",
           // 200: "#a1a4ab",
-          300: "#ffffff",
+          300: "#666666",
           400: "#f2f0f0", 
           // 500: "#fcfcfc",
           500: "#ffffff",
@@ -49,7 +49,7 @@ export const themeSettings = (mode) => {
         ? {
             // palette values for dark mode
             primary: {
-              main: colors.primary[500],
+              main: colors.primary[300],
             },
             secondary: {
               main: colors.blueAccent,
@@ -66,7 +66,7 @@ export const themeSettings = (mode) => {
         : {
             // palette values for light mode
             primary: {
-              main: colors.primary[500],
+              main: colors.primary[300],
             },
             secondary: {
               main: colors.blueAccent,

@@ -3,6 +3,7 @@ import { Box, IconButton } from "@mui/material";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import FieldValueComponent from "./FieldValueComponent";
+import { CaseContext } from "../../scenes/global/CasesForm";
 
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 
@@ -20,6 +21,7 @@ const FieldComponent = ({ field, onChange }) => {
   const [fieldEndDate, setFieldEndDate] = useState(
     field.end ? new Date(field.end) : null
   );
+  const caseIsReadOnly = useContext(CaseContext);
 
   useEffect(() => {
     onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate);
@@ -60,6 +62,7 @@ const FieldComponent = ({ field, onChange }) => {
   return (
     <Box
       display="grid"
+      // gridTemplateColumns={caseIsReadOnly ? "1fr" : "1fr 40px 1fr"}
       gridTemplateColumns="1fr 40px 1fr"
       padding="2px 8px"
       key={"field_inline_" + field.id}
@@ -77,7 +80,7 @@ const FieldComponent = ({ field, onChange }) => {
         key={"field_valuecomponent_" + field.id}
       />
 
-      {field.timeType != "Timeless" && (
+      {field.timeType != "Timeless" && (!caseIsReadOnly) && (
         <Box
           key={"field_timefield_icon_wrapper" + field.id}
           display="flex"
@@ -94,7 +97,7 @@ const FieldComponent = ({ field, onChange }) => {
         </Box>
       )}
 
-      {field.timeType != "Timeless" && isTimeSettingVisible && (
+      {field.timeType != "Timeless" && (!caseIsReadOnly) && isTimeSettingVisible && (
         // fieldStartDate &&
         <Box
           key={"field_textfield_dates" + field.id}

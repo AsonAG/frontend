@@ -26,13 +26,37 @@ const FieldValueTextComponent = (
       type={getInputTypeFromJsonType(fieldValueType)}
       name={fieldKey}
       key={fieldKey}
-      InputProps={{
-        endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
-      }}
       multiline={attributes?.["input.multiLine"]}
       minRows={2}
       hidden={attributes?.["input.hidden"]}
       disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
+      
+      InputProps={{
+        endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
+
+        sx: {
+          // '&:hover fieldset': {
+          //   borderColor: '#003566 !important'
+          // },
+          // '&:focus-within fieldset, &:focus-visible fieldset': {
+          //   borderColor: '#003566 !important'
+          // },
+          // '& .MuiInputBase-colorPrimary': {
+          //   borderColor: '#003566 !important'
+          // },
+          // "& .Mui-focused MuiInputBase-formControl": {
+          //   borderColor: '#003566 !important'
+          //   color
+          // },
+        },
+      }}
+      
+      // InputLabelProps={{
+      //   sx: {
+      //     color: '#003566',
+      //     textTransform: 'capitalize',
+      //   },
+      // }}
     />
   );
 };

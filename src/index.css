@@ -19,7 +19,6 @@ body,
   width: 10px;
 }
 
-
 /* Track */
 ::-webkit-scrollbar-track {
   background: #e0e0e0;
@@ -34,3 +33,4 @@ body,
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+

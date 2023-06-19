@@ -63,10 +63,15 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
           // margin: "0 16px 0 8px",
         }}
         sx={{
+          // TODO: move styles to a different file
+          "& .MuiFormHelperText-root": {
+            marginTop: '0px',
+            marginBottom: '6px',
+          },
           // TODO: fix background color
           "& .MuiPaper-root": {
-            // backgroundColor: colors.primary[500],
-          },
+            // backgroundColor: colors.grey[100] + ' !important',
+          },  
         }}
         onScroll={handleScroll}
       >
