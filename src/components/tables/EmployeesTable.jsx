@@ -150,10 +150,7 @@ const EmployeesTable = () => {
   };
 
   return (
-    <TableWrapper>
-      {error && (
-        <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
-      )}
+    <TableWrapper error={error} setError={setError}>
       <DataGrid
         // disableSelectionOnClick
         // disableColumnFilter

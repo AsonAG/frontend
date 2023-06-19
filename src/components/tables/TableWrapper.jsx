@@ -1,14 +1,17 @@
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { Box } from "@mui/material";
+import ErrorBar from "../errors/ErrorBar";
 
-const TableWrapper = ({ children }) => {
+const TableWrapper = ({ error, setError, children }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Box
-      height="75vh"
+    <Box 
+      height="calc(100vh - 160px)"
+      display="flex"
+      flexDirection="column"
       sx={{
         "& .MuiDataGrid-root": {
           //   border: "none",
@@ -41,6 +44,9 @@ const TableWrapper = ({ children }) => {
         },
       }}
     >
+      {error && (
+          <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
+        )}
       {children}
     </Box>
   );

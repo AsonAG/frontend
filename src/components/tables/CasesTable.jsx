@@ -114,10 +114,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   };
 
   return (
-    <TableWrapper>
-      {error && (
-          <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
-        )}
+    <TableWrapper error={error} setError={setError}>
       <DataGrid
         disableSelectionOnClick
         loading={!caseDataLoaded}

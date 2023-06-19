@@ -1,31 +1,19 @@
 import {
   Box,
-  Button,
   CircularProgress,
-  Divider,
-  Drawer,
   List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   Paper,
   Stack,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
-import {
-  React,
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import SendIcon from "@mui/icons-material/Send";
+import { React, useContext, useEffect, useState } from "react";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
 import { getMainCaseObject } from "../../api/CasesApi";
+import CasesSaveButton from "./CasesSaveButton";
 
 const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
   const theme = useTheme();
@@ -33,6 +21,7 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isTopCaseSet, setIsTopCaseSet] = useState(false);
   const caseIsReadOnly = useContext(CaseContext);
+  const mobileScreen = useMediaQuery("(max-width:600px)");
 
   const handleScroll = (event) => {
     setScrollPosition(event.currentTarget.scrollTop);
@@ -50,14 +39,14 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
     <Box
       margin="0"
       display="flex"
-      flexDirection="row"
+      flexDirection={mobileScreen ? "column" : "row"}
       height="100%"
-      //       height='calc(100vh - 90px)'
     >
       <Paper
         style={{
           height: "100%",
           width: "100%",
+          // minWidth: "520px",
           overflow: "scroll",
           paddingTop: "6px",
           // margin: "0 16px 0 8px",
@@ -65,76 +54,67 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
         sx={{
           // TODO: move styles to a different file
           "& .MuiFormHelperText-root": {
-            marginTop: '0px',
-            marginBottom: '6px',
+            marginTop: "0px",
+            marginBottom: "6px",
           },
           // TODO: fix background color
           "& .MuiPaper-root": {
             // backgroundColor: colors.grey[100] + ' !important',
-          },  
+          },
         }}
         onScroll={handleScroll}
       >
         {children}
       </Paper>
 
-      <Box
-        width="270px"
-        display="flex"
-        flexDirection="column"
-        justifyContent="space-between"
-        // alignItems="flex-start"
-        margin="20px 20px 40px 12px"
-        // sx={{ backgroundColor: colors.primary[400] }}
-      >
-        <Stack spacing={2}>
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            color={colors.blueAccent}
-            marginLeft="12px"
-          >
-            {title}
-          </Typography>
-
-          <List dense disablePadding>
-            {Object.keys(outputCase).length > 0 ? (
-              <CasesTableOfContentComponent
-                caseBase={getMainCaseObject(outputCase)}
-                scrollPosition={scrollPosition}
-              />
-            ) : (
-              // TODO: fix circular progress display
-              <Box sx={{ display: "flex" }}>
-                <CircularProgress
-                  variant="indeterminate"
-                  disableShrink={true}
-                  color="neutral"
-                  size="lg"
-                />
-              </Box>
-            )}
-          </List>
-        </Stack>
-
-        <Box display="flex" justifyContent="center">
-          {!caseIsReadOnly && (
-            <Button
-              // disable={}
-              //   fullWidth
-              disableRipple
-              type="submit"
-              variant="contained"
-              color="secondary"
-              size="large"
-              onClick={onSubmit}
-              endIcon={<SendIcon />}
+      {!mobileScreen ? (
+        <Box
+          width="270px"
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-between"
+          // alignItems="flex-start"
+          margin="20px 20px 40px 12px"
+          // sx={{ backgroundColor: colors.primary[400] }}
+        >
+          <Stack spacing={2}>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              color={colors.blueAccent}
+              marginLeft="12px"
             >
-              <Typography fontWeight="bold">Send</Typography>
-            </Button>
-          )}
+              {title}
+            </Typography>
+
+            <List dense disablePadding>
+              {Object.keys(outputCase).length > 0 ? (
+                <CasesTableOfContentComponent
+                  caseBase={getMainCaseObject(outputCase)}
+                  scrollPosition={scrollPosition}
+                />
+              ) : (
+                // TODO: fix circular progress display
+                <Box sx={{ display: "flex" }}>
+                  <CircularProgress
+                    variant="indeterminate"
+                    disableShrink={true}
+                    color="neutral"
+                    size="lg"
+                  />
+                </Box>
+              )}
+            </List>
+          </Stack>
+
+          <CasesSaveButton
+            onSubmit={onSubmit}
+            caseIsReadOnly={caseIsReadOnly}
+          />
         </Box>
-      </Box>
+      ) : (
+        <CasesSaveButton onSubmit={onSubmit} caseIsReadOnly={caseIsReadOnly} />
+      )}
     </Box>
   );
 };

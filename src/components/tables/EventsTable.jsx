@@ -134,10 +134,7 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
   };
 
   return (
-    <TableWrapper>
-      {error && (
-        <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
-      )}
+    <TableWrapper error={error} setError={setError}>
       <DataGrid
         // disableColumnSelector
         // disableDensitySelector
