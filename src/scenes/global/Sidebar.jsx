@@ -51,9 +51,13 @@ const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
           <Typography>{title}</Typography>
         </div>
       )}
-      <Tooltip title={title}>
+      {isCollapsed ? (
+        <Tooltip title={title} placement="right">
+          <Link to={to} />
+        </Tooltip>
+      ) : (
         <Link to={to} />
-      </Tooltip>
+      )}
     </MenuItem>
   );
 };

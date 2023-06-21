@@ -2,12 +2,30 @@ import { Alert, AlertTitle, Box, Typography } from "@mui/material";
 
 const ErrorBar = (props) => {
   const { error, resetErrorBoundary } = props;
+  let title;
+  let subtitle;
 
-  // TODO: Stringify JSON message
+  try {
+    let text = JSON.parse(error.response.text);
+    if (text.title) {
+      title = text?.title;
+      subtitle = JSON.stringify(text?.errors);
+    } else {
+      title = JSON.stringify(text);
+    }
+  } catch (parsingErr) {
+    console.warn(
+      "Failed to extract the error message: " + JSON.stringify(parsingErr, null, 2)
+    );
+  }
+
   return (
     <Box margin="25px 40px 20px 0px">
       <Alert onClose={resetErrorBoundary} severity="error">
-        <Typography fontWeight="bold">{JSON.stringify(error.message, null, 2)}</Typography> 
+        <AlertTitle>
+          <Typography fontWeight="bold">{title}</Typography>
+        </AlertTitle>
+        <Typography>{subtitle}</Typography>
       </Alert>
     </Box>
   );
