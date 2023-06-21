@@ -14,12 +14,12 @@ import {
   Link,
   Stack,
 } from "@mui/material";
-import TextField from "@mui/material/TextField";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { UserContext } from "../../App";
 import FieldValueTextComponent from "./FieldValueTextComponent";
+import FieldValueAutocompleteComponent from "./FieldValueAutocompleteComponent";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -84,15 +84,20 @@ const FieldValueComponent = ({
     console.log("Lookups: " + JSON.stringify(data[0].values, null, 2));
   };
 
-  const handleInputLookupValueChange = (e, option) => {
+  const handleInputLookupValueChange = (e, result) => {
     // const regex = /^[0-9\b]+$/;
     // if (e.target.value === "" || regex.test(e.target.value)) {
-    let newValue = option
-      ? JSON.parse(option.value)[lookupSettings.valueFieldName]
-      : null;
-    setFieldValue(newValue);
+    let newValue;
+    if (Array.isArray(result))
+      newValue = JSON.stringify(result);
+      // newValue = JSON.stringify(result.map((option) => JSON.parse(option.value)[lookupSettings.valueFieldName]));
+    else
+      newValue = result
+        ? JSON.parse(result.value)[lookupSettings.valueFieldName]
+        : null;
+    setFieldValue(result);
     console.log("lookup input change:" + newValue + " field text:"); //+ JSON.parse(option.value)[lookupSettings.textFieldName]);
-    onChange();
+    onChange(newValue);
   };
   /* LookUp options   ===================================== END ================================ */
 
@@ -148,47 +153,18 @@ const FieldValueComponent = ({
 
   /* Return lookup    =============================== START =============================== */
   if (lookupSettings && "lookupName" in lookupSettings) {
-    return (
-      <Autocomplete
-        name={fieldKey}
-        // sx={{ width: 300 }}
-        open={isLookupOpened}
-        onOpen={() => {
-          setLookupOpened(true);
-        }}
-        onClose={() => {
-          setLookupOpened(false);
-        }}
-        onChange={handleInputLookupValueChange}
-        isOptionEqualToValue={(option, value) =>
-          JSON.parse(option.value)[lookupSettings.textFieldName] ===
-          JSON.parse(value.value)[lookupSettings.textFieldName]
-        }
-        getOptionLabel={(option) =>
-          JSON.parse(option.value)[lookupSettings.textFieldName]
-        }
-        options={lookupOptions}
-        loading={lookupLoading}
-        renderInput={(params) => (
-          <TextField
-            key={fieldKey}
-            {...slotInputProps}
-            {...params}
-            label={fieldDisplayName}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <Fragment>
-                  {lookupLoading ? (
-                    <CircularProgress color="inherit" size={20} />
-                  ) : null}
-                  {params.InputProps.endAdornment}
-                </Fragment>
-              ),
-            }}
-          />
-        )}
-      ></Autocomplete>
+    return FieldValueAutocompleteComponent(
+      fieldValue,
+      fieldKey,
+      isLookupOpened,
+      setLookupOpened,
+      handleInputLookupValueChange,
+      lookupSettings,
+      lookupOptions,
+      lookupLoading,
+      slotInputProps,
+      fieldDisplayName,
+      attributes
     );
   } else
   /* Return Lookup          ================================ END ================================ */
@@ -270,7 +246,9 @@ const FieldValueComponent = ({
               attributes
             )}
             <Box m="6px">
-            <Link href={fieldValue} target="_blank" rel="noopener">{fieldValue}</Link>
+              <Link href={fieldValue} target="_blank" rel="noopener">
+                {fieldValue}
+              </Link>
             </Box>
           </Stack>
         );

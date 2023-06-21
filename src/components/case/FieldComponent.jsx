@@ -25,13 +25,14 @@ const FieldComponent = ({ field, onChange }) => {
 
   useEffect(() => {
     onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate);
-  }, []);
+  }, []); //fieldValue ??
 
   const onValueChange = (value) => {
     onChange(
       fieldKey,
       fieldName,
-      value ? value : fieldValue,
+      // value ? value : fieldValue,
+      value,
       fieldStartDate,
       fieldEndDate
     );

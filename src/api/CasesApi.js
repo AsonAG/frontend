@@ -220,6 +220,7 @@ export class CasesApi {
       employeeId: employeeId,
       caseType: caseType,
       clusterSetName: clusterName,
+      // language: "German" // TODO: langauges
     };
     let headerParams = {};
     let formParams = {};
