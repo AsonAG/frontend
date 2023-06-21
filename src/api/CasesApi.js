@@ -27,6 +27,8 @@ export class CasesApi {
     this.payrollId = user.currentPayrollId;
 
     this.payrollPath = "/payrolls/" + this.payrollId + "/";
+
+    this.userLanguage = user.language;
   }
 
   buildCasesBody(outputCaseMap, shouldIncludeBody) {
@@ -89,13 +91,7 @@ export class CasesApi {
     });
   }
 
-  /**
-   * Callback function to receive the result of the getCaseFields operation.
-   * @callback moduleapi/CasesApi~getCaseFieldsCallback
-   * @param {String} error Error message, if any.
-   * @param {module:model/CaseDetails{ data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
+
   /**
    * Build a case and Get case fields
    * Returs case fields and values along with related cases fields and values. Running this request is required to build a case, before saving it with &#x60;cases/{caseName}/save&#x60;.
@@ -127,6 +123,7 @@ export class CasesApi {
       userId: this.userId,
       employeeId: employeeId,
       // caseType: "Employee",
+      language: this.userLanguage
     };
     let headerParams = {};
     let formParams = {};
@@ -220,7 +217,7 @@ export class CasesApi {
       employeeId: employeeId,
       caseType: caseType,
       clusterSetName: clusterName,
-      // language: "German" // TODO: langauges
+      language: this.userLanguage
     };
     let headerParams = {};
     let formParams = {};
@@ -265,6 +262,7 @@ export class CasesApi {
     let pathParams = {};
     let queryParams = {
       lookupNames: lookupName,
+      language: this.userLanguage
     };
     let headerParams = {};
     let formParams = {};
@@ -307,6 +305,7 @@ export class CasesApi {
       employeeId,
       caseType,
       clusterSetName: clusterName,
+      language: this.userLanguage
     };
     let headerParams = {};
     let formParams = {};
