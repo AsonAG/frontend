@@ -90,13 +90,9 @@ const FieldValueComponent = ({
     let newValue;
     if (Array.isArray(result))
       newValue = JSON.stringify(result);
-      // newValue = JSON.stringify(result.map((option) => JSON.parse(option.value)[lookupSettings.valueFieldName]));
     else
-      newValue = result
-        ? JSON.parse(result.value)[lookupSettings.valueFieldName]
-        : null;
+      newValue = result;
     setFieldValue(result);
-    console.log("lookup input change:" + newValue + " field text:"); //+ JSON.parse(option.value)[lookupSettings.textFieldName]);
     onChange(newValue);
   };
   /* LookUp options   ===================================== END ================================ */

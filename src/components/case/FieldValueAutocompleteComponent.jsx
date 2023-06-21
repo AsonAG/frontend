@@ -16,81 +16,69 @@ function FieldValueAutocompleteComponent(
   fieldDisplayName,
   attributes
 ) {
-  if (attributes?.["input.multiLookup"]) {
-    const fieldValueArray = fieldValue
+  const multiLookup = attributes?.["input.multiLookup"];
+  const options = lookupOptions.map(
+    (option) => JSON.parse(option.value)[lookupSettings.textFieldName]
+  );
+  let autocompleteFieldValue;
+
+  if (multiLookup) {
+    autocompleteFieldValue = fieldValue
       ? Array.isArray(fieldValue)
         ? fieldValue
         : JSON.parse(fieldValue)
       : [];
-    const options = lookupOptions.map(
-      (option) => JSON.parse(option.value)[lookupSettings.textFieldName]
-    );
+  } else {
+    autocompleteFieldValue = fieldValue;
+  }
 
-    return (
-      <Autocomplete
-        name={fieldKey}
-        multiple
-        open={isLookupOpened}
-        onOpen={() => {
-          setLookupOpened(true);
-        }}
-        onClose={() => {
-          setLookupOpened(false);
-        }}
-        value={fieldValueArray}
-        // inputValue={fieldValue}
-        onChange={handleInputLookupValueChange}
-        options={options}
-        loading={lookupLoading}
-        key={fieldKey}
-        renderInput={renderedInput(fieldKey, slotInputProps, fieldDisplayName, lookupLoading)}
-      />
-    );
-  } else
-    return (
-      <Autocomplete
-        name={fieldKey}
-        open={isLookupOpened}
-        onOpen={() => {
-          setLookupOpened(true);
-        }}
-        onClose={() => {
-          setLookupOpened(false);
-        }}
-        // value={fieldValue}
-        // inputValue={fieldValue}
-        onChange={handleInputLookupValueChange}
-        isOptionEqualToValue={(option, value) =>
-          JSON.parse(option?.value)[lookupSettings.textFieldName] ===
-          JSON.parse(value?.value)[lookupSettings.textFieldName]
-        }
-        getOptionLabel={(option) =>
-          JSON.parse(option?.value)[lookupSettings.textFieldName]
-        }
-        options={lookupOptions}
-        loading={lookupLoading}
-        renderInput={renderedInput(fieldKey, slotInputProps, fieldDisplayName, lookupLoading)}
-      />
-    );
+  return (
+    <Autocomplete
+      name={fieldKey}
+      multiple={multiLookup}
+      open={isLookupOpened}
+      onOpen={() => {
+        setLookupOpened(true);
+      }}
+      onClose={() => {
+        setLookupOpened(false);
+      }}
+      value={autocompleteFieldValue}
+      // inputValue={fieldValue}
+      onChange={handleInputLookupValueChange}
+      options={options}
+      loading={lookupLoading}
+      key={fieldKey}
+      renderInput={renderedInput(
+        fieldKey,
+        slotInputProps,
+        fieldDisplayName,
+        lookupLoading
+      )}
+    />
+  );
 }
 
-const renderedInput = (fieldKey, slotInputProps, fieldDisplayName, lookupLoading) => (params) => (
-    <TextField
-      key={fieldKey + '_renderedInput'}
-      {...slotInputProps}
-      {...params}
-      label={fieldDisplayName}
-      InputProps={{
-        ...params.InputProps,
-        endAdornment: (
-          <Fragment>
-            {lookupLoading ? (
-              <CircularProgress color="inherit" size={20} />
-            ) : null}
-            {params.InputProps.endAdornment}
-          </Fragment>
-        ),
-      }} />
-  );
+const renderedInput =
+  (fieldKey, slotInputProps, fieldDisplayName, lookupLoading) => (params) =>
+    (
+      <TextField
+        key={fieldKey + "_renderedInput"}
+        {...slotInputProps}
+        {...params}
+        label={fieldDisplayName}
+        InputProps={{
+          ...params.InputProps,
+          endAdornment: (
+            <Fragment>
+              {lookupLoading ? (
+                <CircularProgress color="inherit" size={20} />
+              ) : null}
+              {params.InputProps.endAdornment}
+            </Fragment>
+          ),
+        }}
+      />
+    );
 
-  export default FieldValueAutocompleteComponent;
+export default FieldValueAutocompleteComponent;
