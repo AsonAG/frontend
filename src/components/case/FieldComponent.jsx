@@ -4,6 +4,7 @@ import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import FieldValueComponent from "./FieldValueComponent";
 import { CaseContext } from "../../scenes/global/CasesForm";
+import { useUpdateEffect } from "usehooks-ts";
 
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 
@@ -23,11 +24,20 @@ const FieldComponent = ({ field, onChange }) => {
   );
   const caseIsReadOnly = useContext(CaseContext);
 
+  // initial build
   useEffect(() => {
     onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate);
-  }, []); //fieldValue ??
+  }, []);
 
-  const onValueChange = (value) => {
+  // update input values when request with newly built field comes 
+  useUpdateEffect(() => {
+    setFieldValue(field.value);
+    setFieldStartDate(field.start ? new Date(field.start) : null);
+    setFieldEndDate(field.end ? new Date(field.end) : null);
+  }, [field])
+
+  // handle user manuall value change
+  const handleValueChange = (value) => {
     onChange(
       fieldKey,
       fieldName,
@@ -75,7 +85,7 @@ const FieldComponent = ({ field, onChange }) => {
         fieldValue={fieldValue}
         setFieldValue={setFieldValue}
         fieldValueType={field.valueType}
-        onChange={onValueChange}
+        onChange={handleValueChange}
         lookupSettings={field.lookupSettings}
         attributes={field.attributes}
         key={"field_valuecomponent_" + field.id}

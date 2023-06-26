@@ -1,6 +1,7 @@
 import FieldComponent from "./FieldComponent";
 
 const CaseFields = ({ inputCase, setOutputCaseFields }) => {
+  
   const handleFieldChange = (
     fieldId,
     fieldName,
