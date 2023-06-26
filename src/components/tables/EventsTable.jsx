@@ -7,22 +7,25 @@ import { React, useState, useEffect, useMemo, useContext } from "react";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import ErrorBar from "../errors/ErrorBar";
-import CasesApi from "../../api/CasesApi";
+import ValuesApi from "../../api/ValuesApi";
 import { format } from "date-fns";
 import TableWrapper from "./TableWrapper";
+import { getLanguageCode } from "../../api/converter/LanguageConverter";
 
 const EventsTable = ({ caseType, employeeId, clusterName }) => {
   const [caseData, setCaseData] = useState([]);
   const [caseDataLoaded, setCaseDataLoaded] = useState(false);
   const { user, setUser } = useContext(UserContext);
-  const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
+  const valuesApi = useMemo(() => new ValuesApi(ApiClient, user), [user]);
   const [error, setError] = useState();
   const [searchText, setSearchText] = useState("");
   const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
 
+  const langCode = getLanguageCode(user.language);
+
   useEffect(() => {
     setCaseData([]);
-    casesApi.getCaseValues(callback, caseType, employeeId, clusterName);
+    valuesApi.getCaseValues(callback, caseType, employeeId, clusterName);
   }, [user]);
 
   const callback = function (error, data, response) {
@@ -37,8 +40,8 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
           ...tableData,
           {
             id: index,
-            caseName: element["caseName"],
-            caseFieldName: element["caseFieldName"],
+            caseName: element["caseNameLocalizations"][langCode],
+            caseFieldName: element["caseFieldNameLocalizations"][langCode],
             value: element["value"],
             valueType: element["valueType"],
             start: element["start"],

@@ -42,7 +42,6 @@ export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
 export const EmployeeSelectionContext = createContext();
 export const ErrorBarContext = createContext();
-export const DEBOUNCE_DELAY = 500;
 
 function App() {
   const [theme, colorMode] = useMode();
