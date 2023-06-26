@@ -117,8 +117,11 @@ const FieldValueComponent = ({
   const handleTextValueChange = (e) => {
     setFieldValue(e.target.value);
     // console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
-    onChange(e.target.value);
   };
+
+  const handleTextBlur = (e) => {
+    onChange(e.target.value);
+  } 
 
   const handleBooleanValueChange = (e) => {
     console.log("input change: boolean clicked." + e.target.checked);
@@ -236,6 +239,7 @@ const FieldValueComponent = ({
               required,
               fieldValue,
               handleTextValueChange,
+              handleTextBlur,
               fieldValueType,
               fieldKey,
               slotInputProps,
@@ -255,6 +259,7 @@ const FieldValueComponent = ({
           required,
           fieldValue,
           handleTextValueChange,
+          handleTextBlur,
           fieldValueType,
           fieldKey,
           slotInputProps,

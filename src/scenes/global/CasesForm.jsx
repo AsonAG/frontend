@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
 import CaseComponent from "../../components/case/CaseComponent";
-import { DEBOUNCE_DELAY, UserContext } from "../../App";
+import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
 import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
 import ErrorBar from "../../components/errors/ErrorBar";
@@ -35,19 +35,15 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
   }, [user]);
 
   useEffect(() => {
-    const delayDebounce = setTimeout(
-      () =>
-        casesApi.getCaseFields(
-          //TODO: add logic to check if cases changed before sending a request
-          caseName,
-          inputCase,
-          outputCase,
-          getFieldsCallback,
-          employee?.employeeId
-        ),
-      DEBOUNCE_DELAY
+    // setOutputCase({});
+    casesApi.getCaseFields(
+      //TODO: add logic to check if cases changed before sending a request 
+      caseName,
+      inputCase,
+      outputCase,
+      getFieldsCallback,
+      employee?.employeeId
     );
-    return () => clearTimeout(delayDebounce);
   }, [outputCase]);
 
   const getFieldsCallback = function (error, data, response) {
@@ -93,7 +89,9 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
   };
 
   return (
-    <CaseContext.Provider value={readOnly}>
+    <CaseContext.Provider
+      value={ readOnly }
+    >
       <CasesFormWrapper
         title={title}
         onSubmit={handleSubmit}
@@ -115,9 +113,8 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
           </Box>
         </form>
       </CasesFormWrapper>
-      {!isDataLoaded && (
-        <CircularProgress color="secondary" variant="soft" size="lg" />
-      )}
+    { !isDataLoaded && <CircularProgress color="secondary" variant="soft" size="lg"/>}
+
     </CaseContext.Provider>
   );
 };

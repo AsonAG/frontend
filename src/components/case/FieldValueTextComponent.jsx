@@ -8,6 +8,7 @@ const FieldValueTextComponent = (
   required,
   fieldValue,
   handleTextValueChange,
+  handleTextBlur,
   fieldValueType,
   fieldKey,
   slotInputProps,
@@ -23,6 +24,7 @@ const FieldValueTextComponent = (
       required={required}
       value={fieldValue}
       onChange={handleTextValueChange}
+      onBlur={handleTextBlur}
       type={getInputTypeFromJsonType(fieldValueType)}
       name={fieldKey}
       key={fieldKey}
