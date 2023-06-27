@@ -13,6 +13,7 @@ import {
   Typography,
   Link,
   Stack,
+  TextField,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -89,10 +90,8 @@ const FieldValueComponent = ({
     // const regex = /^[0-9\b]+$/;
     // if (e.target.value === "" || regex.test(e.target.value)) {
     let newValue;
-    if (Array.isArray(result))
-      newValue = JSON.stringify(result);
-    else
-      newValue = result;
+    if (Array.isArray(result)) newValue = JSON.stringify(result);
+    else newValue = result;
     setFieldValue(result);
     onChange(newValue);
   };
@@ -122,7 +121,7 @@ const FieldValueComponent = ({
 
   const handleTextBlur = (e) => {
     onChange(e.target.value);
-  } 
+  };
 
   const handleBooleanValueChange = (e) => {
     console.log("input change: boolean clicked." + e.target.checked);
@@ -155,6 +154,7 @@ const FieldValueComponent = ({
   if (lookupSettings && "lookupName" in lookupSettings) {
     return FieldValueAutocompleteComponent(
       fieldValue,
+      fieldDescription,
       fieldKey,
       isLookupOpened,
       setLookupOpened,
@@ -172,7 +172,7 @@ const FieldValueComponent = ({
     switch (fieldValueType) {
       case "None":
         return (
-          <Box marginBottom="5px">
+          <Box marginLeft="14px" marginBottom="5px">
             <Typography>{fieldDisplayName}</Typography>
             <Markup content={fieldDescription} />
           </Box>
@@ -180,9 +180,7 @@ const FieldValueComponent = ({
       case "Date":
         return (
           <DatePicker
-            slotProps={{ ...slotInputProps }}
             label={fieldDisplayName + (required ? "*" : "")}
-            helperText={fieldDescription}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
             // onClose={handleDateClose}
@@ -191,14 +189,19 @@ const FieldValueComponent = ({
             // slotProps={dateSlotProps} // field validation
             hidden={attributes?.["input.hidden"]}
             disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
-          ></DatePicker>
+            slotProps={{
+              ...slotInputProps,
+              textField: {
+                helperText: fieldDescription,
+              },
+            }}
+          />
         );
       case "DateTime":
         return (
           <DateTimePicker
-            slotProps={{ ...slotInputProps }}
             label={fieldDisplayName + (required ? "*" : "")}
-            helperText={fieldDescription}
+            // helperText={fieldDescription}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
             // onClose={handleDateClose}
@@ -207,7 +210,13 @@ const FieldValueComponent = ({
             // slotProps={dateSlotProps} // field validation
             hidden={attributes?.["input.hidden"]}
             disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
-          ></DateTimePicker>
+            slotProps={{
+              ...slotInputProps,
+              textField: {
+                helperText: fieldDescription,
+              },
+            }}
+          />
         );
       case "Boolean":
         return (

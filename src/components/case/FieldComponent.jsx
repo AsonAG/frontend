@@ -9,10 +9,6 @@ import { useUpdateEffect } from "usehooks-ts";
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 
 const FieldComponent = ({ field, onChange }) => {
-  const [isTimeSettingVisible, setTimeSettingVisible] = useState(
-    // field.start || field.end
-    true
-  );
   const fieldName = field.name;
   const fieldKey = getFieldKey(field.name, field.id);
   const [fieldValue, setFieldValue] = useState(field.value);
@@ -23,18 +19,22 @@ const FieldComponent = ({ field, onChange }) => {
     field.end ? new Date(field.end) : null
   );
   const caseIsReadOnly = useContext(CaseContext);
+  const [isStartEndVisible, asd] = useState(
+    field.timeType != "Timeless" &&
+    !caseIsReadOnly &&
+    !field.attributes?.["input.hideStartEnd"]);
 
   // initial build
   useEffect(() => {
     onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate);
   }, []);
 
-  // update input values when request with newly built field comes 
+  // update input values when request with newly built field comes
   useUpdateEffect(() => {
     setFieldValue(field.value);
     setFieldStartDate(field.start ? new Date(field.start) : null);
     setFieldEndDate(field.end ? new Date(field.end) : null);
-  }, [field])
+  }, [field]);
 
   // handle user manuall value change
   const handleValueChange = (value) => {
@@ -60,16 +60,6 @@ const FieldComponent = ({ field, onChange }) => {
     onChange(fieldKey, fieldName, fieldValue, fieldStartDate, newDate);
   };
 
-  const handleTimingButtonClick = () => {
-    console.log(
-      "Timing button clicked for field with name:",
-      field.displayName,
-      "popupVisible:",
-      isTimeSettingVisible
-    );
-    setTimeSettingVisible(!isTimeSettingVisible);
-  };
-
   return (
     <Box
       display="grid"
@@ -77,6 +67,7 @@ const FieldComponent = ({ field, onChange }) => {
       gridTemplateColumns="3fr 2fr"
       padding="2px 8px"
       key={"field_inline_" + field.id}
+      // marginBottom="5px"
     >
       <FieldValueComponent
         fieldDisplayName={field.displayName}
@@ -108,21 +99,19 @@ const FieldComponent = ({ field, onChange }) => {
         </Box>
       )} */}
 
-      {field.timeType != "Timeless" && (!caseIsReadOnly) && isTimeSettingVisible && (
-        // fieldStartDate &&
+      {isStartEndVisible && (
         <Box
           key={"field_textfield_dates" + field.id}
           display="inline-flex"
           justifyContent="flex-start"
           paddingLeft="10px"
-          // justifyContent="space-between"
         >
           <FieldValueComponent
             fieldDisplayName={"Start"}
             fieldKey={fieldKey + "_start"}
             fieldValue={fieldStartDate}
             setFieldValue={setFieldStartDate}
-            fieldValueType={"Date"}
+            fieldValueType={ field.attributes["input.pickerStart"] ? "DateTime" : "Date" }
             onChange={handleInputStartDateChange}
             key={"field_startdate" + field.id}
           />
@@ -134,7 +123,7 @@ const FieldComponent = ({ field, onChange }) => {
                 fieldKey={fieldKey + "_end"}
                 fieldValue={fieldEndDate}
                 setFieldValue={setFieldEndDate}
-                fieldValueType={"Date"}
+                fieldValueType={ field.attributes["input.pickerEnd"] ? "DateTime" : "Date"}
                 onChange={handleInputEndDateChange}
                 required={field.endMandatory}
                 key={"field_enddate" + field.id}

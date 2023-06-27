@@ -5,6 +5,7 @@ import TextField from "@mui/material/TextField";
 
 function FieldValueAutocompleteComponent(
   fieldValue,
+  fieldDescription,
   fieldKey,
   isLookupOpened,
   setLookupOpened,
@@ -17,7 +18,7 @@ function FieldValueAutocompleteComponent(
   attributes
 ) {
   const multiLookup = attributes?.["input.multiLookup"];
-  const options = lookupOptions.map(
+  const options = lookupOptions?.map(
     (option) => JSON.parse(option.value)[lookupSettings.textFieldName]
   );
   let autocompleteFieldValue;
@@ -51,25 +52,28 @@ function FieldValueAutocompleteComponent(
       key={fieldKey}
       renderInput={renderedInput(
         fieldKey,
+        fieldDescription,
         slotInputProps,
         fieldDisplayName,
         lookupLoading
       )}
+      
     />
   );
 }
 
 const renderedInput =
-  (fieldKey, slotInputProps, fieldDisplayName, lookupLoading) => (params) =>
+  (fieldKey, fieldDescription, slotInputProps, fieldDisplayName, lookupLoading) => (params) =>
     (
       <TextField
-        key={fieldKey + "_renderedInput"}
+      helperText={fieldDescription}
+      key={fieldKey + "_renderedInput"}
         {...slotInputProps}
         {...params}
         label={fieldDisplayName}
         InputProps={{
           ...params.InputProps,
-          endAdornment: (
+             endAdornment: (
             <Fragment>
               {lookupLoading ? (
                 <CircularProgress color="inherit" size={20} />
