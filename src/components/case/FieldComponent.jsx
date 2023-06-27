@@ -74,7 +74,7 @@ const FieldComponent = ({ field, onChange }) => {
     <Box
       display="grid"
       // gridTemplateColumns={caseIsReadOnly ? "1fr" : "1fr 40px 1fr"}
-      gridTemplateColumns="1fr 40px 1fr"
+      gridTemplateColumns="3fr 2fr"
       padding="2px 8px"
       key={"field_inline_" + field.id}
     >
@@ -91,7 +91,7 @@ const FieldComponent = ({ field, onChange }) => {
         key={"field_valuecomponent_" + field.id}
       />
 
-      {field.timeType != "Timeless" && (!caseIsReadOnly) && (
+      {/* {field.timeType != "Timeless" && (!caseIsReadOnly) && (
         <Box
           key={"field_timefield_icon_wrapper" + field.id}
           display="flex"
@@ -106,7 +106,7 @@ const FieldComponent = ({ field, onChange }) => {
             <HistoryOutlinedIcon key={"field_timefield_icon_" + field.id} />
           </IconButton>
         </Box>
-      )}
+      )} */}
 
       {field.timeType != "Timeless" && (!caseIsReadOnly) && isTimeSettingVisible && (
         // fieldStartDate &&

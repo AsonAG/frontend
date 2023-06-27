@@ -20,6 +20,7 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import { UserContext } from "../../App";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 import FieldValueAutocompleteComponent from "./FieldValueAutocompleteComponent";
+import { Markup } from "interweave";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -171,9 +172,9 @@ const FieldValueComponent = ({
     switch (fieldValueType) {
       case "None":
         return (
-          <Box>
+          <Box marginBottom="5px">
             <Typography>{fieldDisplayName}</Typography>
-            <Typography fontStyle="italic">{fieldDescription}</Typography>
+            <Markup content={fieldDescription} />
           </Box>
         );
       case "Date":

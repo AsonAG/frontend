@@ -40,8 +40,8 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
           ...tableData,
           {
             id: index,
-            caseName: element["caseNameLocalizations"][langCode],
-            caseFieldName: element["caseFieldNameLocalizations"][langCode],
+            caseName: element["caseNameLocalizations"][langCode] ? element["caseNameLocalizations"][langCode] : element["caseName"],
+            caseFieldName: element["caseFieldNameLocalizations"][langCode] ? element["caseFieldNameLocalizations"][langCode] :  element["caseFieldName"],
             value: element["value"],
             valueType: element["valueType"],
             start: element["start"],
