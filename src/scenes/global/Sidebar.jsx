@@ -165,7 +165,7 @@ const Sidebar = ({ isCollapsed }) => {
                     isCollapsed={isCollapsed}
                   />
                   <Item
-                    title="Comapany Events"
+                    title="Company Events"
                     to="/companyEvents"
                     icon={<WorkHistoryOutlinedIcon />}
                     selected={selected}
