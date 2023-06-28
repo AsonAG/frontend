@@ -1,10 +1,8 @@
-
-
 let langCodes = {
   af: "Afrikaans",
   sq: "Albanian",
   an: "Aragonese",
-  ar: "Arabic (Standard)",
+  ar: "Arabic",
   "ar-dz": "Arabic (Algeria)",
   "ar-bh": "Arabic (Bahrain)",
   "ar-eg": "Arabic (Egypt)",
@@ -47,7 +45,7 @@ let langCodes = {
   hr: "Croatian",
   cs: "Czech",
   da: "Danish",
-  nl: "Dutch (Standard)",
+  nl: "Dutch",
   "nl-be": "Dutch (Belgian)",
   en: "English",
   "en-au": "English (Australia)",
@@ -68,7 +66,7 @@ let langCodes = {
   fa: "Farsi",
   fj: "Fijian",
   fi: "Finnish",
-  fr: "French (Standard)",
+  fr: "French",
   "fr-be": "French (Belgium)",
   "fr-ca": "French (Canada)",
   "fr-fr": "French (France)",
@@ -81,7 +79,7 @@ let langCodes = {
   "gd-ie": "Gaelic (Irish)",
   gl: "Galacian",
   ka: "Georgian",
-  de: "German (Standard)",
+  de: "German",
   "de-at": "German (Austria)",
   "de-de": "German (Germany)",
   "de-li": "German (Liechtenstein)",
@@ -97,7 +95,7 @@ let langCodes = {
   id: "Indonesian",
   iu: "Inuktitut",
   ga: "Irish",
-  it: "Italian (Standard)",
+  it: "Italian",
   "it-ch": "Italian (Switzerland)",
   ja: "Japanese",
   kn: "Kannada",
@@ -202,6 +200,12 @@ let langCodes = {
   zu: "Zulu",
 };
 
-export function getLanguageCode(language) {
-  return Object.entries(langCodes).find(l => l[1] === language)[0];
-};
+export function getLanguageCode(languageCode) {
+  let lang;
+  try {
+    lang = Object.entries(langCodes).find((l) => l[1] === languageCode)[0];
+  } catch (error) {
+    console.warn("Language code: '" + languageCode + "'not found.");
+  }
+  return lang;
+}
