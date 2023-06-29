@@ -24,11 +24,7 @@ function FieldValueAutocompleteComponent(
   let autocompleteFieldValue;
 
   if (multiLookup) {
-    autocompleteFieldValue = fieldValue
-      ? Array.isArray(fieldValue)
-        ? fieldValue
-        : JSON.parse(fieldValue)
-      : [];
+    autocompleteFieldValue = fieldValue ? String(fieldValue).split(",") : [];
   } else {
     autocompleteFieldValue = fieldValue;
   }
@@ -57,23 +53,29 @@ function FieldValueAutocompleteComponent(
         fieldDisplayName,
         lookupLoading
       )}
-      
     />
   );
 }
 
 const renderedInput =
-  (fieldKey, fieldDescription, slotInputProps, fieldDisplayName, lookupLoading) => (params) =>
+  (
+    fieldKey,
+    fieldDescription,
+    slotInputProps,
+    fieldDisplayName,
+    lookupLoading
+  ) =>
+  (params) =>
     (
       <TextField
-      helperText={fieldDescription}
-      key={fieldKey + "_renderedInput"}
+        helperText={fieldDescription}
+        key={fieldKey + "_renderedInput"}
         {...slotInputProps}
         {...params}
         label={fieldDisplayName}
         InputProps={{
           ...params.InputProps,
-             endAdornment: (
+          endAdornment: (
             <Fragment>
               {lookupLoading ? (
                 <CircularProgress color="inherit" size={20} />

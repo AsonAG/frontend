@@ -90,7 +90,9 @@ const FieldValueComponent = ({
     // const regex = /^[0-9\b]+$/;
     // if (e.target.value === "" || regex.test(e.target.value)) {
     let newValue;
-    if (Array.isArray(result)) newValue = JSON.stringify(result);
+    if (Array.isArray(result)) 
+      newValue = result.join(',');
+
     else newValue = result;
     setFieldValue(result);
     onChange(newValue);
