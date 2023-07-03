@@ -46,59 +46,11 @@ const FieldValueComponent = ({
         size: "small",
       }
     : {};
+    const caseIsReadOnly = useContext(CaseContext);
   /* Validation options               =============================== START =============================== */
   // const [fieldVisited, setFieldVisited] = useState(false);
   // const [isFieldValid, setFieldValid] = useState((fieldValue ? true : !required));
   /* Validation options               ===============================  END  ================================ */
-  /* LookUp options               =============================== START =============================== */
-  const [isLookupOpened, setLookupOpened] = useState(false);
-  const [lookupOptions, setLookupOptions] = useState([]);
-  const lookupLoading = isLookupOpened && lookupOptions?.length === 0;
-
-  const { user, setUser } = useContext(UserContext);
-  const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
-  const caseIsReadOnly = useContext(CaseContext);
-
-  useEffect(() => {
-    let active = true;
-    if (!lookupLoading) {
-      return undefined;
-    }
-    casesApi.getCaseFieldLookups(lookupSettings.lookupName, callbackLookups);
-    return () => {
-      active = false;
-    };
-  }, [lookupLoading]);
-
-  useEffect(() => {
-    if (!isLookupOpened) {
-      setLookupOptions([]);
-    }
-  }, [isLookupOpened]);
-
-  const callbackLookups = function (error, data, response) {
-    if (error) {
-      console.error(error);
-    } else {
-      // console.log("API called successfully. Returned Lookups data: " +JSON.stringify(data, null, 2));
-    }
-    setLookupOptions(data[0].values);
-    console.log("Lookups: " + JSON.stringify(data[0].values, null, 2));
-  };
-
-  const handleInputLookupValueChange = (e, result) => {
-    // const regex = /^[0-9\b]+$/;
-    // if (e.target.value === "" || regex.test(e.target.value)) {
-    let newValue;
-    if (Array.isArray(result)) 
-      newValue = result.join(',');
-
-    else newValue = result;
-    setFieldValue(result);
-    onChange(newValue);
-  };
-  /* LookUp options   ===================================== END ================================ */
-
   /* Validation - turn red if visited and invalid ======== START ================================ */
   // const { isSaveButtonClicked, setIsSaveButtonClicked } = useContext(CaseContext);
 
@@ -117,6 +69,8 @@ const FieldValueComponent = ({
 
   /* Handlers         =================================== START =============================== */
   const handleTextValueChange = (e) => {
+    // const regex = /^[0-9\b]+$/;
+    // if (e.target.value === "" || regex.test(e.target.value)) {
     setFieldValue(e.target.value);
     // console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
   };
@@ -129,6 +83,11 @@ const FieldValueComponent = ({
     console.log("input change: boolean clicked." + e.target.checked);
     setFieldValue(e.target.checked + "");
     onChange(e.target.checked + "");
+  };
+
+  const handleInputLookupValueChange = (text, value) => {
+    setFieldValue(text);
+    onChange(value);
   };
 
   /**
@@ -158,12 +117,8 @@ const FieldValueComponent = ({
       fieldValue,
       fieldDescription,
       fieldKey,
-      isLookupOpened,
-      setLookupOpened,
-      handleInputLookupValueChange,
+      onChange={handleInputLookupValueChange},
       lookupSettings,
-      lookupOptions,
-      lookupLoading,
       slotInputProps,
       fieldDisplayName,
       attributes

@@ -37,7 +37,7 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
   useEffect(() => {
     // setOutputCase({});
     casesApi.getCaseFields(
-      //TODO: add logic to check if cases changed before sending a request 
+      //TODO: add logic to check if cases changed before sending a request
       caseName,
       inputCase,
       outputCase,
@@ -53,8 +53,10 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
       console.error(JSON.stringify(error, null, 2));
     }
     // setOutputCase({});
-    setInputCase(data);
-    console.log(JSON.stringify(data, null, 2));
+    else {
+      setInputCase(data);
+      console.log(JSON.stringify(data, null, 2));
+    }
   };
 
   const handleSubmit = (event) => {
@@ -89,9 +91,7 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
   };
 
   return (
-    <CaseContext.Provider
-      value={ readOnly }
-    >
+    <CaseContext.Provider value={readOnly}>
       <CasesFormWrapper
         title={title}
         onSubmit={handleSubmit}
@@ -113,8 +113,9 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
           </Box>
         </form>
       </CasesFormWrapper>
-    { !isDataLoaded && <CircularProgress color="secondary" variant="soft" size="lg"/>}
-
+      {!isDataLoaded && (
+        <CircularProgress color="secondary" variant="soft" size="lg" />
+      )}
     </CaseContext.Provider>
   );
 };
