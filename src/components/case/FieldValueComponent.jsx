@@ -144,7 +144,6 @@ const FieldValueComponent = ({
             name={fieldKey}
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
-            hidden={attributes?.["input.hidden"]}
             disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
             slotProps={{
               ...slotInputProps,
@@ -165,7 +164,6 @@ const FieldValueComponent = ({
             name={fieldKey}
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
-            hidden={attributes?.["input.hidden"]}
             disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
             slotProps={{
               ...slotInputProps,
@@ -189,7 +187,6 @@ const FieldValueComponent = ({
                   }
                   onChange={handleBooleanValueChange}
                   key={fieldKey}
-                  hidden={attributes?.["input.hidden"]}
                   disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
                 />
               }

@@ -30,7 +30,6 @@ const FieldValueTextComponent = (
       key={fieldKey}
       multiline={attributes?.["input.multiLine"]}
       minRows={2}
-      hidden={attributes?.["input.hidden"]}
       disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
       
       InputProps={{
