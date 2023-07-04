@@ -13,6 +13,7 @@ function FieldValueSelectorComponent(
   fieldDescription,
   fieldKey,
   onChange,
+  onBlur,
   lookupSettings,
   slotInputProps,
   fieldDisplayName,
@@ -29,7 +30,7 @@ function FieldValueSelectorComponent(
         : fieldValue
       : isMultiLookup
       ? []
-      : ""
+      : null
   );
 
   // init
@@ -66,30 +67,32 @@ function FieldValueSelectorComponent(
 
   const handleChange = (e, keyValue) => {
     setInputValue(keyValue);
+    
+    let outputValue;
+    if (Array.isArray(keyValue)) {
+      outputValue = keyValue.join(",");
+    } else outputValue = keyValue;
+    onChange(outputValue);
+    
   };
 
-  const handleClose = (e, keyValue) => {
-    if (Array.isArray(keyValue)) onChange(keyValue.join(","));
-    else onChange(keyValue);
+  const handleClose = () => {
+    let outputValue;
+    if (Array.isArray(inputValue)) {
+      outputValue = inputValue.join(",");
+    } else outputValue = inputValue;
+    onBlur(outputValue);
   };
 
   return (
     <Autocomplete
       name={fieldKey}
       multiple={isMultiLookup}
-      // open={isLookupOpened}
-      // onOpen={() => {
-      //   setLookupOpened(true);
-      // }}
-      onClose={() => {
-        handleClose();
-      }}
       value={inputValue}
-      // inputValue={fieldValue}
       onChange={handleChange}
+      onBlur={handleClose}
       options={options.map((option) => option[lookupSettings.valueFieldName])}
       getOptionLabel={getLookupTextFromValue}
-      // loading={lookupLoading}
       key={fieldKey}
       renderInput={renderedInput(
         fieldKey,
@@ -102,14 +105,7 @@ function FieldValueSelectorComponent(
 }
 
 const renderedInput =
-  (
-    fieldKey,
-    fieldDescription,
-    slotInputProps,
-    fieldDisplayName,
-    lookupLoading
-  ) =>
-  (params) =>
+  (fieldKey, fieldDescription, slotInputProps, fieldDisplayName) => (params) =>
     (
       <TextField
         helperText={fieldDescription}
@@ -119,14 +115,6 @@ const renderedInput =
         label={fieldDisplayName}
         InputProps={{
           ...params.InputProps,
-          endAdornment: (
-            <Fragment>
-              {lookupLoading ? (
-                <CircularProgress color="inherit" size={20} />
-              ) : null}
-              {params.InputProps.endAdornment}
-            </Fragment>
-          ),
         }}
       />
     );

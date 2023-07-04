@@ -20,8 +20,6 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { UserContext } from "../../App";
 import FieldValueTextComponent from "./FieldValueTextComponent";
-import FieldValueLookupComponent from "./FieldValueLookupComponent";
-import { Markup } from "interweave";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldDescriptionComponent from "./FieldDescriptionComponent";
 import FieldValueSelectorComponent from "./FieldValueSelectorComponent";
@@ -90,6 +88,9 @@ const FieldValueComponent = ({
 
   const handleInputLookupValueChange = (value) => {
     setFieldValue(value);
+  };
+
+  const handleInputLookupValueBlur = (value) => {
     onChange(value);
   };
 
@@ -120,7 +121,8 @@ const FieldValueComponent = ({
       fieldValue,
       fieldDescription,
       fieldKey,
-      (onChange = handleInputLookupValueChange),
+      handleInputLookupValueChange,
+      handleInputLookupValueBlur,
       lookupSettings,
       slotInputProps,
       fieldDisplayName,
