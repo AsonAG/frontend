@@ -20,7 +20,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { UserContext } from "../../App";
 import FieldValueTextComponent from "./FieldValueTextComponent";
-import FieldValueAutocompleteComponent from "./FieldValueAutocompleteComponent";
+import FieldValueLookupComponent from "./FieldValueLookupComponent";
 import { Markup } from "interweave";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldDescriptionComponent from "./FieldDescriptionComponent";
@@ -115,11 +115,11 @@ const FieldValueComponent = ({
 
   /* Return lookup    =============================== START =============================== */
   if (lookupSettings && "lookupName" in lookupSettings) {
-    return FieldValueAutocompleteComponent(
+    return FieldValueLookupComponent(
       fieldValue,
       fieldDescription,
       fieldKey,
-      (onChange = { handleInputLookupValueChange }),
+      (onChange = handleInputLookupValueChange),
       lookupSettings,
       slotInputProps,
       fieldDisplayName,

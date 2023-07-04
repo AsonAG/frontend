@@ -7,7 +7,7 @@ import ApiClient from "../../api/ApiClient";
 import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
 
-function FieldValueAutocompleteComponent(
+function FieldValueLookupComponent(
   fieldValue,
   fieldDescription,
   fieldKey,
@@ -22,8 +22,11 @@ function FieldValueAutocompleteComponent(
   const [isLookupOpened, setLookupOpened] = useState(false);
   const [openedOptions, setOpenedOptions] = useState([]);
   const multiLookup = attributes?.["input.multiLookup"];
-  const [autocompleteFieldValue, setAutocompleteFieldValue] = useState(multiLookup ? [] : "");
+  const [autocompleteFieldValue, setAutocompleteFieldValue] = useState(
+    multiLookup ? [] : ""
+  );
   const [options, setOptions] = useState([]);
+
   const lookupLoading = isLookupOpened && openedOptions?.length === 0;
 
   useEffect(() => {
@@ -42,9 +45,7 @@ function FieldValueAutocompleteComponent(
       setOpenedOptions([]);
     } else {
       setOpenedOptions(
-        options.map(
-          (option) => JSON.parse(option.value)[lookupSettings.textFieldName]
-        )
+        options.map((option) => option[lookupSettings.textFieldName])
       );
     }
   }, [isLookupOpened]);
@@ -65,8 +66,11 @@ function FieldValueAutocompleteComponent(
     if (error) {
       console.error(error);
     } else {
-      setOptions(data[0].values);
-      console.log("Lookups: " + JSON.stringify(data[0].values, null, 2));
+      const optionValues = data[0].values.map((option) =>
+        JSON.parse(option.value)
+      );
+      setOptions(optionValues);
+      console.log("Lookup options: " + JSON.stringify(optionValues, null, 2));
     }
   };
 
@@ -77,25 +81,28 @@ function FieldValueAutocompleteComponent(
   };
 
   const getLookupTextFromValue = (value) => {
-    return options.length > 0
-      ? options.find(
-          (option) => option[lookupSettings.valueFieldName] === value
-        )[lookupSettings.textFieldName]
-      : null;
+    if (value && options.length > 0) {
+      const optionFound = options.find(
+        (option) => option[lookupSettings.valueFieldName] === value
+      );
+      return optionFound ? optionFound[lookupSettings.textFieldName] : "";
+    } else return "";
   };
 
-  const handleInputLookupValueChange = (e, result) => {
-    let newValue;
+  const handleInputLookupValueChange = (e, textValue) => {
+    let keyValue;
     // set multiLookup values
-    if (Array.isArray(result)) {
-      const resultsArray = result.forEach(getLookupValueFromText);
-      newValue = resultsArray.join(",");
+    if (Array.isArray(textValue)) {
+      const resultsArray = textValue.forEach(getLookupValueFromText);
+      keyValue = resultsArray.join(",");
     }
     // set value for sinle Lookup
     else {
-      newValue = getLookupValueFromText(result);
+      keyValue = getLookupValueFromText(textValue);
+      setLookupOpened(false);
     }
-    onChange(result, newValue);
+    if (keyValue) onChange(textValue, keyValue);
+    else console.warn("Lookup value OnChange error: Key Value is empty");
   };
 
   return (
@@ -156,4 +163,4 @@ const renderedInput =
       />
     );
 
-export default FieldValueAutocompleteComponent;
+export default FieldValueLookupComponent;
