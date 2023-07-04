@@ -88,6 +88,7 @@ const FieldValueComponent = ({
 
   const handleInputLookupValueChange = (value) => {
     setFieldValue(value);
+    onChange(value);
   };
 
   const handleInputLookupValueBlur = (value) => {
@@ -122,7 +123,6 @@ const FieldValueComponent = ({
       fieldDescription,
       fieldKey,
       handleInputLookupValueChange,
-      handleInputLookupValueBlur,
       lookupSettings,
       slotInputProps,
       fieldDisplayName,

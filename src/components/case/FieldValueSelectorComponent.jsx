@@ -13,7 +13,6 @@ function FieldValueSelectorComponent(
   fieldDescription,
   fieldKey,
   onChange,
-  onBlur,
   lookupSettings,
   slotInputProps,
   fieldDisplayName,
@@ -76,13 +75,13 @@ function FieldValueSelectorComponent(
     
   };
 
-  const handleBlur = () => {
-    let outputValue;
-    if (Array.isArray(inputValue)) {
-      outputValue = inputValue.join(",");
-    } else outputValue = inputValue;
-    onBlur(outputValue);
-  };
+  // const handleBlur = () => {
+  //   let outputValue;
+  //   if (Array.isArray(inputValue)) {
+  //     outputValue = inputValue.join(",");
+  //   } else outputValue = inputValue;
+  //   onBlur(outputValue);
+  // };
 
   return (
     <Autocomplete
@@ -90,7 +89,6 @@ function FieldValueSelectorComponent(
       multiple={isMultiLookup}
       value={inputValue}
       onChange={handleChange}
-      onBlur={handleBlur}
       options={options.map((option) => option[lookupSettings.valueFieldName])}
       getOptionLabel={getLookupTextFromValue}
       key={fieldKey}
