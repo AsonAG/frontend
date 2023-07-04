@@ -76,7 +76,7 @@ function FieldValueSelectorComponent(
     
   };
 
-  const handleClose = () => {
+  const handleBlur = () => {
     let outputValue;
     if (Array.isArray(inputValue)) {
       outputValue = inputValue.join(",");
@@ -90,7 +90,7 @@ function FieldValueSelectorComponent(
       multiple={isMultiLookup}
       value={inputValue}
       onChange={handleChange}
-      onBlur={handleClose}
+      onBlur={handleBlur}
       options={options.map((option) => option[lookupSettings.valueFieldName])}
       getOptionLabel={getLookupTextFromValue}
       key={fieldKey}

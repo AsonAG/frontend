@@ -19,7 +19,7 @@ const EmployeesTable = () => {
   const { user, setUser } = useContext(UserContext);
   const { employee, setEmployee } = useContext(EmployeeSelectionContext);
   const employeesApi = useMemo(
-    () => new EmployeesApi(ApiClient, user.tenantId, user.CurrentDivisionId),
+    () => new EmployeesApi(ApiClient, user.tenantId, user.currentDivisionId),
     [user]
   );
   const [error, setError] = useState();
