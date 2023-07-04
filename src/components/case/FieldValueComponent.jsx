@@ -24,6 +24,7 @@ import FieldValueLookupComponent from "./FieldValueLookupComponent";
 import { Markup } from "interweave";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldDescriptionComponent from "./FieldDescriptionComponent";
+import FieldValueSelectorComponent from "./FieldValueSelectorComponent";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -87,8 +88,8 @@ const FieldValueComponent = ({
     onChange(e.target.checked + "");
   };
 
-  const handleInputLookupValueChange = (text, value) => {
-    setFieldValue(text);
+  const handleInputLookupValueChange = (value) => {
+    setFieldValue(value);
     onChange(value);
   };
 
@@ -115,7 +116,7 @@ const FieldValueComponent = ({
 
   /* Return lookup    =============================== START =============================== */
   if (lookupSettings && "lookupName" in lookupSettings) {
-    return FieldValueLookupComponent(
+    return FieldValueSelectorComponent(
       fieldValue,
       fieldDescription,
       fieldKey,

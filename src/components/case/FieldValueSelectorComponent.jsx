@@ -1,13 +1,14 @@
 import { Fragment, useContext, useEffect, useMemo, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Autocomplete } from "@mui/material";
+import { Autocomplete, FormControl, InputLabel, Select } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import CasesApi from "../../api/CasesApi";
 import ApiClient from "../../api/ApiClient";
 import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
+import { MenuItem } from "react-pro-sidebar";
 
-function FieldValueLookupComponent(
+function FieldValueSelectorComponent(
   fieldValue,
   fieldDescription,
   fieldKey,
@@ -19,51 +20,22 @@ function FieldValueLookupComponent(
 ) {
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
-  const [isLookupOpened, setLookupOpened] = useState(false);
   const isMultiLookup = attributes?.["input.multiLookup"];
-  const [textFieldValue, setTextFieldValue] = useState(
-    isMultiLookup ? [] : ""
-  );
   const [options, setOptions] = useState([]);
-  const [openedOptions, setOpenedOptions] = useState([]);
-
-  const lookupLoading = isLookupOpened && openedOptions?.length === 0;
+  const [inputValue, setInputValue] = useState(
+    fieldValue
+      ? isMultiLookup
+        ? String(fieldValue).split(",")
+        : fieldValue
+      : isMultiLookup
+      ? []
+      : ""
+  );
 
   // init
   useEffect(() => {
-    let active = true;
-    if (!lookupLoading) {
-      return undefined;
-    }
     casesApi.getCaseFieldLookups(lookupSettings.lookupName, callbackLookups);
-    return () => {
-      active = false;
-    };
   }, []);
-
-  // after options are loaded
-  useUpdateEffect(() => {
-    if (isMultiLookup) {
-      setTextFieldValue(
-        fieldValue
-          ? String(fieldValue).split(",").forEach(getLookupTextFromValue)
-          : []
-      );
-    } else {
-      setTextFieldValue(getLookupTextFromValue(fieldValue));
-    }
-  }, [options]);
-
-  // on open and close
-  useUpdateEffect(() => {
-    if (!isLookupOpened) {
-      setOpenedOptions([]);
-    } else {
-      setOpenedOptions(
-        options.map((option) => option[lookupSettings.textFieldName])
-      );
-    }
-  }, [isLookupOpened]);
 
   const callbackLookups = function (error, data, response) {
     if (error) {
@@ -92,48 +64,38 @@ function FieldValueLookupComponent(
     } else return "";
   };
 
-  const handleInputLookupValueChange = (e, textValue) => {
-    setTextFieldValue(textValue);
-    let keyValue;
+  const handleChange = (e, keyValue) => {
+    setInputValue(keyValue);
+  };
 
-    // set multiLookup values
-    if (Array.isArray(textValue)) {
-      const resultsArray = textValue.forEach(getLookupValueFromText);
-      keyValue = resultsArray.join(",");
-    }
-    // set value for sinle Lookup
-    else {
-      keyValue = getLookupValueFromText(textValue);
-      // setLookupOpened(false);
-    }
-    // invoke update function
-    if (keyValue) onChange(textValue, keyValue);
-    else console.warn("Lookup value OnChange error: Key Value is empty");
+  const handleClose = (e, keyValue) => {
+    if (Array.isArray(keyValue)) onChange(keyValue.join(","));
+    else onChange(keyValue);
   };
 
   return (
     <Autocomplete
       name={fieldKey}
       multiple={isMultiLookup}
-      open={isLookupOpened}
-      onOpen={() => {
-        setLookupOpened(true);
-      }}
+      // open={isLookupOpened}
+      // onOpen={() => {
+      //   setLookupOpened(true);
+      // }}
       onClose={() => {
-        setLookupOpened(false);
+        handleClose();
       }}
-      value={textFieldValue}
+      value={inputValue}
       // inputValue={fieldValue}
-      onChange={handleInputLookupValueChange}
-      options={openedOptions}
-      loading={lookupLoading}
+      onChange={handleChange}
+      options={options.map((option) => option[lookupSettings.valueFieldName])}
+      getOptionLabel={getLookupTextFromValue}
+      // loading={lookupLoading}
       key={fieldKey}
       renderInput={renderedInput(
         fieldKey,
         fieldDescription,
         slotInputProps,
-        fieldDisplayName,
-        lookupLoading
+        fieldDisplayName
       )}
     />
   );
@@ -169,4 +131,4 @@ const renderedInput =
       />
     );
 
-export default FieldValueLookupComponent;
+export default FieldValueSelectorComponent;
