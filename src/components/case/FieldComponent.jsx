@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, createContext } from "react";
 import { Box, IconButton } from "@mui/material";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -7,6 +7,8 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import { useUpdateEffect } from "usehooks-ts";
 
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
+
+export const FieldAttachmentFileContext = createContext();
 
 const FieldComponent = ({ field, onChange }) => {
   const fieldName = field.name;
@@ -21,8 +23,11 @@ const FieldComponent = ({ field, onChange }) => {
   const caseIsReadOnly = useContext(CaseContext);
   const [isStartEndVisible, asd] = useState(
     field.timeType != "Timeless" &&
-    !caseIsReadOnly &&
-    !field.attributes?.["input.hideStartEnd"]);
+      !caseIsReadOnly &&
+      !field.attributes?.["input.hideStartEnd"]
+  );
+
+  const [attachmentFiles, setAttachmentFiles] = useState();
 
   // initial build
   useEffect(() => {
@@ -69,19 +74,20 @@ const FieldComponent = ({ field, onChange }) => {
       key={"field_inline_" + field.id}
       // marginBottom="5px"
     >
-      <FieldValueComponent
-        fieldDisplayName={field.displayName}
-        fieldDescription={field.description}
-        fieldKey={fieldKey}
-        fieldValue={fieldValue}
-        setFieldValue={setFieldValue}
-        fieldValueType={field.valueType}
-        onChange={handleValueChange}
-        lookupSettings={field.lookupSettings}
-        attributes={field.attributes}
-        key={"field_valuecomponent_" + field.id}
-      />
-
+      <FieldAttachmentFileContext.Provider value={(attachmentFiles, setAttachmentFiles)}>
+        <FieldValueComponent
+          fieldDisplayName={field.displayName}
+          fieldDescription={field.description}
+          fieldKey={fieldKey}
+          fieldValue={fieldValue}
+          setFieldValue={setFieldValue}
+          fieldValueType={field.valueType}
+          onChange={handleValueChange}
+          lookupSettings={field.lookupSettings}
+          attributes={field.attributes}
+          key={"field_valuecomponent_" + field.id}
+        />
+      </FieldAttachmentFileContext.Provider>
       {/* {field.timeType != "Timeless" && (!caseIsReadOnly) && (
         <Box
           key={"field_timefield_icon_wrapper" + field.id}
@@ -111,7 +117,9 @@ const FieldComponent = ({ field, onChange }) => {
             fieldKey={fieldKey + "_start"}
             fieldValue={fieldStartDate}
             setFieldValue={setFieldStartDate}
-            fieldValueType={ field.attributes["input.pickerStart"] ? "DateTime" : "Date" }
+            fieldValueType={
+              field.attributes["input.pickerStart"] ? "DateTime" : "Date"
+            }
             onChange={handleInputStartDateChange}
             key={"field_startdate" + field.id}
           />
@@ -123,7 +131,9 @@ const FieldComponent = ({ field, onChange }) => {
                 fieldKey={fieldKey + "_end"}
                 fieldValue={fieldEndDate}
                 setFieldValue={setFieldEndDate}
-                fieldValueType={ field.attributes["input.pickerEnd"] ? "DateTime" : "Date"}
+                fieldValueType={
+                  field.attributes["input.pickerEnd"] ? "DateTime" : "Date"
+                }
                 onChange={handleInputEndDateChange}
                 required={field.endMandatory}
                 key={"field_enddate" + field.id}

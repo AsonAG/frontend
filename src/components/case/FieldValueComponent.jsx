@@ -22,6 +22,8 @@ import { UserContext } from "../../App";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 import FieldValueAutocompleteComponent from "./FieldValueAutocompleteComponent";
 import { Markup } from "interweave";
+import FieldValueFileComponent from "./FieldValueFileComponent";
+import FieldDescriptionComponent from "./FieldDescriptionComponent";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -46,7 +48,7 @@ const FieldValueComponent = ({
         size: "small",
       }
     : {};
-    const caseIsReadOnly = useContext(CaseContext);
+  const caseIsReadOnly = useContext(CaseContext);
   /* Validation options               =============================== START =============================== */
   // const [fieldVisited, setFieldVisited] = useState(false);
   // const [isFieldValid, setFieldValid] = useState((fieldValue ? true : !required));
@@ -117,7 +119,7 @@ const FieldValueComponent = ({
       fieldValue,
       fieldDescription,
       fieldKey,
-      onChange={handleInputLookupValueChange},
+      (onChange = { handleInputLookupValueChange }),
       lookupSettings,
       slotInputProps,
       fieldDisplayName,
@@ -128,12 +130,27 @@ const FieldValueComponent = ({
   /* Return any other type  =============================== START =============================== */
     switch (fieldValueType) {
       case "None":
-        return (
-          <Box marginLeft="14px" marginBottom="5px">
-            <Typography>{fieldDisplayName}</Typography>
-            <Markup content={fieldDescription} />
-          </Box>
-        );
+        if (attributes?.["input.attachment"])
+          return FieldValueFileComponent(
+            fieldDisplayName,
+            fieldDescription,
+            required,
+            fieldValue,
+            handleTextValueChange,
+            handleTextBlur,
+            fieldValueType,
+            fieldKey,
+            slotInputProps,
+            attributes
+          );
+        else
+          return (
+            <Box marginLeft="14px" marginBottom="5px">
+              <Typography>{fieldDisplayName}</Typography>
+              {FieldDescriptionComponent(fieldDescription)}
+            </Box>
+          );
+
       case "Date":
         return (
           <DatePicker
