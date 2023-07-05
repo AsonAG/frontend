@@ -14,8 +14,8 @@ import Header from "../../components/Header";
 import TenantsApi from "../../api/TenantsApi";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
-import Logo from "../../components/Logo";
 import { useNavigate } from "react-router-dom";
+import Topbar from "../global/Topbar";
 
 const Tenants = () => {
   const { user, setUser } = useContext(UserContext);
@@ -50,7 +50,10 @@ const Tenants = () => {
 <Box 
       m="25px"
       >
-    <Logo />
+    <Topbar
+        noSidebar={true}
+      />
+
     <Box
       mt="25vh"
       display="flex"

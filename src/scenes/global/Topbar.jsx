@@ -19,7 +19,7 @@ import { UserContext } from "../../App";
 import UsersApi from "../../api/UsersApi";
 import ApiClient from "../../api/ApiClient";
 
-const Topbar = ({ isCollapsed, setIsCollapsed }) => {
+const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
@@ -100,24 +100,26 @@ const Topbar = ({ isCollapsed, setIsCollapsed }) => {
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box display="flex" flexDirection="row">
             {/* LOGO AND MENU ICON */}
-            <MenuItem
-              style={{
-                color: colors.grey[100],
-              }}
-            >
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                sx={{
-                  margin: "0",
+            {!noSidebar && (
+              <MenuItem
+                style={{
+                  color: colors.grey[100],
                 }}
               >
-                <MenuOutlinedIcon />
-              </IconButton>
-            </MenuItem>
+                <IconButton
+                  size="large"
+                  edge="start"
+                  color="inherit"
+                  aria-label="menu"
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  sx={{
+                    margin: "0",
+                  }}
+                >
+                  <MenuOutlinedIcon />
+                </IconButton>
+              </MenuItem>
+            )}
 
             <MenuItem
               sx={{

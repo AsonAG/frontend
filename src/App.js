@@ -23,7 +23,11 @@ import PayrollsApi from "./api/PayrollsApi";
 import Tenants from "./scenes/tenants";
 import UsersApi from "./api/UsersApi";
 import de from "date-fns/locale/de";
-import { useLocalStorage, useSessionStorage, useUpdateEffect } from "usehooks-ts";
+import {
+  useLocalStorage,
+  useSessionStorage,
+  useUpdateEffect,
+} from "usehooks-ts";
 import EmployeesApi from "./api/EmployeesApi";
 import authConfig from "./authConfig";
 import { ErrorBoundary } from "react-error-boundary";
@@ -54,6 +58,24 @@ function App() {
   );
   const [user, setUser] = useState({});
 
+  const authLink = async () => {
+    let token = sessionStorage.getItem(
+      "oidc.user:https://ason-01-p4mk1f.zitadel.cloud:210272222781178113@ason"
+    );
+    const { exp } = token.expires_at;
+    const expirationTime = exp * 1000 - 60000;
+
+    if (Date.now() >= expirationTime) {
+      localStorage.clear();
+      sessionStorage.clear();
+    }
+  };
+
+  useEffect(() => {
+    // authLink();
+    console.log("App.js useEffect invoked.");
+  }, []);
+
   useEffect(() => {
     document.title = user.currentPayrollName
       ? "Ason - " + user.currentPayrollName
@@ -61,7 +83,6 @@ function App() {
   }, [user.currentPayrollName]);
 
   useUpdateEffect(() => {
-    console.log("Use effect invoked on: [user.tenantId, authUserIdentifier]");
     if (user.tenantId && authUserIdentifier) {
       const usersApi = new UsersApi(ApiClient, user.tenantId);
       usersApi.getUsers(onGetUsersCallback);
@@ -72,10 +93,13 @@ function App() {
   }, [user.tenantId, authUserIdentifier]);
 
   useUpdateEffect(() => {
-    console.log("Use effect invoked on: [user.attributes]");
     if (user.tenantId && user.attributes) {
       const payrollsApi = new PayrollsApi(ApiClient, user.tenantId);
-      const employeesApi = new EmployeesApi(ApiClient, user.tenantId, user.currentDivisionId);
+      const employeesApi = new EmployeesApi(
+        ApiClient,
+        user.tenantId,
+        user.currentDivisionId
+      );
       payrollsApi.getPayrolls(onGetPayrollsCallback);
       employeesApi.getEmployees(onGetEmployeesCallbck);
     } else {
@@ -141,9 +165,9 @@ function App() {
           divisionId: payroll.divisionId,
         })),
       }));
-      else {
-        console.warn("No payrolls set in user attributes.");
-      }
+    else {
+      console.warn("No payrolls set in user attributes.");
+    }
   };
 
   const onGetEmployeesCallbck = (error, data, response) => {
@@ -168,54 +192,60 @@ function App() {
         // display="flex"
         // flexDirection="column"
       >
-        {/* <ErrorBoundary
-        FallbackComponent={UnknownErrorPage}
-        onError={(error) => console.error(JSON.stringify(error, null, 2))}
-      > */}
-        <Topbar
-          isCollapsed={isSidebarCollapsed}
-          setIsCollapsed={setIsSidebarCollapsed}
-        />
-
-        <Box
-          display="flex"
-          flexDirection="row"
-          width="100%"
-          height="100%"
-          paddingTop="60px"
+        <ErrorBoundary
+          FallbackComponent={UnknownErrorPage}
+          onError={(error) => console.error(JSON.stringify(error, null, 2))}
         >
-          <Sidebar isCollapsed={isSidebarCollapsed} />
-          <main className="content">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/employees" element={<Employees />} />
+          <Topbar
+            isCollapsed={isSidebarCollapsed}
+            setIsCollapsed={setIsSidebarCollapsed}
+          />
 
-              <Route path="/employee" element={<EmployeeCases />} />
-              <Route path="/company" element={<CompanyCases />} />
+          <Box
+            display="flex"
+            flexDirection="row"
+            width="100%"
+            height="100%"
+            paddingTop="60px"
+          >
+            <Sidebar isCollapsed={isSidebarCollapsed} />
+            <main className="content">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/employees" element={<Employees />} />
 
-              <Route path="/personalCase" element={<PersonalCase />} />
-              <Route path="/employeeCase" element={<EmployeeCase />} />
-              <Route path="/companyCase" element={<CompanyCase />} />
+                <Route path="/employee" element={<EmployeeCases />} />
+                <Route path="/company" element={<CompanyCases />} />
 
-              <Route path="/personalData" element={<PersonalData />} />
-              <Route path="/employeeData" element={<EmployeeData />} />
-              <Route path="/companyData" element={<CompanyData />} />
+                <Route path="/personalCase" element={<PersonalCase />} />
+                <Route path="/employeeCase" element={<EmployeeCase />} />
+                <Route path="/companyCase" element={<CompanyCase />} />
 
-              <Route path="/personalDataCase" element={<PersonalDataCase />} />
-              <Route path="/companyDataCase" element={<CompanyDataCase />} />
-              <Route path="/employeeDataCase" element={<EmployeeDataCase />} />
+                <Route path="/personalData" element={<PersonalData />} />
+                <Route path="/employeeData" element={<EmployeeData />} />
+                <Route path="/companyData" element={<CompanyData />} />
 
-              <Route path="/employeeEvents" element={<EmployeeEvents />} />
-              <Route path="/companyEvents" element={<CompanyEvents />} />
+                <Route
+                  path="/personalDataCase"
+                  element={<PersonalDataCase />}
+                />
+                <Route path="/companyDataCase" element={<CompanyDataCase />} />
+                <Route
+                  path="/employeeDataCase"
+                  element={<EmployeeDataCase />}
+                />
 
-              <Route path="/ECT" element={<Tasks />} />
-              <Route path="/ESS" element={<PersonalCases />} />
+                <Route path="/employeeEvents" element={<EmployeeEvents />} />
+                <Route path="/companyEvents" element={<CompanyEvents />} />
 
-              {/* <Route path="/documents" element={<Documents />} /> */}
-            </Routes>
-          </main>
-        </Box>
-        {/* </ErrorBoundary> */}
+                <Route path="/ECT" element={<Tasks />} />
+                <Route path="/ESS" element={<PersonalCases />} />
+
+                {/* <Route path="/documents" element={<Documents />} /> */}
+              </Routes>
+            </main>
+          </Box>
+        </ErrorBoundary>
       </Box>
     );
   } else {
