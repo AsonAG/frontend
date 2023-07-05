@@ -6,18 +6,20 @@ import {
   Toolbar,
   Menu,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import { AccountCircle } from "@mui/icons-material";
+import { AccountCircle, TypeSpecimenOutlined } from "@mui/icons-material";
 import Logo from "../../components/Logo";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { useAuth } from "oidc-react";
 import { UserContext } from "../../App";
 import UsersApi from "../../api/UsersApi";
 import ApiClient from "../../api/ApiClient";
+import { Link, useNavigate } from "react-router-dom";
 
 const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
   const theme = useTheme();
@@ -26,10 +28,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const auth = useAuth();
   const { user, setUser } = useContext(UserContext);
-
-  const handleChange = (event) => {
-    // setAuth(event.target.checked);
-  };
+  const settingsLink = process.env.REACT_APP_AUTHORITY_SETTINGS_URL;
 
   const handleLogout = () => {
     setUser({});
@@ -158,7 +157,9 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose}>Settings</MenuItem>
+              <MenuItem component={Link} to={settingsLink}>
+                User settings
+              </MenuItem>
               <MenuItem onClick={handleSwitchTenant}>Switch tenant</MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
