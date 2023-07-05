@@ -188,64 +188,42 @@ function App() {
   if (user.tenantId) {
     content = (
       <Box
-        className="app"
-        // display="flex"
-        // flexDirection="column"
+        display="flex"
+        flexDirection="row"
+        width="100%"
+        height="100%"
+        paddingTop="60px"
       >
-        <ErrorBoundary
-          FallbackComponent={UnknownErrorPage}
-          onError={(error) => console.error(JSON.stringify(error, null, 2))}
-        >
-          <Topbar
-            isCollapsed={isSidebarCollapsed}
-            setIsCollapsed={setIsSidebarCollapsed}
-          />
+        <Sidebar isCollapsed={isSidebarCollapsed} />
+        <main className="content">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/employees" element={<Employees />} />
 
-          <Box
-            display="flex"
-            flexDirection="row"
-            width="100%"
-            height="100%"
-            paddingTop="60px"
-          >
-            <Sidebar isCollapsed={isSidebarCollapsed} />
-            <main className="content">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/employees" element={<Employees />} />
+            <Route path="/employee" element={<EmployeeCases />} />
+            <Route path="/company" element={<CompanyCases />} />
 
-                <Route path="/employee" element={<EmployeeCases />} />
-                <Route path="/company" element={<CompanyCases />} />
+            <Route path="/personalCase" element={<PersonalCase />} />
+            <Route path="/employeeCase" element={<EmployeeCase />} />
+            <Route path="/companyCase" element={<CompanyCase />} />
 
-                <Route path="/personalCase" element={<PersonalCase />} />
-                <Route path="/employeeCase" element={<EmployeeCase />} />
-                <Route path="/companyCase" element={<CompanyCase />} />
+            <Route path="/personalData" element={<PersonalData />} />
+            <Route path="/employeeData" element={<EmployeeData />} />
+            <Route path="/companyData" element={<CompanyData />} />
 
-                <Route path="/personalData" element={<PersonalData />} />
-                <Route path="/employeeData" element={<EmployeeData />} />
-                <Route path="/companyData" element={<CompanyData />} />
+            <Route path="/personalDataCase" element={<PersonalDataCase />} />
+            <Route path="/companyDataCase" element={<CompanyDataCase />} />
+            <Route path="/employeeDataCase" element={<EmployeeDataCase />} />
 
-                <Route
-                  path="/personalDataCase"
-                  element={<PersonalDataCase />}
-                />
-                <Route path="/companyDataCase" element={<CompanyDataCase />} />
-                <Route
-                  path="/employeeDataCase"
-                  element={<EmployeeDataCase />}
-                />
+            <Route path="/employeeEvents" element={<EmployeeEvents />} />
+            <Route path="/companyEvents" element={<CompanyEvents />} />
 
-                <Route path="/employeeEvents" element={<EmployeeEvents />} />
-                <Route path="/companyEvents" element={<CompanyEvents />} />
+            <Route path="/ECT" element={<Tasks />} />
+            <Route path="/ESS" element={<PersonalCases />} />
 
-                <Route path="/ECT" element={<Tasks />} />
-                <Route path="/ESS" element={<PersonalCases />} />
-
-                {/* <Route path="/documents" element={<Documents />} /> */}
-              </Routes>
-            </main>
-          </Box>
-        </ErrorBoundary>
+            {/* <Route path="/documents" element={<Documents />} /> */}
+          </Routes>
+        </main>
       </Box>
     );
   } else {
@@ -266,7 +244,24 @@ function App() {
                 value={{ employee, setEmployee }}
               >
                 <UserEmployeeContext.Provider value={userEmployee}>
-                  {content}
+                  <Box
+                    className="app"
+                    // display="flex"
+                    // flexDirection="column"
+                  >
+                    <ErrorBoundary
+                      FallbackComponent={UnknownErrorPage}
+                      onError={(error) =>
+                        console.error(JSON.stringify(error, null, 2))
+                      }
+                    >
+                      <Topbar
+                        isCollapsed={isSidebarCollapsed}
+                        setIsCollapsed={setIsSidebarCollapsed}
+                      />
+                      {content}
+                    </ErrorBoundary>
+                  </Box>
                 </UserEmployeeContext.Provider>
               </EmployeeSelectionContext.Provider>
             </UserContext.Provider>
