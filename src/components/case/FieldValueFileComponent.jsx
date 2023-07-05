@@ -21,11 +21,38 @@ const FieldValueFileComponent = (
   //   const caseIsReadOnly = useContext(CaseContext);
   const extensions = attributes?.["input.attachmentExtensions"];
   const required = attributes?.["input.attachment"] === "Mandatory";
-  const [attachmentFiles, setAttachmentFiles] = useContext(FieldAttachmentFileContext);
+  const { attachmentFiles, setAttachmentFiles } = useContext(
+    FieldAttachmentFileContext
+  );
+
+  const uploadFile = async (file) => {
+    const base64 = await convertBase64(file);
+    setAttachmentFiles((current) => ({
+      ...current,
+      [file.name]: { base64 },
+    }));
+  };
+
+  const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
 
   const handleUpload = (event) => {
-//     setFiles((current) => [...current, event.target.files[0]]);
-        setAttachmentFiles(event.target.files);
+    const files = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+      uploadFile(files[i]);
+    }
   };
 
   // TODO: refactor color to separate style files
@@ -34,7 +61,7 @@ const FieldValueFileComponent = (
       <Typography color="rgba(0, 0, 0, 0.6)">
         {fieldDisplayName + (required ? "*" : "")}
       </Typography>
-      {/* <Box width="160px"> */}
+      <Box width="160px">
         <IconButton variant="contained" component="label">
           <FileUploadOutlinedIcon />
           <input
@@ -45,9 +72,8 @@ const FieldValueFileComponent = (
             //     hidden
             required={required}
           />
-          
         </IconButton>
-      {/* </Box> */}
+      </Box>
       {FieldDescriptionComponent(fieldDescription)}
     </Stack>
   );

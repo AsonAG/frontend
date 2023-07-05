@@ -27,7 +27,7 @@ const FieldComponent = ({ field, onChange }) => {
       !field.attributes?.["input.hideStartEnd"]
   );
 
-  const [attachmentFiles, setAttachmentFiles] = useState();
+  const [attachmentFiles, setAttachmentFiles] = useState({});
 
   // initial build
   useEffect(() => {
@@ -74,7 +74,7 @@ const FieldComponent = ({ field, onChange }) => {
       key={"field_inline_" + field.id}
       // marginBottom="5px"
     >
-      <FieldAttachmentFileContext.Provider value={(attachmentFiles, setAttachmentFiles)}>
+      <FieldAttachmentFileContext.Provider value={{attachmentFiles, setAttachmentFiles}}>
         <FieldValueComponent
           fieldDisplayName={field.displayName}
           fieldDescription={field.description}

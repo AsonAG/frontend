@@ -7,7 +7,7 @@ const UnknownErrorPage = (props) => {
   const { error, resetErrorBoundary } = props;
 
   return (
-    <Box m="25px">
+    <Box marginTop="60px" marginLeft="25px">
       
       <Topbar
         noSidebar={true}

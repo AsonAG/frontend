@@ -1,7 +1,4 @@
-import {
-  DataGrid,
-  GridToolbarQuickFilter,
-} from "@mui/x-data-grid";
+import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import { UserContext } from "../../App";
@@ -40,8 +37,14 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
           ...tableData,
           {
             id: index,
-            caseName: langCode && element["caseNameLocalizations"][langCode] ? element["caseNameLocalizations"][langCode] : element["caseName"],
-            caseFieldName: langCode && element["caseFieldNameLocalizations"][langCode] ? element["caseFieldNameLocalizations"][langCode] :  element["caseFieldName"],
+            caseName:
+              langCode && element["caseNameLocalizations"][langCode]
+                ? element["caseNameLocalizations"][langCode]
+                : element["caseName"],
+            caseFieldName:
+              langCode && element["caseFieldNameLocalizations"][langCode]
+                ? element["caseFieldNameLocalizations"][langCode]
+                : element["caseFieldName"],
             value: element["value"],
             valueType: element["valueType"],
             start: element["start"],
@@ -62,10 +65,10 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
   };
 
   const dateTimeFormatter = (params) =>
-    format(new Date(params?.value), "yyyy-MM-dd hh:mm");
+    params?.value ? format(new Date(params?.value), "yyyy-MM-dd HH:mm") : null;
 
   const dateFormatter = (params) =>
-    format(new Date(params?.value), "yyyy-MM-dd");
+    params?.value ? format(new Date(params?.value), "yyyy-MM-dd") : null;
 
   const columns = [
     {
@@ -84,11 +87,11 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
       headerName: "Value",
       flex: 3,
     },
-//     {
-//       field: "valueType",
-//       headerName: "Value Type",
-//       flex: 3,
-//     },
+    //     {
+    //       field: "valueType",
+    //       headerName: "Value Type",
+    //       flex: 3,
+    //     },
     {
       field: "start",
       headerName: "Start",
