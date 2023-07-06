@@ -12,9 +12,9 @@ const FieldValueTextComponent = (
   fieldValueType,
   fieldKey,
   slotInputProps,
-  attributes
+  attributes,
+  caseIsReadOnly
 ) => {
-  const caseIsReadOnly = useContext(CaseContext);
 
   return (
     <TextField
@@ -30,7 +30,7 @@ const FieldValueTextComponent = (
       key={fieldKey}
       multiline={attributes?.["input.multiLine"]}
       minRows={2}
-      disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
+      disabled={caseIsReadOnly}
       
       InputProps={{
         endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),

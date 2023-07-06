@@ -16,7 +16,8 @@ function FieldValueSelectorComponent(
   lookupSettings,
   slotInputProps,
   fieldDisplayName,
-  attributes
+  attributes,
+  caseIsReadOnly
 ) {
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
@@ -92,6 +93,7 @@ function FieldValueSelectorComponent(
       options={options.map((option) => option[lookupSettings.valueFieldName])}
       getOptionLabel={getLookupTextFromValue}
       key={fieldKey}
+      disabled={caseIsReadOnly}
       renderInput={renderedInput(
         fieldKey,
         fieldDescription,

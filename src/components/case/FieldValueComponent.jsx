@@ -47,7 +47,7 @@ const FieldValueComponent = ({
         size: "small",
       }
     : {};
-  const caseIsReadOnly = useContext(CaseContext);
+  const caseIsReadOnly = useContext(CaseContext) || attributes?.["input.readOnly"];
   /* Validation options               =============================== START =============================== */
   // const [fieldVisited, setFieldVisited] = useState(false);
   // const [isFieldValid, setFieldValid] = useState((fieldValue ? true : !required));
@@ -126,7 +126,8 @@ const FieldValueComponent = ({
       lookupSettings,
       slotInputProps,
       fieldDisplayName,
-      attributes
+      attributes,
+      caseIsReadOnly
     );
   } else
   /* Return Lookup          ================================ END ================================ */
@@ -160,7 +161,7 @@ const FieldValueComponent = ({
             name={fieldKey}
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
-            disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
+            disabled={caseIsReadOnly}
             slotProps={{
               ...slotInputProps,
               textField: {
@@ -180,7 +181,7 @@ const FieldValueComponent = ({
             name={fieldKey}
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
-            disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
+            disabled={caseIsReadOnly}
             slotProps={{
               ...slotInputProps,
               textField: {
@@ -203,7 +204,7 @@ const FieldValueComponent = ({
                   }
                   onChange={handleBooleanValueChange}
                   key={fieldKey}
-                  disabled={caseIsReadOnly || attributes?.["input.readOnly"]}
+                  disabled={caseIsReadOnly}
                 />
               }
             />
@@ -223,7 +224,8 @@ const FieldValueComponent = ({
               fieldValueType,
               fieldKey,
               slotInputProps,
-              attributes
+              attributes,
+              caseIsReadOnly
             )}
             <Box m="6px">
               <Link href={fieldValue} target="_blank" rel="noopener">
@@ -243,7 +245,8 @@ const FieldValueComponent = ({
           fieldValueType,
           fieldKey,
           slotInputProps,
-          attributes
+          attributes,
+          caseIsReadOnly
         );
     }
   /* Return any other type  =============================== END =============================== */

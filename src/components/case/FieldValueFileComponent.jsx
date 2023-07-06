@@ -25,8 +25,8 @@ const FieldValueFileComponent = (
   const uploadFile = async (file) => {
     const fileEncoded = await convertBase64(file);
     let [contentType, base64] = fileEncoded.split(";");
-    contentType = String(contentType).slice(5);
-    base64 = String(base64).slice(7);
+    contentType = contentType.slice(5);
+    base64 = base64.slice(7);
 
     setAttachmentFiles((current) => [
       ...current,
