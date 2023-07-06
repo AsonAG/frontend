@@ -13,7 +13,7 @@ import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
 import { getMainCaseObject } from "../../api/CasesApi";
-import CasesSaveButton from "./CasesSaveButton";
+import CasesSaveButton from "../buttons/CasesSaveButton";
 
 const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
   const theme = useTheme();
