@@ -23,48 +23,48 @@ import { UserContext, UserEmployeeContext } from "../../App";
 import PayrollSelector from "../../components/selectors/PayrollSelector";
 import { useAuth } from "oidc-react";
 import { Stack } from "@mui/system";
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import CasesOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
-
-const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  return (
-    <MenuItem
-      active={selected === title}
-      style={{
-        color: colors.grey[100],
-      }}
-      onClick={() => setSelected(title)}
-      icon={icon}
-    >
-      {!isCollapsed && (
-        <div>
-          <Typography>{title}</Typography>
-        </div>
-      )}
-      {isCollapsed ? (
-        <Tooltip title={title} placement="right">
-          <Link to={to} />
-        </Tooltip>
-      ) : (
-        <Link to={to} />
-      )}
-    </MenuItem>
-  );
-};
 
 const Sidebar = ({ isCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [selected, setSelected] = useState("Dashboard");
   const minWidth = useMediaQuery("(min-width:600px)");
   const auth = useAuth();
   const { user, setUser } = useContext(UserContext);
   const userEmployee = useContext(UserEmployeeContext);
+  const [selected, setSelected] = useState("Dashboard");
+
+  const Item = ({ title, to, icon }) => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    return (
+      <MenuItem
+        active={selected === title}
+        style={{
+          color: colors.grey[100],
+        }}
+        onClick={() => setSelected(title)}
+        icon={icon}
+      >
+        {!isCollapsed && (
+          <div>
+            <Typography>{title}</Typography>
+          </div>
+        )}
+        {isCollapsed ? (
+          <Tooltip title={title} placement="right">
+            <Link to={to} />
+          </Tooltip>
+        ) : (
+          <Link to={to} />
+        )}
+      </MenuItem>
+    );
+  };
 
   return (
     (minWidth || !isCollapsed) && (
@@ -92,10 +92,10 @@ const Sidebar = ({ isCollapsed }) => {
             // padding: "0px 20px 10px 20px !important",
           },
           "& .pro-inner-item:hover": {
-            color: "#868dfb !important",
+            color: colors.blueAccentReverse + "!important",
           },
-          "& .pro-menu-item.active": {
-            color: "#6870fa !important",
+          "& .pro-menu-item.active .pro-inner-item": {
+            color: colors.blueAccent + "!important",
           },
         }}
       >
@@ -123,14 +123,7 @@ const Sidebar = ({ isCollapsed }) => {
           >
             <Menu>
               <Box>
-                <Item
-                  title="Dashboard"
-                  to="/"
-                  icon={<HomeIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-                  isCollapsed={isCollapsed}
-                />
+                <Item title="Dashboard" to="/" icon={<HomeIcon />} />
 
                 <Divider />
 
@@ -139,9 +132,6 @@ const Sidebar = ({ isCollapsed }) => {
                     title="Employees"
                     to="/employees"
                     icon={<PeopleOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
                   />
                   <SubMenu
                     defaultOpen
@@ -152,33 +142,21 @@ const Sidebar = ({ isCollapsed }) => {
                       title="New event"
                       to="/company"
                       icon={<AddOutlinedIcon />}
-                      selected={selected}
-                      setSelected={setSelected}
-                      isCollapsed={isCollapsed}
                     />
                     <Item
                       title="Data"
                       to="/companyData"
                       icon={<CasesOutlinedIcon />}
-                      selected={selected}
-                      setSelected={setSelected}
-                      isCollapsed={isCollapsed}
                     />
                     <Item
                       title="Events"
                       to="/companyEvents"
                       icon={<WorkHistoryOutlinedIcon />}
-                      selected={selected}
-                      setSelected={setSelected}
-                      isCollapsed={isCollapsed}
                     />
                     <Item
                       title="Documents"
                       to="/documents"
                       icon={<DescriptionOutlinedIcon />}
-                      selected={selected}
-                      setSelected={setSelected}
-                      isCollapsed={isCollapsed}
                     />
                   </SubMenu>
                 </SubMenu>
@@ -187,8 +165,6 @@ const Sidebar = ({ isCollapsed }) => {
                 title="Calendar"
                 to="/calendar"
                 icon={<CalendarTodayOutlinedIcon />}
-                selected={selected}
-                setSelected={setSelected}
               />
                */}
                 <Divider />
@@ -198,33 +174,21 @@ const Sidebar = ({ isCollapsed }) => {
                     title="New event"
                     to="/ESS"
                     icon={<AddOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
                   />
                   <Item
                     title="My Profile"
                     to="/personalData"
                     icon={<PersonOutlineOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
                   />
                   <Item
                     title="Tasks"
                     to="/ECT"
                     icon={<FormatListBulletedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
                   />
                   <Item
                     title="Documents"
                     to="/documents"
                     icon={<DescriptionOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
                   />
                 </SubMenu>
               </Box>

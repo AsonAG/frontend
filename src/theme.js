@@ -19,6 +19,7 @@ export const tokens = (mode) => ({
           500: "#141b2d", // background 
         },
         blueAccent: "#4985e2",
+        blueAccentReverse: "#461eb7",
       }
     : {
         grey: {
@@ -36,7 +37,9 @@ export const tokens = (mode) => ({
           500: "#ffffff",
         },
         // blueAccent: "#4985e2",
-        blueAccent: "#461eb7"
+        blueAccent: "#461eb7",
+        blueAccentReverse: "#4985e2",
+        
 
       }),
 });

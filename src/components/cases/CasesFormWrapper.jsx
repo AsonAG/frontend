@@ -81,7 +81,7 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
             <Typography
               variant="h4"
               fontWeight="bold"
-              color={colors.blueAccent}
+              // color={colors.blueAccent}
               marginLeft="12px"
             >
               {title}

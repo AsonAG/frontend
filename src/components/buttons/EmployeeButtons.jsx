@@ -21,7 +21,7 @@ export const EmployeeButtons = (params) => {
           color: colors.primary[300],
         },
         "& .employee-icon-button:hover": {
-          color: "#868dfb ",
+          color: colors.blueAccentReverse + "!important",
         },
       }}
     >
