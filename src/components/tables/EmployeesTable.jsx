@@ -112,6 +112,7 @@ const EmployeesTable = () => {
           <EmployeeButtons
             employee={employeeData.find((x) => x.employeeId === employeeId)}
             setEmployeeChoice={handleEmployeeSelection}
+            key={"employee-buttons-"+employeeId}
           ></EmployeeButtons>
         );
       },

@@ -13,7 +13,7 @@ export const FieldAttachmentFileContext = createContext();
 const FieldComponent = ({ field, onChange }) => {
   const fieldName = field.name;
   const fieldKey = getFieldKey(field.name, field.id);
-  const [fieldValue, setFieldValue] = useState(field.value);
+  const [fieldValue, setFieldValue] = useState(field.value ? field.value : ""); // TODO: test if works properly
   const [fieldStartDate, setFieldStartDate] = useState(
     field.start ? new Date(field.start) : null
   );
@@ -21,11 +21,10 @@ const FieldComponent = ({ field, onChange }) => {
     field.end ? new Date(field.end) : null
   );
   const caseIsReadOnly = useContext(CaseContext);
-  const [isStartEndVisible, asd] = useState(
+  const isStartEndVisible =
     field.timeType != "Timeless" &&
-      !caseIsReadOnly &&
-      !field.attributes?.["input.hideStartEnd"]
-  );
+    !caseIsReadOnly &&
+    !field.attributes?.["input.hideStartEnd"];
 
   const [attachmentFiles, setAttachmentFiles] = useState([]);
 
@@ -43,8 +42,15 @@ const FieldComponent = ({ field, onChange }) => {
 
   // handle new document upload
   useUpdateEffect(() => {
-    onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate, attachmentFiles);
-  }, [attachmentFiles])
+    onChange(
+      fieldKey,
+      fieldName,
+      fieldValue,
+      fieldStartDate,
+      fieldEndDate,
+      attachmentFiles
+    );
+  }, [attachmentFiles]);
 
   // handle user manuall value change
   const handleValueChange = (value) => {
@@ -79,7 +85,9 @@ const FieldComponent = ({ field, onChange }) => {
       key={"field_inline_" + field.id}
       // marginBottom="5px"
     >
-      <FieldAttachmentFileContext.Provider value={{attachmentFiles, setAttachmentFiles}}>
+      <FieldAttachmentFileContext.Provider
+        value={{ attachmentFiles, setAttachmentFiles }}
+      >
         <FieldValueComponent
           fieldDisplayName={field.displayName}
           fieldDescription={field.description}
