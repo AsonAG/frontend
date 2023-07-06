@@ -36,18 +36,18 @@ const Sidebar = ({ isCollapsed }) => {
   const auth = useAuth();
   const { user, setUser } = useContext(UserContext);
   const userEmployee = useContext(UserEmployeeContext);
-  const [selected, setSelected] = useState("Dashboard");
+  const [selected, setSelected] = useState("/");
 
   const Item = ({ title, to, icon }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     return (
       <MenuItem
-        active={selected === title}
+        active={selected === to}
         style={{
           color: colors.grey[100],
         }}
-        onClick={() => setSelected(title)}
+        onClick={() => setSelected(to)}
         icon={icon}
       >
         {!isCollapsed && (
