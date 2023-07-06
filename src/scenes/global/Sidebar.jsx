@@ -1,15 +1,11 @@
 import { useContext, useState } from "react";
 import { ProSidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import {
-  AppBar,
   Box,
-  IconButton,
   TextField,
   Tooltip,
   Typography,
-  Toolbar,
   useTheme,
-  Drawer,
   Divider,
 } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -17,11 +13,9 @@ import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import PersonIcon from "@mui/icons-material/Person";
 import WorkIcon from "@mui/icons-material/Work";
-import CasesOutlinedIcon from "@mui/icons-material/CasesOutlined";
-import TaskIcon from "@mui/icons-material/Task";
+// import CasesOutlinedIcon from "@mui/icons-material/CasesOutlined";
 import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -29,9 +23,10 @@ import { UserContext, UserEmployeeContext } from "../../App";
 import PayrollSelector from "../../components/selectors/PayrollSelector";
 import { useAuth } from "oidc-react";
 import { Stack } from "@mui/system";
-import { InsertCommentOutlined } from "@mui/icons-material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import CasesOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
@@ -148,38 +143,44 @@ const Sidebar = ({ isCollapsed }) => {
                     setSelected={setSelected}
                     isCollapsed={isCollapsed}
                   />
-                  <Item
-                    title="Company Cases"
-                    to="/company"
-                    icon={<CasesOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
-                  />
-                  <Item
-                    title="Company Data"
-                    to="/companyData"
+                  <SubMenu
+                    defaultOpen
                     icon={<ApartmentOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
-                  />
-                  <Item
-                    title="Company Events"
-                    to="/companyEvents"
-                    icon={<WorkHistoryOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
-                  />
-                  <Item
-                    title="Documents"
-                    to="/documents"
-                    icon={<DescriptionOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                    isCollapsed={isCollapsed}
-                  />
+                    title="Company"
+                  >
+                    <Item
+                      title="New event"
+                      to="/company"
+                      icon={<AddOutlinedIcon />}
+                      selected={selected}
+                      setSelected={setSelected}
+                      isCollapsed={isCollapsed}
+                    />
+                    <Item
+                      title="Data"
+                      to="/companyData"
+                      icon={<CasesOutlinedIcon />}
+                      selected={selected}
+                      setSelected={setSelected}
+                      isCollapsed={isCollapsed}
+                    />
+                    <Item
+                      title="Events"
+                      to="/companyEvents"
+                      icon={<WorkHistoryOutlinedIcon />}
+                      selected={selected}
+                      setSelected={setSelected}
+                      isCollapsed={isCollapsed}
+                    />
+                    <Item
+                      title="Documents"
+                      to="/documents"
+                      icon={<DescriptionOutlinedIcon />}
+                      selected={selected}
+                      setSelected={setSelected}
+                      isCollapsed={isCollapsed}
+                    />
+                  </SubMenu>
                 </SubMenu>
 
                 {/* <Item
@@ -192,11 +193,11 @@ const Sidebar = ({ isCollapsed }) => {
                */}
                 <Divider />
 
-                <SubMenu icon={<PersonIcon />} title="Employee">
+                <SubMenu defaultOpen icon={<PersonIcon />} title="Employee">
                   <Item
-                    title="New Event"
+                    title="New event"
                     to="/ESS"
-                    icon={<AddCircleOutlineIcon />}
+                    icon={<AddOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
                     isCollapsed={isCollapsed}
@@ -204,15 +205,23 @@ const Sidebar = ({ isCollapsed }) => {
                   <Item
                     title="My Profile"
                     to="/personalData"
-                    icon={<PeopleOutlinedIcon />}
+                    icon={<PersonOutlineOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
                     isCollapsed={isCollapsed}
                   />
                   <Item
-                    title="My Tasks"
+                    title="Tasks"
                     to="/ECT"
                     icon={<FormatListBulletedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                    isCollapsed={isCollapsed}
+                  />
+                  <Item
+                    title="Documents"
+                    to="/documents"
+                    icon={<DescriptionOutlinedIcon />}
                     selected={selected}
                     setSelected={setSelected}
                     isCollapsed={isCollapsed}

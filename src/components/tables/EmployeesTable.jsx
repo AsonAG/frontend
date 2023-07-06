@@ -3,7 +3,7 @@ import {
   GridToolbarQuickFilter,
   GridToolbar,
 } from "@mui/x-data-grid";
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Box, IconButton, Tooltip, useTheme } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import EmployeesApi from "../../api/EmployeesApi";
 import { tokens } from "../../theme";
@@ -12,6 +12,11 @@ import { EmployeeSelectionContext, UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import ErrorBar from "../errors/ErrorBar";
 import TableWrapper from "./TableWrapper";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
+import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import { Link } from "react-router-dom";
 
 const EmployeesTable = () => {
   const [employeeData, setEmployeeData] = useState([]);
@@ -102,16 +107,17 @@ const EmployeesTable = () => {
     },
     {
       field: "employeeId",
-      headerName: "Cases",
+      headerName: "",
       flex: 3,
       headerAlign: "left",
       align: "left",
+      hideable: false,
       renderCell: ({ row: { employeeId } }) => {
         return (
-          <EmployeeSelectorOptions
+          <EmployeeButtons
             employee={employeeData.find((x) => x.employeeId === employeeId)}
             setEmployeeChoice={handleEmployeeSelection}
-          ></EmployeeSelectorOptions>
+          ></EmployeeButtons>
         );
       },
     },
@@ -180,6 +186,11 @@ const EmployeesTable = () => {
           },
         }}
         initialState={{
+          columns: {
+            columnVisibilityModel: {
+              divisions: false,
+            },
+          },
           sorting: {
             sortModel: [{ field: "firstName", sort: "asc" }],
           },
@@ -188,5 +199,41 @@ const EmployeesTable = () => {
     </TableWrapper>
   );
 };
+
+const EmployeeButtons = (params) => {
+  const handleClick = () => {
+    params.setEmployeeChoice(params.employee);
+  };
+
+  return (
+    <>
+      <EmployeeButton title={"New event"} onClick={handleClick} to={"/employee"}>
+        <AddOutlinedIcon />
+      </EmployeeButton>
+
+      <EmployeeButton title={"Data"} onClick={handleClick} to={"/employeeData"}>
+        <CasesOutlinedIcon />
+      </EmployeeButton>
+
+      <EmployeeButton title={"Events"} onClick={handleClick} to="/employeeEvents">
+        <WorkHistoryOutlinedIcon />
+      </EmployeeButton>
+
+      <EmployeeButton title={"Documents"}  onClick={handleClick} to="/employeeDocuments">
+        <DescriptionOutlinedIcon />
+      </EmployeeButton>
+    </>
+  );
+};
+
+const EmployeeButton = ({title, onClick, to, children}) => {return (
+  <Tooltip title={title} placement="top">
+  <IconButton onClick={onClick} component={Link} to={to}>
+    {children}
+  </IconButton>
+</Tooltip>
+)
+
+}
 
 export default EmployeesTable;
