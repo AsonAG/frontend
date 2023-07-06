@@ -137,11 +137,7 @@ const FieldValueComponent = ({
           return FieldValueFileComponent(
             fieldDisplayName,
             fieldDescription,
-            required,
             fieldValue,
-            handleTextValueChange,
-            handleTextBlur,
-            fieldValueType,
             fieldKey,
             slotInputProps,
             attributes
@@ -150,7 +146,7 @@ const FieldValueComponent = ({
           return (
             <Box marginLeft="14px" marginBottom="5px">
               <Typography>{fieldDisplayName}</Typography>
-              {FieldDescriptionComponent(fieldDescription)}
+              {FieldDescriptionComponent(fieldDescription, fieldKey)}
             </Box>
           );
 

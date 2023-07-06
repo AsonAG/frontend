@@ -27,7 +27,7 @@ const FieldComponent = ({ field, onChange }) => {
       !field.attributes?.["input.hideStartEnd"]
   );
 
-  const [attachmentFiles, setAttachmentFiles] = useState({});
+  const [attachmentFiles, setAttachmentFiles] = useState([]);
 
   // initial build
   useEffect(() => {
@@ -40,6 +40,11 @@ const FieldComponent = ({ field, onChange }) => {
     setFieldStartDate(field.start ? new Date(field.start) : null);
     setFieldEndDate(field.end ? new Date(field.end) : null);
   }, [field]);
+
+  // handle new document upload
+  useUpdateEffect(() => {
+    onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate, attachmentFiles);
+  }, [attachmentFiles])
 
   // handle user manuall value change
   const handleValueChange = (value) => {

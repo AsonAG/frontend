@@ -11,9 +11,6 @@ const FieldValueFileComponent = (
   fieldDisplayName,
   fieldDescription,
   fieldValue,
-  handleTextValueChange,
-  handleTextBlur,
-  fieldValueType,
   fieldKey,
   slotInputProps,
   attributes
@@ -26,25 +23,35 @@ const FieldValueFileComponent = (
   );
 
   const uploadFile = async (file) => {
-    const base64 = await convertBase64(file);
-    setAttachmentFiles((current) => ({
+    const fileEncoded = await convertBase64(file);
+    let [contentType, base64] = fileEncoded.split(";");
+    contentType = String(contentType).slice(5);
+    base64 = String(base64).slice(7);
+
+    setAttachmentFiles((current) => [
       ...current,
-      [file.name]: { base64 },
-    }));
+      {
+        name: file.name,
+        contentType: file.type,
+        content: base64,
+      },
+    ]);
   };
 
   const convertBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
 
-      fileReader.onload = () => {
-        resolve(fileReader.result);
+      fileReader.onload = (event) => {
+        resolve(event.target.result);
+        // resolve(fileReader.result);
       };
 
       fileReader.onerror = (error) => {
         reject(error);
       };
+
+      fileReader.readAsDataURL(file);
     });
   };
 
@@ -57,12 +64,16 @@ const FieldValueFileComponent = (
 
   // TODO: refactor color to separate style files
   return (
-    <Stack marginLeft="14px" marginBottom="5px">
-      <Typography color="rgba(0, 0, 0, 0.6)">
+    <Stack marginLeft="14px" marginBottom="5px" key={"stack_" + fieldKey}>
+      <Typography color="rgba(0, 0, 0, 0.6)" key={"title_" + fieldKey}>
         {fieldDisplayName + (required ? "*" : "")}
       </Typography>
-      <Box width="160px">
-        <IconButton variant="contained" component="label">
+      <Box width="160px" key={"inputbox_" + fieldKey}>
+        <IconButton
+          variant="contained"
+          component="label"
+          key={"uploadbutton_" + fieldKey}
+        >
           <FileUploadOutlinedIcon />
           <input
             type="file"
@@ -74,7 +85,7 @@ const FieldValueFileComponent = (
           />
         </IconButton>
       </Box>
-      {FieldDescriptionComponent(fieldDescription)}
+      {FieldDescriptionComponent(fieldDescription, fieldKey)}
     </Stack>
   );
 };

@@ -7,7 +7,7 @@ export default function EmployeeSelectorOptions(params) {
 
   const options = [
     "New case",
-    "Data",
+    "Details",
     "Events",
     // "Assign tasks",
     // "Deactivate employee",

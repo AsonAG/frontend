@@ -1,13 +1,14 @@
 import FieldComponent from "./FieldComponent";
 
 const CaseFields = ({ inputCase, setOutputCaseFields }) => {
-  
+
   const handleFieldChange = (
     fieldId,
     fieldName,
     fieldValue,
     fieldStartDate,
-    fieldEndDate
+    fieldEndDate,
+    attachmentFiles
   ) => {
     setOutputCaseFields((current) => ({
       ...current,
@@ -17,6 +18,7 @@ const CaseFields = ({ inputCase, setOutputCaseFields }) => {
         value: fieldValue,
         start: isoDateWithoutTimeZone(fieldStartDate),
         end: isoDateWithoutTimeZone(fieldEndDate),
+        documents: attachmentFiles
       },
     }));
   };
