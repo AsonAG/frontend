@@ -38,7 +38,7 @@ export default function PayrollSelector() {
     <Box>
       <FormControl fullWidth>
         <InputLabel color="primary" id="payroll-selection-label">
-          Payroll Unit
+          Business Unit
         </InputLabel>
         <Select
           variant="standard"

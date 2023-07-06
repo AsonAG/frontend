@@ -160,7 +160,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
               <MenuItem component={Link} to={settingsLink}>
                 User settings
               </MenuItem>
-              <MenuItem onClick={handleSwitchTenant}>Switch tenant</MenuItem>
+              <MenuItem onClick={handleSwitchTenant}>Switch company</MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </Box>

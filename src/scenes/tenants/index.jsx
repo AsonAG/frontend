@@ -7,6 +7,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Stack,
   Typography,
 } from "@mui/material";
 import { React, useEffect, useContext, useState, useMemo } from "react";
@@ -47,37 +48,37 @@ const Tenants = () => {
   };
 
   return (
-<Box 
-      m="25px"
-      >
-    <Topbar
-        noSidebar={true}
-      />
+    <Box m="25px">
+      <Topbar noSidebar={true} />
 
-    <Box
-      mt="25vh"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      minWidth="90vw"
-    >
-        <Header title="Tenants" subtitle="Select tenant" />
-        {tenants.map((tenant) => (
-          <Card sx={{ 
-            maxWidth: '445px',
-            minWidth: '345px'
-             }} key={tenant.id}>
-            <CardActionArea>
-              <CardContent onClick={() => onSelectTenant(tenant)}>
-                <Typography gutterBottom variant="h5" component="div">
-                  {tenant.identifier}
-                </Typography>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        ))}
-      </Box>
+      <Stack
+        mt="25vh"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        minWidth="90vw"
+        spacing="200"
+      >
+        <Header title="Select a company" subtitle="Select a company" />
+          {tenants.map((tenant) => (
+            <Card
+              sx={{
+                maxWidth: "445px",
+                minWidth: "345px",
+              }}
+              key={tenant.id}
+            >
+              <CardActionArea>
+                <CardContent onClick={() => onSelectTenant(tenant)}>
+                  <Typography gutterBottom variant="h5" component="div">
+                    {tenant.identifier}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))}
+        </Stack>
     </Box>
   );
 };
