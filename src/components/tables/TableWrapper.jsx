@@ -42,6 +42,9 @@ const TableWrapper = ({ error, setError, children }) => {
         "& .MuiCheckbox-root": {
           color: `${colors.blueAccent} !important`,
         },
+        "& .name-column--cell:hover": {
+          color: `${colors.blueAccentReverse} !important`,
+        }
       }}
     >
       {error && (

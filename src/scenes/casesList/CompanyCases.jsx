@@ -8,7 +8,7 @@ import { useContext } from "react";
 const CompanyCases = () => {
   return (
     <Box m="25px">
-      <Header title="Company Cases" subtitle="Choose a case" />
+      <Header title="New Company Event" subtitle="Choose a case" />
       <CasesTable caseType={"Company"} navigateTo={"/companyCase"} />
     </Box>
   );

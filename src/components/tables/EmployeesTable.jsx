@@ -107,6 +107,7 @@ const EmployeesTable = () => {
       headerAlign: "left",
       align: "left",
       hideable: false,
+      sortable: false,
       renderCell: ({ row: { employeeId } }) => {
         return (
           <EmployeeButtons
