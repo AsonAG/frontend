@@ -30,6 +30,8 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
   const { user, setUser } = useContext(UserContext);
   const settingsLink = process.env.REACT_APP_AUTHORITY_SETTINGS_URL;
 
+  const handleSidebar = () => setIsCollapsed(!isCollapsed);
+
   const handleLogout = () => {
     setUser({});
     auth.signOut();
@@ -89,7 +91,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
           padding: "0 22px 0 0 !important",
         },
         "& .MuiButtonBase-root:hover": {
-          color: "#868dfb !important",
+          color: `${colors.blueAccentReverse} !important`,
         },
       }}
     >
@@ -98,31 +100,20 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
       >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box display="flex" flexDirection="row">
-            {/* LOGO AND MENU ICON */}
             {!noSidebar && (
               <MenuItem
                 style={{
                   color: colors.grey[100],
                 }}
+                onClick={handleSidebar}
               >
-                <IconButton
-                  size="large"
-                  edge="start"
-                  color="inherit"
-                  aria-label="menu"
-                  onClick={() => setIsCollapsed(!isCollapsed)}
-                  sx={{
-                    margin: "0",
-                  }}
-                >
-                  <MenuOutlinedIcon />
-                </IconButton>
+                <MenuOutlinedIcon />
               </MenuItem>
             )}
 
             <MenuItem
               sx={{
-                margin: "0 0",
+                margin: "0",
               }}
             >
               <Logo />

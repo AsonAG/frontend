@@ -67,13 +67,12 @@ function FieldValueSelectorComponent(
 
   const handleChange = (e, keyValue) => {
     setInputValue(keyValue);
-    
+
     let outputValue;
     if (Array.isArray(keyValue)) {
       outputValue = keyValue.join(",");
     } else outputValue = keyValue;
     onChange(outputValue);
-    
   };
 
   // const handleBlur = () => {
@@ -94,23 +93,23 @@ function FieldValueSelectorComponent(
       getOptionLabel={getLookupTextFromValue}
       key={fieldKey}
       disabled={caseIsReadOnly}
+      // slotProps={slotInputProps}
       renderInput={renderedInput(
         fieldKey,
         fieldDescription,
-        slotInputProps,
         fieldDisplayName
       )}
+      fullWidth
     />
   );
 }
 
 const renderedInput =
-  (fieldKey, fieldDescription, slotInputProps, fieldDisplayName) => (params) =>
+  (fieldKey, fieldDescription, fieldDisplayName) => (params) =>
     (
       <TextField
         helperText={fieldDescription}
         key={fieldKey + "_renderedInput"}
-        {...slotInputProps}
         {...params}
         label={fieldDisplayName}
         InputProps={{

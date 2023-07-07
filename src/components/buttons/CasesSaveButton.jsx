@@ -11,12 +11,12 @@ export default function CasesSaveButton({onSubmit, caseIsReadOnly}) {
           disableRipple
           type="submit"
           variant="contained"
-          color="secondary"
+          color="blueAccent"
           size="large"
           onClick={onSubmit}
-          endIcon={<SendIcon />}
+          endIcon={<SendIcon htmlColor="#ffffff" />}
         >
-          <Typography fontWeight="bold">Send</Typography>
+          <Typography fontWeight="bold" color="#ffffff">Send</Typography>
         </Button>
       )}
     </Box>

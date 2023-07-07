@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect, createContext } from "react";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import FieldValueComponent from "./FieldValueComponent";
@@ -22,13 +22,14 @@ const FieldComponent = ({ field, onChange }) => {
   const [fieldEndDate, setFieldEndDate] = useState(
     field.end ? new Date(field.end) : null
   );
+  const [attachmentFiles, setAttachmentFiles] = useState([]);
   const caseIsReadOnly = useContext(CaseContext);
   const isStartEndVisible =
     field.timeType != "Timeless" &&
     !caseIsReadOnly &&
     !field.attributes?.["input.hideStartEnd"];
 
-  const [attachmentFiles, setAttachmentFiles] = useState([]);
+  const fieldDisplayName = caseIsReadOnly ? "" : field.displayName;
 
   // initial build
   useEffect(() => {
@@ -81,60 +82,58 @@ const FieldComponent = ({ field, onChange }) => {
   return (
     <Box
       display="grid"
-      // gridTemplateColumns={caseIsReadOnly ? "1fr" : "1fr 40px 1fr"}
-      gridTemplateColumns="3fr 20px 2fr"
+      // gridTemplateColumns={caseIsReadOnly ? "2fr 3fr 20px" : "3fr 20px 2fr"}
+      // gridTemplateColumns="3fr 20px 2fr"
+      gridTemplateColumns="repeat( auto-fill, minmax(400px, 1fr) )"
       padding="2px 8px"
       key={"field_inline_" + field.id}
-
       marginBottom="8px"
+      gridGap="10px"
     >
-      <FieldAttachmentFileContext.Provider
-        value={{ attachmentFiles, setAttachmentFiles }}
-      >
-        <FieldValueComponent
-          fieldDisplayName={field.displayName}
-          // fieldDescription={" "}
-          fieldKey={fieldKey}
-          fieldValue={fieldValue}
-          setFieldValue={setFieldValue}
-          fieldValueType={field.valueType}
-          onChange={handleValueChange}
-          lookupSettings={field.lookupSettings}
-          attributes={field.attributes}
-          key={"field_valuecomponent_" + field.id}
-        />
-      </FieldAttachmentFileContext.Provider>
-
-      {field.description ? (
-        <Tooltip arrow title={field.description} placement="top" >
-          <HelpOutlineOutlinedIcon small color="secondary" />
-        </Tooltip>
-      ) : (
-        <div></div>
+      {caseIsReadOnly && (
+        <Stack direction="column" justifyContent="center">
+          <Typography variant="h5" alignCenter color="primary">
+            {field.displayName}
+          </Typography>
+        </Stack>
       )}
-      {/* {field.timeType != "Timeless" && (!caseIsReadOnly) && (
-        <Box
-          key={"field_timefield_icon_wrapper" + field.id}
-          display="flex"
-          flexDirection="row-reverse"
-          marginBottom="22px"
-          height="50px"
-        >
-          <IconButton
-            onClick={handleTimingButtonClick}
-            key={"icon_" + field.id}
-          >
-            <HistoryOutlinedIcon key={"field_timefield_icon_" + field.id} />
-          </IconButton>
-        </Box>
-      )} */}
 
-      {isStartEndVisible && (
+      <Box display="inline-flex" maxWidth="400px">
+        <FieldAttachmentFileContext.Provider
+          value={{ attachmentFiles, setAttachmentFiles }}
+        >
+          <FieldValueComponent
+            fieldDisplayName={fieldDisplayName}
+            // fieldDescription={" "}
+            fieldKey={fieldKey}
+            fieldValue={fieldValue}
+            setFieldValue={setFieldValue}
+            fieldValueType={field.valueType}
+            onChange={handleValueChange}
+            lookupSettings={field.lookupSettings}
+            attributes={field.attributes}
+            key={"field_valuecomponent_" + field.id}
+          />
+
+          {field.description ? (
+            <Box margin="0 5px">
+              <Tooltip arrow title={field.description} placement="top">
+                <HelpOutlineOutlinedIcon small color="secondary" />
+              </Tooltip>
+            </Box>
+          ) : (
+            <div></div>
+          )}
+        </FieldAttachmentFileContext.Provider>
+      </Box>
+
+      {isStartEndVisible ? (
         <Box
           key={"field_textfield_dates" + field.id}
           display="inline-flex"
           justifyContent="flex-start"
           paddingLeft="10px"
+          width="400px"
         >
           <FieldValueComponent
             fieldDisplayName={"Start"}
@@ -165,8 +164,11 @@ const FieldComponent = ({ field, onChange }) => {
             </Box>
           )}
         </Box>
+      ) : (
+        <div></div>
       )}
     </Box>
+
   );
 };
 

@@ -5,7 +5,6 @@ const Header = ({ title, subtitle }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // TODO: add Title checking logic (error when the tittle isn't set)
   return (
     <Box mb="15px">
       <Typography variant="h2" fontWeight="bold">

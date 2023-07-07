@@ -39,8 +39,6 @@ export const tokens = (mode) => ({
         // blueAccent: "#4985e2",
         blueAccent: "#461eb7",
         blueAccentReverse: "#4985e2",
-        
-
       }),
 });
 
@@ -62,6 +60,9 @@ export const themeSettings = (mode) => {
             blueAccent: {
               main: colors.blueAccent,
             },
+            blueAccentReverse: {
+              main: colors.blueAccentReverse,
+            },
             neutral: {
               dark: colors.grey[700],
               main: colors.grey[500],
@@ -81,6 +82,9 @@ export const themeSettings = (mode) => {
             },
             blueAccent: {
               main: colors.blueAccent,
+            },
+            blueAccentReverse: {
+              main: colors.blueAccentReverse,
             },
             neutral: {
               dark: colors.grey[700],

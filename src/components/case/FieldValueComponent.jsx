@@ -46,7 +46,7 @@ const FieldValueComponent = ({
         textField: { size: "small" },
         size: "small",
       }
-    : {};
+    : {fullWidth: true,};
   const caseIsReadOnly = useContext(CaseContext) || attributes?.["input.readOnly"];
   /* Validation options               =============================== START =============================== */
   // const [fieldVisited, setFieldVisited] = useState(false);
@@ -196,7 +196,8 @@ const FieldValueComponent = ({
             <FormControlLabel
               name={fieldKey}
               label={fieldDisplayName}
-              labelPlacement="end"
+              slotProps={{...slotInputProps}}
+              labelPlacement="start"
               control={
                 <Checkbox
                   checked={
