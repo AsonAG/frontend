@@ -1,10 +1,12 @@
 import { useState, useContext, useEffect, createContext } from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import FieldValueComponent from "./FieldValueComponent";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { useUpdateEffect } from "usehooks-ts";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 
@@ -80,17 +82,18 @@ const FieldComponent = ({ field, onChange }) => {
     <Box
       display="grid"
       // gridTemplateColumns={caseIsReadOnly ? "1fr" : "1fr 40px 1fr"}
-      gridTemplateColumns="3fr 2fr"
+      gridTemplateColumns="3fr 20px 2fr"
       padding="2px 8px"
       key={"field_inline_" + field.id}
-      // marginBottom="5px"
+
+      marginBottom="8px"
     >
       <FieldAttachmentFileContext.Provider
         value={{ attachmentFiles, setAttachmentFiles }}
       >
         <FieldValueComponent
           fieldDisplayName={field.displayName}
-          fieldDescription={field.description}
+          // fieldDescription={" "}
           fieldKey={fieldKey}
           fieldValue={fieldValue}
           setFieldValue={setFieldValue}
@@ -101,6 +104,14 @@ const FieldComponent = ({ field, onChange }) => {
           key={"field_valuecomponent_" + field.id}
         />
       </FieldAttachmentFileContext.Provider>
+
+      {field.description ? (
+        <Tooltip arrow title={field.description} placement="top" >
+          <HelpOutlineOutlinedIcon small color="secondary" />
+        </Tooltip>
+      ) : (
+        <div></div>
+      )}
       {/* {field.timeType != "Timeless" && (!caseIsReadOnly) && (
         <Box
           key={"field_timefield_icon_wrapper" + field.id}

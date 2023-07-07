@@ -15,7 +15,6 @@ const FieldValueFileComponent = (
   slotInputProps,
   attributes
 ) => {
-  //   const caseIsReadOnly = useContext(CaseContext);
   const extensions = attributes?.["input.attachmentExtensions"];
   const required = attributes?.["input.attachment"] === "Mandatory";
   const { attachmentFiles, setAttachmentFiles } = useContext(

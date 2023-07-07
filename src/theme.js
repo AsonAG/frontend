@@ -57,6 +57,9 @@ export const themeSettings = (mode) => {
               main: colors.primary[300],
             },
             secondary: {
+              main: '#bdbdbd',
+            },
+            blueAccent: {
               main: colors.blueAccent,
             },
             neutral: {
@@ -74,6 +77,9 @@ export const themeSettings = (mode) => {
               main: colors.primary[300],
             },
             secondary: {
+              main: '#bdbdbd',
+            },
+            blueAccent: {
               main: colors.blueAccent,
             },
             neutral: {

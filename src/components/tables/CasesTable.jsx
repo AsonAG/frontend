@@ -47,6 +47,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
             id: index,
             displayName: element["displayName"],
             caseName: element["name"],
+            clusters: element["clusters"],
             // ApiClient.basePath + "/" + encodeURIComponent(element["name"]),
           },
         ];
@@ -75,29 +76,18 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const columns = [
     {
       field: "displayName",
-      headerName: "Name",
+      headerName: "Event name",
       headerAlign: "left",
       flex: 3,
       cellClassName: "name-column--cell",
+      hideable: false,
     },
     {
-      field: "caseName",
-      headerName: "Proceed",
-      flex: 2,
-      // align: "center",
-      renderCell: ({ row: { caseName } }) => {
-        return (
-          <IconButton
-            component={Link}
-            to={navigateTo}
-            variant="outlined"
-            color="secondary"
-            size="medium"
-            onClick={() => handleCaseSelection(caseName)}
-          >
-            <SendIcon />
-          </IconButton>
-        );
+      field: "clusters",
+      headerName: "Clusters",
+      flex: 3,
+      renderCell: ({ row: { cluster } }) => {
+        if (Array.isArray(cluster)) return cluster.combine(", ");
       },
     },
   ];
@@ -132,6 +122,11 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
           },
         }}
         initialState={{
+          columns: {
+            columnVisibilityModel: {
+              clusters: false,
+            },
+          },
           sorting: {
             sortModel: [{ field: "displayName", sort: "asc" }],
           },
