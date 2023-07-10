@@ -96,34 +96,32 @@ const FieldComponent = ({ field, onChange }) => {
       columnGap="4px"
       padding="4px 0px 10px 10px"
     >
+      <FieldAttachmentFileContext.Provider
+        value={{ attachmentFiles, setAttachmentFiles }}
+      >
+        <FieldValueComponent
+          fieldDisplayName={fieldDisplayName}
+          fieldKey={fieldKey}
+          fieldValue={fieldValue}
+          setFieldValue={setFieldValue}
+          fieldValueType={field.valueType}
+          onChange={handleValueChange}
+          lookupSettings={field.lookupSettings}
+          attributes={field.attributes}
+          key={"field_valuecomponent_" + field.id}
+        />
+      </FieldAttachmentFileContext.Provider>
+      <FieldDescription fieldDescription={field.description} fieldKey />
+
       {caseIsReadOnly ? (
+        // Read-Only case display
         <Stack direction="column" justifyContent="center">
           <Typography variant="h5" alignCenter color="primary">
             {field.displayName}
           </Typography>
         </Stack>
-      ) : (
-          <FieldAttachmentFileContext.Provider
-            value={{ attachmentFiles, setAttachmentFiles }}
-          >
-            <FieldValueComponent
-              fieldDisplayName={fieldDisplayName}
-              // fieldDescription={" "}
-              fieldKey={fieldKey}
-              fieldValue={fieldValue}
-              setFieldValue={setFieldValue}
-              fieldValueType={field.valueType}
-              onChange={handleValueChange}
-              lookupSettings={field.lookupSettings}
-              attributes={field.attributes}
-              key={"field_valuecomponent_" + field.id}
-            />
-          </FieldAttachmentFileContext.Provider>
-      )}
-          <FieldDescription fieldDescription={field.description} fieldKey />
-
-
-      {isStartEndVisible ? (
+      ) : isStartEndVisible ? (
+        // Start-end input
         <Box
           key={"field_textfield_dates" + field.id}
           display="grid"
@@ -142,9 +140,7 @@ const FieldComponent = ({ field, onChange }) => {
             key={"field_startdate" + field.id}
           />
 
-          <Box
-            key={"field_box_enddate" + field.id}
-          >
+          <Box key={"field_box_enddate" + field.id}>
             {field.timeType != "Moment" && (
               <FieldValueComponent
                 fieldDisplayName={"End"}
@@ -170,9 +166,13 @@ const FieldComponent = ({ field, onChange }) => {
 
 function FieldDescription({ fieldDescription, fieldKey }) {
   return (
-    <Box >
+    <Box>
       {fieldDescription ? (
-        <Tooltip arrow title={FieldDescriptionText(fieldDescription, fieldKey)} placement="top">
+        <Tooltip
+          arrow
+          title={FieldDescriptionText(fieldDescription, fieldKey)}
+          placement="top"
+        >
           <HelpOutlineOutlinedIcon small color="secondary" />
         </Tooltip>
       ) : (

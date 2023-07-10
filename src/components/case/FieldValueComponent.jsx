@@ -38,8 +38,9 @@ const FieldValueComponent = ({
         textField: { size: "small" },
         size: "small",
       }
-    : {fullWidth: true,};
-  const caseIsReadOnly = useContext(CaseContext) || attributes?.["input.readOnly"];
+    : { fullWidth: true };
+  const caseIsReadOnly =
+    useContext(CaseContext) || attributes?.["input.readOnly"];
   /* Validation options               =============================== START =============================== */
   // const [fieldVisited, setFieldVisited] = useState(false);
   // const [isFieldValid, setFieldValid] = useState((fieldValue ? true : !required));
@@ -83,10 +84,6 @@ const FieldValueComponent = ({
     onChange(value);
   };
 
-  const handleInputLookupValueBlur = (value) => {
-    onChange(value);
-  };
-
   /**
    * if dateValue is a Date class - updates fieldValue
    */
@@ -126,22 +123,20 @@ const FieldValueComponent = ({
   /* Return any other type  =============================== START =============================== */
     switch (fieldValueType) {
       case "None":
-        if (attributes?.["input.attachment"])
-          return FieldValueFileComponent(
-            fieldDisplayName,
-            fieldDescription,
-            fieldValue,
-            fieldKey,
-            slotInputProps,
-            attributes
-          );
-        else
-          return (
-            <Box marginLeft="14px" marginBottom="5px">
-              <Typography>{fieldDisplayName}</Typography>
-            </Box>
-          );
-
+        return (
+          <Box marginLeft="14px" marginBottom="5px">
+            <Typography>{fieldDisplayName}</Typography>
+          </Box>
+        );
+      case "Document":
+        return FieldValueFileComponent(
+          fieldDisplayName,
+          fieldDescription,
+          fieldValue,
+          fieldKey,
+          slotInputProps,
+          attributes
+        );
       case "Date":
         return (
           <DatePicker
@@ -187,7 +182,7 @@ const FieldValueComponent = ({
             <FormControlLabel
               name={fieldKey}
               label={fieldDisplayName}
-              slotProps={{...slotInputProps}}
+              slotProps={{ ...slotInputProps }}
               labelPlacement="start"
               control={
                 <Checkbox
