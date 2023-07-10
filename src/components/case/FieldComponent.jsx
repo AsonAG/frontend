@@ -14,6 +14,7 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import { useUpdateEffect } from "usehooks-ts";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import FieldDescriptionText from "./FieldDescriptionText";
 
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 
@@ -119,7 +120,7 @@ const FieldComponent = ({ field, onChange }) => {
             />
           </FieldAttachmentFileContext.Provider>
       )}
-          <FieldDescription fieldDescription={field.description} />
+          <FieldDescription fieldDescription={field.description} fieldKey />
 
 
       {isStartEndVisible ? (
@@ -167,11 +168,11 @@ const FieldComponent = ({ field, onChange }) => {
   );
 };
 
-function FieldDescription({ fieldDescription }) {
+function FieldDescription({ fieldDescription, fieldKey }) {
   return (
     <Box >
       {fieldDescription ? (
-        <Tooltip arrow title={fieldDescription} placement="top">
+        <Tooltip arrow title={FieldDescriptionText(fieldDescription, fieldKey)} placement="top">
           <HelpOutlineOutlinedIcon small color="secondary" />
         </Tooltip>
       ) : (

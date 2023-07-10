@@ -1,10 +1,6 @@
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
-import { CaseContext } from "../../scenes/global/CasesForm";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import { useContext } from "react";
-import { Markup } from "interweave";
-import FieldDescriptionComponent from "./FieldDescriptionComponent";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
-import { useState } from "react";
 import { FieldAttachmentFileContext } from "./FieldComponent";
 
 const FieldValueFileComponent = (
@@ -84,7 +80,6 @@ const FieldValueFileComponent = (
           />
         </IconButton>
       </Box>
-      {FieldDescriptionComponent(fieldDescription, fieldKey)}
     </Stack>
   );
 };

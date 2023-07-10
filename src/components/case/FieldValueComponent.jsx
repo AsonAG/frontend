@@ -1,27 +1,19 @@
-import { useMemo, useState, useContext, Fragment, useEffect } from "react";
-import CircularProgress from "@mui/material/CircularProgress";
-import ApiClient from "../../api/ApiClient";
-import CasesApi from "../../api/CasesApi";
+import { useContext } from "react";
 import {
   Box,
-  InputAdornment,
   Checkbox,
-  Autocomplete,
   FormControl,
   FormControlLabel,
   FormHelperText,
   Typography,
   Link,
   Stack,
-  TextField,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../scenes/global/CasesForm";
-import { UserContext } from "../../App";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 import FieldValueFileComponent from "./FieldValueFileComponent";
-import FieldDescriptionComponent from "./FieldDescriptionComponent";
 import FieldValueSelectorComponent from "./FieldValueSelectorComponent";
 
 /**
@@ -147,7 +139,6 @@ const FieldValueComponent = ({
           return (
             <Box marginLeft="14px" marginBottom="5px">
               <Typography>{fieldDisplayName}</Typography>
-              {FieldDescriptionComponent(fieldDescription, fieldKey)}
             </Box>
           );
 
