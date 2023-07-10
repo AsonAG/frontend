@@ -10,7 +10,7 @@ import EmployeeSelectorOptions from "../selectors/EmployeeSelectorOptions";
 import { EmployeeSelectionContext, UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import ErrorBar from "../errors/ErrorBar";
-import TableWrapper from "./TableWrapper";
+import TableComponent from "./TableComponent";
 import { EmployeeButtons } from "../buttons/EmployeeButtons";
 
 const EmployeesTable = () => {
@@ -81,7 +81,8 @@ const EmployeesTable = () => {
       field: "firstName",
       headerName: "First name",
       flex: 3,
-      cellClassName: "name-column--cell",
+      // uncomment if you want to highlight on hover
+      // cellClassName: "name-column--cell",
     },
     {
       field: "lastName",
@@ -119,7 +120,7 @@ const EmployeesTable = () => {
   ];
 
   return (
-    <TableWrapper
+    <TableComponent
       error={error}
       setError={setError}
       tableData={employeeData}

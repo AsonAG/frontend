@@ -4,6 +4,7 @@ import EmployeeHeader from "../../components/EmployeeHeader";
 import { useSessionStorage } from "usehooks-ts";
 import { useContext } from "react";
 import { EmployeeSelectionContext } from "../../App";
+import DocumentsTable from "../../components/tables/DocumentsTable";
 
 const EmployeeDocuments = () => {
   // const employee = JSON.parse(window.sessionStorage.getItem("employee"));
@@ -12,7 +13,7 @@ const EmployeeDocuments = () => {
   return employee && (
     <Box m="25px">
       <EmployeeHeader employee={employee} />
-      <CasesTable 
+      <DocumentsTable 
           caseType={'Employee'}
           employeeId={employee.employeeId}    
       />

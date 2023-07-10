@@ -1,27 +1,27 @@
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
-import { Box } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import ErrorBar from "../errors/ErrorBar";
 import ValuesApi from "../../api/ValuesApi";
 import { format } from "date-fns";
-import TableWrapper from "./TableWrapper";
+import TableComponent from "./TableComponent";
 import { getLanguageCode } from "../../api/converter/LanguageConverter";
+import { FileIcon, defaultStyles } from "react-file-icon";
 
-const EventsTable = ({ caseType, employeeId, clusterName }) => {
-  const [caseData, setCaseData] = useState([]);
-  const [caseDataLoaded, setCaseDataLoaded] = useState(false);
+const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
+  const [tableData, setTableData] = useState([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const { user, setUser } = useContext(UserContext);
   const valuesApi = useMemo(() => new ValuesApi(ApiClient, user), [user]);
   const [error, setError] = useState();
-  const [searchText, setSearchText] = useState("");
-  const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
 
   const langCode = getLanguageCode(user.language);
 
   useEffect(() => {
-    setCaseData([]);
+    setTableData([]);
+    setIsDataLoaded(false);
     valuesApi.getCaseValues(callback, caseType, employeeId, clusterName);
   }, [user]);
 
@@ -30,36 +30,37 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
     if (error) {
       setError(error);
       console.error(JSON.stringify(error, null, 2));
-      setCaseDataLoaded(true);
+      setIsDataLoaded(true);
     } else {
       data.forEach((element, index) => {
-        tableData = [
-          ...tableData,
-          {
-            id: index,
-            caseName:
-              langCode && element["caseNameLocalizations"][langCode]
-                ? element["caseNameLocalizations"][langCode]
-                : element["caseName"],
-            caseFieldName:
-              langCode && element["caseFieldNameLocalizations"][langCode]
-                ? element["caseFieldNameLocalizations"][langCode]
-                : element["caseFieldName"],
-            value: element["value"],
-            valueType: element["valueType"],
-            start: element["start"],
-            end: element["end"],
-            created: element["created"],
-          },
-        ];
+        if (element["valueType"] === "Document") {
+          tableData = [
+            ...tableData,
+            {
+              id: index,
+              caseName:
+                langCode && element["caseNameLocalizations"][langCode]
+                  ? element["caseNameLocalizations"][langCode]
+                  : element["caseName"],
+              caseFieldName:
+                langCode && element["caseFieldNameLocalizations"][langCode]
+                  ? element["caseFieldNameLocalizations"][langCode]
+                  : element["caseFieldName"],
+              value: element["value"],
+              start: element["start"],
+              end: element["end"],
+              created: element["created"],
+              documents: element["documents"],
+            },
+          ];
+        }
       });
       console.log(
         "API called successfully. Table data loaded: " +
           JSON.stringify(tableData, null, 2)
       );
-      setCaseData(tableData);
-      setCaseDataLoaded(true);
-      setCaseDataFiltered(tableData);
+      setTableData(tableData);
+      setIsDataLoaded(true);
       setError(null);
     }
   };
@@ -71,27 +72,36 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
     params?.value ? format(new Date(params?.value), "yyyy-MM-dd") : null;
 
   const columns = [
-        {
-          field: "caseFieldName",
-          headerName: "Field",
-          flex: 3,
-          cellClassName: "name-column--cell",
-        },
+    {
+      field: "caseFieldName",
+      headerName: "Name (event field name)",
+      flex: 3,
+    },
     {
       field: "caseName",
       headerName: "Case",
       flex: 3,
     },
     {
-      field: "documentType",
-      headerName: "Document type",
+      field: "documents",
+      headerName: "Documents",
       flex: 3,
+      cellClassName: "name-column--cell",
+      renderCell: ({ row: { documents } }) =>  documents.map((doc) => {
+                const contentType = doc.contentType?.split('/')[1];
+        return (
+          <Box display="inline-flex">
+            <Box width="20px">
+              <FileIcon extension={contentType} {...defaultStyles[contentType]} />
+            </Box>
+            <Typography>{doc.name}</Typography>
+            <Typography>{}</Typography>
+          </Box>
+        );
+        // }
+      }
+      )
     },
-    //     {
-    //       field: "valueType",
-    //       headerName: "Value Type",
-    //       flex: 3,
-    //     },
     {
       field: "start",
       headerName: "Start",
@@ -112,19 +122,28 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
     },
   ];
 
-
   return (
-    <TableWrapper error={error} setError={setError}
-        loading={!caseDataLoaded}
-        rows={caseDataFiltered}
-        columns={columns}
-        initialState={{
-          sorting: {
-            sortModel: [{ field: "created", sort: "desc" }],
+    <TableComponent
+      error={error}
+      setError={setError}
+      loading={!isDataLoaded}
+      tableData={tableData}
+      columns={columns}
+      initialState={{
+        columns: {
+          columnVisibilityModel: {
+            start: false,
+            end: false,
+            caseName: false,
           },
-        }}
-      />
+        },
+        sorting: {
+          sortModel: [{ field: "created", sort: "desc" }],
+        },
+      }}
+      rowHeight={80}
+    />
   );
 };
 
-export default EventsTable;
+export default DocumentsTable;

@@ -11,7 +11,7 @@ import { useContext } from "react";
 import { UserContext } from "../../App";
 import { useErrorBoundary } from "react-error-boundary";
 import ErrorBar from "../errors/ErrorBar";
-import TableWrapper from "./TableWrapper";
+import TableComponent from "./TableComponent";
 
 /**
  * Returns a table component representation of list of available cases.
@@ -98,7 +98,7 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   ];
 
   return (
-    <TableWrapper error={error} setError={setError}
+    <TableComponent error={error} setError={setError}
         loading={!caseDataLoaded}
         tableData={caseData}
         columns={columns}

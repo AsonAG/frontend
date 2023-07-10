@@ -31,7 +31,7 @@ export class CasesApi {
     let postBody = null;
 
     let pathParams = { employeeId };
-    let queryParams = {};
+    let queryParams =  { divisionId: this.divisionId } ;
     let headerParams = {};
     let formParams = {};
 

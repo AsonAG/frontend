@@ -5,7 +5,7 @@ import ApiClient from "../../api/ApiClient";
 import ErrorBar from "../errors/ErrorBar";
 import ValuesApi from "../../api/ValuesApi";
 import { format } from "date-fns";
-import TableWrapper from "./TableWrapper";
+import TableComponent from "./TableComponent";
 import { getLanguageCode } from "../../api/converter/LanguageConverter";
 
 const EventsTable = ({ caseType, employeeId, clusterName }) => {
@@ -73,7 +73,8 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
       field: "caseName",
       headerName: "Case",
       flex: 3,
-      cellClassName: "name-column--cell",
+      // uncomment if you want to highlight on hover
+      // cellClassName: "name-column--cell",  
     },
     {
       field: "caseFieldName",
@@ -106,7 +107,7 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
   ];
 
   return (
-    <TableWrapper error={error} setError={setError}
+    <TableComponent error={error} setError={setError}
         tableData={caseData}
         columns={columns}
         loading={!caseDataLoaded}

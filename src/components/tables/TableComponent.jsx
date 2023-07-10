@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import ErrorBar from "../errors/ErrorBar";
 import { useEffect, useState } from "react";
 
-const TableWrapper = ({
+const TableComponent = ({
   error,
   setError,
   tableData,
@@ -120,4 +120,4 @@ const TableWrapper = ({
   );
 };
 
-export default TableWrapper;
+export default TableComponent;
