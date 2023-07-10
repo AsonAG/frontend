@@ -159,7 +159,7 @@ const Sidebar = ({ isCollapsed }) => {
                     />
                     <Item
                       title="Documents"
-                      to="/documents"
+                      to="/companyDocuments"
                       icon={<DescriptionOutlinedIcon />}
                     />
                   </SubMenu>
@@ -191,7 +191,7 @@ const Sidebar = ({ isCollapsed }) => {
                   />
                   <Item
                     title="Documents"
-                    to="/documents"
+                    to="/personalDocuments"
                     icon={<DescriptionOutlinedIcon />}
                   />
                 </SubMenu>

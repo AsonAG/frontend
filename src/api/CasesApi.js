@@ -254,6 +254,7 @@ export class CasesApi {
       caseType: caseType,
       clusterSetName: clusterName, // TODO: specific cluster for ESS docs
       language: this.userLanguage,
+      filter: "DocumentCount gt 0"
      };
     let headerParams = {};
     let formParams = {};

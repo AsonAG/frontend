@@ -2,6 +2,7 @@ import { Box, IconButton, Tooltip, useTheme } from "@mui/material";
 import { React } from "react";
 import { tokens } from "../../theme";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -34,7 +35,8 @@ export const EmployeeButtons = (params) => {
       </EmployeeButton>
 
       <EmployeeButton title={"Data"} onClick={handleClick} to={"/employeeData"}>
-        <CasesOutlinedIcon />
+        {/* <CasesOutlinedIcon /> */}
+        <PersonOutlineOutlinedIcon />
       </EmployeeButton>
 
       <EmployeeButton

@@ -43,6 +43,8 @@ import EmployeeEvents from "./scenes/events/EmployeeEvents";
 import CompanyEvents from "./scenes/events/CompanyEvents";
 import DocumentsTable from "./components/tables/DocumentsTable";
 import EmployeeDocuments from "./scenes/documents/EmployeeDocuments";
+import CompanyDocuments from "./scenes/documents/CompanyDocuments";
+import PersonalDocuments from "./scenes/documents/PersonalDocuments";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
@@ -223,9 +225,9 @@ function App() {
             <Route path="/ECT" element={<Tasks />} />
             <Route path="/ESS" element={<PersonalCases />} />
 
-            <Route path="/documents" element={<EmployeeDocuments />} />
-            {/* <Route path="/documents" element={<Documents />} /> */}
-            {/* <Route path="/documents" element={<Documents />} /> */}
+            <Route path="/employeeDocuments" element={<EmployeeDocuments />} />
+            <Route path="/companyDocuments" element={<CompanyDocuments />} />
+            <Route path="/PersonalDocuments" element={<PersonalDocuments />} />
           </Routes>
         </main>
       </Box>

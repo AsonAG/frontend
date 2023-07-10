@@ -38,7 +38,7 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
       setIsDataLoaded(true);
     } else {
       data.forEach((element) => {
-        if (element["valueType"] === "Document") {
+        // if (element["valueType"] === "Document") {
           tableData = [
             ...tableData,
             {
@@ -59,7 +59,7 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
               documents: element["documents"],
             },
           ];
-        }
+        // }
       });
       console.log(
         "API called successfully. Table data loaded: " +
