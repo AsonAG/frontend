@@ -91,7 +91,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
           padding: "0 22px 0 0 !important",
         },
         "& .MuiButtonBase-root:hover": {
-          color: `${colors.blueAccentReverse} !important`,
+          color: `${colors.blueAccent} !important`,
         },
       }}
     >

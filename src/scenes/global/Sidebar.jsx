@@ -71,8 +71,12 @@ const Sidebar = ({ isCollapsed }) => {
       <Box
         // display="flex" flexDirection="row"
         sx={{
-          "& .pro-sidebar": {
-            maxWidth: "250px",
+          ".pro-sidebar": {
+            minWidth: "230px",
+            maxWidth: "230px",
+          },
+          ".pro-sidebar.collapsed": {
+            minWidth: "inherit",
           },
           "& .pro-sidebar-inner": {
             // overflowY: "scroll",
@@ -220,7 +224,7 @@ const Sidebar = ({ isCollapsed }) => {
 
                   <TextField
                     id="user-tenant"
-                    label="Tenant"
+                    label="Company"
                     variant="standard"
                     disabled
                     InputLabelProps={{ shrink: true }}

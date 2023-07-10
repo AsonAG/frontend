@@ -1,5 +1,12 @@
 import { useState, useContext, useEffect, createContext } from "react";
-import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import FieldValueComponent from "./FieldValueComponent";
@@ -82,58 +89,45 @@ const FieldComponent = ({ field, onChange }) => {
   return (
     <Box
       display="grid"
-      // gridTemplateColumns={caseIsReadOnly ? "2fr 3fr 20px" : "3fr 20px 2fr"}
-      // gridTemplateColumns="3fr 20px 2fr"
-      gridTemplateColumns="repeat( auto-fill, minmax(400px, 1fr) )"
-      padding="2px 8px"
-      key={"field_inline_" + field.id}
-      marginBottom="8px"
-      gridGap="10px"
+      gridTemplateColumns="repeat( auto-fill, 400px 21px)"
+      key={"field_grid_" + field.id}
+      rowGap="10px"
+      columnGap="4px"
+      padding="4px 0px 10px 10px"
     >
-      {caseIsReadOnly && (
+      {caseIsReadOnly ? (
         <Stack direction="column" justifyContent="center">
           <Typography variant="h5" alignCenter color="primary">
             {field.displayName}
           </Typography>
         </Stack>
+      ) : (
+          <FieldAttachmentFileContext.Provider
+            value={{ attachmentFiles, setAttachmentFiles }}
+          >
+            <FieldValueComponent
+              fieldDisplayName={fieldDisplayName}
+              // fieldDescription={" "}
+              fieldKey={fieldKey}
+              fieldValue={fieldValue}
+              setFieldValue={setFieldValue}
+              fieldValueType={field.valueType}
+              onChange={handleValueChange}
+              lookupSettings={field.lookupSettings}
+              attributes={field.attributes}
+              key={"field_valuecomponent_" + field.id}
+            />
+          </FieldAttachmentFileContext.Provider>
       )}
+          <FieldDescription fieldDescription={field.description} />
 
-      <Box display="inline-flex" maxWidth="400px">
-        <FieldAttachmentFileContext.Provider
-          value={{ attachmentFiles, setAttachmentFiles }}
-        >
-          <FieldValueComponent
-            fieldDisplayName={fieldDisplayName}
-            // fieldDescription={" "}
-            fieldKey={fieldKey}
-            fieldValue={fieldValue}
-            setFieldValue={setFieldValue}
-            fieldValueType={field.valueType}
-            onChange={handleValueChange}
-            lookupSettings={field.lookupSettings}
-            attributes={field.attributes}
-            key={"field_valuecomponent_" + field.id}
-          />
-
-          {field.description ? (
-            <Box margin="0 5px">
-              <Tooltip arrow title={field.description} placement="top">
-                <HelpOutlineOutlinedIcon small color="secondary" />
-              </Tooltip>
-            </Box>
-          ) : (
-            <div></div>
-          )}
-        </FieldAttachmentFileContext.Provider>
-      </Box>
 
       {isStartEndVisible ? (
         <Box
           key={"field_textfield_dates" + field.id}
-          display="inline-flex"
-          justifyContent="flex-start"
-          paddingLeft="10px"
-          width="400px"
+          display="grid"
+          gridTemplateColumns="1fr 1fr"
+          columnGap="14px"
         >
           <FieldValueComponent
             fieldDisplayName={"Start"}
@@ -147,8 +141,10 @@ const FieldComponent = ({ field, onChange }) => {
             key={"field_startdate" + field.id}
           />
 
-          {field.timeType != "Moment" && (
-            <Box key={"field_box_enddate" + field.id} paddingLeft="20px">
+          <Box
+            key={"field_box_enddate" + field.id}
+          >
+            {field.timeType != "Moment" && (
               <FieldValueComponent
                 fieldDisplayName={"End"}
                 fieldKey={fieldKey + "_end"}
@@ -161,15 +157,28 @@ const FieldComponent = ({ field, onChange }) => {
                 required={field.endMandatory}
                 key={"field_enddate" + field.id}
               />
-            </Box>
-          )}
+            )}
+          </Box>
         </Box>
       ) : (
         <div></div>
       )}
     </Box>
-
   );
 };
+
+function FieldDescription({ fieldDescription }) {
+  return (
+    <Box >
+      {fieldDescription ? (
+        <Tooltip arrow title={fieldDescription} placement="top">
+          <HelpOutlineOutlinedIcon small color="secondary" />
+        </Tooltip>
+      ) : (
+        <div></div>
+      )}
+    </Box>
+  );
+}
 
 export default FieldComponent;

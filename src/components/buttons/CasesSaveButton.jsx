@@ -1,9 +1,15 @@
 import SendIcon from "@mui/icons-material/Send";
 import { Box, Button, Typography } from "@mui/material";
 
-export default function CasesSaveButton({onSubmit, caseIsReadOnly}) {
+export default function CasesSaveButton({ onSubmit, caseIsReadOnly }) {
   return (
-    <Box display="flex" justifyContent="center">
+    <Box
+      display="flex"
+      justifyContent="center"
+    >
+      <Box 
+          className="case-icon-button"
+          >
       {!caseIsReadOnly && (
         <Button
           // disable={}
@@ -16,9 +22,13 @@ export default function CasesSaveButton({onSubmit, caseIsReadOnly}) {
           onClick={onSubmit}
           endIcon={<SendIcon htmlColor="#ffffff" />}
         >
-          <Typography fontWeight="bold" color="#ffffff">Send</Typography>
+          <Typography fontWeight="bold" color="#ffffff">
+            Send
+          </Typography>
         </Button>
       )}
+        </Box>
+
     </Box>
   );
 }
