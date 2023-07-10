@@ -1,14 +1,59 @@
+import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { Box } from "@mui/material";
 import ErrorBar from "../errors/ErrorBar";
+import { useEffect, useState } from "react";
 
-const TableWrapper = ({ error, setError, children }) => {
+const TableWrapper = ({
+  error,
+  setError,
+  tableData,
+  loading,
+  columns,
+  initialState,
+  ...props
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [searchText, setSearchText] = useState("");
+  const [tableDataFiltered, setTableDataFiltered] = useState([]);
+
+
+  useEffect(() => {
+    setTableDataFiltered(tableData);
+  }, [tableData])
+
+  function QuickSearchToolbar() {
+    return (
+      <Box
+        sx={{
+          p: 0.5,
+          pb: 0,
+        }}
+      >
+        <GridToolbarQuickFilter />
+      </Box>
+    );
+  }
+
+  function escapeRegExp(value) {
+    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  }
+
+  const requestSearch = (searchValue) => {
+    setSearchText(searchValue);
+    const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
+    const filteredRows = tableData.filter((row) => {
+      return Object.keys(row).some((field) => {
+        return searchRegex.test(row[field].toString());
+      });
+    });
+    setTableDataFiltered(filteredRows);
+  };
 
   return (
-    <Box 
+    <Box
       height="calc(100vh - 160px)"
       display="flex"
       flexDirection="column"
@@ -44,13 +89,33 @@ const TableWrapper = ({ error, setError, children }) => {
         },
         "& .name-column--cell:hover": {
           color: `${colors.blueAccentReverse} !important`,
-        }
+        },
       }}
     >
       {error && (
-          <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
-        )}
-      {children}
+        <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
+      )}
+      <DataGrid
+        // disableColumnSelector
+        // disableDensitySelector
+        loading={loading}
+        rows={tableDataFiltered}
+        columns={columns}
+        components={{ Toolbar: QuickSearchToolbar }}
+        componentsProps={{
+          toolbar: {
+            value: searchText,
+            onChange: (event) => requestSearch(event.target.value),
+            clearSearch: () => requestSearch(""),
+          },
+        }}
+        initialState={initialState}
+        // justifyContent="center"
+        // alignItems="center"
+        // rowHeight={rowHeight}
+        // getRowHeight={() => 'auto'}
+        {...props}
+      />
     </Box>
   );
 };

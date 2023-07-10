@@ -1,3 +1,4 @@
+import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import { UserContext } from "../../App";
@@ -14,12 +15,13 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
   const { user, setUser } = useContext(UserContext);
   const valuesApi = useMemo(() => new ValuesApi(ApiClient, user), [user]);
   const [error, setError] = useState();
+  const [searchText, setSearchText] = useState("");
+  const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
 
   const langCode = getLanguageCode(user.language);
 
   useEffect(() => {
-    setCaseDataLoaded(false);
-    setCaseData([]); 
+    setCaseData([]);
     valuesApi.getCaseValues(callback, caseType, employeeId, clusterName);
   }, [user]);
 
@@ -57,7 +59,7 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
       );
       setCaseData(tableData);
       setCaseDataLoaded(true);
-      // setCaseDataFiltered(tableData);
+      setCaseDataFiltered(tableData);
       setError(null);
     }
   };
@@ -69,22 +71,27 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
     params?.value ? format(new Date(params?.value), "yyyy-MM-dd") : null;
 
   const columns = [
+        {
+          field: "caseFieldName",
+          headerName: "Field",
+          flex: 3,
+          cellClassName: "name-column--cell",
+        },
     {
       field: "caseName",
       headerName: "Case",
       flex: 3,
-      cellClassName: "name-column--cell",
     },
     {
-      field: "caseFieldName",
-      headerName: "Field",
+      field: "documentType",
+      headerName: "Document type",
       flex: 3,
     },
-    {
-      field: "value",
-      headerName: "Value",
-      flex: 3,
-    },
+    //     {
+    //       field: "valueType",
+    //       headerName: "Value Type",
+    //       flex: 3,
+    //     },
     {
       field: "start",
       headerName: "Start",
@@ -105,12 +112,12 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
     },
   ];
 
+
   return (
     <TableWrapper error={error} setError={setError}
-        tableData={caseData}
-        columns={columns}
         loading={!caseDataLoaded}
-        rowHeight={25}
+        rows={caseDataFiltered}
+        columns={columns}
         initialState={{
           sorting: {
             sortModel: [{ field: "created", sort: "desc" }],

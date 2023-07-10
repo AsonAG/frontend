@@ -27,7 +27,6 @@ const EmployeesTable = () => {
   useEffect(() => {
     setEmployeeData([]);
     setEmployeeDataLoaded(false);
-    setEmployeeDataFiltered([]);
     employeesApi.getEmployees(callback);
   }, [user]);
 
@@ -67,7 +66,6 @@ const EmployeesTable = () => {
       );
       setEmployeeData(tableData);
       setEmployeeDataLoaded(true);
-      setEmployeeDataFiltered(tableData);
       setError(null);
     }
   };
@@ -113,87 +111,32 @@ const EmployeesTable = () => {
           <EmployeeButtons
             employee={employeeData.find((x) => x.employeeId === employeeId)}
             setEmployeeChoice={handleEmployeeSelection}
-            key={"employee-buttons-"+employeeId}
+            key={"employee-buttons-" + employeeId}
           ></EmployeeButtons>
         );
       },
     },
   ];
 
-  function QuickSearchToolbar() {
-    return (
-      <Box
-        sx={{
-          p: 0.5,
-          pb: 0,
-        }}
-      >
-        <GridToolbarQuickFilter />
-      </Box>
-    );
-  }
-
-  function escapeRegExp(value) {
-    return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-  }
-
-  const [searchText, setSearchText] = useState("");
-  const [employeeDataFiltered, setEmployeeDataFiltered] =
-    useState(employeeData);
-
-  const requestSearch = (searchValue) => {
-    setSearchText(searchValue);
-    const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
-    const filteredRows = employeeData.filter((row) => {
-      return Object.keys(row).some((field) => {
-        return searchRegex.test(row[field].toString());
-      });
-    });
-    setEmployeeDataFiltered(filteredRows);
-  };
-
   return (
-    <TableWrapper error={error} setError={setError}>
-      <DataGrid
-        // disableSelectionOnClick
-        // disableColumnFilter
-        // disableColumnSelector
-        // disableDensitySelector
-        loading={!employeeDataLoaded}
-        rows={employeeDataFiltered}
-        columns={columns}
-        // justifyContent="center"
-        // alignItems="center"
-        // slots={{
-        //   Toolbar: GridToolbar
-        // // toolbar: QuickSearchToolbar
-        // }}
-        // slotProps={{
-        //   toolbar: {
-        //     showQuickFilter: true,
-        //     quickFilterProps: { debounceMs: 500 },
-        //   },
-        // }}
-        components={{ Toolbar: QuickSearchToolbar }}
-        componentsProps={{
-          toolbar: {
-            value: searchText,
-            onChange: (event) => requestSearch(event.target.value),
-            clearSearch: () => requestSearch(""),
+    <TableWrapper
+      error={error}
+      setError={setError}
+      tableData={employeeData}
+      loading={!employeeDataLoaded}
+      columns={columns}
+      rowHeight={50}
+      initialState={{
+        columns: {
+          columnVisibilityModel: {
+            divisions: false,
           },
-        }}
-        initialState={{
-          columns: {
-            columnVisibilityModel: {
-              divisions: false,
-            },
-          },
-          sorting: {
-            sortModel: [{ field: "firstName", sort: "asc" }],
-          },
-        }}
-      />
-    </TableWrapper>
+        },
+        sorting: {
+          sortModel: [{ field: "firstName", sort: "asc" }],
+        },
+      }}
+    />
   );
 };
 

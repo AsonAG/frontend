@@ -24,12 +24,11 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
   const { user, setUser } = useContext(UserContext);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const navigate = useNavigate();
-  const [searchText, setSearchText] = useState("");
-  const [caseDataFiltered, setCaseDataFiltered] = useState(caseData);
   const [error, setError] = useState();
 
   useEffect(() => {
     setCaseData([]);
+    setCaseDataLoaded(false);
     casesApi.getCases(callback, caseType, employeeId, clusterName);
   }, [user]);
 
@@ -59,7 +58,6 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
       );
       setCaseData(tableData);
       setCaseDataLoaded(true);
-      setCaseDataFiltered(tableData);
       setError(null);
     }
   };
@@ -99,35 +97,11 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
     },
   ];
 
-  const requestSearch = (searchValue) => {
-    setSearchText(searchValue);
-    const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
-    const filteredRows = caseData.filter((row) => {
-      return Object.keys(row).some((field) => {
-        return searchRegex.test(row[field].toString());
-      });
-    });
-    setCaseDataFiltered(filteredRows);
-  };
-
   return (
-    <TableWrapper error={error} setError={setError}>
-      <DataGrid
-        disableSelectionOnClick
+    <TableWrapper error={error} setError={setError}
         loading={!caseDataLoaded}
-        rows={caseData}
+        tableData={caseData}
         columns={columns}
-        // justifyContent="center"
-        // alignItems="center"
-        onRowClick={handleRowClick}
-        components={{ Toolbar: QuickSearchToolbar }}
-        componentsProps={{
-          toolbar: {
-            value: searchText,
-            onChange: (event) => requestSearch(event.target.value),
-            clearSearch: () => requestSearch(""),
-          },
-        }}
         initialState={{
           columns: {
             columnVisibilityModel: {
@@ -139,26 +113,10 @@ const CasesTable = ({ caseType, employeeId, clusterName, navigateTo }) => {
             sortModel: [{ field: "displayName", sort: "asc" }],
           },
         }}
+        disableSelectionOnClick
+        onRowClick={handleRowClick}
       />
-    </TableWrapper>
   );
 };
-
-function QuickSearchToolbar() {
-  return (
-    <Box
-      sx={{
-        p: 0.5,
-        pb: 0,
-      }}
-    >
-      <GridToolbarQuickFilter />
-    </Box>
-  );
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-}
 
 export default CasesTable;
