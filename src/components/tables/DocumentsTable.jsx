@@ -1,5 +1,5 @@
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
@@ -9,12 +9,17 @@ import { format } from "date-fns";
 import TableComponent from "./TableComponent";
 import { getLanguageCode } from "../../api/converter/LanguageConverter";
 import { FileIcon, defaultStyles } from "react-file-icon";
+import { Link } from "react-router-dom";
+import DocumentsApi from "../../api/DocumentsApi";
+import CasesApi from "../../api/CasesApi";
 
 const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
   const [tableData, setTableData] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const { user, setUser } = useContext(UserContext);
   const valuesApi = useMemo(() => new ValuesApi(ApiClient, user), [user]);
+  const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
+  const documentsApi = useMemo(() => new DocumentsApi(ApiClient, user), [user]);
   const [error, setError] = useState();
 
   const langCode = getLanguageCode(user.language);
@@ -22,7 +27,7 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
   useEffect(() => {
     setTableData([]);
     setIsDataLoaded(false);
-    valuesApi.getCaseValues(callback, caseType, employeeId, clusterName);
+    casesApi.getCaseValues(callback, caseType, employeeId, clusterName);
   }, [user]);
 
   const callback = function (error, data, response) {
@@ -32,12 +37,12 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
       console.error(JSON.stringify(error, null, 2));
       setIsDataLoaded(true);
     } else {
-      data.forEach((element, index) => {
+      data.forEach((element) => {
         if (element["valueType"] === "Document") {
           tableData = [
             ...tableData,
             {
-              id: index,
+              id: element["id"],
               caseName:
                 langCode && element["caseNameLocalizations"][langCode]
                   ? element["caseNameLocalizations"][langCode]
@@ -47,6 +52,7 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
                   ? element["caseFieldNameLocalizations"][langCode]
                   : element["caseFieldName"],
               value: element["value"],
+              valueType: element["valueType"],
               start: element["start"],
               end: element["end"],
               created: element["created"],
@@ -86,21 +92,42 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
       field: "documents",
       headerName: "Documents",
       flex: 3,
-      cellClassName: "name-column--cell",
-      renderCell: ({ row: { documents } }) =>  documents.map((doc) => {
-                const contentType = doc.contentType?.split('/')[1];
-        return (
-          <Box display="inline-flex">
-            <Box width="20px">
-              <FileIcon extension={contentType} {...defaultStyles[contentType]} />
-            </Box>
-            <Typography>{doc.name}</Typography>
-            <Typography>{}</Typography>
-          </Box>
-        );
-        // }
-      }
-      )
+      renderCell: ({ row }) => {
+        if (Array.isArray(row.documents)) {
+          const rowId = row.id;
+          return (
+            <Stack spacing={2}>
+              {row.documents.map((doc) => {
+                const contentType = doc.name?.split(".").pop();
+                return (
+                  <Box
+                    display="inline-flex"
+                    //       onClick={() => handleFileClick(doc.id, rowId)}
+                    component={Link}
+                    to={documentsApi.getDocumentLink(
+                      doc.id,
+                      rowId,
+                      caseType,
+                      employeeId
+                    )}
+                    target="_blank"
+                    rel="noopener"
+                    alignItems="center"
+                  >
+                    <Box width="30px" marginRight="15px">
+                      <FileIcon
+                        extension={contentType}
+                        {...defaultStyles[contentType]}
+                      />
+                    </Box>
+                    <Typography>{doc.name}</Typography>
+                  </Box>
+                );
+              })}
+            </Stack>
+          );
+        }
+      },
     },
     {
       field: "start",
@@ -141,7 +168,14 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
           sortModel: [{ field: "created", sort: "desc" }],
         },
       }}
-      rowHeight={80}
+      getRowHeight={() => "auto"}
+      sx={{
+        "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: "8px" },
+        "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": { py: "12px" },
+        "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
+          py: "22px",
+        },
+      }}
     />
   );
 };

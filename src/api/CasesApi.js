@@ -91,7 +91,6 @@ export class CasesApi {
     });
   }
 
-
   /**
    * Build a case and Get case fields
    * Returs case fields and values along with related cases fields and values. Running this request is required to build a case, before saving it with &#x60;cases/{caseName}/save&#x60;.
@@ -123,7 +122,7 @@ export class CasesApi {
       userId: this.userId,
       employeeId: employeeId,
       // caseType: "Employee",
-      language: this.userLanguage
+      language: this.userLanguage,
     };
     let headerParams = {};
     let formParams = {};
@@ -217,7 +216,7 @@ export class CasesApi {
       employeeId: employeeId,
       caseType: caseType,
       clusterSetName: clusterName,
-      language: this.userLanguage
+      language: this.userLanguage,
     };
     let headerParams = {};
     let formParams = {};
@@ -229,6 +228,43 @@ export class CasesApi {
 
     return this.apiClient.callApi(
       this.payrollPath + "cases/sets",
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      callback,
+      this.tenantId
+    );
+  }
+
+  getCaseValues(callback, caseType, employeeId, clusterName) {
+    let postBody = null;
+
+    let pathParams = {};
+    let queryParams = { 
+      userId: this.userId,
+      employeeId: employeeId,
+      divisionId: this.divisionId,
+      caseType: caseType,
+      clusterSetName: clusterName, // TODO: specific cluster for ESS docs
+      language: this.userLanguage,
+     };
+    let headerParams = {};
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = null;
+
+    return this.apiClient.callApi(
+      this.payrollPath + "changes/values",
       "GET",
       pathParams,
       queryParams,
@@ -262,7 +298,7 @@ export class CasesApi {
     let pathParams = {};
     let queryParams = {
       lookupNames: lookupName,
-      language: this.userLanguage
+      language: this.userLanguage,
     };
     let headerParams = {};
     let formParams = {};
@@ -296,7 +332,7 @@ export class CasesApi {
    * @param {module:api/CasesApi~getCaseFieldCurrentValuesCallback} callback The callback function, accepting three arguments: error, data, response
    * data is of type: {@link <&vendorExtensions.x-jsdoc-type>}
    */
-  getCaseValues(callback, caseType, employeeId, clusterName) {
+  getCurrentCaseValues(callback, caseType, employeeId, clusterName) {
     let postBody = null;
 
     let pathParams = {};
@@ -305,7 +341,7 @@ export class CasesApi {
       employeeId,
       caseType,
       clusterSetName: clusterName,
-      language: this.userLanguage
+      language: this.userLanguage,
     };
     let headerParams = {};
     let formParams = {};
