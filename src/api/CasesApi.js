@@ -31,19 +31,27 @@ export class CasesApi {
     this.userLanguage = user.language;
   }
 
-  buildCasesBody(outputCaseMap, shouldIncludeBody) {
+  buildCasesBody(
+    outputCaseMap,
+    shouldIncludeBody,
+    shouldDeleteDocumentsFromBody
+  ) {
     if (shouldIncludeBody) {
       let outputCase = {};
       let baseCase = getMainCaseObject(outputCaseMap);
 
       outputCase.caseName = baseCase.caseName;
-      outputCase.values = Object.values(baseCase.values);
-      //TODO: filter values and related cases (if they are in inputCase or not)
+      outputCase.values = Object.values(baseCase.values); 
+
       outputCase.relatedCases = this.buildRelatedCasesBody(
         baseCase.relatedCases
       );
-      // baseCase.values = baseCase.values.concat(filteredRelatedCases);
 
+      // delete documents (sending documents content is not needed for Build requests, only used for send)
+      if (shouldDeleteDocumentsFromBody && outputCase.values) {
+        outputCase.values.forEach((v) => delete v.documents);
+      }
+      // delete empty items
       if (outputCase.values.length === 0) delete outputCase.values;
 
       return {
@@ -52,7 +60,7 @@ export class CasesApi {
     } else return null;
   }
 
-  buildRelatedCasesBody(relatedCases) {
+  buildRelatedCasesBody(relatedCases, shouldDeleteDocumentsFromBody) {
     let filteredRelatedCases = [];
 
     Object.values(relatedCases).map((relatedCase) => {
@@ -62,6 +70,10 @@ export class CasesApi {
       caseObj.relatedCases = this.buildRelatedCasesBody(
         relatedCase.relatedCases
       );
+      // delete documents (sending documents content is not needed for Build requests, only used for send)
+      if (shouldDeleteDocumentsFromBody) {
+        caseObj.values.forEach((v) => delete v.documents);
+      }
 
       filteredRelatedCases.push(caseObj);
     });
@@ -69,6 +81,7 @@ export class CasesApi {
     return filteredRelatedCases;
   }
 
+  // filter values and related cases (if they are in inputCase or not)
   filterBody(inputCaseSchema, outputCase) {
     // fields filter
     let valuesSchema = inputCaseSchema.fields.map((field) => field.name);
@@ -110,7 +123,7 @@ export class CasesApi {
       Object.values(outputCase).length > 0 &&
       Object.values(getMainCaseObject(outputCase)?.values).length > 0;
     // build a case body if case fields are provided
-    let postBody = this.buildCasesBody(outputCase, shouldIncludeBody);
+    let postBody = this.buildCasesBody(outputCase, shouldIncludeBody, true);
 
     if (shouldIncludeBody) this.filterBody(inputCase, postBody.case);
     console.log("Request body: " + JSON.stringify(postBody, null, 2));
@@ -247,15 +260,15 @@ export class CasesApi {
     let postBody = null;
 
     let pathParams = {};
-    let queryParams = { 
+    let queryParams = {
       userId: this.userId,
       employeeId: employeeId,
       divisionId: this.divisionId,
       caseType: caseType,
       clusterSetName: clusterName, // TODO: specific cluster for ESS docs
       language: this.userLanguage,
-      filter: "DocumentCount gt 0"
-     };
+      filter: "DocumentCount gt 0",
+    };
     let headerParams = {};
     let formParams = {};
 

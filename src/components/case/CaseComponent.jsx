@@ -50,7 +50,6 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
         caseName: inputCase.name,
         values: outputCaseFields,
         relatedCases: outputRelatedCases,
-
         ref: caseRef,
         displayName: inputCase.displayName,
       },

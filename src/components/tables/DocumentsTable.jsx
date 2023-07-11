@@ -110,8 +110,6 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
                       caseType,
                       employeeId
                     )}
-                    target="_blank"
-                    rel="noopener"
                     alignItems="center"
                   >
                     <Box width="30px" marginRight="15px">
