@@ -39,7 +39,14 @@ const FieldComponent = ({ field, onChange }) => {
 
   // initial build
   useEffect(() => {
-    onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate, attachmentFiles);
+    onChange(
+      fieldKey,
+      fieldName,
+      fieldValue,
+      fieldStartDate,
+      fieldEndDate,
+      attachmentFiles
+    );
   }, []);
 
   // update input values when request with newly built field comes
@@ -51,7 +58,7 @@ const FieldComponent = ({ field, onChange }) => {
 
   // handle new document upload
   useUpdateEffect(() => {
-    // TODO: await for Send button click 
+    // TODO: await for Send button click
     onChange(
       fieldKey,
       fieldName,
@@ -70,20 +77,35 @@ const FieldComponent = ({ field, onChange }) => {
       // value ? value : fieldValue,
       value,
       fieldStartDate,
-      fieldEndDate, attachmentFiles
+      fieldEndDate,
+      attachmentFiles
     );
   };
 
   const handleInputStartDateChange = (dateValue) => {
     let newDate = dateValue ? new Date(dateValue) : null;
     setFieldStartDate(newDate);
-    onChange(fieldKey, fieldName, fieldValue, newDate, fieldEndDate, attachmentFiles);
+    onChange(
+      fieldKey,
+      fieldName,
+      fieldValue,
+      newDate,
+      fieldEndDate,
+      attachmentFiles
+    );
   };
 
   const handleInputEndDateChange = (dateValue) => {
     let newDate = dateValue ? new Date(dateValue) : null;
     setFieldEndDate(newDate);
-    onChange(fieldKey, fieldName, fieldValue, fieldStartDate, newDate, attachmentFiles);
+    onChange(
+      fieldKey,
+      fieldName,
+      fieldValue,
+      fieldStartDate,
+      newDate,
+      attachmentFiles
+    );
   };
 
   return (

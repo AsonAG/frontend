@@ -41,16 +41,11 @@ export class CasesApi {
       let baseCase = getMainCaseObject(outputCaseMap);
 
       outputCase.caseName = baseCase.caseName;
-      outputCase.values = Object.values(baseCase.values); 
-
+      outputCase.values = Object.values(baseCase.values);
       outputCase.relatedCases = this.buildRelatedCasesBody(
         baseCase.relatedCases
       );
 
-      // delete documents (sending documents content is not needed for Build requests, only used for send)
-      if (shouldDeleteDocumentsFromBody && outputCase.values) {
-        outputCase.values.forEach((v) => delete v.documents);
-      }
       // delete empty items
       if (outputCase.values.length === 0) delete outputCase.values;
 
@@ -70,11 +65,6 @@ export class CasesApi {
       caseObj.relatedCases = this.buildRelatedCasesBody(
         relatedCase.relatedCases
       );
-      // delete documents (sending documents content is not needed for Build requests, only used for send)
-      if (shouldDeleteDocumentsFromBody) {
-        caseObj.values.forEach((v) => delete v.documents);
-      }
-
       filteredRelatedCases.push(caseObj);
     });
 
