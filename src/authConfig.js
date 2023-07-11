@@ -10,6 +10,12 @@ const authConfig = (setAuthUserIdentifier) => {
     redirectUri: process.env.REACT_APP_REDIRECT_URL,
     post_logout_redirect_uri: process.env.REACT_APP_REDIRECT_URL,
 
+    autoSignIn: true,
+    autoSignOut: true,
+    loadUserInfo: true,
+    
+    // stateStore: localStorage,
+
     onSignIn: async (response) => {
       console.log("LogoIN activated");
       localStorage.setItem("ason_access_token", response.access_token);

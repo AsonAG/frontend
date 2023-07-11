@@ -30,6 +30,7 @@ const FieldValueComponent = ({
   required = true,
   lookupSettings,
   attributes,
+  setAttachmentFiles,
   small,
 }) => {
   const slotInputProps = small
@@ -135,7 +136,8 @@ const FieldValueComponent = ({
           fieldValue,
           fieldKey,
           slotInputProps,
-          attributes
+          attributes,
+          setAttachmentFiles,
         );
       case "Date":
         return (

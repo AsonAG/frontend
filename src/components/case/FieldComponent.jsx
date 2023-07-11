@@ -18,8 +18,6 @@ import FieldDescriptionText from "./FieldDescriptionText";
 
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 
-export const FieldAttachmentFileContext = createContext();
-
 const FieldComponent = ({ field, onChange }) => {
   const fieldName = field.name;
   const fieldKey = getFieldKey(field.name, field.id);
@@ -41,7 +39,7 @@ const FieldComponent = ({ field, onChange }) => {
 
   // initial build
   useEffect(() => {
-    onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate);
+    onChange(fieldKey, fieldName, fieldValue, fieldStartDate, fieldEndDate, attachmentFiles);
   }, []);
 
   // update input values when request with newly built field comes
@@ -53,6 +51,7 @@ const FieldComponent = ({ field, onChange }) => {
 
   // handle new document upload
   useUpdateEffect(() => {
+    // TODO: await for Send button click 
     onChange(
       fieldKey,
       fieldName,
@@ -71,20 +70,20 @@ const FieldComponent = ({ field, onChange }) => {
       // value ? value : fieldValue,
       value,
       fieldStartDate,
-      fieldEndDate
+      fieldEndDate, attachmentFiles
     );
   };
 
   const handleInputStartDateChange = (dateValue) => {
     let newDate = dateValue ? new Date(dateValue) : null;
     setFieldStartDate(newDate);
-    onChange(fieldKey, fieldName, fieldValue, newDate, fieldEndDate);
+    onChange(fieldKey, fieldName, fieldValue, newDate, fieldEndDate, attachmentFiles);
   };
 
   const handleInputEndDateChange = (dateValue) => {
     let newDate = dateValue ? new Date(dateValue) : null;
     setFieldEndDate(newDate);
-    onChange(fieldKey, fieldName, fieldValue, fieldStartDate, newDate);
+    onChange(fieldKey, fieldName, fieldValue, fieldStartDate, newDate, attachmentFiles);
   };
 
   return (
@@ -96,21 +95,18 @@ const FieldComponent = ({ field, onChange }) => {
       columnGap="4px"
       padding="4px 0px 10px 10px"
     >
-      <FieldAttachmentFileContext.Provider
-        value={{ attachmentFiles, setAttachmentFiles }}
-      >
-        <FieldValueComponent
-          fieldDisplayName={fieldDisplayName}
-          fieldKey={fieldKey}
-          fieldValue={fieldValue}
-          setFieldValue={setFieldValue}
-          fieldValueType={field.valueType}
-          onChange={handleValueChange}
-          lookupSettings={field.lookupSettings}
-          attributes={field.attributes}
-          key={"field_valuecomponent_" + field.id}
-        />
-      </FieldAttachmentFileContext.Provider>
+      <FieldValueComponent
+        fieldDisplayName={fieldDisplayName}
+        fieldKey={fieldKey}
+        fieldValue={fieldValue}
+        setFieldValue={setFieldValue}
+        fieldValueType={field.valueType}
+        onChange={handleValueChange}
+        lookupSettings={field.lookupSettings}
+        attributes={field.attributes}
+        setAttachmentFiles={setAttachmentFiles}
+        key={"field_valuecomponent_" + field.id}
+      />
       <FieldDescription fieldDescription={field.description} fieldKey />
 
       {caseIsReadOnly ? (

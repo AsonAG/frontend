@@ -1,7 +1,5 @@
 import { Box, IconButton, Stack, Typography } from "@mui/material";
-import { useContext } from "react";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
-import { FieldAttachmentFileContext } from "./FieldComponent";
 
 const FieldValueFileComponent = (
   fieldDisplayName,
@@ -9,13 +7,12 @@ const FieldValueFileComponent = (
   fieldValue,
   fieldKey,
   slotInputProps,
-  attributes
+  attributes,
+  setAttachmentFiles
 ) => {
   const extensions = attributes?.["input.attachmentExtensions"];
-  const required = attributes?.["input.attachment"] === "Mandatory";
-  const { attachmentFiles, setAttachmentFiles } = useContext(
-    FieldAttachmentFileContext
-  );
+  // const required = attributes?.["input.attachment"] === "Mandatory";
+  const required = true;
 
   const uploadFile = async (file) => {
     const fileEncoded = await convertBase64(file);
