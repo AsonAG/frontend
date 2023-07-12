@@ -157,8 +157,6 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
       initialState={{
         columns: {
           columnVisibilityModel: {
-            start: false,
-            end: false,
             caseName: false,
           },
         },
