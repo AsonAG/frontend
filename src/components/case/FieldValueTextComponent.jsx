@@ -15,7 +15,6 @@ const FieldValueTextComponent = (
   attributes,
   caseIsReadOnly
 ) => {
-
   return (
     <TextField
       {...slotInputProps}
@@ -25,33 +24,12 @@ const FieldValueTextComponent = (
       value={fieldValue}
       onChange={handleTextValueChange}
       onBlur={handleTextBlur}
-      type={getInputTypeFromJsonType(fieldValueType)}
+      type="text"
       name={fieldKey}
       key={fieldKey}
       multiline={attributes?.["input.multiLine"]}
       minRows={2}
       disabled={caseIsReadOnly}
-      
-      InputProps={{
-        endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
-
-        sx: {
-          // '&:hover fieldset': {
-          //   borderColor: '#003566 !important'
-          // },
-          // '&:focus-within fieldset, &:focus-visible fieldset': {
-          //   borderColor: '#003566 !important'
-          // },
-          // '& .MuiInputBase-colorPrimary': {
-          //   borderColor: '#003566 !important'
-          // },
-          // "& .Mui-focused MuiInputBase-formControl": {
-          //   borderColor: '#003566 !important'
-          //   color
-          // },
-        },
-      }}
-      
       // InputLabelProps={{
       //   sx: {
       //     color: '#003566',
@@ -59,45 +37,6 @@ const FieldValueTextComponent = (
       //   },
       // }}
     />
-  );
-};
-
-const getInputTypeFromJsonType = (jsonType) => {
-  switch (jsonType) {
-    case "String":
-      return "text";
-    case "Boolean":
-      return "Boolean";
-    case "Number":
-      return "numeric";
-    case "Money":
-      return "numeric";
-    case "Decimal":
-      return "numeric";
-    default:
-      return jsonType;
-  }
-};
-
-const getAdornmentFromJsonType = (jsonType, fieldId) => {
-  let adornment;
-  switch (jsonType) {
-    case "Money":
-      adornment = "CHF";
-      break;
-    case "Percent":
-      adornment = "%";
-      break;
-    case "Distance":
-      adornment = "m";
-      break;
-    default:
-      return <></>;
-  }
-  return (
-    <InputAdornment key={"numbertype_adornment_" + fieldId} position="end">
-      {adornment}
-    </InputAdornment>
   );
 };
 

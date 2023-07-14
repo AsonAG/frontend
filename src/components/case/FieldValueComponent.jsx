@@ -15,6 +15,7 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldValueSelectorComponent from "./FieldValueSelectorComponent";
+import FieldValueNumberComponent from "./FieldValueNumberComponent";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -67,7 +68,15 @@ const FieldValueComponent = ({
     // const regex = /^[0-9\b]+$/;
     // if (e.target.value === "" || regex.test(e.target.value)) {
     setFieldValue(e.target.value);
-    // console.log("input change:" + e.target.value + " fieldValue:" + fieldValue);
+  };
+
+  const handleNumberValueChange = (e) => {
+    // TODO: replace regex logic with InputMask library
+    let regex;
+    if (fieldValueType === "Integer") regex = /^[0-9\b]+$/;
+    else regex = /^[0-9\b]+$/;
+    if (e.target.value === "" || regex.test(e.target.value))
+      setFieldValue(e.target.value);
   };
 
   const handleTextBlur = (e) => {
@@ -137,12 +146,12 @@ const FieldValueComponent = ({
           fieldKey,
           slotInputProps,
           attributes,
-          setAttachmentFiles,
+          setAttachmentFiles
         );
       case "Date":
         return (
           <DatePicker
-            label={fieldDisplayName + (required ? "*" : "")}
+            label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
             // onClose={handleDateClose}
@@ -161,7 +170,7 @@ const FieldValueComponent = ({
       case "DateTime":
         return (
           <DateTimePicker
-            label={fieldDisplayName + (required ? "*" : "")}
+            label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
             // helperText={fieldDescription}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
@@ -222,6 +231,30 @@ const FieldValueComponent = ({
               </Link>
             </Box>
           </Stack>
+        );
+      case "Decimal":
+      case "Day":
+      case "Distance":
+      case "Hour":
+      case "Integer":
+      case "Money":
+      case "Month":
+      case "NumericBoolean":
+      case "Percent":
+      case "Week":
+      case "Year":
+        return FieldValueNumberComponent(
+          fieldDisplayName,
+          fieldDescription,
+          required,
+          fieldValue,
+          handleNumberValueChange,
+          handleTextBlur,
+          fieldValueType,
+          fieldKey,
+          slotInputProps,
+          attributes,
+          caseIsReadOnly
         );
       default: //TextField
         return FieldValueTextComponent(
