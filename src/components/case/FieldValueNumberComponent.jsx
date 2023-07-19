@@ -1,6 +1,8 @@
+import { NumberFormatBase, NumericFormat } from "react-number-format";
 import { InputAdornment, TextField } from "@mui/material";
 import { CaseContext } from "../../scenes/global/CasesForm";
 import { useContext } from "react";
+import ReactInputMask from "react-input-mask";
 
 const FieldValueNumberComponent = (
   fieldDisplayName,
@@ -13,24 +15,55 @@ const FieldValueNumberComponent = (
   fieldKey,
   slotInputProps,
   attributes,
-  caseIsReadOnly
+  caseIsReadOnly,
+  isInteger
 ) => {
+  const decimalParams = isInteger
+    ? {
+        decimalScale: 0,
+        fixedDecimalScale: true,
+      }
+    : fieldValueType === "Money"
+    ? {
+        decimalScale: 2,
+        fixedDecimalScale: true,
+      }
+    : {};
+
   return (
-    <TextField
+    <NumericFormat
+      value={fieldValue}
+      // onChange={handleNumberValueChange}
+      onValueChange={handleNumberValueChange}
+      isNumericString
+      thousandSeparator={
+        attributes?.["input.thousandSeparator"]
+          ? attributes["input.thousandSeparator"]
+          : " "
+      }
+      {...decimalParams}
+      customInput={TextField}
+      // <TextField
       {...slotInputProps}
       label={fieldDisplayName}
       helperText={fieldDescription}
-      required={required}
-      value={fieldValue}
-      onChange={handleNumberValueChange}
-      onBlur={handleTextBlur}
       type={getInputTypeFromJsonType(fieldValueType)}
       name={fieldKey}
       key={fieldKey}
+      required={required}
+      onBlur={handleTextBlur}
       disabled={caseIsReadOnly}
       InputProps={{
-        endAdornment: getAdornmentFromJsonType(fieldValueType, fieldKey),
+        endAdornment: getAdornmentFromJsonType(
+          fieldValueType,
+          fieldKey,
+          attributes
+        ),
+        inputProps: {
+          style: { textAlign: "right" },
+        },
       }}
+      // /> )}
     />
   );
 };
@@ -52,17 +85,17 @@ const getInputTypeFromJsonType = (jsonType) => {
   }
 };
 
-const getAdornmentFromJsonType = (jsonType, fieldId) => {
+const getAdornmentFromJsonType = (jsonType, fieldId, attributes) => {
   let adornment;
   switch (jsonType) {
     case "Money":
-      adornment = "CHF";
+      adornment = attributes?.["input.currency"];
       break;
     case "Percent":
       adornment = "%";
       break;
     case "Distance":
-      adornment = "m";
+      adornment = attributes?.["input.distanceMeasure"];
       break;
     default:
       return <></>;

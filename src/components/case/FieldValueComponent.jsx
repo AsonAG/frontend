@@ -43,6 +43,7 @@ const FieldValueComponent = ({
     : { fullWidth: true };
   const caseIsReadOnly =
     useContext(CaseContext) || attributes?.["input.readOnly"];
+  let isInteger;
   /* Validation options               =============================== START =============================== */
   // const [fieldVisited, setFieldVisited] = useState(false);
   // const [isFieldValid, setFieldValid] = useState((fieldValue ? true : !required));
@@ -62,22 +63,14 @@ const FieldValueComponent = ({
   //   setFieldVisited(true);
   // };
   /* Validation ========================================== END ================================ */
-
   /* Handlers         =================================== START =============================== */
   const handleTextValueChange = (e) => {
-    // const regex = /^[0-9\b]+$/;
-    // if (e.target.value === "" || regex.test(e.target.value)) {
     setFieldValue(e.target.value);
   };
 
-  const handleNumberValueChange = (e) => {
-    // TODO: replace regex logic with InputMask library
-    let regex;
-    if (fieldValueType === "Integer") regex = /^[0-9\b]+$/;
-    else regex = /^[0-9\b]+$/;
-    if (e.target.value === "" || regex.test(e.target.value))
-      setFieldValue(e.target.value);
-  };
+  const handleNumberValueChange = (values, sourceInfo) => {
+    setFieldValue(values.value);
+  }
 
   const handleTextBlur = (e) => {
     onChange(e.target.value);
@@ -232,17 +225,9 @@ const FieldValueComponent = ({
             </Box>
           </Stack>
         );
-      case "Decimal":
-      case "Day":
-      case "Distance":
-      case "Hour":
       case "Integer":
-      case "Money":
-      case "Month":
       case "NumericBoolean":
-      case "Percent":
-      case "Week":
-      case "Year":
+        isInteger = true;
         return FieldValueNumberComponent(
           fieldDisplayName,
           fieldDescription,
@@ -254,7 +239,32 @@ const FieldValueComponent = ({
           fieldKey,
           slotInputProps,
           attributes,
-          caseIsReadOnly
+          caseIsReadOnly,
+          isInteger
+        );
+      case "Week":
+      case "Decimal":
+      case "Year":
+      case "Day":
+      case "Hour":
+      case "Distance":
+      case "Month":
+      case "Percent":
+      case "Money":
+        isInteger = false;
+        return FieldValueNumberComponent(
+          fieldDisplayName,
+          fieldDescription,
+          required,
+          fieldValue,
+          handleNumberValueChange,
+          handleTextBlur,
+          fieldValueType,
+          fieldKey,
+          slotInputProps,
+          attributes,
+          caseIsReadOnly,
+          isInteger
         );
       default: //TextField
         return FieldValueTextComponent(
