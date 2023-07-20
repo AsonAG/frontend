@@ -16,6 +16,7 @@ import FieldValueTextComponent from "./FieldValueTextComponent";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldValueSelectorComponent from "./FieldValueSelectorComponent";
 import FieldValueNumberComponent from "./FieldValueNumberComponent";
+import { useUpdateEffect } from "usehooks-ts";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -39,33 +40,49 @@ const FieldValueComponent = ({
   let isInteger;
 
   /* Validation options               =============================== START =============================== */
-  const [slotInputProps, setSlotProps] = useState({
-    fullWidth: true,
-    helperText: helperText,
-    error: false,
-    textField: {
+  const [slotInputProps, setSlotProps] = useState({});
+
+  useEffect(() => {
+    setSlotProps({
+      fullWidth: true,
       helperText: helperText,
-      error: false,
-    },
-    // textField: { size: "small" },
-    // size: "small",
-  });
+      error: !isValid,
+      textField: {
+        helperText: helperText,
+        error: !isValid,
+      },
+      // textField: { size: "small" },
+      // size: "small",
+    });
+  }, [isValid, helperText]);
 
-  // useEffect(() => {
-  //   isValid ? setSlotProps((current) => {{
-  //     ...current,
-
-  //   }}
-
-  //   ) : setSlotProps({});
+  // useUpdateEffect(() => {
+  //   isValid
+  //     ? setSlotProps((current) => ({
+  //         ...current,
+  //         error: true,
+  //         textField: {
+  //           helperText: helperText,
+  //           error: true,
+  //         },
+  //       }))
+  //     : setSlotProps((current) => ({
+  //         ...current,
+  //         error: false,
+  //         textField: {
+  //           helperText: helperText,
+  //           error: false,
+  //         },
+  //       }));
   // }, [isValid]);
 
-  const checkMinMax = (values) => {
+  const checkMinMax = (stringValue) => {
     const maxValue = attributes?.["input.maxValue"];
     const minValue = attributes?.["input.minValue"];
-    const { formattedValue, floatValue } = values;
 
-    if (floatValue == null) setIsValid(formattedValue === "");
+    const floatValue = parseFloat(stringValue);
+
+    if (floatValue === null) setIsValid(true);
     else if (maxValue && minValue)
       setIsValid(floatValue <= maxValue && floatValue >= minValue);
     else if (maxValue) setIsValid(floatValue <= maxValue);
