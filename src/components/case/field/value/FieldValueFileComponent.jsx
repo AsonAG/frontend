@@ -3,7 +3,6 @@ import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 
 const FieldValueFileComponent = (
   fieldDisplayName,
-  fieldDescription,
   fieldValue,
   fieldKey,
   slotInputProps,

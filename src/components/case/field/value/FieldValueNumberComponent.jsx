@@ -3,7 +3,6 @@ import { InputAdornment, TextField } from "@mui/material";
 
 const FieldValueNumberComponent = (
   fieldDisplayName,
-  fieldDescription,
   required,
   fieldValue,
   handleNumberValueChange,
@@ -27,19 +26,6 @@ const FieldValueNumberComponent = (
       }
     : {};
 
-    const checkMinMax = (values) => {
-      const maxValue = attributes?.["input.maxValue"];
-      const minValue = attributes?.["input.minValue"];
-      const { formattedValue, floatValue } = values;
-  
-      if (floatValue == null) return formattedValue === "";
-      else if (maxValue && minValue)
-        return floatValue <= maxValue && floatValue >= minValue;
-      else if (maxValue) return floatValue <= maxValue;
-      else if (minValue) return floatValue >= minValue;
-      else return true;
-    };
-
   return (
     <NumericFormat
       value={fieldValue}
@@ -52,12 +38,10 @@ const FieldValueNumberComponent = (
           : " "
       }
       {...decimalParams}
-      isAllowed={checkMinMax}
       customInput={TextField}
       // <TextField
       {...slotInputProps}
       label={fieldDisplayName}
-      helperText={fieldDescription}
       type={getInputTypeFromJsonType(fieldValueType)}
       name={fieldKey}
       key={fieldKey}

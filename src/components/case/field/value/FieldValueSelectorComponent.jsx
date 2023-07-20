@@ -9,7 +9,6 @@ import { UserContext } from "../../../../App";
 
 function FieldValueSelectorComponent(
   fieldValue,
-  fieldDescription,
   fieldKey,
   onChange,
   lookupSettings,
@@ -92,29 +91,23 @@ function FieldValueSelectorComponent(
       getOptionLabel={getLookupTextFromValue}
       key={fieldKey}
       disabled={caseIsReadOnly}
-      // slotProps={slotInputProps}
-      renderInput={renderedInput(
-        fieldKey,
-        fieldDescription,
-        fieldDisplayName
-      )}
+      renderInput={renderedInput(fieldKey, fieldDisplayName, slotInputProps)}
       fullWidth
     />
   );
 }
 
-const renderedInput =
-  (fieldKey, fieldDescription, fieldDisplayName) => (params) =>
-    (
-      <TextField
-        helperText={fieldDescription}
-        key={fieldKey + "_renderedInput"}
-        {...params}
-        label={fieldDisplayName}
-        InputProps={{
-          ...params.InputProps,
-        }}
-      />
-    );
+const renderedInput = (fieldKey, fieldDisplayName, slotInputProps) => (params) =>
+  (
+    <TextField
+      key={fieldKey + "_renderedInput"}
+      {...params}
+      label={fieldDisplayName}
+      {...slotInputProps}
+      InputProps={{
+        ...params.InputProps,
+      }}
+    />
+  );
 
 export default FieldValueSelectorComponent;

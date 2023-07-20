@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   Checkbox,
@@ -22,7 +22,6 @@ import FieldValueNumberComponent from "./FieldValueNumberComponent";
  */
 const FieldValueComponent = ({
   fieldDisplayName,
-  fieldDescription,
   fieldKey,
   fieldValue,
   setFieldValue,
@@ -32,28 +31,47 @@ const FieldValueComponent = ({
   lookupSettings,
   attributes,
   setAttachmentFiles,
-  small,
 }) => {
-  const slotInputProps = small
-    ? {
-        fullWidth: true,
-        textField: { size: "small" },
-        size: "small",
-      }
-    : { fullWidth: true };
   const caseIsReadOnly =
     useContext(CaseContext) || attributes?.["input.readOnly"];
+  const [helperText, setHelperText] = useState("");
+  const [isValid, setIsValid] = useState(true);
   let isInteger;
+
   /* Validation options               =============================== START =============================== */
-  // const dateSlotProps = () => {
-  //   return fieldVisited && !isFieldValid
-  //     ? { textField: {
-  //         error: true,
-  //         helperText: "Field can not be empty"
-  //       } } // TODO: Change error message
-  //     : null;
-  // };
-  
+  const [slotInputProps, setSlotProps] = useState({
+    fullWidth: true,
+    helperText: helperText,
+    error: false,
+    textField: {
+      helperText: helperText,
+      error: false,
+    },
+    // textField: { size: "small" },
+    // size: "small",
+  });
+
+  // useEffect(() => {
+  //   isValid ? setSlotProps((current) => {{
+  //     ...current,
+
+  //   }}
+
+  //   ) : setSlotProps({});
+  // }, [isValid]);
+
+  const checkMinMax = (values) => {
+    const maxValue = attributes?.["input.maxValue"];
+    const minValue = attributes?.["input.minValue"];
+    const { formattedValue, floatValue } = values;
+
+    if (floatValue == null) setIsValid(formattedValue === "");
+    else if (maxValue && minValue)
+      setIsValid(floatValue <= maxValue && floatValue >= minValue);
+    else if (maxValue) setIsValid(floatValue <= maxValue);
+    else if (minValue) setIsValid(floatValue >= minValue);
+    else setIsValid(true);
+  };
   /* Validation ========================================== END ================================ */
   /* Handlers         =================================== START =============================== */
   const handleTextValueChange = (e) => {
@@ -62,13 +80,14 @@ const FieldValueComponent = ({
 
   const handleNumberValueChange = (values, sourceInfo) => {
     setFieldValue(values.value);
-  }
+  };
 
   const handleTextBlur = (e) => {
     onChange(e.target.value);
   };
 
   const handleNumberBlur = () => {
+    checkMinMax(fieldValue);
     onChange(fieldValue);
   };
 
@@ -101,14 +120,12 @@ const FieldValueComponent = ({
       !isNaN(date)
     );
   }
-
   /* Handlers         ================================ END ================================ */
 
   /* Return lookup    =============================== START =============================== */
   if (lookupSettings && "lookupName" in lookupSettings) {
     return FieldValueSelectorComponent(
       fieldValue,
-      fieldDescription,
       fieldKey,
       handleInputLookupValueChange,
       lookupSettings,
@@ -130,7 +147,6 @@ const FieldValueComponent = ({
       case "Document":
         return FieldValueFileComponent(
           fieldDisplayName,
-          fieldDescription,
           fieldValue,
           fieldKey,
           slotInputProps,
@@ -143,37 +159,24 @@ const FieldValueComponent = ({
             label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
-            // onClose={handleDateClose}
             name={fieldKey}
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
             disabled={caseIsReadOnly}
-            slotProps={{
-              ...slotInputProps,
-              textField: {
-                helperText: fieldDescription,
-              },
-            }}
+            slotProps={{ ...slotInputProps }}
           />
         );
       case "DateTime":
         return (
           <DateTimePicker
             label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
-            // helperText={fieldDescription}
             value={fieldValue ? new Date(fieldValue) : null}
             onChange={handleDateValueChange}
-            // onClose={handleDateClose}
             name={fieldKey}
             key={fieldKey}
             // slotProps={dateSlotProps} // field validation
             disabled={caseIsReadOnly}
-            slotProps={{
-              ...slotInputProps,
-              textField: {
-                helperText: fieldDescription,
-              },
-            }}
+            slotProps={{ ...slotInputProps }}
           />
         );
       case "Boolean":
@@ -195,7 +198,7 @@ const FieldValueComponent = ({
                 />
               }
             />
-            <FormHelperText>{fieldDescription}</FormHelperText>
+            <FormHelperText>{helperText}</FormHelperText>
           </FormControl>
         );
       case "WebResource":
@@ -203,7 +206,6 @@ const FieldValueComponent = ({
           <Stack>
             {FieldValueTextComponent(
               fieldDisplayName,
-              fieldDescription,
               required,
               fieldValue,
               handleTextValueChange,
@@ -226,7 +228,6 @@ const FieldValueComponent = ({
         isInteger = true;
         return FieldValueNumberComponent(
           fieldDisplayName,
-          fieldDescription,
           required,
           fieldValue,
           handleNumberValueChange,
@@ -250,7 +251,6 @@ const FieldValueComponent = ({
         isInteger = false;
         return FieldValueNumberComponent(
           fieldDisplayName,
-          fieldDescription,
           required,
           fieldValue,
           handleNumberValueChange,
@@ -265,7 +265,6 @@ const FieldValueComponent = ({
       default: //TextField
         return FieldValueTextComponent(
           fieldDisplayName,
-          fieldDescription,
           required,
           fieldValue,
           handleTextValueChange,

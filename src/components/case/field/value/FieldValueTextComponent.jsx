@@ -3,7 +3,6 @@ import ReactInputMask from "react-input-mask";
 
 const FieldValueTextComponent = (
   fieldDisplayName,
-  fieldDescription,
   required,
   fieldValue,
   handleTextValueChange,
@@ -29,7 +28,6 @@ const FieldValueTextComponent = (
           <TextField
             {...slotInputProps}
             label={fieldDisplayName}
-            helperText={fieldDescription}
             type="text"
             name={fieldKey}
             key={fieldKey}
@@ -50,7 +48,6 @@ const FieldValueTextComponent = (
       <TextField
         {...slotInputProps}
         label={fieldDisplayName}
-        helperText={fieldDescription}
         required={required}
         value={fieldValue}
         onChange={handleTextValueChange}
