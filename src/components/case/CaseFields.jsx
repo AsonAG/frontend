@@ -1,4 +1,4 @@
-import FieldComponent from "./FieldComponent";
+import FieldComponent from "./field/FieldComponent";
 
 const CaseFields = ({ inputCase, setOutputCaseFields }) => {
 

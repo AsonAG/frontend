@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { CaseContext } from "../../scenes/global/CasesForm";
+import { CaseContext } from "../../../../scenes/global/CasesForm";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldValueSelectorComponent from "./FieldValueSelectorComponent";
@@ -45,12 +45,6 @@ const FieldValueComponent = ({
     useContext(CaseContext) || attributes?.["input.readOnly"];
   let isInteger;
   /* Validation options               =============================== START =============================== */
-  // const [fieldVisited, setFieldVisited] = useState(false);
-  // const [isFieldValid, setFieldValid] = useState((fieldValue ? true : !required));
-  /* Validation options               ===============================  END  ================================ */
-  /* Validation - turn red if visited and invalid ======== START ================================ */
-  // const { isSaveButtonClicked, setIsSaveButtonClicked } = useContext(CaseContext);
-
   // const dateSlotProps = () => {
   //   return fieldVisited && !isFieldValid
   //     ? { textField: {
@@ -59,9 +53,7 @@ const FieldValueComponent = ({
   //       } } // TODO: Change error message
   //     : null;
   // };
-  // const handleDateClose = () => {
-  //   setFieldVisited(true);
-  // };
+  
   /* Validation ========================================== END ================================ */
   /* Handlers         =================================== START =============================== */
   const handleTextValueChange = (e) => {
@@ -74,6 +66,10 @@ const FieldValueComponent = ({
 
   const handleTextBlur = (e) => {
     onChange(e.target.value);
+  };
+
+  const handleNumberBlur = () => {
+    onChange(fieldValue);
   };
 
   const handleBooleanValueChange = (e) => {
@@ -234,7 +230,7 @@ const FieldValueComponent = ({
           required,
           fieldValue,
           handleNumberValueChange,
-          handleTextBlur,
+          handleNumberBlur,
           fieldValueType,
           fieldKey,
           slotInputProps,
@@ -258,7 +254,7 @@ const FieldValueComponent = ({
           required,
           fieldValue,
           handleNumberValueChange,
-          handleTextBlur,
+          handleNumberBlur,
           fieldValueType,
           fieldKey,
           slotInputProps,

@@ -2,11 +2,10 @@ import { Fragment, useContext, useEffect, useMemo, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Autocomplete, FormControl, InputLabel, Select } from "@mui/material";
 import TextField from "@mui/material/TextField";
-import CasesApi from "../../api/CasesApi";
-import ApiClient from "../../api/ApiClient";
-import { UserContext } from "../../App";
-import { useUpdateEffect } from "usehooks-ts";
 import { MenuItem } from "react-pro-sidebar";
+import ApiClient from "../../../../api/ApiClient";
+import CasesApi from "../../../../api/CasesApi";
+import { UserContext } from "../../../../App";
 
 function FieldValueSelectorComponent(
   fieldValue,

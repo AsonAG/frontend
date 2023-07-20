@@ -1,6 +1,4 @@
-import { InputAdornment, TextField } from "@mui/material";
-import { CaseContext } from "../../scenes/global/CasesForm";
-import { useContext } from "react";
+import { TextField } from "@mui/material";
 import ReactInputMask from "react-input-mask";
 
 const FieldValueTextComponent = (

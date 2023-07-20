@@ -3,14 +3,14 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import { useContext } from "react";
 import { Markup } from "interweave";
 
-const FieldDescriptionText = (fieldDescription, fieldKey) => {
-  const isHtml = /<\/?[a-z][\s\S]*>/i.test(fieldDescription);
+const DescriptionText = (description, fieldKey) => {
+  const isHtml = /<\/?[a-z][\s\S]*>/i.test(description);
 
   // TODO: refactor color to separate style files
   return (
-    fieldDescription &&
+    description &&
     (isHtml ? (
-      <Markup content={fieldDescription} key={"description_" + fieldKey} />
+      <Markup content={description} key={"description_" + fieldKey} />
     ) : (
       // <Typography
       //   key={"description_" + fieldKey}
@@ -21,9 +21,9 @@ const FieldDescriptionText = (fieldDescription, fieldKey) => {
       // >
       //   {fieldDescription}
       // </Typography>
-      <>{fieldDescription}</>
+      <>{description}</>
     ))
   );
 };
 
-export default FieldDescriptionText;
+export default DescriptionText;

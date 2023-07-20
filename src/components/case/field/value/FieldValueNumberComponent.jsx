@@ -1,8 +1,5 @@
-import { NumberFormatBase, NumericFormat } from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import { InputAdornment, TextField } from "@mui/material";
-import { CaseContext } from "../../scenes/global/CasesForm";
-import { useContext } from "react";
-import ReactInputMask from "react-input-mask";
 
 const FieldValueNumberComponent = (
   fieldDisplayName,
@@ -30,6 +27,19 @@ const FieldValueNumberComponent = (
       }
     : {};
 
+    const checkMinMax = (values) => {
+      const maxValue = attributes?.["input.maxValue"];
+      const minValue = attributes?.["input.minValue"];
+      const { formattedValue, floatValue } = values;
+  
+      if (floatValue == null) return formattedValue === "";
+      else if (maxValue && minValue)
+        return floatValue <= maxValue && floatValue >= minValue;
+      else if (maxValue) return floatValue <= maxValue;
+      else if (minValue) return floatValue >= minValue;
+      else return true;
+    };
+
   return (
     <NumericFormat
       value={fieldValue}
@@ -42,6 +52,7 @@ const FieldValueNumberComponent = (
           : " "
       }
       {...decimalParams}
+      isAllowed={checkMinMax}
       customInput={TextField}
       // <TextField
       {...slotInputProps}

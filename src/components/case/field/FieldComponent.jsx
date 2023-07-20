@@ -1,20 +1,13 @@
-import { useState, useContext, useEffect, createContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   Box,
-  Divider,
-  IconButton,
   Stack,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import FieldValueComponent from "./FieldValueComponent";
-import { CaseContext } from "../../scenes/global/CasesForm";
+import FieldValueComponent from "./value/FieldValueComponent";
+import { CaseContext } from "../../../scenes/global/CasesForm";
 import { useUpdateEffect } from "usehooks-ts";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import FieldDescriptionText from "./FieldDescriptionText";
+import { DescriptionComponent } from "../DescriptionComponent";
 
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 
@@ -129,7 +122,7 @@ const FieldComponent = ({ field, onChange }) => {
         setAttachmentFiles={setAttachmentFiles}
         key={"field_valuecomponent_" + field.id}
       />
-      <FieldDescription fieldDescription={field.description} fieldKey />
+      <DescriptionComponent description={field.description} fieldKey />
 
       {caseIsReadOnly ? (
         // Read-Only case display
@@ -181,23 +174,5 @@ const FieldComponent = ({ field, onChange }) => {
     </Box>
   );
 };
-
-function FieldDescription({ fieldDescription, fieldKey }) {
-  return (
-    <Box>
-      {fieldDescription ? (
-        <Tooltip
-          arrow
-          title={FieldDescriptionText(fieldDescription, fieldKey)}
-          placement="top"
-        >
-          <HelpOutlineOutlinedIcon small color="secondary" />
-        </Tooltip>
-      ) : (
-        <div></div>
-      )}
-    </Box>
-  );
-}
 
 export default FieldComponent;
