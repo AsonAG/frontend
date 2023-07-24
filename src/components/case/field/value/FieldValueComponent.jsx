@@ -14,9 +14,10 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../../../scenes/global/CasesForm";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 import FieldValueFileComponent from "./FieldValueFileComponent";
-import FieldValueSelectorComponent from "./FieldValueSelectorComponent";
+import FieldValueLookupComponent from "./selector/FieldValueLookupComponent";
 import FieldValueNumberComponent from "./FieldValueNumberComponent";
 import { useUpdateEffect } from "usehooks-ts";
+import FieldValueListComponent from "./selector/FieldValueListComponent";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -139,9 +140,20 @@ const FieldValueComponent = ({
   }
   /* Handlers         ================================ END ================================ */
 
-  /* Return lookup    =============================== START =============================== */
+  /* Selectors    =============================== START =============================== */
   if (lookupSettings && "lookupName" in lookupSettings) {
-    return FieldValueSelectorComponent(
+    return FieldValueLookupComponent(
+      fieldValue,
+      fieldKey,
+      handleInputLookupValueChange,
+      lookupSettings,
+      slotInputProps,
+      fieldDisplayName,
+      attributes,
+      caseIsReadOnly
+    );
+  } else if (attributes?.["input.list"]) {
+    return FieldValueListComponent(
       fieldValue,
       fieldKey,
       handleInputLookupValueChange,
@@ -152,7 +164,7 @@ const FieldValueComponent = ({
       caseIsReadOnly
     );
   } else
-  /* Return Lookup          ================================ END ================================ */
+  /* Selectors          ================================ END ================================ */
   /* Return any other type  =============================== START =============================== */
     switch (fieldValueType) {
       case "None":
