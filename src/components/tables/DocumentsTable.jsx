@@ -7,7 +7,7 @@ import ErrorBar from "../errors/ErrorBar";
 import ValuesApi from "../../api/ValuesApi";
 import { format } from "date-fns";
 import TableComponent from "./TableComponent";
-import { getLanguageCode } from "../../api/converter/LanguageConverter";
+import { getLanguageCode } from "../../services/converters/LanguageConverter";
 import { FileIcon, defaultStyles } from "react-file-icon";
 import { Link } from "react-router-dom";
 import DocumentsApi from "../../api/DocumentsApi";

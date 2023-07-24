@@ -6,7 +6,7 @@ import ErrorBar from "../errors/ErrorBar";
 import ValuesApi from "../../api/ValuesApi";
 import { format } from "date-fns";
 import TableComponent from "./TableComponent";
-import { getLanguageCode } from "../../api/converter/LanguageConverter";
+import { getLanguageCode } from "../../services/converters/LanguageConverter";
 
 const EventsTable = ({ caseType, employeeId, clusterName }) => {
   const [caseData, setCaseData] = useState([]);

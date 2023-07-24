@@ -18,6 +18,7 @@ import FieldValueLookupComponent from "./selector/FieldValueLookupComponent";
 import FieldValueNumberComponent from "./FieldValueNumberComponent";
 import { useUpdateEffect } from "usehooks-ts";
 import FieldValueListComponent from "./selector/FieldValueListComponent";
+import { validateMask, validateMinMax } from "../../../../services/validators/FieldValueValidator";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -40,7 +41,7 @@ const FieldValueComponent = ({
   const [isValid, setIsValid] = useState(true);
   let isInteger;
 
-  /* Validation options               =============================== START =============================== */
+  /* Validation          =============================== START =============================== */
   const [slotInputProps, setSlotProps] = useState({});
 
   useEffect(() => {
@@ -77,19 +78,6 @@ const FieldValueComponent = ({
   //       }));
   // }, [isValid]);
 
-  const checkMinMax = (stringValue) => {
-    const maxValue = attributes?.["input.maxValue"];
-    const minValue = attributes?.["input.minValue"];
-
-    const floatValue = parseFloat(stringValue);
-
-    if (floatValue === null) setIsValid(true);
-    else if (maxValue && minValue)
-      setIsValid(floatValue <= maxValue && floatValue >= minValue);
-    else if (maxValue) setIsValid(floatValue <= maxValue);
-    else if (minValue) setIsValid(floatValue >= minValue);
-    else setIsValid(true);
-  };
   /* Validation ========================================== END ================================ */
   /* Handlers         =================================== START =============================== */
   const handleTextValueChange = (e) => {
@@ -101,11 +89,12 @@ const FieldValueComponent = ({
   };
 
   const handleTextBlur = (e) => {
+    setIsValid(validateMask(fieldValue, attributes));
     onChange(e.target.value);
   };
 
   const handleNumberBlur = () => {
-    checkMinMax(fieldValue);
+    setIsValid(validateMinMax(fieldValue, attributes));
     onChange(fieldValue);
   };
 

@@ -1,5 +1,6 @@
 import { TextField } from "@mui/material";
 import ReactInputMask from "react-input-mask";
+import { MASK_CHAR } from "../../../../services/validators/FieldValueValidator";
 
 const FieldValueTextComponent = (
   fieldDisplayName,
@@ -17,7 +18,7 @@ const FieldValueTextComponent = (
     return (
       <ReactInputMask
         mask={attributes["input.mask"]}
-        // maskChar={null}
+        maskChar={MASK_CHAR}
         value={fieldValue}
         onChange={handleTextValueChange}
         required={required}
