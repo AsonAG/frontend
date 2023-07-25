@@ -1,19 +1,23 @@
 import { TextField } from "@mui/material";
 import ReactInputMask from "react-input-mask";
 import { MASK_CHAR } from "../../../../services/validators/FieldValueValidator";
+import FieldValueLookupComponent from "./selector/FieldValueLookupComponent";
+import FieldValueListComponent from "./selector/FieldValueListComponent";
+import { useEffect, useState } from "react";
 
 const FieldValueTextComponent = (
-  fieldDisplayName,
-  required,
+  attributes,
   fieldValue,
   handleTextValueChange,
+  required,
   handleTextBlur,
-  fieldValueType,
-  fieldKey,
+  caseIsReadOnly,
   slotInputProps,
-  attributes,
-  caseIsReadOnly
+  fieldDisplayName,
+  fieldKey
 ) => {
+  useEffect(() => {}, []);
+
   if (attributes?.["input.mask"])
     return (
       <ReactInputMask
@@ -34,12 +38,6 @@ const FieldValueTextComponent = (
             key={fieldKey}
             multiline={attributes?.["input.multiLine"]}
             minRows={2}
-            // InputLabelProps={{
-            //   sx: {
-            //     color: '#003566',
-            //     textTransform: 'capitalize',
-            //   },
-            // }}
           />
         )}
       </ReactInputMask>

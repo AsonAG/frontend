@@ -12,7 +12,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../../../scenes/global/CasesForm";
-import FieldValueTextComponent from "./FieldValueTextComponent";
+import FieldValueStringComponent from "./FieldValueStringComponent";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldValueLookupComponent from "./selector/FieldValueLookupComponent";
 import FieldValueNumberComponent from "./FieldValueNumberComponent";
@@ -129,31 +129,6 @@ const FieldValueComponent = ({
   }
   /* Handlers         ================================ END ================================ */
 
-  /* Selectors    =============================== START =============================== */
-  if (lookupSettings && "lookupName" in lookupSettings) {
-    return FieldValueLookupComponent(
-      fieldValue,
-      fieldKey,
-      handleInputLookupValueChange,
-      lookupSettings,
-      slotInputProps,
-      fieldDisplayName,
-      attributes,
-      caseIsReadOnly
-    );
-  } else if (attributes?.["input.list"]) {
-    return FieldValueListComponent(
-      fieldValue,
-      fieldKey,
-      handleInputLookupValueChange,
-      lookupSettings,
-      slotInputProps,
-      fieldDisplayName,
-      attributes,
-      caseIsReadOnly
-    );
-  } else
-  /* Selectors          ================================ END ================================ */
   /* Return any other type  =============================== START =============================== */
     switch (fieldValueType) {
       case "None":
@@ -222,7 +197,7 @@ const FieldValueComponent = ({
       case "WebResource":
         return (
           <Stack>
-            {FieldValueTextComponent(
+            {FieldValueStringComponent(
               fieldDisplayName,
               required,
               fieldValue,
@@ -281,7 +256,7 @@ const FieldValueComponent = ({
           isInteger
         );
       default: //TextField
-        return FieldValueTextComponent(
+        return FieldValueStringComponent(
           fieldDisplayName,
           required,
           fieldValue,
@@ -291,7 +266,9 @@ const FieldValueComponent = ({
           fieldKey,
           slotInputProps,
           attributes,
-          caseIsReadOnly
+          caseIsReadOnly,
+          lookupSettings,
+          handleInputLookupValueChange
         );
     }
   /* Return any other type  =============================== END =============================== */
