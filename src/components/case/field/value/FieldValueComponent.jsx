@@ -12,13 +12,12 @@ import {
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CaseContext } from "../../../../scenes/global/CasesForm";
-import FieldValueStringComponent from "./FieldValueStringComponent";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldValueLookupComponent from "./selector/FieldValueLookupComponent";
 import FieldValueNumberComponent from "./FieldValueNumberComponent";
-import { useUpdateEffect } from "usehooks-ts";
 import FieldValueListComponent from "./selector/FieldValueListComponent";
 import { validateMask, validateMinMax } from "../../../../services/validators/FieldValueValidator";
+import FieldValueTextComponent from "./FieldValueTextComponent";
 
 /**
  * Input field types {Decimal/Money/Percent/Hour/Day../Distance/NumericBoolean}
@@ -135,7 +134,7 @@ const FieldValueComponent = ({
       <div key={fieldKey + "_lookupoption"}>
         {FieldValueLookupComponent(
           fieldValue,
-          fieldKey + "_lookup",
+          fieldKey,
           handleInputLookupValueChange,
           lookupSettings,
           slotInputProps,
@@ -150,7 +149,7 @@ const FieldValueComponent = ({
       <div key={fieldKey + "_listoption"}>
         {FieldValueListComponent(
           fieldValue,
-          fieldKey + "_list",
+          fieldKey,
           handleInputLookupValueChange,
           lookupSettings,
           slotInputProps,
@@ -230,13 +229,12 @@ const FieldValueComponent = ({
       case "WebResource":
         return (
           <Stack>
-            {FieldValueStringComponent(
+            {FieldValueTextComponent(
               fieldDisplayName,
               required,
               fieldValue,
               handleTextValueChange,
               handleTextBlur,
-              fieldValueType,
               fieldKey,
               slotInputProps,
               attributes,
@@ -289,19 +287,16 @@ const FieldValueComponent = ({
           isInteger
         );
       default: //TextField or Autocomplete
-        return FieldValueStringComponent(
+        return FieldValueTextComponent(
           fieldDisplayName,
           required,
           fieldValue,
           handleTextValueChange,
           handleTextBlur,
-          fieldValueType,
           fieldKey,
           slotInputProps,
           attributes,
-          caseIsReadOnly,
-          lookupSettings,
-          handleInputLookupValueChange
+          caseIsReadOnly
         );
     };
   /* Return component =============================== END =============================== */
