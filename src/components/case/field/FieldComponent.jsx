@@ -120,7 +120,7 @@ const FieldComponent = ({ field, onChange }) => {
         lookupSettings={field.lookupSettings}
         attributes={field.attributes}
         setAttachmentFiles={setAttachmentFiles}
-        key={"field_valuecomponent_" + field.id}
+        key={"field_valuecomponent_" + field.id + "_" + field.valueType}
       />
       <DescriptionComponent description={field.description} fieldKey />
 

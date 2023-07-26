@@ -11,8 +11,8 @@ function FieldValueListComponent(
   attributes,
   caseIsReadOnly
 ) {
-  const isMultiOptions = attributes?.["input.multiList"];
-  const [options, setOptions] = useState([]);
+  const isMultiOptions = attributes["input.multiList"];
+  const [options, setOptions] = useState(attributes["input.list"]);
   const [inputValue, setInputValue] = useState(
     fieldValue
       ? isMultiOptions
@@ -26,7 +26,7 @@ function FieldValueListComponent(
 
   // init
   useEffect(() => {
-    setOptions(attributes?.["input.list"]);
+    setOptions(attributes["input.list"]);
   }, []);
 
   const getTextFromValue = (value) => {

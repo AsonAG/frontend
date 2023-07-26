@@ -16,8 +16,6 @@ const FieldValueTextComponent = (
   fieldDisplayName,
   fieldKey
 ) => {
-  useEffect(() => {}, []);
-
   if (attributes?.["input.mask"])
     return (
       <ReactInputMask
@@ -35,7 +33,7 @@ const FieldValueTextComponent = (
             label={fieldDisplayName}
             type="text"
             name={fieldKey}
-            key={fieldKey}
+            key={fieldKey+'_textfield'}
             multiline={attributes?.["input.multiLine"]}
             minRows={2}
           />
@@ -53,7 +51,7 @@ const FieldValueTextComponent = (
         onBlur={handleTextBlur}
         type="text"
         name={fieldKey}
-        key={fieldKey}
+        key={fieldKey+'_textfield'}
         multiline={attributes?.["input.multiLine"]}
         minRows={2}
         disabled={caseIsReadOnly}

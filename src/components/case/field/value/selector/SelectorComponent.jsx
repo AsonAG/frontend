@@ -19,7 +19,7 @@ const SelectorComponent = (
       onChange={handleChange}
       options={getOptions}
       getOptionLabel={getLookupTextFromValue}
-      key={fieldKey}
+      key={fieldKey+'_autocomplete'}
       disabled={caseIsReadOnly}
       renderInput={renderedInput(fieldKey, fieldDisplayName, slotInputProps)}
       fullWidth

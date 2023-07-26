@@ -129,7 +129,40 @@ const FieldValueComponent = ({
   }
   /* Handlers         ================================ END ================================ */
 
-  /* Return any other type  =============================== START =============================== */
+  /* Selectors    =============================== START =============================== */
+  if (lookupSettings && "lookupName" in lookupSettings) {
+    return (
+      <div key={fieldKey + "_lookupoption"}>
+        {FieldValueLookupComponent(
+          fieldValue,
+          fieldKey + "_lookup",
+          handleInputLookupValueChange,
+          lookupSettings,
+          slotInputProps,
+          fieldDisplayName,
+          attributes,
+          caseIsReadOnly
+        )}
+      </div>
+    );
+  } else if (attributes?.["input.list"]) {
+    return (
+      <div key={fieldKey + "_listoption"}>
+        {FieldValueListComponent(
+          fieldValue,
+          fieldKey + "_list",
+          handleInputLookupValueChange,
+          lookupSettings,
+          slotInputProps,
+          fieldDisplayName,
+          attributes,
+          caseIsReadOnly
+        )}
+      </div>
+    );
+  } else
+  /* Selectors          ================================ END ================================ */
+  /* Return component =============================== START =============================== */
     switch (fieldValueType) {
       case "None":
         return (
@@ -255,7 +288,7 @@ const FieldValueComponent = ({
           caseIsReadOnly,
           isInteger
         );
-      default: //TextField
+      default: //TextField or Autocomplete
         return FieldValueStringComponent(
           fieldDisplayName,
           required,
@@ -270,8 +303,8 @@ const FieldValueComponent = ({
           lookupSettings,
           handleInputLookupValueChange
         );
-    }
-  /* Return any other type  =============================== END =============================== */
+    };
+  /* Return component =============================== END =============================== */
 };
 
 export default FieldValueComponent;
