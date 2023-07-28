@@ -466,8 +466,6 @@ export class ApiClient {
             }
         }
 
-        
-
         request.end((error, response) => {
             if (callback) {
                 var data = null;

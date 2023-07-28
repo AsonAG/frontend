@@ -41,13 +41,11 @@ export class DocumentsApi {
     if (caseType === "Employee") {
       documentTypePath = "/employees/" + employeeId + "/cases/";
     } else {
-      documentTypePath = "/companycases/";
+      documentTypePath =
+        "/companycases/";
     }
 
     return (
-      this.apiClient.basePath +
-      "/" +
-      this.tenantId +
       documentTypePath +
       caseValueId +
       "/documents/" +
@@ -55,13 +53,35 @@ export class DocumentsApi {
     );
   }
 
-  /**
-   * Callback function to receive the result of the getDocuments operation.
-   * @callback moduleapi/DocumentsApi~getDocumentsCallback
-   * @param {String} error Error message, if any.
-   * @param {module:model/DocumentsResponseBody{ data The data returned by the service call.
-   * @param {String} response The complete HTTP response.
-   */
+  getDocument(documentId, caseValueId, caseType, employeeId, callback) {
+    let postBody = null;
+    let pathParams = {};
+    let queryParams = {};
+    let headerParams = {
+    };
+    let formParams = {};
+
+    let authNames = [];
+    let contentTypes = [];
+    let accepts = ["application/json"];
+    let returnType = "";
+
+    return this.apiClient.callApi(
+      this.getDocumentLink(documentId, caseValueId, caseType, employeeId),
+      "GET",
+      pathParams,
+      queryParams,
+      headerParams,
+      formParams,
+      postBody,
+      authNames,
+      contentTypes,
+      accepts,
+      returnType,
+      callback,
+      this.tenantId
+    );
+  }
 
   /**
    * Gets a list of documents

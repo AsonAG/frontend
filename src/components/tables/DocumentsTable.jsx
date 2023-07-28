@@ -1,9 +1,15 @@
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
-import ErrorBar from "../errors/ErrorBar";
 import ValuesApi from "../../api/ValuesApi";
 import { format } from "date-fns";
 import TableComponent from "./TableComponent";
@@ -12,6 +18,7 @@ import { FileIcon, defaultStyles } from "react-file-icon";
 import { Link } from "react-router-dom";
 import DocumentsApi from "../../api/DocumentsApi";
 import CasesApi from "../../api/CasesApi";
+import { DownloadOutlined } from "@mui/icons-material";
 
 const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
   const [tableData, setTableData] = useState([]);
@@ -21,6 +28,7 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const documentsApi = useMemo(() => new DocumentsApi(ApiClient, user), [user]);
   const [error, setError] = useState();
+  const [backdropOpen, setBackdropOpen] = useState(false);
 
   const langCode = getLanguageCode(user.language);
 
@@ -39,26 +47,26 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
     } else {
       data.forEach((element) => {
         // if (element["valueType"] === "Document") {
-          tableData = [
-            ...tableData,
-            {
-              id: element["id"],
-              caseName:
-                langCode && element["caseNameLocalizations"][langCode]
-                  ? element["caseNameLocalizations"][langCode]
-                  : element["caseName"],
-              caseFieldName:
-                langCode && element["caseFieldNameLocalizations"][langCode]
-                  ? element["caseFieldNameLocalizations"][langCode]
-                  : element["caseFieldName"],
-              value: element["value"],
-              valueType: element["valueType"],
-              start: element["start"],
-              end: element["end"],
-              created: element["created"],
-              documents: element["documents"],
-            },
-          ];
+        tableData = [
+          ...tableData,
+          {
+            id: element["id"],
+            caseName:
+              langCode && element["caseNameLocalizations"][langCode]
+                ? element["caseNameLocalizations"][langCode]
+                : element["caseName"],
+            caseFieldName:
+              langCode && element["caseFieldNameLocalizations"][langCode]
+                ? element["caseFieldNameLocalizations"][langCode]
+                : element["caseFieldName"],
+            value: element["value"],
+            valueType: element["valueType"],
+            start: element["start"],
+            end: element["end"],
+            created: element["created"],
+            documents: element["documents"],
+          },
+        ];
         // }
       });
       console.log(
@@ -77,6 +85,33 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
   const dateFormatter = (params) =>
     params?.value ? format(new Date(params?.value), "yyyy-MM-dd") : null;
 
+  const handleFileClick = (docId, row) => {
+    setBackdropOpen(true);
+    documentsApi.getDocument(
+      docId,
+      row.id,
+      caseType,
+      employeeId,
+      getFileCallback
+    );
+  };
+
+  const handleClose = () => {
+    setBackdropOpen(false);
+  };
+
+  const getFileCallback = (error, data, response) => {
+    if (error) {
+      setError(error);
+      console.error(JSON.stringify(error, null, 2));
+      setBackdropOpen(false);
+    } else {
+      downloadBase64File(data.content, data.contentType, data.name);
+      setBackdropOpen(false);
+      setError(null);
+    }
+  };
+
   const columns = [
     {
       field: "caseFieldName",
@@ -94,7 +129,7 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
       flex: 3,
       renderCell: ({ row }) => {
         if (Array.isArray(row.documents)) {
-          const rowId = row.id;
+          const rowCopy = row;
           return (
             <Stack spacing={2}>
               {row.documents.map((doc) => {
@@ -102,14 +137,8 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
                 return (
                   <Box
                     display="inline-flex"
-                    //       onClick={() => handleFileClick(doc.id, rowId)}
+                    onClick={() => handleFileClick(doc.id, rowCopy)}
                     component={Link}
-                    to={documentsApi.getDocumentLink(
-                      doc.id,
-                      rowId,
-                      caseType,
-                      employeeId
-                    )}
                     alignItems="center"
                   >
                     <Box width="30px" marginRight="15px">
@@ -148,32 +177,54 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
   ];
 
   return (
-    <TableComponent
-      error={error}
-      setError={setError}
-      loading={!isDataLoaded}
-      tableData={tableData}
-      columns={columns}
-      initialState={{
-        columns: {
-          columnVisibilityModel: {
-            caseName: false,
+    <Box>
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={backdropOpen}
+        onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <TableComponent
+        error={error}
+        setError={setError}
+        loading={!isDataLoaded}
+        tableData={tableData}
+        columns={columns}
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              caseName: false,
+            },
           },
-        },
-        sorting: {
-          sortModel: [{ field: "created", sort: "desc" }],
-        },
-      }}
-      getRowHeight={() => "auto"}
-      sx={{
-        "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: "8px" },
-        "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": { py: "12px" },
-        "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
-          py: "22px",
-        },
-      }}
-    />
+          sorting: {
+            sortModel: [{ field: "created", sort: "desc" }],
+          },
+        }}
+        getRowHeight={() => "auto"}
+        sx={{
+          "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: "8px" },
+          "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
+            py: "12px",
+          },
+          "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
+            py: "22px",
+          },
+        }}
+      />
+    </Box>
   );
 };
+
+function downloadBase64File(base64Data, contentType, fileName) {
+  const linkSource = `data:${contentType};base64,${base64Data}`;
+  const downloadLink = document.createElement("a");
+  downloadLink.href = linkSource;
+  downloadLink.download = fileName;
+  downloadLink.click();
+}
 
 export default DocumentsTable;
