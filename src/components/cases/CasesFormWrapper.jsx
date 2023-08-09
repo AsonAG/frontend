@@ -12,16 +12,32 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
-import { getMainCaseObject } from "../../api/CasesApi";
+import { buildCasesBody, filterBody, getMainCaseObject } from "../../api/CasesApi";
 import CasesSaveButton from "../buttons/CasesSaveButton";
 
-const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
+const CasesFormWrapper = ({ title, onSubmit, children, inputCase, outputCase }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isTopCaseSet, setIsTopCaseSet] = useState(false);
   const caseIsReadOnly = useContext(CaseContext);
   const mobileScreen = useMediaQuery("(max-width:600px)");
+
+
+  // const [caseFiltered, setCaseFiltered] = useState();
+
+  // useEffect(() => {
+  //   if (outputCase){
+  //   try{
+  //     const postBody = buildCasesBody(outputCase, true);
+  //   filterBody(inputCase, postBody.case);
+  //   setCaseFiltered(postBody.case);
+  //   }
+  //   catch (error){
+  //     console.warn("Error on filtering output case: "+error);
+  //   }
+  // }
+  // }, [outputCase])
 
   const handleScroll = (event) => {
     setScrollPosition(event.currentTarget.scrollTop);
@@ -92,6 +108,7 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
                 <CasesTableOfContentComponent
                   caseBase={getMainCaseObject(outputCase)}
                   scrollPosition={scrollPosition}
+                  inputCaseSchema={inputCase}
                 />
               ) : (
                 // TODO: fix circular progress display
@@ -105,6 +122,7 @@ const CasesFormWrapper = ({ title, onSubmit, children, outputCase }) => {
                 </Box>
               )}
             </List>
+            
           </Stack>
 
           <CasesSaveButton

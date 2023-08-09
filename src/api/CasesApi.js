@@ -31,69 +31,6 @@ export class CasesApi {
     this.userLanguage = user.language;
   }
 
-  buildCasesBody(
-    outputCaseMap,
-    shouldIncludeBody,
-    shouldDeleteDocumentsFromBody
-  ) {
-    if (shouldIncludeBody) {
-      let outputCase = {};
-      let baseCase = getMainCaseObject(outputCaseMap);
-
-      outputCase.caseName = baseCase.caseName;
-      outputCase.values = Object.values(baseCase.values);
-      outputCase.relatedCases = this.buildRelatedCasesBody(
-        baseCase.relatedCases
-      );
-
-      // delete empty items
-      if (outputCase.values.length === 0) delete outputCase.values;
-
-      return {
-        case: outputCase,
-      };
-    } else return null;
-  }
-
-  buildRelatedCasesBody(relatedCases, shouldDeleteDocumentsFromBody) {
-    let filteredRelatedCases = [];
-
-    Object.values(relatedCases).map((relatedCase) => {
-      let caseObj = {};
-      caseObj.caseName = relatedCase.caseName;
-      caseObj.values = Object.values(relatedCase.values);
-      caseObj.relatedCases = this.buildRelatedCasesBody(
-        relatedCase.relatedCases
-      );
-      filteredRelatedCases.push(caseObj);
-    });
-
-    return filteredRelatedCases;
-  }
-
-  // filter values and related cases (if they are in inputCase or not)
-  filterBody(inputCaseSchema, outputCase) {
-    // fields filter
-    let valuesSchema = inputCaseSchema.fields.map((field) => field.name);
-    outputCase.values = outputCase.values.filter((val) =>
-      valuesSchema.includes(val.caseFieldName)
-    );
-    // related cases filter
-    let relatedCasesSchema = inputCaseSchema.relatedCases.map(
-      (relCase) => relCase.name
-    );
-    outputCase.relatedCases = outputCase.relatedCases.filter((rel) =>
-      relatedCasesSchema.includes(rel.caseName)
-    );
-    // related cases values filter
-    inputCaseSchema.relatedCases?.forEach((relSchema) => {
-      let relatedCase = outputCase.relatedCases.find(
-        (rel) => rel.caseName === relSchema.name
-      );
-      relatedCase && this.filterBody(relSchema, relatedCase);
-    });
-  }
-
   /**
    * Build a case and Get case fields
    * Returs case fields and values along with related cases fields and values. Running this request is required to build a case, before saving it with &#x60;cases/{caseName}/save&#x60;.
@@ -113,9 +50,9 @@ export class CasesApi {
       Object.values(outputCase).length > 0 &&
       Object.values(getMainCaseObject(outputCase)?.values).length > 0;
     // build a case body if case fields are provided
-    let postBody = this.buildCasesBody(outputCase, shouldIncludeBody, true);
+    let postBody = buildCasesBody(outputCase, shouldIncludeBody, true);
 
-    if (shouldIncludeBody) this.filterBody(inputCase, postBody.case);
+    if (shouldIncludeBody) filterBody(inputCase, postBody.case);
     console.log("Request body: " + JSON.stringify(postBody, null, 2));
 
     let pathParams = {
@@ -166,12 +103,12 @@ export class CasesApi {
     //   JSON.stringify(caseFields[0]) != "{}"
     //     ? this.buildRequestBodyCaseSave(caseName, caseFields)
     //     : null;
-    let postBody = this.buildCasesBody(outputCase, true);
+    let postBody = buildCasesBody(outputCase, true);
     postBody.userId = this.userId;
     postBody.employeeId = employeeId;
     postBody.divisionId = this.divisionId;
 
-    this.filterBody(inputCase, postBody.case);
+    filterBody(inputCase, postBody.case);
     console.log("Request body: " + JSON.stringify(postBody, null, 2));
 
     let pathParams = {};
@@ -375,6 +312,70 @@ export class CasesApi {
 
 export function getMainCaseObject(mainCase) {
   return Object.values(mainCase)[0];
+}
+
+// filter values and related cases (if they are in inputCase or not)
+export function filterBody(inputCaseSchema, outputCase) {
+  // fields filter
+  let valuesSchema = inputCaseSchema.fields.map((field) => field.name);
+  outputCase.values = outputCase.values.filter((val) =>
+    valuesSchema.includes(val.caseFieldName)
+  );
+  // related cases filter
+  let relatedCasesSchema = inputCaseSchema.relatedCases.map(
+    (relCase) => relCase.name
+  );
+  outputCase.relatedCases = outputCase.relatedCases.filter((rel) =>
+    relatedCasesSchema.includes(rel.caseName)
+  );
+  // related cases values filter
+  inputCaseSchema.relatedCases?.forEach((relSchema) => {
+    let relatedCase = outputCase.relatedCases.find(
+      (rel) => rel.caseName === relSchema.name
+    );
+    relatedCase && filterBody(relSchema, relatedCase);
+  });
+}
+
+// build CaseChengeSetup object
+export function buildCasesBody(
+  outputCaseMap,
+  shouldIncludeBody,
+  shouldDeleteDocumentsFromBody
+) {
+  if (shouldIncludeBody) {
+    let outputCase = {};
+    let baseCase = getMainCaseObject(outputCaseMap);
+
+    outputCase.caseName = baseCase.caseName;
+    outputCase.values = Object.values(baseCase.values);
+    outputCase.relatedCases = buildRelatedCasesBody(baseCase.relatedCases);
+
+    // delete empty items
+    if (outputCase.values.length === 0) delete outputCase.values;
+
+    return {
+      case: outputCase,
+    };
+  } else return null;
+}
+
+// build CaseChengeSetup object for related cases
+export function buildRelatedCasesBody(
+  relatedCases,
+  shouldDeleteDocumentsFromBody
+) {
+  let filteredRelatedCases = [];
+
+  Object.values(relatedCases).map((relatedCase) => {
+    let caseObj = {};
+    caseObj.caseName = relatedCase.caseName;
+    caseObj.values = Object.values(relatedCase.values);
+    caseObj.relatedCases = buildRelatedCasesBody(relatedCase.relatedCases);
+    filteredRelatedCases.push(caseObj);
+  });
+
+  return filteredRelatedCases;
 }
 
 export default CasesApi;

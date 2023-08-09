@@ -48,6 +48,7 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
       ...prevState,
       [getCasedKey(inputCase)]: {
         caseName: inputCase.name,
+        id: inputCase.id,
         values: outputCaseFields,
         relatedCases: outputRelatedCases,
         ref: caseRef,

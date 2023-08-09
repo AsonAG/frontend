@@ -95,6 +95,7 @@ const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
       <CasesFormWrapper
         title={title}
         onSubmit={handleSubmit}
+        inputCase={inputCase}
         outputCase={outputCase}
       >
         {error && (

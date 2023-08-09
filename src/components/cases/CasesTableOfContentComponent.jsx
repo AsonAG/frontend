@@ -10,7 +10,11 @@ import {
 import { useState } from "react";
 import { tokens } from "../../theme";
 
-const CasesTableOfContentComponent = ({ caseBase, scrollPosition }) => {
+const CasesTableOfContentComponent = ({
+  caseBase,
+  scrollPosition,
+  inputCaseSchema,
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -31,57 +35,73 @@ const CasesTableOfContentComponent = ({ caseBase, scrollPosition }) => {
   }
 
   return (
-    <Box sx={{
-      "& .MuiListItem-root": {
-        paddingRight: '4px'
-      }
-    }}>
-      <ListItem>
-        {/* <ListItemButton
+    inputCaseSchema &&
+    caseBase.id &&
+    shouldShowOutputCase(caseBase, inputCaseSchema) && (
+      <Box
+        sx={{
+          "& .MuiListItem-root": {
+            paddingRight: "4px",
+          },
+        }}
+      >
+        <ListItem>
+          {/* <ListItemButton
             onClick={(event) => onClick(event, _case)}
             key={"casesTableOfContent_caseButton_" + _case.id}
           > */}
-        <ListItemButton
-          data-to-scrollspy-id={"case_item_" + caseBase.id}
-          key={"casesTableOfContent_caseButton_" + caseBase.id}
-          className="nav__item"
-          onClick={(event) => handleTableOfContentsItemClick(event, caseBase)}
-        >
-          <Typography
-            key={"casesTableOfContent_caseButtonText_" + caseBase.id}
-            fontSize="0.9rem"
-            sx={
-              // scrollPosition < _case.ref.current.getBoundingClientRect().top //+30
-              isActive
-                ? {
-                    fontWeight: "bold",
-                    color: colors.blueAccent,
-                    // textDecoration: "underline"
-                  }
-                : {}
-            }
+          <ListItemButton
+            data-to-scrollspy-id={"case_item_" + caseBase.id}
+            key={"casesTableOfContent_caseButton_" + caseBase.id}
+            className="nav__item"
+            onClick={(event) => handleTableOfContentsItemClick(event, caseBase)}
           >
-            {caseBase.displayName}
-          </Typography>
-        </ListItemButton>
-      </ListItem>
-
-      {caseBase.relatedCases ? (
-        <ListItem>
-          <List dense disablePadding>
-            {Object.values(caseBase.relatedCases).map((relatedCase) => (
-              <CasesTableOfContentComponent
-                caseBase={relatedCase}
-                scrollPosition={scrollPosition}
-              />
-            ))}
-          </List>
+            <Typography
+              key={"casesTableOfContent_caseButtonText_" + caseBase.id}
+              fontSize="0.9rem"
+              sx={
+                // scrollPosition < _case.ref.current.getBoundingClientRect().top //+30
+                isActive
+                  ? {
+                      fontWeight: "bold",
+                      color: colors.blueAccent,
+                      // textDecoration: "underline"
+                    }
+                  : {}
+              }
+            >
+              {caseBase.displayName}
+            </Typography>
+          </ListItemButton>
         </ListItem>
-      ) : (
-        <></>
-      )}
-    </Box>
+
+        {caseBase.relatedCases ? (
+          <ListItem>
+            <List dense disablePadding>
+              {Object.values(caseBase.relatedCases).map((relatedCase) => (
+                <CasesTableOfContentComponent
+                  caseBase={relatedCase}
+                  scrollPosition={scrollPosition}
+                  inputCaseSchema={inputCaseSchema}
+                />
+              ))}
+            </List>
+          </ListItem>
+        ) : (
+          <></>
+        )}
+      </Box>
+    )
   );
 };
+
+function shouldShowOutputCase(caseBase, inputCaseSchema) {
+  return (
+    caseBase.id === inputCaseSchema.id ||
+    inputCaseSchema.relatedCases.some((element) =>
+      shouldShowOutputCase(caseBase, element)
+    )
+  );
+}
 
 export default CasesTableOfContentComponent;
