@@ -22,8 +22,6 @@ const CasesFormWrapper = ({ title, onSubmit, children, inputCase, outputCase }) 
   const [isTopCaseSet, setIsTopCaseSet] = useState(false);
   const caseIsReadOnly = useContext(CaseContext);
   const mobileScreen = useMediaQuery("(max-width:600px)");
-
-
   // const [caseFiltered, setCaseFiltered] = useState();
 
   // useEffect(() => {
@@ -109,6 +107,7 @@ const CasesFormWrapper = ({ title, onSubmit, children, inputCase, outputCase }) 
                   caseBase={getMainCaseObject(outputCase)}
                   scrollPosition={scrollPosition}
                   inputCaseSchema={inputCase}
+                  key={'CasesTableOfContentComponents_'+inputCase.relatedCases.length}
                 />
               ) : (
                 // TODO: fix circular progress display

@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { tokens } from "../../theme";
+import { getCaseKey } from "../case/CaseComponent";
 
 const CasesTableOfContentComponent = ({
   caseBase,
@@ -21,8 +22,26 @@ const CasesTableOfContentComponent = ({
   const handleTableOfContentsItemClick = (event, caseBase) => {
     console.log("Focus invoked: ", caseBase.ref.current);
     caseBase.ref.current.scrollIntoView();
-    // casesTableOfContents["case_" + caseBase.id].ref.current.focus();
   };
+
+  // populated related cases components
+  let relatedCasesComponents = [];
+  inputCaseSchema.relatedCases.forEach((schemaRelatedCase) => {
+    let key = getCaseKey(schemaRelatedCase);
+    if (Object.hasOwnProperty.call(caseBase.relatedCases, key)) {
+      const relatedCase = caseBase.relatedCases[key];
+      relatedCasesComponents.push(
+        <CasesTableOfContentComponent
+          caseBase={relatedCase}
+          scrollPosition={scrollPosition}
+          inputCaseSchema={inputCaseSchema}
+        />
+      );
+    }
+    // else {
+    //   console.warn("The input case doesn't have a corresponding case key in OutputCase. Case name: " +schemaRelatedCase.name);
+    // }
+  });
 
   let isActive = false;
   try {
@@ -46,10 +65,6 @@ const CasesTableOfContentComponent = ({
         }}
       >
         <ListItem>
-          {/* <ListItemButton
-            onClick={(event) => onClick(event, _case)}
-            key={"casesTableOfContent_caseButton_" + _case.id}
-          > */}
           <ListItemButton
             data-to-scrollspy-id={"case_item_" + caseBase.id}
             key={"casesTableOfContent_caseButton_" + caseBase.id}
@@ -78,13 +93,7 @@ const CasesTableOfContentComponent = ({
         {caseBase.relatedCases ? (
           <ListItem>
             <List dense disablePadding>
-              {Object.values(caseBase.relatedCases).map((relatedCase) => (
-                <CasesTableOfContentComponent
-                  caseBase={relatedCase}
-                  scrollPosition={scrollPosition}
-                  inputCaseSchema={inputCaseSchema}
-                />
-              ))}
+              {relatedCasesComponents}
             </List>
           </ListItem>
         ) : (

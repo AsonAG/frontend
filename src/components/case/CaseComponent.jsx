@@ -7,7 +7,7 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import CaseNameHeader from "../../scenes/global/CaseNameHeader";
 import CaseFields from "./CaseFields";
 
-export const getCasedKey = (_case) => "case_" + _case.name + "_" + _case.id;
+export const getCaseKey = (_case) => "case_" + _case.name + "_" + _case.id;
 
 const CaseComponent = ({ inputCase, setOutputCase }) => {
   const theme = useTheme();
@@ -46,7 +46,7 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
     // update output cases
     setOutputCase((prevState) => ({
       ...prevState,
-      [getCasedKey(inputCase)]: {
+      [getCaseKey(inputCase)]: {
         caseName: inputCase.name,
         id: inputCase.id,
         values: outputCaseFields,
