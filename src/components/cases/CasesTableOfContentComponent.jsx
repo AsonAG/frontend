@@ -13,11 +13,15 @@ import { getCaseKey } from "../case/CaseComponent";
 
 const CasesTableOfContentComponent = ({
   caseBase,
-  scrollPosition,
   inputCaseSchema,
+  topCase,
+  setTopCase,
+  orderID,
+  scrollPosition
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [relatedTopCaseID, setRelatedTopCaseID] = useState();
 
   const handleTableOfContentsItemClick = (event, caseBase) => {
     console.log("Focus invoked: ", caseBase.ref.current);
@@ -26,32 +30,41 @@ const CasesTableOfContentComponent = ({
 
   // populated related cases components
   let relatedCasesComponents = [];
-  inputCaseSchema.relatedCases.forEach((schemaRelatedCase) => {
-    let key = getCaseKey(schemaRelatedCase);
+  inputCaseSchema?.relatedCases?.forEach((schemaRelatedCase, id) => {
+    const key = getCaseKey(schemaRelatedCase);
     if (Object.hasOwnProperty.call(caseBase.relatedCases, key)) {
       const relatedCase = caseBase.relatedCases[key];
       relatedCasesComponents.push(
         <CasesTableOfContentComponent
           caseBase={relatedCase}
+          topCase={relatedTopCaseID}
+          setTopCase={setRelatedTopCaseID}
+          inputCaseSchema={schemaRelatedCase}
+          orderID={id}
           scrollPosition={scrollPosition}
-          inputCaseSchema={inputCaseSchema}
+          key={"CasesTableOfContentComponents_" + key}
         />
       );
     }
-    // else {
-    //   console.warn("The input case doesn't have a corresponding case key in OutputCase. Case name: " +schemaRelatedCase.name);
-    // }
   });
 
   let isActive = false;
-  try {
-    // isTopCaseParam &&
-    isActive =
-      scrollPosition < caseBase?.ref?.current.offsetTop &&
-      scrollPosition + window.innerHeight > caseBase?.ref?.current.offsetTop;
-  } catch (error) {
-    console.error(JSON.stringify(error));
-  }
+      try {
+        const isInViewport =
+          scrollPosition < caseBase?.ref?.current.offsetTop &&
+          scrollPosition + window.innerHeight > caseBase?.ref?.current.offsetTop;
+
+        if (isInViewport && (orderID === topCase || !topCase)) {
+          isActive = true;
+          setTopCase(orderID);
+          // setRelatedTopCaseID(undefined);
+        }
+        else if (!isInViewport && orderID === topCase)
+          setTopCase(undefined);
+
+      } catch (error) {
+        console.warn(JSON.stringify(error));
+      }
 
   return (
     inputCaseSchema &&

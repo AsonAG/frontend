@@ -12,30 +12,62 @@ import { CaseContext } from "../../scenes/global/CasesForm";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
-import { buildCasesBody, filterBody, getMainCaseObject } from "../../api/CasesApi";
+import {
+  buildCasesBody,
+  filterBody,
+  getMainCaseObject,
+} from "../../api/CasesApi";
 import CasesSaveButton from "../buttons/CasesSaveButton";
+import { getCaseKey } from "../case/CaseComponent";
+import useIntersection from "../../hooks/useIntersection";
 
-const CasesFormWrapper = ({ title, onSubmit, children, inputCase, outputCase }) => {
+const CasesFormWrapper = ({
+  title,
+  onSubmit,
+  children,
+  inputCase,
+  outputCase,
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [isTopCaseSet, setIsTopCaseSet] = useState(false);
   const caseIsReadOnly = useContext(CaseContext);
   const mobileScreen = useMediaQuery("(max-width:600px)");
-  // const [caseFiltered, setCaseFiltered] = useState();
+
+  // START set active case based on scroll position
+  // outputCase.relat
+  
+//   outputCase.relatedCases.map((relCase) => {
+//   const inViewport = useIntersection(relCase.ref, "0px");
+
+//   if (inViewport) {
+//       console.log("in viewport:", ref.current);
+//   }
+
+// });
+  
+  // const updateIsCaseActive = (caseBase) => { 
+  //    const caseBaseKey = getCaseKey(caseBase);
+
+  //   let isActive = false;
+  //   if (topCase != caseBaseKey)
+  //     try {
+  //       // isTopCaseParam &&
+  //       isActive =
+  //         scrollPosition < caseBase?.ref?.current.offsetTop &&
+  //         scrollPosition + window.innerHeight > caseBase?.ref?.current.offsetTop;
+  //       if (isActive) {
+  //         setTopCase(caseBaseKey);
+  //       }
+  //     } catch (error) {
+  //       console.warn(JSON.stringify(error));
+  //     }
+  // }
+  // END scroll positon setting 
 
   // useEffect(() => {
-  //   if (outputCase){
-  //   try{
-  //     const postBody = buildCasesBody(outputCase, true);
-  //   filterBody(inputCase, postBody.case);
-  //   setCaseFiltered(postBody.case);
-  //   }
-  //   catch (error){
-  //     console.warn("Error on filtering output case: "+error);
-  //   }
-  // }
-  // }, [outputCase])
+  //   if (inputCase) setTopCase(getCaseKey(inputCase));
+  // }, [inputCase]);
 
   const handleScroll = (event) => {
     setScrollPosition(event.currentTarget.scrollTop);
@@ -105,9 +137,11 @@ const CasesFormWrapper = ({ title, onSubmit, children, inputCase, outputCase }) 
               {Object.keys(outputCase).length > 0 ? (
                 <CasesTableOfContentComponent
                   caseBase={getMainCaseObject(outputCase)}
-                  scrollPosition={scrollPosition}
                   inputCaseSchema={inputCase}
-                  key={'CasesTableOfContentComponents_'+inputCase.relatedCases.length}
+                  key={'CasesTableOfContentComponents_baseCase_'+inputCase.relatedCases.length}
+                  // topCase={0}
+                  setTopCase={()=>{}}
+                  scrollPosition={scrollPosition}
                 />
               ) : (
                 // TODO: fix circular progress display
@@ -121,7 +155,6 @@ const CasesFormWrapper = ({ title, onSubmit, children, inputCase, outputCase }) 
                 </Box>
               )}
             </List>
-            
           </Stack>
 
           <CasesSaveButton
