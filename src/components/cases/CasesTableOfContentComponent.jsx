@@ -9,15 +9,12 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { tokens } from "../../theme";
-import { getCaseKey } from "../case/CaseComponent";
+import { getInputCaseKey, getOutputCaseKey } from "../case/CaseComponent";
 
 const CasesTableOfContentComponent = ({
   caseBase,
   inputCaseSchema,
-  topCase,
-  setTopCase,
-  orderID,
-  scrollPosition
+  activeCaseKey
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -28,43 +25,24 @@ const CasesTableOfContentComponent = ({
     caseBase.ref.current.scrollIntoView();
   };
 
+  const isActive = activeCaseKey === getInputCaseKey(inputCaseSchema);
+
   // populated related cases components
   let relatedCasesComponents = [];
   inputCaseSchema?.relatedCases?.forEach((schemaRelatedCase, id) => {
-    const key = getCaseKey(schemaRelatedCase);
+    const key = getInputCaseKey(schemaRelatedCase);
     if (Object.hasOwnProperty.call(caseBase.relatedCases, key)) {
       const relatedCase = caseBase.relatedCases[key];
       relatedCasesComponents.push(
         <CasesTableOfContentComponent
           caseBase={relatedCase}
-          topCase={relatedTopCaseID}
-          setTopCase={setRelatedTopCaseID}
           inputCaseSchema={schemaRelatedCase}
-          orderID={id}
-          scrollPosition={scrollPosition}
           key={"CasesTableOfContentComponents_" + key}
-        />
+          activeCaseKey={activeCaseKey}
+          />
       );
     }
   });
-
-  let isActive = false;
-      try {
-        const isInViewport =
-          scrollPosition < caseBase?.ref?.current.offsetTop &&
-          scrollPosition + window.innerHeight > caseBase?.ref?.current.offsetTop;
-
-        if (isInViewport && (orderID === topCase || !topCase)) {
-          isActive = true;
-          setTopCase(orderID);
-          // setRelatedTopCaseID(undefined);
-        }
-        else if (!isInViewport && orderID === topCase)
-          setTopCase(undefined);
-
-      } catch (error) {
-        console.warn(JSON.stringify(error));
-      }
 
   return (
     inputCaseSchema &&

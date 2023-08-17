@@ -18,8 +18,7 @@ import {
   getMainCaseObject,
 } from "../../api/CasesApi";
 import CasesSaveButton from "../buttons/CasesSaveButton";
-import { getCaseKey } from "../case/CaseComponent";
-import useIntersection from "../../hooks/useIntersection";
+import useActiveCase from "../../hooks/useActiveCase";
 
 const CasesFormWrapper = ({
   title,
@@ -30,56 +29,20 @@ const CasesFormWrapper = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [scrollPosition, setScrollPosition] = useState(0);
   const caseIsReadOnly = useContext(CaseContext);
   const mobileScreen = useMediaQuery("(max-width:600px)");
+  // const [activeCaseKey, setActiveCaseKey] = useState();
+  const [activeCaseKey, setActiveCaseKey] = useState();
+  const handleScroll = useActiveCase( outputCase, setActiveCaseKey);
 
   // START set active case based on scroll position
-  // outputCase.relat
   
-//   outputCase.relatedCases.map((relCase) => {
-//   const inViewport = useIntersection(relCase.ref, "0px");
-
-//   if (inViewport) {
-//       console.log("in viewport:", ref.current);
-//   }
-
-// });
-  
-  // const updateIsCaseActive = (caseBase) => { 
-  //    const caseBaseKey = getCaseKey(caseBase);
-
-  //   let isActive = false;
-  //   if (topCase != caseBaseKey)
-  //     try {
-  //       // isTopCaseParam &&
-  //       isActive =
-  //         scrollPosition < caseBase?.ref?.current.offsetTop &&
-  //         scrollPosition + window.innerHeight > caseBase?.ref?.current.offsetTop;
-  //       if (isActive) {
-  //         setTopCase(caseBaseKey);
-  //       }
-  //     } catch (error) {
-  //       console.warn(JSON.stringify(error));
-  //     }
-  // }
-  // END scroll positon setting 
 
   // useEffect(() => {
   //   if (inputCase) setTopCase(getCaseKey(inputCase));
   // }, [inputCase]);
+  // END scroll positon setting
 
-  const handleScroll = (event) => {
-    setScrollPosition(event.currentTarget.scrollTop);
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   return (
     <Box
@@ -138,10 +101,11 @@ const CasesFormWrapper = ({
                 <CasesTableOfContentComponent
                   caseBase={getMainCaseObject(outputCase)}
                   inputCaseSchema={inputCase}
-                  key={'CasesTableOfContentComponents_baseCase_'+inputCase.relatedCases.length}
-                  // topCase={0}
-                  setTopCase={()=>{}}
-                  scrollPosition={scrollPosition}
+                  key={
+                    "CasesTableOfContentComponents_baseCase_" +
+                    inputCase.relatedCases.length
+                  }
+                  activeCaseKey={activeCaseKey}
                 />
               ) : (
                 // TODO: fix circular progress display
