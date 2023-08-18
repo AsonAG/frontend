@@ -27,22 +27,10 @@ const CasesFormWrapper = ({
   inputCase,
   outputCase,
 }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const caseIsReadOnly = useContext(CaseContext);
   const mobileScreen = useMediaQuery("(max-width:600px)");
-  // const [activeCaseKey, setActiveCaseKey] = useState();
   const [activeCaseKey, setActiveCaseKey] = useState();
   const handleScroll = useActiveCase( outputCase, setActiveCaseKey);
-
-  // START set active case based on scroll position
-  
-
-  // useEffect(() => {
-  //   if (inputCase) setTopCase(getCaseKey(inputCase));
-  // }, [inputCase]);
-  // END scroll positon setting
-
 
   return (
     <Box

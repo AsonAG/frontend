@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getMainCaseObject } from "../api/CasesApi";
 import { getOutputCaseKey } from "../components/case/CaseComponent";
+import { useUpdateEffect } from "usehooks-ts";
 
 // returns a key of the case that is visible in the current viewport
 export default function useActiveCase(outputCase, setActiveCaseKey) {
@@ -18,13 +19,19 @@ export default function useActiveCase(outputCase, setActiveCaseKey) {
     };
   }, []);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (getMainCaseObject(outputCase)) {
       iterateThroughCases(outputCase, checkIsCaseActive, setActiveCaseKey);
     }
-  }, [scrollPosition]);
+  }, [outputCase, scrollPosition]);
 
   const iterateThroughCases = (cases, func, setterFunc) => {
+        // TODO: add logic to iterate based on InputCase, not Output
+        //   if (getMainCaseObject(outputCase)) {
+        //     let outputRelatedCases = getMainCaseObject(outputCase).relatedCases;
+      
+        //     inputCase?.relatedCases?.every((schemaRelatedCase, id) => {
+        //       const key = getCaseKey(schemaRelatedCase);
     for (const caseObj of Object.values(cases)) {
       if (func(caseObj, setterFunc)) return true;
       if (caseObj.relatedCases) {
@@ -37,7 +44,7 @@ export default function useActiveCase(outputCase, setActiveCaseKey) {
   const checkIsCaseActive = (_case, setterFunc) => {
     try {
       if (
-        scrollPosition < _case?.ref?.current.offsetTop &&
+        scrollPosition + 20 < _case?.ref?.current.offsetTop &&
         scrollPosition + window.innerHeight > _case?.ref?.current.offsetTop
       ) {
         const activeCase = _case;
@@ -67,8 +74,6 @@ export default function useActiveCase(outputCase, setActiveCaseKey) {
 }
 
 const getCaseByKey = (cases, key) => {
-  //   if (!Object.keys(outputCase)) return null;
-
   for (const [caseKey, caseObj] of Object.entries(cases)) {
     if (caseKey === key) return caseObj;
     else if (Object.hasOwnProperty.call(caseObj.relatedCases, key))
