@@ -9,7 +9,11 @@ const CompanyCases = () => {
   return (
     <Box m="25px">
       <Header title="New Company Event" subtitle="Choose a case" />
-      <CasesTable caseType={"Company"} navigateTo={"/companyCase"} />
+      <CasesTable
+        clusterName={"NotAvailable"}
+        caseType={"Company"}
+        navigateTo={"/companyCase"}
+      />
     </Box>
   );
 };

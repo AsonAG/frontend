@@ -14,6 +14,7 @@ const EmployeeCases = () => {
       <EmployeeHeader employee={employee} />
       <CasesTable 
           caseType={'Employee'}
+          clusterName={"NotAvailable"}
           employeeId={employee.employeeId}    
           navigateTo={'/employeeCase'}
       />

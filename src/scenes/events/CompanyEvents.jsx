@@ -1,7 +1,6 @@
 import { Box } from "@mui/material";
 import { React } from "react";
 import Header from "../../components/Header";
-import CasesTable from "../../components/tables/CasesTable";
 import EventsTable from "../../components/tables/EventsTable";
 
 const CompanyEvents = () => {

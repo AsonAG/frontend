@@ -2,7 +2,6 @@ import { Box } from "@mui/material";
 import { React } from "react";
 import { useContext } from "react";
 import { EmployeeSelectionContext } from "../../App";
-import CasesTable from "../../components/tables/CasesTable";
 import EmployeeHeader from "../../components/EmployeeHeader";
 import EventsTable from "../../components/tables/EventsTable";
 
