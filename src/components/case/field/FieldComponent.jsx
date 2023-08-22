@@ -14,7 +14,7 @@ export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 const FieldComponent = ({ field, onChange }) => {
   const fieldName = field.name;
   const fieldKey = getFieldKey(field.name, field.id);
-  const [fieldValue, setFieldValue] = useState(field.value ? field.value : ""); // TODO: test if works properly
+  const [fieldValue, setFieldValue] = useState(field.value); // TODO: test if works properly
   const [fieldStartDate, setFieldStartDate] = useState(
     field.start ? new Date(field.start) : null
   );
@@ -76,27 +76,27 @@ const FieldComponent = ({ field, onChange }) => {
   };
 
   const handleInputStartDateChange = (dateValue) => {
-    let newDate = dateValue ? new Date(dateValue) : null;
-    setFieldStartDate(newDate);
+    // let newDate = dateValue ? new Date(dateValue) : null;
+    setFieldStartDate(dateValue);
     onChange(
       fieldKey,
       fieldName,
       fieldValue,
-      newDate,
+      dateValue,
       fieldEndDate,
       attachmentFiles
     );
   };
 
   const handleInputEndDateChange = (dateValue) => {
-    let newDate = dateValue ? new Date(dateValue) : null;
-    setFieldEndDate(newDate);
+    // let newDate = dateValue ? new Date(dateValue) : null;
+    setFieldEndDate(dateValue);
     onChange(
       fieldKey,
       fieldName,
       fieldValue,
       fieldStartDate,
-      newDate,
+      dateValue,
       attachmentFiles
     );
   };
@@ -109,6 +109,7 @@ const FieldComponent = ({ field, onChange }) => {
       rowGap="10px"
       columnGap="4px"
       padding="4px 0px 10px 10px"
+      borderBottom="1px solid #0f0f0f"
     >
       <FieldValueComponent
         fieldDisplayName={fieldDisplayName}

@@ -14,7 +14,6 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "date-fns": "^2.29.3",
-    "dayjs": "^1.11.7",
     "formik": "^2.2.9",
     "interweave": "^13.1.0",
     "oidc-react": "^3.0.4",
