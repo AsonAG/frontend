@@ -156,6 +156,7 @@ export class CasesApi {
       employeeId: employeeId,
       caseType: caseType,
       clusterSetName: clusterName,
+      clusterSetName: 'NotAvailable',
       language: this.userLanguage,
     };
     let headerParams = {};
