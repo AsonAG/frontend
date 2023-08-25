@@ -89,8 +89,8 @@ const getAdornmentFromJsonType = (jsonType, fieldId, attributes) => {
     case "Percent":
       adornment = "%";
       break;
-    case "Distance":
-      adornment = attributes?.["input.distanceMeasure"];
+    case "Decimal":
+      adornment = attributes?.["input.units"];
       break;
     default:
       return <></>;

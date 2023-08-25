@@ -263,13 +263,7 @@ const FieldValueComponent = ({
           caseIsReadOnly,
           isInteger
         );
-      case "Week":
       case "Decimal":
-      case "Year":
-      case "Day":
-      case "Hour":
-      case "Distance":
-      case "Month":
       case "Percent":
       case "Money":
         isInteger = false;
