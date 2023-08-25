@@ -16,8 +16,8 @@ const FieldValueDateTimeComponent = (
 	);
 
 	useEffect(() => {
-		// const newDate = dateValue ? new Date(dateValue) : null;
-		// setDateValue(newDate);
+		const newDate = dateValue ? new Date(dateValue) : null;
+		setDateValue(newDate);
 	}, [fieldValue]);
 
 	const handleChange = (dateValue) => {
@@ -30,7 +30,7 @@ const FieldValueDateTimeComponent = (
 	return fieldValueType === "Date" ? (
 		<DatePicker
 			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
-			value={fieldValue}
+			value={dateValue}
 			onChange={handleChange}
 			name={fieldKey}
 			key={fieldKey}
@@ -40,7 +40,7 @@ const FieldValueDateTimeComponent = (
 	) : (
 		<DateTimePicker
 			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
-			value={fieldValue}
+			value={dateValue}
 			onChange={handleChange}
 			name={fieldKey}
 			key={fieldKey}

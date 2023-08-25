@@ -45,8 +45,10 @@ const FieldComponent = ({ field, onChange }) => {
   // update input values when request with newly built field comes
   useUpdateEffect(() => {
     setFieldValue(field.value);
-    setFieldStartDate(field.start ? new Date(field.start) : null);
-    setFieldEndDate(field.end ? new Date(field.end) : null);
+    // setFieldStartDate(field.start ? new Date(field.start) : null);
+    setFieldStartDate(field.start);
+    // setFieldEndDate(field.end ? new Date(field.end) : null);
+    setFieldEndDate(field.end);
   }, [field]);
 
   // handle new document upload

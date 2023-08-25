@@ -17,8 +17,8 @@ const CaseFields = ({ inputCase, setOutputCaseFields }) => {
         caseName: inputCase.name,
         caseFieldName: fieldName,
         value: fieldValue,
-        start: isoDateWithoutTimeZone(fieldStartDate),
-        end: isoDateWithoutTimeZone(fieldEndDate),
+        start: fieldStartDate,
+        end: fieldEndDate,
         documents: attachmentFiles
       },
     }));
