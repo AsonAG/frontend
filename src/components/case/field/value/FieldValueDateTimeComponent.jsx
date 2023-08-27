@@ -20,9 +20,14 @@ const FieldValueDateTimeComponent = (
 		setDateValue(newDate);
 	}, [fieldValue]);
 
-	const handleChange = (dateValue) => {
-		// const newDate = new Date(dateValue);
-		const newDate = dateValue;
+	const handleDateChange = (newDate) => {
+                // transfer to date with time set at 00:00:00 UTC
+                const utc = new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000);
+		setDateValue(utc);
+		onChange(utc);
+	};
+
+	const handleDateTimeChange = (newDate) => {
 		setDateValue(newDate);
 		onChange(newDate);
 	};
@@ -31,36 +36,24 @@ const FieldValueDateTimeComponent = (
 		<DatePicker
 			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
 			value={dateValue}
-			onChange={handleChange}
+			onChange={handleDateChange}
 			name={fieldKey}
 			key={fieldKey}
 			disabled={caseIsReadOnly}
 			slotProps={{ ...slotInputProps }}
+                        timezone={'UTC'}
 		/>
 	) : (
 		<DateTimePicker
 			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
 			value={dateValue}
-			onChange={handleChange}
+			onChange={handleDateTimeChange}
 			name={fieldKey}
 			key={fieldKey}
 			disabled={caseIsReadOnly}
 			slotProps={{ ...slotInputProps }}
 		/>
 	);
-};
-function isValidDate(date) {
-	return (
-		date &&
-		Object.prototype.toString.call(date) === "[object Date]" &&
-		!isNaN(date)
-	);
-}
-
-const getValidatedDate = (dateValue) => {
-	let newDate = dateValue;
-	if (isValidDate(dateValue)) newDate = new Date(dateValue);
-	return newDate;
 };
 
 export default FieldValueDateTimeComponent;
