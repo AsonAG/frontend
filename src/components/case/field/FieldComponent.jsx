@@ -104,7 +104,7 @@ const FieldComponent = ({ field, onChange }) => {
 			rowGap="10px"
 			columnGap="4px"
 			padding="4px 0px 10px 10px"
-			borderBottom="1px solid #0f0f0f"
+			// borderBottom="1px solid #0f0f0f"
 		>
 			<FieldValueComponent
 				fieldDisplayName={fieldDisplayName}
