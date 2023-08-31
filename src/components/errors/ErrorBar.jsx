@@ -11,7 +11,7 @@ const ErrorBar = (props) => {
       title = text?.title;
       subtitle = JSON.stringify(text?.errors);
     } else {
-      title = JSON.stringify(text);
+      subtitle = JSON.stringify(text);
     }
   } catch (parsingErr) {
     let text = error.message;

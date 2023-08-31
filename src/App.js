@@ -45,7 +45,7 @@ import DocumentsTable from "./components/tables/DocumentsTable";
 import EmployeeDocuments from "./scenes/documents/EmployeeDocuments";
 import CompanyDocuments from "./scenes/documents/CompanyDocuments";
 import PersonalDocuments from "./scenes/documents/PersonalDocuments";
-import { warn } from "console";
+import console from "console-browserify";
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
