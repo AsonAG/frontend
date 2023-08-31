@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import FieldComponent from "./field/FieldComponent";
 
 const CaseFields = ({ inputCase, setOutputCaseFields }) => {
@@ -16,8 +17,8 @@ const CaseFields = ({ inputCase, setOutputCaseFields }) => {
         caseName: inputCase.name,
         caseFieldName: fieldName,
         value: fieldValue,
-        start: isoDateWithoutTimeZone(fieldStartDate),
-        end: isoDateWithoutTimeZone(fieldEndDate),
+        start: fieldStartDate,
+        end: fieldEndDate,
         documents: attachmentFiles
       },
     }));
@@ -36,11 +37,9 @@ const CaseFields = ({ inputCase, setOutputCaseFields }) => {
   );
 };
 
-const isoDateWithoutTimeZone = (date) => {
-  if (date == null) return date;
-  let timestamp = date.getTime() - date.getTimezoneOffset() * 60000;
-  let correctDate = new Date(timestamp);
-  return correctDate.toISOString();
-};
+// TODO: replace iso date with date without time for Date value types
+const getDateWithoutTime = (date) => {
+  return date ? format(new Date(date), "yyyy-MM-dd") : null;
+}
 
 export default CaseFields;
