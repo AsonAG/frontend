@@ -14,9 +14,9 @@ const ErrorBar = (props) => {
       title = JSON.stringify(text);
     }
   } catch (parsingErr) {
-    console.warn(
-      "Failed to extract the error message: " + JSON.stringify(parsingErr, null, 2)
-    );
+    let text = error.message;
+    title = "Unexpected issue occurred"
+    subtitle = text;
   }
 
   return (
