@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 const FieldValueDateTimeComponent = (
 	fieldDisplayName,
-	fieldValueType,
 	required,
 	fieldValue,
 	onChange,
@@ -11,39 +10,18 @@ const FieldValueDateTimeComponent = (
 	slotInputProps,
 	caseIsReadOnly
 ) => {
-	const [dateValue, setDateValue] = useState(
-		fieldValue ? new Date(fieldValue) : null
-	);
+	const [dateValue, setDateValue] = useState(toDateObject(fieldValue));
 
 	useEffect(() => {
-		const newDate = dateValue ? new Date(dateValue) : null;
-		setDateValue(newDate);
+		setDateValue(toDateObject(fieldValue));
 	}, [fieldValue]);
-
-	const handleDateChange = (newDate) => {
-                // transfer to date with time set at 00:00:00 UTC
-                const utc = new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000);
-		setDateValue(utc);
-		onChange(utc);
-	};
 
 	const handleDateTimeChange = (newDate) => {
 		setDateValue(newDate);
 		onChange(newDate);
 	};
 
-	return fieldValueType === "Date" ? (
-		<DatePicker
-			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
-			value={dateValue}
-			onChange={handleDateChange}
-			name={fieldKey}
-			key={fieldKey}
-			disabled={caseIsReadOnly}
-			slotProps={{ ...slotInputProps }}
-                        timezone={'UTC'}
-		/>
-	) : (
+	return (
 		<DateTimePicker
 			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
 			value={dateValue}
@@ -54,6 +32,12 @@ const FieldValueDateTimeComponent = (
 			slotProps={{ ...slotInputProps }}
 		/>
 	);
+};
+
+const toDateObject = (value) => {
+	if (value) {
+		return new Date(value);
+	} else return null;
 };
 
 export default FieldValueDateTimeComponent;

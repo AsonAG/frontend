@@ -21,6 +21,7 @@ import {
 	validateMinMax,
 } from "../../../../services/validators/FieldValueValidator";
 import FieldValueTextComponent from "./FieldValueTextComponent";
+import FieldValueDateComponent from "./FieldValueDateComponent";
 import FieldValueDateTimeComponent from "./FieldValueDateTimeComponent";
 
 /**
@@ -112,25 +113,6 @@ const FieldValueComponent = ({
 		onChange(value);
 	};
 
-	/**
-	 * if dateValue is a Date class - updates fieldValue
-	 */
-	const handleDateValueChange = (dateValue) => {
-		if (dateValue == null || isValidDate(dateValue)) {
-			let newDate = dateValue ? new Date(dateValue) : null;
-			setFieldValue(newDate);
-			onChange(newDate);
-		}
-	};
-
-	function isValidDate(date) {
-		return (
-			date &&
-			Object.prototype.toString.call(date) === "[object Date]" &&
-			!isNaN(date)
-		);
-	}
-
 	const handleDateTimeValueChange = (dateValue) => {
 		onChange(dateValue);
 	};
@@ -187,9 +169,8 @@ const FieldValueComponent = ({
 					setAttachmentFiles
 				);
 			case "Date":
-				return FieldValueDateTimeComponent(
+				return FieldValueDateComponent(
 					fieldDisplayName,
-					fieldValueType,
 					required,
 					fieldValue,
 					handleDateTimeValueChange,
@@ -200,7 +181,6 @@ const FieldValueComponent = ({
 			case "DateTime":
 				return FieldValueDateTimeComponent(
 					fieldDisplayName,
-					fieldValueType,
 					required,
 					fieldValue,
 					handleDateTimeValueChange,
