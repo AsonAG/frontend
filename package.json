@@ -13,7 +13,6 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "console-browserify": "^1.2.0",
     "date-fns": "^2.30.0",
     "formik": "^2.4.3",
     "interweave": "^13.1.0",
@@ -34,13 +33,15 @@
     "react-sticky": "^6.0.3",
     "superagent": "^8.1.2",
     "usehooks-ts": "^2.9.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "stream": "npm:stream-browserify@3.0.0"
+
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "CI= react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject"
+    "start": "react-scripts start",
+    "build": "CI= react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -61,6 +62,11 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    
+  "buffer": "npm:buffer@6.0.3",
+  "crypto": "npm:crypto-browserify@3.12.0",
+  "stream": "npm:stream-browserify@3.0.0",
+  "util": "npm:util@0.12.5"
   }
 }

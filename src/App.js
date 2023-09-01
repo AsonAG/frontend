@@ -1,7 +1,7 @@
-import React, { useState, createContext, useMemo } from "react";
+import React, { useState, createContext } from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
@@ -31,7 +31,6 @@ import {
 import EmployeesApi from "./api/EmployeesApi";
 import authConfig from "./authConfig";
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorBar from "./components/errors/ErrorBar";
 import UnknownErrorPage from "./components/errors/UnknownErrorPage";
 import CompanyData from "./scenes/data/CompanyData";
 import EmployeeData from "./scenes/data/EmployeeData";
@@ -41,11 +40,10 @@ import PersonalData from "./scenes/data/PersonalData";
 import PersonalDataCase from "./scenes/data/dataCase/PersonalDataCase";
 import EmployeeEvents from "./scenes/events/EmployeeEvents";
 import CompanyEvents from "./scenes/events/CompanyEvents";
-import DocumentsTable from "./components/tables/DocumentsTable";
 import EmployeeDocuments from "./scenes/documents/EmployeeDocuments";
 import CompanyDocuments from "./scenes/documents/CompanyDocuments";
 import PersonalDocuments from "./scenes/documents/PersonalDocuments";
-import console from "console-browserify";
+
 
 export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
