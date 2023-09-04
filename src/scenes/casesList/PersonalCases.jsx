@@ -1,9 +1,7 @@
-import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
 import { Box } from "@mui/material";
 import Header from "../../components/Header";
 import CasesTable from "../../components/tables/CasesTable";
-import { EmployeeContext, UserContext, UserEmployeeContext } from "../../App";
+import { UserEmployeeContext } from "../../App";
 import { useContext } from "react";
 
 const PersonalCases = () => {
