@@ -28,7 +28,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const auth = useAuth();
   const { user, setUser } = useContext(UserContext);
-  const settingsLink = process.env.REACT_APP_AUTHORITY_SETTINGS_URL;
+  const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
 
   const handleSidebar = () => setIsCollapsed(!isCollapsed);
 
