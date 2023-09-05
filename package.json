@@ -34,6 +34,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "staging": "vite build --mode staging",
     "serve": "vite serve preview"
   },
   "browserslist": {
