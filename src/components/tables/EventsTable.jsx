@@ -1,10 +1,8 @@
-import { Box } from "@mui/material";
 import { React, useState, useEffect, useMemo, useContext } from "react";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
-import ErrorBar from "../errors/ErrorBar";
 import ValuesApi from "../../api/ValuesApi";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import TableComponent from "./TableComponent";
 import { getLanguageCode } from "../../services/converters/LanguageConverter";
 
@@ -63,10 +61,10 @@ const EventsTable = ({ caseType, employeeId, clusterName }) => {
   };
 
   const dateTimeFormatter = (params) =>
-    params?.value ? format(new Date(params?.value), "yyyy-MM-dd HH:mm") : null;
+    params?.value ? dayjs(params.value).format("YYYY-MM-DD HH:mm") : null;
 
   const dateFormatter = (params) =>
-    params?.value ? format(new Date(params?.value), "yyyy-MM-dd") : null;
+    params?.value ? dayjs(params.value).format("YYYY-MM-DD") : null;
 
   const columns = [
     {

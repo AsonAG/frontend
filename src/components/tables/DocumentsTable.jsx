@@ -1,8 +1,6 @@
-import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import {
   Backdrop,
   Box,
-  Button,
   CircularProgress,
   Stack,
   Typography,
@@ -11,14 +9,13 @@ import { React, useState, useEffect, useMemo, useContext } from "react";
 import { UserContext } from "../../App";
 import ApiClient from "../../api/ApiClient";
 import ValuesApi from "../../api/ValuesApi";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import TableComponent from "./TableComponent";
 import { getLanguageCode } from "../../services/converters/LanguageConverter";
 import { FileIcon, defaultStyles } from "react-file-icon";
 import { Link } from "react-router-dom";
 import DocumentsApi from "../../api/DocumentsApi";
 import CasesApi from "../../api/CasesApi";
-import { DownloadOutlined } from "@mui/icons-material";
 
 const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
   const [tableData, setTableData] = useState([]);
@@ -80,10 +77,10 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
   };
 
   const dateTimeFormatter = (params) =>
-    params?.value ? format(new Date(params?.value), "yyyy-MM-dd HH:mm") : null;
+    params?.value ? dayjs(params.value).format()("yyyy-MM-dd HH:mm") : null;
 
   const dateFormatter = (params) =>
-    params?.value ? format(new Date(params?.value), "yyyy-MM-dd") : null;
+    params?.value ? dayjs(params.value).format()("yyyy-MM-dd") : null;
 
   const handleFileClick = (docId, row) => {
     setBackdropOpen(true);

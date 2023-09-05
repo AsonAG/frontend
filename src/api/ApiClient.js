@@ -14,7 +14,6 @@
  *
  */
 import superagent from "superagent";
-import querystring from "querystring";
 
 
 /**
@@ -428,7 +427,7 @@ export class ApiClient {
         }
 
         if (contentType === 'application/x-www-form-urlencoded') {
-            request.send(querystring.stringify(this.normalizeParams(formParams)));
+            // request.send(querystring.stringify(this.normalizeParams(formParams)));
         } else if (contentType == 'multipart/form-data') {
             var _formParams = this.normalizeParams(formParams);
             for (var key in _formParams) {

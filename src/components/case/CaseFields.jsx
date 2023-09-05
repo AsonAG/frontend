@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import FieldComponent from "./field/FieldComponent";
 
 const CaseFields = ({ inputCase, setOutputCaseFields }) => {
@@ -36,10 +35,5 @@ const CaseFields = ({ inputCase, setOutputCaseFields }) => {
     </>
   );
 };
-
-// TODO: replace iso date with date without time for Date value types
-const getDateWithoutTime = (date) => {
-  return date ? format(new Date(date), "yyyy-MM-dd") : null;
-}
 
 export default CaseFields;

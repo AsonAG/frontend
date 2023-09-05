@@ -17,7 +17,7 @@ const authConfig = (setAuthUserIdentifier) => {
     // stateStore: localStorage,
 
     onSignIn: async (response) => {
-      console.log("LogoIN activated");
+      console.log("on sign in user", JSON.stringify(response));
       localStorage.setItem("ason_access_token", response.access_token);
       setAuthUserIdentifier(response.profile.email);
       window.history.replaceState(

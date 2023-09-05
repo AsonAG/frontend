@@ -8,7 +8,8 @@ import Dashboard from "./scenes/dashboard";
 import Tasks from "./scenes/tasks";
 import PersonalCases from "./scenes/casesList/PersonalCases";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/de';
 import { Box } from "@mui/system";
 import CompanyCases from "./scenes/casesList/CompanyCases";
 import Employees from "./scenes/employees";
@@ -22,7 +23,6 @@ import ApiClient from "./api/ApiClient";
 import PayrollsApi from "./api/PayrollsApi";
 import Tenants from "./scenes/tenants";
 import UsersApi from "./api/UsersApi";
-import de from "date-fns/locale/de";
 import {
 	useLocalStorage,
 	useSessionStorage,
@@ -244,8 +244,8 @@ function App() {
 	return (
 		<AuthProvider {...authConfig(setAuthUserIdentifier)}>
 			<LocalizationProvider
-				dateAdapter={AdapterDateFns}
-				adapterLocale={de} // TODO: user default selection and manual selection option
+				dateAdapter={AdapterDayjs}
+				adapterLocale="de" // TODO: user default selection and manual selection option
 			>
 				<ColorModeContext.Provider value={colorMode}>
 					<ThemeProvider theme={theme}>
