@@ -37,7 +37,7 @@ export class ApiClient {
          * @default https://localhost:44354/api/tenants
          */
         // this.basePath = 'https://localhost:44354/api/tenants'.replace(/\/+$/, ''); 
-        this.basePath = process.env.REACT_APP_API_URL.replace(/\/+$/, ''); 
+        this.basePath = import.meta.env.VITE_API_URL.replace(/\/+$/, ''); 
 
         /**
          * The authentication methods to be included for all API calls.

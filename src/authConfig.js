@@ -6,9 +6,9 @@ const authConfig = (setAuthUserIdentifier) => {
     code_challenge_method: "S256",
     scope: "openid profile email",
 
-    authority: process.env.REACT_APP_AUTHORITY_URL,
-    redirectUri: process.env.REACT_APP_REDIRECT_URL,
-    post_logout_redirect_uri: process.env.REACT_APP_REDIRECT_URL,
+    authority: import.meta.env.VITE_AUTHORITY_URL,
+    redirectUri: import.meta.env.VITE_REDIRECT_URL,
+    post_logout_redirect_uri: import.meta.env.VITE_REDIRECT_URL,
 
     autoSignIn: true,
     autoSignOut: true,
