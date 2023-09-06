@@ -117,7 +117,7 @@ const FieldComponent = ({ field, onChange }) => {
 				setAttachmentFiles={setAttachmentFiles}
 				key={"field_valuecomponent_" + field.id + "_" + field.valueType}
 			/>
-			<DescriptionComponent description={field.description} fieldKey />
+			<DescriptionComponent description={field.description} />
 
 			{caseIsReadOnly ? (
 				// Read-Only case display

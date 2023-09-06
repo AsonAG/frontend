@@ -56,20 +56,6 @@ export default function useActiveCase(outputCase, setActiveCaseKey) {
       console.warn(JSON.stringify(error));
     }
   };
-
-  //   if (getMainCaseObject(outputCase)) {
-  //     let outputRelatedCases = getMainCaseObject(outputCase).relatedCases;
-
-  //     inputCase?.relatedCases?.every((schemaRelatedCase, id) => {
-  //       const key = getCaseKey(schemaRelatedCase);
-  //       if (Object.hasOwnProperty.call(outputRelatedCases, key)) {
-  //         const relatedCase = outputRelatedCases[key];
-  //         checkRelationToScreenPosition(relatedCase, key);
-  //       }
-  //       return true;
-  //     });
-  //   }
-
   return handleScroll;
 }
 
