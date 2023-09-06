@@ -1,5 +1,6 @@
-import { DatePicker, DateTimePicker } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 
 const FieldValueDateTimeComponent = (
 	fieldDisplayName,
@@ -10,15 +11,15 @@ const FieldValueDateTimeComponent = (
 	slotInputProps,
 	caseIsReadOnly
 ) => {
-	const [dateValue, setDateValue] = useState(toDateObject(fieldValue));
+	const [dateValue, setDateValue] = useState(dayjs.utc(fieldValue));
 
 	useEffect(() => {
-		setDateValue(toDateObject(fieldValue));
+		setDateValue(dayjs.utc(fieldValue));
 	}, [fieldValue]);
 
 	const handleDateTimeChange = (newDate) => {
 		setDateValue(newDate);
-		onChange(newDate);
+		onChange(newDate.format());
 	};
 
 	return (
@@ -26,18 +27,13 @@ const FieldValueDateTimeComponent = (
 			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
 			value={dateValue}
 			onChange={handleDateTimeChange}
+			timezone="UTC"
 			name={fieldKey}
 			key={fieldKey}
 			disabled={caseIsReadOnly}
 			slotProps={{ ...slotInputProps }}
 		/>
 	);
-};
-
-const toDateObject = (value) => {
-	if (value) {
-		return new Date(value);
-	} else return null;
 };
 
 export default FieldValueDateTimeComponent;

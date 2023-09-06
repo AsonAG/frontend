@@ -4,6 +4,7 @@ import FieldValueComponent from "./value/FieldValueComponent";
 import { CaseContext } from "../../../scenes/global/CasesForm";
 import { useUpdateEffect } from "usehooks-ts";
 import { DescriptionComponent } from "../DescriptionComponent";
+import dayjs from "dayjs";
 
 export const getFieldKey = (name, id) => "field_" + name + "_" + id;
 
@@ -11,10 +12,8 @@ const FieldComponent = ({ field, onChange }) => {
 	const fieldName = field.name;
 	const fieldKey = getFieldKey(field.name, field.id);
 	const [fieldValue, setFieldValue] = useState(field.value);
-	const [fieldStartDate, setFieldStartDate] = useState(
-		checkUtcFormat(field.start)
-	);
-	const [fieldEndDate, setFieldEndDate] = useState(checkUtcFormat(field.end));
+	const [fieldStartDate, setFieldStartDate] = useState(dayjs.utc(field.start));
+	const [fieldEndDate, setFieldEndDate] = useState(dayjs.utc(field.end));
 	const [attachmentFiles, setAttachmentFiles] = useState([]);
 	const caseIsReadOnly = useContext(CaseContext);
 	const isStartEndVisible =
@@ -42,11 +41,11 @@ const FieldComponent = ({ field, onChange }) => {
 	}, [field.value]);
 
 	useUpdateEffect(() => {
-		setFieldStartDate(checkUtcFormat(field.start));
+		setFieldStartDate(dayjs.utc(field.start));
 	}, [field.start]);
 
 	useUpdateEffect(() => {
-		setFieldEndDate(checkUtcFormat(field.end));
+		setFieldEndDate(dayjs.utc(field.end));
 	}, [field.end]);
 
 	// handle new document upload
@@ -165,12 +164,6 @@ const FieldComponent = ({ field, onChange }) => {
 			)}
 		</Box>
 	);
-};
-
-const checkUtcFormat = (date) => {
-	if (date) {
-		return String(date).endsWith("Z") ? date : date + "Z";
-	} else return date;
 };
 
 export default FieldComponent;

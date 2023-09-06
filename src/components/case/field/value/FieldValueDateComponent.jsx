@@ -1,5 +1,6 @@
-import { DatePicker, DateTimePicker } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 
 const FieldValueDateComponent = (
 	fieldDisplayName,
@@ -10,52 +11,30 @@ const FieldValueDateComponent = (
 	slotInputProps,
 	caseIsReadOnly
 ) => {
-	const [dateValue, setDateValue] = useState(makeLocalAppearUTC(fieldValue));
+	const [dateValue, setDateValue] = useState(dayjs.utc(fieldValue));
 
 	useEffect(() => {
-		setDateValue(makeLocalAppearUTC(fieldValue));
+		setDateValue(dayjs.utc(fieldValue));
 	}, [fieldValue]);
 
 	const handleDateChange = (newDate) => {
-		// transfer to date with time set at 00:00:00 UTC
 		setDateValue(newDate);
-		const utc = localToUTC(newDate);
-		onChange(utc);
+		onChange(newDate.format());
 	};
 
 	return (
-		<DateTimePicker
+		<DatePicker
 			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
 			value={dateValue}
 			onChange={handleDateChange}
 			name={fieldKey}
+			timezone="UTC"
 			key={fieldKey}
 			disabled={caseIsReadOnly}
 			slotProps={{ ...slotInputProps }}
 			views={["year", "month", "day"]}
 		/>
 	);
-};
-
-const getTimezoneOffset = (value) => value.getTimezoneOffset() * 60000;
-
-const makeLocalAppearUTC = (value) => {
-	if (value) {
-		const dateTime = new Date(value);
-		const utcFromLocal = new Date(
-			dateTime.getTime() + getTimezoneOffset(dateTime)
-		);
-		return utcFromLocal;
-	} else return null;
-};
-
-const localToUTC = (dateTime) => {
-	if (dateTime) {
-		const utcFromLocal = new Date(
-			dateTime.getTime() - getTimezoneOffset(dateTime)
-		);
-		return utcFromLocal;
-	} else return null;
 };
 
 export default FieldValueDateComponent;

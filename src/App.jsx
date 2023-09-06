@@ -10,6 +10,8 @@ import PersonalCases from "./scenes/casesList/PersonalCases";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { Box } from "@mui/system";
 import CompanyCases from "./scenes/casesList/CompanyCases";
 import Employees from "./scenes/employees";
@@ -49,6 +51,8 @@ export const UserContext = createContext();
 export const UserEmployeeContext = createContext();
 export const EmployeeSelectionContext = createContext();
 export const ErrorBarContext = createContext();
+
+dayjs.extend(utc);
 
 function App() {
 	const [theme, colorMode] = useMode();
