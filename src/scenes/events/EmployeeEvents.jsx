@@ -1,22 +1,15 @@
-import { Box } from "@mui/material";
 import { React } from "react";
-import { useContext } from "react";
-import { EmployeeSelectionContext } from "../../App";
-import EmployeeHeader from "../../components/EmployeeHeader";
 import EventsTable from "../../components/tables/EventsTable";
+import { useRouteLoaderData } from "react-router-dom";
 
 const EmployeeEvents = () => {
-  const {employee, setEmployee} = useContext(EmployeeSelectionContext);
+  const employee = useRouteLoaderData("employee");
 
   return (
-    <Box m="25px">
-      <EmployeeHeader employee={employee} />
-      <EventsTable 
-        employeeId={employee.employeeId}
+    <EventsTable 
+        employeeId={employee.id}
         caseType={"Employee"}
-        // clusterName={"EmployeeEvents"}
-        />
-    </Box>
+    />
   );
 };
 

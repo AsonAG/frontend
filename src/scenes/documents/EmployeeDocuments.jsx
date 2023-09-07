@@ -1,21 +1,14 @@
-import { Box } from "@mui/material";
-import EmployeeHeader from "../../components/EmployeeHeader";
-import { useContext } from "react";
-import { EmployeeSelectionContext } from "../../App";
+import { useRouteLoaderData } from "react-router-dom";
 import DocumentsTable from "../../components/tables/DocumentsTable";
 
 const EmployeeDocuments = () => {
-  // const employee = JSON.parse(window.sessionStorage.getItem("employee"));
-  const {employee, setEmployee} = useContext(EmployeeSelectionContext);
+  const employee = useRouteLoaderData("employee");
 
   return employee && (
-    <Box m="25px">
-      <EmployeeHeader employee={employee} />
-      <DocumentsTable 
-          caseType={'Employee'}
-          employeeId={employee.employeeId}    
-      />
-    </Box>
+    <DocumentsTable 
+        caseType={'Employee'}
+        employeeId={employee.id}    
+    />
   );
 };
 

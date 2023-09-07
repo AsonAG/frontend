@@ -1,9 +1,7 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ApiClient from "../../../../../api/ApiClient";
 import CasesApi from "../../../../../api/CasesApi";
-import { UserContext } from "../../../../../App";
-import SelectorComponent, { parseSelectorValueInput } from "./SelectorComponent";
-import { useUpdateEffect } from "usehooks-ts";
+import SelectorComponent from "./SelectorComponent";
 
 function FieldValueLookupComponent(
   fieldValue,
@@ -15,7 +13,8 @@ function FieldValueLookupComponent(
   attributes,
   caseIsReadOnly
 ) {
-  const { user, setUser } = useContext(UserContext);
+  // TODO AJO fix 
+  const [ user, setUser ] = useState(null);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const isMultiOptions = attributes["input.multiLookup"];
   const [options, setOptions] = useState([]);
@@ -26,7 +25,7 @@ function FieldValueLookupComponent(
 
   // init
   useEffect(() => {
-    casesApi.getCaseFieldLookups(lookupSettings.lookupName, callbackLookups);
+    // casesApi.getCaseFieldLookups(lookupSettings.lookupName, callbackLookups);
   }, []);
 
   const callbackLookups = function (error, data, response) {

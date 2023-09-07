@@ -5,77 +5,20 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { React, useState, useEffect, useMemo, useContext } from "react";
-import { UserContext } from "../../App";
-import ApiClient from "../../api/ApiClient";
-import ValuesApi from "../../api/ValuesApi";
+import { React, useState } from "react";
 import dayjs from "dayjs";
 import TableComponent from "./TableComponent";
-import { getLanguageCode } from "../../services/converters/LanguageConverter";
 import { FileIcon, defaultStyles } from "react-file-icon";
-import { Link } from "react-router-dom";
-import DocumentsApi from "../../api/DocumentsApi";
-import CasesApi from "../../api/CasesApi";
+import { Link, useLoaderData } from "react-router-dom";
 
-const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
-  const [tableData, setTableData] = useState([]);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const { user, setUser } = useContext(UserContext);
-  const valuesApi = useMemo(() => new ValuesApi(ApiClient, user), [user]);
-  const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
-  const documentsApi = useMemo(() => new DocumentsApi(ApiClient, user), [user]);
-  const [error, setError] = useState();
+const DocumentsTable = () => {
+  // TODO AJO localization
+  const events = useLoaderData();
+  // TODO AJO document downloading
+  // const documentsApi = useMemo(() => new DocumentsApi(ApiClient), []);
   const [backdropOpen, setBackdropOpen] = useState(false);
 
-  const langCode = getLanguageCode(user.language);
-
-  useEffect(() => {
-    setTableData([]);
-    setIsDataLoaded(false);
-    casesApi.getCaseValues(callback, caseType, employeeId, clusterName);
-  }, [user]);
-
-  const callback = function (error, data, response) {
-    let tableData = [];
-    if (error) {
-      setError(error);
-      console.error(JSON.stringify(error, null, 2));
-      setIsDataLoaded(true);
-    } else {
-      data.forEach((element) => {
-        // if (element["valueType"] === "Document") {
-        tableData = [
-          ...tableData,
-          {
-            id: element["id"],
-            caseName:
-              langCode && element["caseNameLocalizations"][langCode]
-                ? element["caseNameLocalizations"][langCode]
-                : element["caseName"],
-            caseFieldName:
-              langCode && element["caseFieldNameLocalizations"][langCode]
-                ? element["caseFieldNameLocalizations"][langCode]
-                : element["caseFieldName"],
-            value: element["value"],
-            valueType: element["valueType"],
-            start: element["start"],
-            end: element["end"],
-            created: element["created"],
-            documents: element["documents"],
-          },
-        ];
-        // }
-      });
-      console.log(
-        "API called successfully. Table data loaded: " +
-          JSON.stringify(tableData, null, 2)
-      );
-      setTableData(tableData);
-      setIsDataLoaded(true);
-      setError(null);
-    }
-  };
-
+  // TODO AJO localized formatting
   const dateTimeFormatter = (params) =>
     params?.value ? dayjs(params.value).format()("yyyy-MM-dd HH:mm") : null;
 
@@ -84,13 +27,13 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
 
   const handleFileClick = (docId, row) => {
     setBackdropOpen(true);
-    documentsApi.getDocument(
-      docId,
-      row.id,
-      caseType,
-      employeeId,
-      getFileCallback
-    );
+    // documentsApi.getDocument(
+    //   docId,
+    //   row.id,
+    //   caseType,
+    //   employeeId,
+    //   getFileCallback
+    // );
   };
 
   const handleClose = () => {
@@ -186,10 +129,7 @@ const DocumentsTable = ({ caseType, employeeId, clusterName }) => {
         <CircularProgress color="inherit" />
       </Backdrop>
       <TableComponent
-        error={error}
-        setError={setError}
-        loading={!isDataLoaded}
-        tableData={tableData}
+        tableData={events}
         columns={columns}
         initialState={{
           columns: {

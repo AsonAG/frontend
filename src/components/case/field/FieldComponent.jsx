@@ -1,21 +1,17 @@
 import { useState, useContext, useEffect } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import FieldValueComponent from "./value/FieldValueComponent";
-import { CaseContext } from "../../../scenes/global/CasesForm";
 import { useUpdateEffect } from "usehooks-ts";
 import { DescriptionComponent } from "../DescriptionComponent";
 import dayjs from "dayjs";
 
-export const getFieldKey = (name, id) => "field_" + name + "_" + id;
-
 const FieldComponent = ({ field, onChange }) => {
 	const fieldName = field.name;
-	const fieldKey = getFieldKey(field.name, field.id);
 	const [fieldValue, setFieldValue] = useState(field.value);
 	const [fieldStartDate, setFieldStartDate] = useState(dayjs.utc(field.start));
 	const [fieldEndDate, setFieldEndDate] = useState(dayjs.utc(field.end));
 	const [attachmentFiles, setAttachmentFiles] = useState([]);
-	const caseIsReadOnly = useContext(CaseContext);
+	const caseIsReadOnly = false; // useContext(CaseContext); TODO AJO readonly
 	const isStartEndVisible =
 		field.timeType != "Timeless" &&
 		!caseIsReadOnly &&
@@ -26,7 +22,6 @@ const FieldComponent = ({ field, onChange }) => {
 	// initial build
 	useEffect(() => {
 		onChange(
-			fieldKey,
 			fieldName,
 			fieldValue,
 			fieldStartDate,
@@ -99,7 +94,6 @@ const FieldComponent = ({ field, onChange }) => {
 		<Box
 			display="grid"
 			gridTemplateColumns="repeat( auto-fill, 400px 21px)"
-			key={"field_grid_" + field.id}
 			rowGap="10px"
 			columnGap="4px"
 			padding="4px 0px 10px 10px"
@@ -107,7 +101,6 @@ const FieldComponent = ({ field, onChange }) => {
 		>
 			<FieldValueComponent
 				fieldDisplayName={fieldDisplayName}
-				fieldKey={fieldKey}
 				fieldValue={fieldValue}
 				setFieldValue={setFieldValue}
 				fieldValueType={field.valueType}
@@ -136,7 +129,6 @@ const FieldComponent = ({ field, onChange }) => {
 				>
 					<FieldValueComponent
 						fieldDisplayName={"Start"}
-						fieldKey={fieldKey + "_start"}
 						fieldValue={fieldStartDate}
 						setFieldValue={setFieldStartDate}
 						fieldValueType="Date"
@@ -148,7 +140,6 @@ const FieldComponent = ({ field, onChange }) => {
 						{field.timeType != "Moment" && (
 							<FieldValueComponent
 								fieldDisplayName={"End"}
-								fieldKey={fieldKey + "_end"}
 								fieldValue={fieldEndDate}
 								setFieldValue={setFieldEndDate}
 								fieldValueType="Date"

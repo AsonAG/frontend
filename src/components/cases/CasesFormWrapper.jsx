@@ -7,18 +7,12 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import { React, useContext, useEffect, useState } from "react";
-import { CaseContext } from "../../scenes/global/CasesForm";
-import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
+import { React, useState } from "react";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
 import {
-  buildCasesBody,
-  filterBody,
   getMainCaseObject,
 } from "../../api/CasesApi";
 import CasesSaveButton from "../buttons/CasesSaveButton";
-import useActiveCase from "../../hooks/useActiveCase";
 
 const CasesFormWrapper = ({
   title,
@@ -27,10 +21,11 @@ const CasesFormWrapper = ({
   inputCase,
   outputCase,
 }) => {
-  const caseIsReadOnly = useContext(CaseContext);
+  const caseIsReadOnly = false; // useContext(CaseContext); // TODO AJO
   const mobileScreen = useMediaQuery("(max-width:600px)");
   const [activeCaseKey, setActiveCaseKey] = useState();
-  const handleScroll = useActiveCase( outputCase, setActiveCaseKey);
+  // TODO AJO fix scrolling
+  // const handleScroll = useActiveCase( outputCase, setActiveCaseKey);
 
   return (
     <Box
@@ -59,7 +54,7 @@ const CasesFormWrapper = ({
             // backgroundColor: colors.grey[100] + ' !important',
           },
         }}
-        onScroll={handleScroll}
+        // onScroll={handleScroll}
       >
         {children}
       </Paper>

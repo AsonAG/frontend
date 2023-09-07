@@ -1,72 +1,37 @@
-import { Box, IconButton, Tooltip, useTheme } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import { React } from "react";
-import { tokens } from "../../theme";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import { Link } from "react-router-dom";
 
-export const EmployeeButtons = (params) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const handleClick = () => {
-    params.setEmployeeChoice(params.employee);
-  };
+export const EmployeeButtons = ({employeeId}) => {
 
   return (
-    <Box
-      sx={{
-        "& .employee-icon-button": {
-          color: colors.primary[300],
-        },
-        "& .employee-icon-button:hover": {
-          color: colors.blueAccentReverse + "!important",
-        },
-      }}
-    >
-      <EmployeeButton
-        title={"New event"}
-        onClick={handleClick}
-        to={"/employee"}
-      >
+    <Box>
+      <EmployeeButton title={"New event"} to={employeeId + "/new"}>
         <AddOutlinedIcon />
       </EmployeeButton>
 
-      <EmployeeButton title={"Data"} onClick={handleClick} to={"/employeeData"}>
-        {/* <CasesOutlinedIcon /> */}
+      <EmployeeButton title={"Data"} to={employeeId + ""}>
         <PersonOutlineOutlinedIcon />
       </EmployeeButton>
 
-      <EmployeeButton
-        title={"Events"}
-        onClick={handleClick}
-        to="/employeeEvents"
-      >
+      <EmployeeButton title={"Events"}to={employeeId + "/events"}>
         <WorkHistoryOutlinedIcon />
       </EmployeeButton>
 
-      <EmployeeButton
-        title={"Documents"}
-        onClick={handleClick}
-        to="/employeeDocuments"
-      >
+      <EmployeeButton title={"Documents"} to={employeeId + "/documents"}>
         <DescriptionOutlinedIcon />
       </EmployeeButton>
     </Box>
   );
 };
-const EmployeeButton = ({ title, onClick, to, children }) => {
+const EmployeeButton = ({ title, to, children }) => {
   return (
-    <Tooltip title={title} placement="top" arrow size="sm"
-      className="employee-icon-button"
-    >
-      <IconButton
-        onClick={onClick}
-        component={Link}
-        to={to}
-      >
+    <Tooltip title={title} placement="top" arrow size="sm">
+      <IconButton component={Link} to={to}>
         {children}
       </IconButton>
     </Tooltip>

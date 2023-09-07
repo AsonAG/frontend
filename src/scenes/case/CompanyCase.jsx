@@ -1,13 +1,10 @@
-import { Box } from "@mui/material";
 import { React } from "react";
-import { UserContext, UserEmployeeContext } from "../../App";
-import { useContext } from "react";
 import CasesForm from "../global/CasesForm";
-import Header from "../../components/Header";
 
 const CompanyCase = () => {
-  const { user, setUser } = useContext(UserContext);
-  const userEmployee = useContext(UserEmployeeContext);
+  // TODO AJO fix 
+  const [ user, setUser ] = useState(null);
+  const [ userEmployee, setEmployee ] = useState(null);
 
   return (
     <CasesForm

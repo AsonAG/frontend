@@ -9,8 +9,8 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { tokens } from "../../theme";
-import { getInputCaseKey, getOutputCaseKey } from "../case/CaseComponent";
 
+// TODO AJO fix this
 const CasesTableOfContentComponent = ({
   caseBase,
   inputCaseSchema,
@@ -18,31 +18,28 @@ const CasesTableOfContentComponent = ({
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [relatedTopCaseID, setRelatedTopCaseID] = useState();
 
   const handleTableOfContentsItemClick = (event, caseBase) => {
     console.log("Focus invoked: ", caseBase.ref.current);
     caseBase.ref.current.scrollIntoView();
   };
 
-  const isActive = activeCaseKey === getInputCaseKey(inputCaseSchema);
-
   // populated related cases components
-  let relatedCasesComponents = [];
-  inputCaseSchema?.relatedCases?.forEach((schemaRelatedCase, id) => {
-    const key = getInputCaseKey(schemaRelatedCase);
-    if (Object.hasOwnProperty.call(caseBase.relatedCases, key)) {
-      const relatedCase = caseBase.relatedCases[key];
-      relatedCasesComponents.push(
-        <CasesTableOfContentComponent
-          caseBase={relatedCase}
-          inputCaseSchema={schemaRelatedCase}
-          key={"CasesTableOfContentComponents_" + key}
-          activeCaseKey={activeCaseKey}
-          />
-      );
-    }
-  });
+  // let relatedCasesComponents = [];
+  // inputCaseSchema?.relatedCases?.forEach((schemaRelatedCase, id) => {
+  //   const key = getInputCaseKey(schemaRelatedCase);
+  //   if (Object.hasOwnProperty.call(caseBase.relatedCases, key)) {
+  //     const relatedCase = caseBase.relatedCases[key];
+  //     relatedCasesComponents.push(
+  //       <CasesTableOfContentComponent
+  //         caseBase={relatedCase}
+  //         inputCaseSchema={schemaRelatedCase}
+  //         key={"CasesTableOfContentComponents_" + key}
+  //         activeCaseKey={activeCaseKey}
+  //         />
+  //     );
+  //   }
+  // });
 
   return (
     inputCaseSchema &&

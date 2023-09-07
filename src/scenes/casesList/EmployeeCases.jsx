@@ -1,24 +1,16 @@
-import { Box } from "@mui/material";
+import { useRouteLoaderData } from "react-router-dom";
 import CasesTable from "../../components/tables/CasesTable";
-import EmployeeHeader from "../../components/EmployeeHeader";
-import { useSessionStorage } from "usehooks-ts";
-import { useContext } from "react";
-import { EmployeeSelectionContext } from "../../App";
 
 const EmployeeCases = () => {
-  // const employee = JSON.parse(window.sessionStorage.getItem("employee"));
-  const {employee, setEmployee} = useContext(EmployeeSelectionContext);
+  const employee = useRouteLoaderData("employee");
 
-  return employee && (
-    <Box m="25px">
-      <EmployeeHeader employee={employee} />
-      <CasesTable 
-          caseType={'Employee'}
-          clusterName={"NotAvailable"}
-          employeeId={employee.employeeId}    
-          navigateTo={'/employeeCase'}
-      />
-    </Box>
+  return (
+    <CasesTable 
+        caseType={'Employee'}
+        clusterName={"NotAvailable"}
+        employeeId={employee.id}
+        navigateTo={'/employeeCase'}
+    />
   );
 };
 

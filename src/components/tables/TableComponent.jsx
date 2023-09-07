@@ -6,8 +6,6 @@ import ErrorBar from "../errors/ErrorBar";
 import { useEffect, useState } from "react";
 
 const TableComponent = ({
-  error,
-  setError,
   tableData,
   loading,
   columns,
@@ -18,6 +16,7 @@ const TableComponent = ({
   const colors = tokens(theme.palette.mode);
   const [searchText, setSearchText] = useState("");
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
+  const [error, setError] = useState({});
 
 
   useEffect(() => {

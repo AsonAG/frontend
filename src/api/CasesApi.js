@@ -19,16 +19,6 @@ export class CasesApi {
    */
   constructor(apiClient, user) {
     this.apiClient = apiClient || ApiClient.instance;
-
-    this.tenantId = user.tenantId;
-    this.userId = user.userId;
-    // this.employeeId = user.employeeId;
-    this.divisionId = user.currentDivisionId;
-    this.payrollId = user.currentPayrollId;
-
-    this.payrollPath = "/payrolls/" + this.payrollId + "/";
-
-    this.userLanguage = user.language;
   }
 
   /**

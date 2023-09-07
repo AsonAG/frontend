@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { CaseContext } from "../../../../scenes/global/CasesForm";
 import FieldValueFileComponent from "./FieldValueFileComponent";
 import FieldValueLookupComponent from "./selector/FieldValueLookupComponent";
 import FieldValueNumberComponent from "./FieldValueNumberComponent";
@@ -40,50 +39,13 @@ const FieldValueComponent = ({
 	setAttachmentFiles,
 }) => {
 	const caseIsReadOnly =
-		useContext(CaseContext) || attributes?.["input.readOnly"];
+		// TODO AJO readonly
+		// useContext(CaseContext) || 
+		attributes?.["input.readOnly"];
 	const [isValid, setIsValid] = useState(true);
 	const helperText = "";
 	let isInteger;
 
-	/* Validation          =============================== START =============================== */
-	const [slotInputProps, setSlotProps] = useState({});
-
-	useEffect(() => {
-		setSlotProps({
-			fullWidth: true,
-			helperText: helperText,
-			error: !isValid,
-			textField: {
-				helperText: helperText,
-				error: !isValid,
-			},
-			// textField: { size: "small" },
-			// size: "small",
-		});
-	}, [isValid, helperText]);
-
-	// useUpdateEffect(() => {
-	//   isValid
-	//     ? setSlotProps((current) => ({
-	//         ...current,
-	//         error: true,
-	//         textField: {
-	//           helperText: helperText,
-	//           error: true,
-	//         },
-	//       }))
-	//     : setSlotProps((current) => ({
-	//         ...current,
-	//         error: false,
-	//         textField: {
-	//           helperText: helperText,
-	//           error: false,
-	//         },
-	//       }));
-	// }, [isValid]);
-
-	/* Validation ========================================== END ================================ */
-	/* Handlers         =================================== START =============================== */
 	const handleTextValueChange = (e) => {
 		setFieldValue(e.target.value);
 	};

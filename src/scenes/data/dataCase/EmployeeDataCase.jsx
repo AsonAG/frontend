@@ -1,9 +1,8 @@
-import { useContext } from "react";
-import { EmployeeSelectionContext } from "../../../App";
 import CasesForm from "../../global/CasesForm";
 
 const EmployeeDataCase = () => {
-  const { employee, setEmployee } = useContext(EmployeeSelectionContext);
+  // TODO AJO fix 
+  const [ employee, setEmployee ] = useState(null);
 
   return (
     <CasesForm

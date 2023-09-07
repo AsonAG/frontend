@@ -6,35 +6,25 @@ import {
   Toolbar,
   Menu,
   MenuItem,
-  Typography,
 } from "@mui/material";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import { AccountCircle, TypeSpecimenOutlined } from "@mui/icons-material";
+import { AccountCircle } from "@mui/icons-material";
 import Logo from "../../components/Logo";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import { useAuth } from "oidc-react";
-import { UserContext } from "../../App";
-import UsersApi from "../../api/UsersApi";
-import ApiClient from "../../api/ApiClient";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
+const Topbar = ({ toggleSidebar, renderSidebarButton }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const [anchorEl, setAnchorEl] = useState(null);
-  const auth = useAuth();
-  const { user, setUser } = useContext(UserContext);
   const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
 
-  const handleSidebar = () => setIsCollapsed(!isCollapsed);
-
   const handleLogout = () => {
-    setUser({});
-    auth.signOut();
+    // TODO AJO handle logout
   };
 
   const handleMenu = (event) => {
@@ -45,45 +35,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
     setAnchorEl(null);
   };
 
-  const handleSwitchTenant = () => {
-    setUser((current) => ({
-      ...current,
-      tenantId: null,
-    }));
-    handleClose();
-  };
-
   return (
-    // <Box
-    //   display="flex"
-    //   flexDirection="row-reverse"
-    //   justifyContent="space-between"
-    //   padding="10px 6px 0px">
-    //   {/* ICONS */}
-    //   <Box display="flex">
-    //     <IconButton
-    //       onClick={colorMode.toggleColorMode}
-    //       // size="large"
-    //       >
-    //       {theme.palette.mode === "dark" ? (
-    //         <DarkModeOutlinedIcon />
-    //       ) : (
-    //         <LightModeOutlinedIcon />
-    //       )}
-    //     </IconButton>
-
-    //     {/* <IconButton>
-    //       <NotificationsOutlinedIcon />
-    //     </IconButton>
-    //     <IconButton>
-    //       <SettingsOutlinedIcon />
-    //     </IconButton> */}
-
-    //     <IconButton>
-    //       <PersonOutlinedIcon />
-    //     </IconButton>
-    //   </Box>
-    // </Box>
     <Box
       sx={{
         "& .MuiToolbar-root": {
@@ -95,17 +47,15 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
         },
       }}
     >
-      <AppBar
-      // position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
+      <AppBar>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box display="flex" flexDirection="row">
-            {!noSidebar && (
+            {renderSidebarButton && (
               <MenuItem
                 style={{
                   color: colors.grey[100],
                 }}
-                onClick={handleSidebar}
+                onClick={toggleSidebar}
               >
                 <MenuOutlinedIcon />
               </MenuItem>
@@ -121,8 +71,6 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
           </Box>
 
           <Box display="flex">
-            {/* <PayrollSelector /> */}
-
             <IconButton onClick={colorMode.toggleColorMode} size="large">
               {theme.palette.mode === "dark" ? (
                 <DarkModeOutlinedIcon />
@@ -151,7 +99,7 @@ const Topbar = ({ isCollapsed, setIsCollapsed, noSidebar }) => {
               <MenuItem component={Link} to={settingsLink}>
                 User settings
               </MenuItem>
-              <MenuItem onClick={handleSwitchTenant}>Switch company</MenuItem>
+              <MenuItem component={Link} to="/tenants" onClick={handleClose}>Switch company</MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </Box>

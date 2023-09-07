@@ -2,29 +2,53 @@ import {
   useMemo,
   useRef,
   useState,
-  useContext,
-  createContext,
   useEffect,
 } from "react";
-import { Box, Button, CircularProgress, LinearProgress } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import ApiClient from "../../api/ApiClient";
 import CasesApi from "../../api/CasesApi";
 import CaseComponent from "../../components/case/CaseComponent";
-import { UserContext } from "../../App";
 import { useUpdateEffect } from "usehooks-ts";
 import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
 import ErrorBar from "../../components/errors/ErrorBar";
 
-export const CaseContext = createContext();
+const CasesForm = () => {
+  const caseData = useLoaderData();
 
-const CasesForm = ({ employee, navigateTo, title, readOnly }) => {
+  console.log(caseData);
+
+  const [outputCase, setOutputCase] = useState(caseData);
+
+  const handleSubmit = () => {};
+
+  return <CasesFormWrapper
+        title="Testing"
+        onSubmit={handleSubmit}
+        inputCase={caseData}
+        outputCase={outputCase}
+      >
+        <form >
+          <Box>
+            {caseData && (
+              <CaseComponent
+                inputCase={caseData}
+                setOutputCase={setOutputCase}
+              />
+            )}
+          </Box>
+        </form>
+      </CasesFormWrapper>
+}
+
+const CasesForm2 = ({ employee, navigateTo, title, readOnly }) => {
   const caseName = window.sessionStorage.getItem("caseName");
 
   const navigate = useNavigate();
   const [inputCase, setInputCase] = useState();
   const [outputCase, setOutputCase] = useState({});
-  const { user, setUser } = useContext(UserContext);
+  // TODO AJO fix 
+  const [ user, setUser ] = useState(null);
   const casesApi = useMemo(() => new CasesApi(ApiClient, user), [user]);
   const formRef = useRef();
   const [error, setError] = useState();

@@ -26,6 +26,7 @@ export function validateMinMax(stringValue, attributes) {
  * @param {object} attributes
  * @returns {boolean} returns if the value is valid or not
  */
+// TODO AJO this is wrong? 
 export function validateMask(stringValue, attributes) {
   if (!attributes?.["input.mask"]) return true;
   else return !maskRegex.test(attributes["input.mask"]) && !maskRegex.test(stringValue);

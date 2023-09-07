@@ -8,20 +8,17 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useRouteLoaderData } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import PersonIcon from "@mui/icons-material/Person";
 import WorkIcon from "@mui/icons-material/Work";
-// import CasesOutlinedIcon from "@mui/icons-material/CasesOutlined";
 import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { UserContext, UserEmployeeContext } from "../../App";
 import PayrollSelector from "../../components/selectors/PayrollSelector";
-import { useAuth } from "oidc-react";
 import { Stack } from "@mui/system";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
@@ -30,13 +27,14 @@ import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 
 const Sidebar = ({ isCollapsed }) => {
+  const { tenant } = useRouteLoaderData("root");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const minWidth = useMediaQuery("(min-width:600px)");
-  const auth = useAuth();
-  const { user, setUser } = useContext(UserContext);
-  const userEmployee = useContext(UserEmployeeContext);
   const [selected, setSelected] = useState("/");
+
+  // TODO AJO fix this
+  const user = {identifier: "ajo@ason.ch", tenantIdentifier: "Blabla"};
 
   const Item = ({ title, to, icon }) => {
     const theme = useTheme();
@@ -134,7 +132,7 @@ const Sidebar = ({ isCollapsed }) => {
                 <SubMenu defaultOpen icon={<WorkIcon />} title="HR">
                   <Item
                     title="Employees"
-                    to="/employees"
+                    to="hr/employees"
                     icon={<PeopleOutlinedIcon />}
                   />
                   <SubMenu
@@ -165,12 +163,6 @@ const Sidebar = ({ isCollapsed }) => {
                   </SubMenu>
                 </SubMenu>
 
-                {/* <Item
-                title="Calendar"
-                to="/calendar"
-                icon={<CalendarTodayOutlinedIcon />}
-              />
-               */}
                 <Divider />
 
                 <SubMenu defaultOpen icon={<PersonIcon />} title="Employee">
@@ -201,13 +193,6 @@ const Sidebar = ({ isCollapsed }) => {
             {minWidth && !isCollapsed && (
               <Box>
                 <Box display="flex" justifyContent="left" alignItems="left">
-                  {/* <img
-                  alt="profile-user"
-                  width="120px"
-                  height="120px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                /> */}
                 </Box>
                 <Stack sx={{ m: "0 30px 20px " }} spacing={1.5}>
                   <PayrollSelector />
@@ -219,7 +204,6 @@ const Sidebar = ({ isCollapsed }) => {
                     disabled
                     InputLabelProps={{ shrink: true }}
                     value={user.identifier}
-                    // defaultValue={auth.userData?.profile?.email}
                   />
 
                   <TextField
@@ -228,7 +212,7 @@ const Sidebar = ({ isCollapsed }) => {
                     variant="standard"
                     disabled
                     InputLabelProps={{ shrink: true }}
-                    defaultValue={user.tenantIdentifier}
+                    defaultValue={tenant.identifier}
                   />
                 </Stack>
               </Box>

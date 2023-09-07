@@ -20,18 +20,10 @@ export default function useActiveCase(outputCase, setActiveCaseKey) {
   }, []);
 
   useUpdateEffect(() => {
-    if (getMainCaseObject(outputCase)) {
-      iterateThroughCases(outputCase, checkIsCaseActive, setActiveCaseKey);
-    }
+    iterateThroughCases(outputCase, checkIsCaseActive, setActiveCaseKey);
   }, [outputCase, scrollPosition]);
 
   const iterateThroughCases = (cases, func, setterFunc) => {
-        // TODO: add logic to iterate based on InputCase, not Output
-        //   if (getMainCaseObject(outputCase)) {
-        //     let outputRelatedCases = getMainCaseObject(outputCase).relatedCases;
-      
-        //     inputCase?.relatedCases?.every((schemaRelatedCase, id) => {
-        //       const key = getCaseKey(schemaRelatedCase);
     for (const caseObj of Object.values(cases)) {
       if (func(caseObj, setterFunc)) return true;
       if (caseObj.relatedCases) {
