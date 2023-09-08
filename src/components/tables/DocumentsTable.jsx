@@ -20,10 +20,10 @@ const DocumentsTable = () => {
 
   // TODO AJO localized formatting
   const dateTimeFormatter = (params) =>
-    params?.value ? dayjs(params.value).format()("yyyy-MM-dd HH:mm") : null;
+    params?.value ? dayjs(params.value).format("yyyy-MM-dd HH:mm") : null;
 
   const dateFormatter = (params) =>
-    params?.value ? dayjs(params.value).format()("yyyy-MM-dd") : null;
+    params?.value ? dayjs(params.value).format("yyyy-MM-dd") : null;
 
   const handleFileClick = (docId, row) => {
     setBackdropOpen(true);

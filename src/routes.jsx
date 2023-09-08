@@ -13,8 +13,23 @@ import CasesForm from "./scenes/global/CasesForm";
 
 import App from "./App";
 
-import { getTenants, getPayrolls, getEmployees, getEmployee, getTenant, getEmployeeCases, getEmployeeCaseValues, getCase } from "./api/FetchClient";
+import { getTenants, getPayrolls, getEmployees, getEmployee, getTenant, getEmployeeCases, getEmployeeCaseValues, buildCase } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
+
+
+function mapCase(_case) {
+  return {
+    caseName: _case.name,
+    values: _case.fields.map(f => ({
+      caseName: _case.name,
+      caseFieldName: f.name,
+      value: f.value,
+      start: f.start,
+      end: f.end
+    })),
+    relatedCases: _case.relatedCases.map(c => mapCase(c))
+  };
+}
 
 function PayrollRedirect() {
   const payrolls = useLoaderData();
@@ -92,8 +107,16 @@ export default createBrowserRouter([
           {
             path: "new/:caseName",
             element: <CasesForm />, // TODO AJO fix header
-            loader: ({params}) => getCase(params.tenantId, params.payrollId, params.caseName, params.employeeId),
-            // TODO AJO action
+            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId),
+            shouldRevalidate: ({actionResult}) => !actionResult,
+            action: async ({request, params}) => {
+              const _case = await request.json();
+              const caseChangeSetup = {
+                employeeId: Number(params.employeeId),
+                case: mapCase(_case)
+              }
+              return buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId, caseChangeSetup);
+            }
           },
           {
             path: "events",

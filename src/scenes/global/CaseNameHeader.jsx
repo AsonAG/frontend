@@ -15,12 +15,10 @@ function CaseNameHeader({ caseDetails }) {
         backgroundColor: colors.primary[400],
         padding: "14px 14px",
       }}
-      key={"casesummary_" + caseDetails.id}
     >
       <Typography
         variant="h4"
         fontWeight="bold"
-        key={"casename_" + caseDetails.id}
         sx={{
           marginLeft: "6px",
           marginRight: "20px",
@@ -33,7 +31,6 @@ function CaseNameHeader({ caseDetails }) {
       <Typography
         variant="h5"
         sx={{ color: "text.secondary" }}
-        key={"casename_desc_" + caseDetails.id}
       >
         {caseDetails.description}
       </Typography>

@@ -10,13 +10,12 @@ export function DescriptionComponent({ description }) {
     return <div></div>;
   }
 
-  // TODO: refactor color to separate style files
   const content = isHtml(description) ? <Markup content={description} /> : <>{description}</>;
 
   return (
     <Box>
         <Tooltip arrow title={content} placement="top">
-          <HelpOutlineOutlinedIcon small color="secondary" />
+          <HelpOutlineOutlinedIcon color="secondary" />
         </Tooltip>
     </Box>
   );

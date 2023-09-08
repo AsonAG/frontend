@@ -8,7 +8,7 @@ const CasesTable = () => {
   const cases = useLoaderData();
   const navigate = useNavigate();
   
-  // TODO AJO can we do this better?
+  // TODO AJO can we do this better? i.e links
   const handleRowClick = (params) => {
     console.log(encUriComponent(params.row.name));
 

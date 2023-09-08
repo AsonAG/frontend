@@ -14,13 +14,13 @@ import {
 } from "../../api/CasesApi";
 import CasesSaveButton from "../buttons/CasesSaveButton";
 
-const CasesFormWrapper = ({
+function CasesFormWrapper({
   title,
   onSubmit,
   children,
   inputCase,
   outputCase,
-}) => {
+}) {
   const caseIsReadOnly = false; // useContext(CaseContext); // TODO AJO
   const mobileScreen = useMediaQuery("(max-width:600px)");
   const [activeCaseKey, setActiveCaseKey] = useState();

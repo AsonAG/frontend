@@ -7,6 +7,7 @@ const tenantUrl = (tenantId) => `${tenantsUrl}/${tenantId}`;
 const payrollsUrl = (tenantId) => `${tenantUrl(tenantId)}/payrolls`;
 const payrollUrl = (tenantId, payrollId) => `${tenantUrl(tenantId)}/payrolls/${payrollId}`;
 const caseSetsUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/cases/sets`;
+const lookupValuesUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/lookups/values`;
 const employeesUrl = (tenantId) => `${tenantUrl(tenantId)}/employees`;
 const employeeUrl = (tenantId, employeeId) => `${employeesUrl(tenantId)}/${employeeId}`;
 
@@ -37,7 +38,16 @@ async function get(url, queryParams) {
 
 async function post(url, body, queryParams) {
     url = appendQueryParams(url, queryParams);
-    return fetch(url, {method: "POST", body: JSON.stringify(body), ...defaultParams()});
+    let fetchParams = {
+        method: "POST",
+        ...defaultParams()
+    };
+
+    if (body) {
+        fetchParams = {...fetchParams, body: JSON.stringify(body)};
+    }
+
+    return fetch(url, fetchParams);
 }
 
 function getTenants() {
@@ -72,9 +82,13 @@ function getEmployeeCaseValues(tenantId, payrollId, employeeId, queryParams) {
     return get(url, {employeeId, caseType: "Employee", ...queryParams});
 }
 
-function getCase(tenantId, payrollId, caseName, employeeId) {
+function buildCase(tenantId, payrollId, caseName, employeeId, caseChangeSetup) {
     const url = `${caseSetsUrl(tenantId, payrollId)}/${caseName}`;
-    return get(url, {employeeId});
+    return post(url, caseChangeSetup, {employeeId});
 }
 
-export { getTenants, getTenant, getPayrolls, getEmployees, getEmployee, getEmployeeCases, getEmployeeCaseValues, getCase };
+async function getLookupValues(tenantId, payrollId, lookupName) {
+    return (await get(lookupValuesUrl(tenantId, payrollId), {lookupNames: lookupName})).json();
+}
+
+export { getTenants, getTenant, getPayrolls, getEmployees, getEmployee, getEmployeeCases, getEmployeeCaseValues, buildCase, getLookupValues };

@@ -1,50 +1,49 @@
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 
-const FieldValueFileComponent = (
-  fieldDisplayName,
-  fieldValue,
-  fieldKey,
-  slotInputProps,
-  attributes,
-  setAttachmentFiles
-) => {
-  const extensions = attributes?.["input.attachmentExtensions"];
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+
+    fileReader.onload = (event) => {
+      try {
+        const [_, base64] = event.target.result.split(";");
+        resolve(base64.slice(7));
+      }
+      catch(e) {
+        reject(e);
+      }
+    };
+
+    fileReader.onerror = (error) => {
+      reject(error);
+    };
+
+    fileReader.readAsDataURL(file);
+  });
+};
+
+
+// TODO AJO fix file upload
+function FieldValueFileComponent({field}) {
+  const extensions = field.attributes?.["input.attachmentExtensions"];
   // const required = attributes?.["input.attachment"] === "Mandatory";
   const required = true;
 
   const uploadFile = async (file) => {
-    const fileEncoded = await convertBase64(file);
-    let [contentType, base64] = fileEncoded.split(";");
-    contentType = contentType.slice(5);
-    base64 = base64.slice(7);
+    const data = await toBase64(file);
 
     setAttachmentFiles((current) => [
       ...current,
       {
         name: file.name,
         contentType: file.type,
-        content: base64,
+        content: data,
       },
     ]);
   };
 
-  const convertBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-
-      fileReader.onload = (event) => {
-        resolve(event.target.result);
-        // resolve(fileReader.result);
-      };
-
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-
-      fileReader.readAsDataURL(file);
-    });
-  };
 
   const handleUpload = (event) => {
     const files = event.target.files;
@@ -55,15 +54,14 @@ const FieldValueFileComponent = (
 
   // TODO: refactor color to separate style files
   return (
-    <Stack marginLeft="14px" marginBottom="5px" key={"stack_" + fieldKey}>
-      <Typography color="rgba(0, 0, 0, 0.6)" key={"title_" + fieldKey}>
-        {fieldDisplayName + (required ? "*" : "")}
+    <Stack marginLeft="14px" marginBottom="5px">
+      <Typography color="rgba(0, 0, 0, 0.6)">
+        {field.displayName + (required ? "*" : "")}
       </Typography>
-      <Box width="160px" key={"inputbox_" + fieldKey}>
+      <Box width="160px">
         <IconButton
           variant="contained"
           component="label"
-          key={"uploadbutton_" + fieldKey}
         >
           <FileUploadOutlinedIcon />
           <input
@@ -71,7 +69,6 @@ const FieldValueFileComponent = (
             onChange={handleUpload}
             accept={extensions}
             multiple
-            //     hidden
             required={required}
           />
         </IconButton>

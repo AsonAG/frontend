@@ -1,40 +1,38 @@
-import { useEffect, useState } from "react";
-import SelectorComponent, { parseSelectorValueInput } from "./SelectorComponent";
+import { Autocomplete, TextField } from "@mui/material";
+import { useContext } from "react";
+import { CaseFormContext } from "../../../../../scenes/global/CasesForm";
 
-function FieldValueListComponent(
-  fieldValue,
-  fieldKey,
-  onChange,
-  lookupSettings,
-  slotInputProps,
-  fieldDisplayName,
-  attributes,
-  caseIsReadOnly
-) {
-  const isMultiOptions = attributes["input.multiList"];
-  const [options, setOptions] = useState(attributes["input.list"]);
-  const getOptions = Object.values(options);
+function FieldValueListComponent({ field, isReadonly }) {
+  const { buildCase } = useContext(CaseFormContext);
+  const isMultiOptions = fieldattributes["input.multiList"];
 
-  // init
-  useEffect(() => {
-    setOptions(attributes["input.list"]);
-  }, []);
-  
-  const getTextFromValue = (value) => {
-    return Object.keys(options).find(key => options[key] === value);
+  const value = useMemo(() => parseSelectorValueInput(field.value, isMultiOptions), [field.value]);
+
+  const handleChange = (e, value) => {
+    const outputValue = Array.isArray(value) ? value.join(",") : value;
+    field.value = outputValue;
+    buildCase();
   };
 
-  return SelectorComponent(
-    fieldKey,
-    isMultiOptions,
-    fieldValue,
-    onChange,
-    getOptions,
-    getTextFromValue,
-    caseIsReadOnly,
-    fieldDisplayName,
-    slotInputProps
-  );
+  <Autocomplete
+    required
+    name={field.name}
+    multiple={isMultiOptions}
+    value={value}
+    onChange={handleChange}
+    options={field.attributes["input.list"]}
+    getOptionLabel={getTextFromValue}
+    disabled={isReadonly}
+    renderInput={<TextField {...params} label={field.displayName} />}
+    fullWidth
+  />
+}
+
+function parseSelectorValueInput(input, isMultiOptions) {
+  if (isMultiOptions) {
+    return input ? String(input).split(",") : [];
+  }
+  return input ? input : null;
 }
 
 export default FieldValueListComponent;

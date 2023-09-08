@@ -1,45 +1,17 @@
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
-import { useMemo, useRef, useState } from "react";
 import { Box, Divider, Paper } from "@mui/material";
 import CaseNameHeader from "../../scenes/global/CaseNameHeader";
-import CaseFields from "./CaseFields";
+import FieldComponent from "./field/FieldComponent";
 
-const CaseComponent = ({ inputCase, setOutputCase }) => {
+const CaseComponent = ({ _case }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [outputCaseFields, setOutputCaseFields] = useState({});
-  const [outputRelatedCases, setOutputRelatedCases] = useState({});
-  const caseRef = useRef(null);
-
-  const caseFields = useMemo(
-    () => (
-      <CaseFields
-        inputCase={inputCase}
-        setOutputCaseFields={setOutputCaseFields}
-      />
-    ),
-    [inputCase]
-  );
-  const relatedCases = useMemo(
-    () => (
-      <Box>
-        {inputCase.relatedCases?.map((relatedCase) => (
-          <CaseComponent
-            inputCase={relatedCase}
-            setOutputCase={setOutputRelatedCases}
-          />
-        ))}
-      </Box>
-    ),
-    [inputCase.relatedCases]
-  );
-  
   return (
     <Box margin="5px 0 0 0" >
       <section>
-      <Paper elevation={3} ref={caseRef} >
-        <CaseNameHeader caseDetails={inputCase} />
+      <Paper elevation={3} >
+        <CaseNameHeader caseDetails={_case} />
 
         <Box
           sx={{ backgroundColor: colors.primary[500] }}
@@ -47,10 +19,19 @@ const CaseComponent = ({ inputCase, setOutputCase }) => {
           <Divider />
 
           <Box margin="10px 0 0 10px">
-            {caseFields}
+            {
+              _case.fields?.map((field) => <FieldComponent key={field.id} field={field} />)
+            }
           </Box>
 
-          {relatedCases}
+          <Box>
+            {_case.relatedCases?.map((relatedCase) => (
+              <CaseComponent
+                key={relatedCase.id}
+                _case={relatedCase}
+              />
+            ))}
+          </Box>
         </Box>
       </Paper>
       </section>

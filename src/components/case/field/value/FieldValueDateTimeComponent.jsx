@@ -1,37 +1,26 @@
 import { DateTimePicker } from "@mui/x-date-pickers";
-import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
-const FieldValueDateTimeComponent = (
-	fieldDisplayName,
-	required,
-	fieldValue,
-	onChange,
-	fieldKey,
-	slotInputProps,
-	caseIsReadOnly
-) => {
-	const [dateValue, setDateValue] = useState(dayjs.utc(fieldValue));
+function FieldValueDateTimeComponent({ field, isReadonly })
+{
+	const value = field.value ? dayjs.utc(field.value) : null;
 
-	useEffect(() => {
-		setDateValue(dayjs.utc(fieldValue));
-	}, [fieldValue]);
-
-	const handleDateTimeChange = (newDate) => {
-		setDateValue(newDate);
-		onChange(newDate.format());
+	const handleChange = (newDate) => {
+		field.value = newDate.format();
+		// TODO AJO submit
 	};
 
 	return (
 		<DateTimePicker
-			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
-			value={dateValue}
-			onChange={handleDateTimeChange}
+			label={field.displayName + "*"}
+			value={value}
+			onChange={handleChange}
 			timezone="UTC"
-			name={fieldKey}
-			key={fieldKey}
-			disabled={caseIsReadOnly}
-			slotProps={{ ...slotInputProps }}
+			name={field.name}
+			disabled={isReadonly}
+			slotProps={{
+				field: { required: true }
+			}}
 		/>
 	);
 };
