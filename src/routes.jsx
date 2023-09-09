@@ -1,7 +1,7 @@
 
 import * as React from "react";
 
-import { createBrowserRouter, Navigate, useLoaderData } from "react-router-dom";
+import { createBrowserRouter, Navigate, redirect, useLoaderData } from "react-router-dom";
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
@@ -80,15 +80,14 @@ export default createBrowserRouter([
   {
     path: "tenants/:tenantId/payrolls/:payrollId",
     element: <App key="root" />,
-    loader: async ({params}) => {
+    loader: async ({ params }) => {
       let response = await getTenant(params.tenantId);
       const tenant = await response.json();
-      console.log("root loader");
       const user = await getUser(params.tenantId, "ajo@ason.ch");
       const payroll = await getPayroll(params.tenantId, params.payrollId);
       return { tenant, user, payroll };
     },
-    // shouldRevalidate: (params) => { console.log(params); return false},
+    shouldRevalidate: () => false,
     id: "root",
     children: [
       {
@@ -139,8 +138,12 @@ export default createBrowserRouter([
 
               switch (intent) {
                 case "addCase":
-                  // TODO AJO maybe redirect?
-                  return addCase(params.tenantId, params.payrollId, params.employeeId, caseChangeSetup)
+                  const response = await addCase(params.tenantId, params.payrollId, params.employeeId, caseChangeSetup)
+                  if (response.ok) {
+                    throw redirect("../new");
+                  }
+                  // TODO validation errors
+                  return response;
                 case "buildCase":
                   return buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId, caseChangeSetup);
               } 

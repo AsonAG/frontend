@@ -11,7 +11,6 @@ function CasesForm({ displayOnly = false }) {
   const loaderData = useLoaderData();
   const actionData = useActionData(); 
   const caseData = actionData || loaderData;
-  console.log(payroll);
 
   const submit = useSubmit();
 
