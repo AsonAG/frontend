@@ -8,6 +8,7 @@ import { FieldContext } from "../FieldComponent";
 function FieldValueTextComponent() {
   const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
   const [value, setValue] = useState(field.value);
+  const [isValid, setIsValid] = useState(true);
 
   const handleChange = (e) => {
     setValue(e.target.value);
@@ -18,9 +19,7 @@ function FieldValueTextComponent() {
       return;
     }
 
-    if (!validateMask(value, field.attributes)) {
-      // TODO AJO set invalid state
-    }
+    setIsValid(validateMask(value, field.attributes));
 
     field.value = value;
     buildCase();
@@ -43,11 +42,12 @@ function FieldValueTextComponent() {
       minRows={2}
       maxRows={6}
       disabled={isReadonly}
+      error={!isValid}
     />;
   }
 
   return (
-    // TODO AJO fix error.. 
+    // TODO AJO fix error "findDOMNode is deprecated in StrictMode"
     <ReactInputMask
       mask={field.attributes["input.mask"]}
       maskChar={MASK_CHAR}
@@ -65,6 +65,8 @@ function FieldValueTextComponent() {
           multiline={field.attributes?.["input.multiLine"]}
           minRows={2}
           maxRows={6}
+          error={!isValid}
+          required
         />
       )}
     </ReactInputMask>

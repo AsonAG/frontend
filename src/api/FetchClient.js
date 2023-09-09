@@ -85,7 +85,7 @@ function getEmployeeCaseValues(tenantId, payrollId, employeeId, queryParams) {
 }
 
 function buildCase(tenantId, payrollId, caseName, employeeId, caseChangeSetup) {
-    const url = `${caseSetsUrl(tenantId, payrollId)}/${caseName}`;
+    const url = `${caseSetsUrl(tenantId, payrollId)}/${encodeURIComponent(caseName)}`;
     return post(url, caseChangeSetup, {employeeId});
 }
 

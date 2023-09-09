@@ -2,17 +2,13 @@ import { React } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import TableComponent from "./TableComponent";
 
-const encUriComponent = (component) => encodeURIComponent(component).replace(/\./g, "%2E");
-
 const CasesTable = () => {
   const cases = useLoaderData();
   const navigate = useNavigate();
   
   // TODO AJO can we do this better? i.e links
   const handleRowClick = (params) => {
-    console.log(encUriComponent(params.row.name));
-
-    navigate(encUriComponent(params.row.name));
+    navigate(params.row.name);
   };
 
   const columns = [

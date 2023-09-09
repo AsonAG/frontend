@@ -20,16 +20,13 @@ function getDecimalParams(valueType) {
 function FieldValueNumberComponent() {
   const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
   const [value, setValue] = useState(field.value);
+  const [isValid, setIsValid] = useState(true);
 
   const handleBlur = () => {
     if (field.value === value) {
       return;
     }
-
-    if (!validateMinMax(value, field.attributes)) {
-      // TODO AJO set invalid state
-    }
-
+    setIsValid(validateMinMax(value, field.attributes));
     field.value = value;
     buildCase();
   }
@@ -47,6 +44,7 @@ function FieldValueNumberComponent() {
       value={value}
       onValueChange={handleChange}
       valueIsNumericString
+      error={!isValid}
       // TODO AJO 
       thousandSeparator={
         field.attributes?.["input.thousandSeparator"]
