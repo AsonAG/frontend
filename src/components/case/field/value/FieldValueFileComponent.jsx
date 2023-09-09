@@ -1,11 +1,10 @@
-import { Box, IconButton, Stack, Typography } from "@mui/material";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import { TextField } from "@mui/material";
+// import { Box, Button, Stack, Typography, Chip, InputLabel, FormControl, OutlinedInput } from "@mui/material";
 import { FieldContext } from "../FieldComponent";
 import { useContext, useState, useEffect } from "react";
 import { toBase64 } from "../../../../services/converters/BinaryConverter";
 
 
-// TODO AJO fix file upload
 function FieldValueFileComponent() {
   const { field, isReadonly, displayName, attachments } = useContext(FieldContext);
   const extensions = field.attributes?.["input.attachmentExtensions"];
@@ -16,7 +15,6 @@ function FieldValueFileComponent() {
   useEffect(() => {
     attachments[field.id] = attachmentFiles;
   }, [attachmentFiles]);
-
 
   const handleUpload = async (event) => {
     const files = event.target.files;
@@ -31,36 +29,24 @@ function FieldValueFileComponent() {
       });
     }
 
-    setAttachmentFiles(current => [
-      ...current,
-      ...attachments
-    ]);
-
+    setAttachmentFiles(attachments);
   };
 
-  // TODO: refactor color to separate style files
   return (
-    <Stack marginLeft="14px" marginBottom="5px">
-      <Typography color="rgba(0, 0, 0, 0.6)">
-        {displayName + (required ? "*" : "")}
-      </Typography>
-      <Box width="160px">
-        <IconButton
-          variant="contained"
-          component="label"
-        >
-          <FileUploadOutlinedIcon />
-            <input
-              disabled={isReadonly}
-              type="file"
-              onChange={handleUpload}
-              accept={extensions}
-              multiple
-              required={required}
-            />
-        </IconButton>
-      </Box>
-    </Stack>
+    <TextField
+      label={displayName}
+      onChange={handleUpload}
+      required
+      disabled={isReadonly}
+      type="file"
+      InputLabelProps={{
+        shrink: true,
+      }}
+      inputProps={{
+        multiple: true,
+        accept: extensions
+      }}
+    />
   );
 };
 export default FieldValueFileComponent;
