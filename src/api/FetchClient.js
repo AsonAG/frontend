@@ -88,9 +88,12 @@ function buildCase(tenantId, payrollId, caseName, employeeId, caseChangeSetup) {
     const url = `${caseSetsUrl(tenantId, payrollId)}/${encodeURIComponent(caseName)}`;
     return post(url, caseChangeSetup, {employeeId});
 }
+function addCase(tenantId, payrollId, employeeId, caseChangeSetup) {
+    return post(caseSetsUrl(tenantId, payrollId), caseChangeSetup, {employeeId});
+}
 
 async function getLookupValues(tenantId, payrollId, lookupName) {
     return (await get(lookupValuesUrl(tenantId, payrollId), {lookupNames: lookupName})).json();
 }
 
-export { getTenants, getTenant, getPayrolls, getEmployees, getEmployee, getEmployeeCases, getEmployeeCaseValues, buildCase, getLookupValues };
+export { getTenants, getTenant, getPayrolls, getEmployees, getEmployee, getEmployeeCases, getEmployeeCaseValues, buildCase, addCase, getLookupValues };

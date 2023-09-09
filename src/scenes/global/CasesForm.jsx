@@ -14,10 +14,14 @@ function CasesForm({ displayOnly = false }) {
   const submit = useSubmit();
 
   const buildCase = () => {
-    submit(caseData, { method: "post", encType: "application/json"});
+    const submitData = { caseData, intent: "buildCase" };
+    submit(submitData, { method: "post", encType: "application/json" });
   }
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    const submitData = { caseData, intent: "addCase" };
+    submit(submitData, { method: "post", encType: "application/json" });
+  };
 
   return (
     <CaseFormContext.Provider value={{ buildCase, displayOnly }}>

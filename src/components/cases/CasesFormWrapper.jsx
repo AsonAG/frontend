@@ -5,14 +5,13 @@ import {
   Paper,
   Stack,
   Typography,
-  useMediaQuery,
+  useMediaQuery
 } from "@mui/material";
-import { React, useState } from "react";
+import { React, useContext } from "react";
 import CasesTableOfContentComponent from "./CasesTableOfContentComponent";
-import {
-  getMainCaseObject,
-} from "../../api/CasesApi";
 import CasesSaveButton from "../buttons/CasesSaveButton";
+import { useTheme } from "@emotion/react";
+import { CaseFormContext } from "../../scenes/global/CasesForm";
 
 function CasesFormWrapper({
   title,
@@ -21,9 +20,9 @@ function CasesFormWrapper({
   inputCase,
   outputCase,
 }) {
-  const caseIsReadOnly = false; // useContext(CaseContext); // TODO AJO
-  const mobileScreen = useMediaQuery("(max-width:600px)");
-  const [activeCaseKey, setActiveCaseKey] = useState();
+  const theme = useTheme();
+  const { displayOnly } =  useContext(CaseFormContext);
+  const mobileScreen = useMediaQuery(theme.breakpoints.down("sm"));
   // TODO AJO fix scrolling
   // const handleScroll = useActiveCase( outputCase, setActiveCaseKey);
 
@@ -79,15 +78,11 @@ function CasesFormWrapper({
               {title}
             </Typography>
 
-            <List dense disablePadding>
+            {/* <List dense disablePadding>
               {Object.keys(outputCase).length > 0 ? (
                 <CasesTableOfContentComponent
-                  caseBase={getMainCaseObject(outputCase)}
+                  caseBase={outputCase}
                   inputCaseSchema={inputCase}
-                  key={
-                    "CasesTableOfContentComponents_baseCase_" +
-                    inputCase.relatedCases.length
-                  }
                   activeCaseKey={activeCaseKey}
                 />
               ) : (
@@ -101,16 +96,16 @@ function CasesFormWrapper({
                   />
                 </Box>
               )}
-            </List>
+            </List> */}
           </Stack>
 
           <CasesSaveButton
             onSubmit={onSubmit}
-            caseIsReadOnly={caseIsReadOnly}
+            caseIsReadOnly={displayOnly}
           />
         </Box>
       ) : (
-        <CasesSaveButton onSubmit={onSubmit} caseIsReadOnly={caseIsReadOnly} />
+        <CasesSaveButton onSubmit={onSubmit} caseIsReadOnly={displayOnly} />
       )}
     </Box>
   );

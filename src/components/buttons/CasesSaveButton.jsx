@@ -20,6 +20,8 @@ export default function CasesSaveButton({ onSubmit, caseIsReadOnly }) {
           color="blueAccent"
           size="large"
           onClick={onSubmit}
+          name="intent"
+          value="addCase"
           endIcon={<SendIcon htmlColor="#ffffff" />}
         >
           <Typography fontWeight="bold" color="#ffffff">

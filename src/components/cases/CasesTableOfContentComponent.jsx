@@ -24,23 +24,6 @@ const CasesTableOfContentComponent = ({
     caseBase.ref.current.scrollIntoView();
   };
 
-  // populated related cases components
-  // let relatedCasesComponents = [];
-  // inputCaseSchema?.relatedCases?.forEach((schemaRelatedCase, id) => {
-  //   const key = getInputCaseKey(schemaRelatedCase);
-  //   if (Object.hasOwnProperty.call(caseBase.relatedCases, key)) {
-  //     const relatedCase = caseBase.relatedCases[key];
-  //     relatedCasesComponents.push(
-  //       <CasesTableOfContentComponent
-  //         caseBase={relatedCase}
-  //         inputCaseSchema={schemaRelatedCase}
-  //         key={"CasesTableOfContentComponents_" + key}
-  //         activeCaseKey={activeCaseKey}
-  //         />
-  //     );
-  //   }
-  // });
-
   return (
     inputCaseSchema &&
     caseBase.id &&
@@ -62,16 +45,16 @@ const CasesTableOfContentComponent = ({
             <Typography
               key={"casesTableOfContent_caseButtonText_" + caseBase.id}
               fontSize="0.9rem"
-              sx={
-                // scrollPosition < _case.ref.current.getBoundingClientRect().top //+30
-                isActive
-                  ? {
-                      fontWeight: "bold",
-                      color: colors.blueAccent,
-                      // textDecoration: "underline"
-                    }
-                  : {}
-              }
+              // sx={
+              //   // scrollPosition < _case.ref.current.getBoundingClientRect().top //+30
+              //   isActive
+              //     ? {
+              //         fontWeight: "bold",
+              //         color: colors.blueAccent,
+              //         // textDecoration: "underline"
+              //       }
+              //     : {}
+              // }
             >
               {caseBase.displayName}
             </Typography>

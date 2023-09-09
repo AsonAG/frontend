@@ -13,7 +13,7 @@ import CasesForm from "./scenes/global/CasesForm";
 
 import App from "./App";
 
-import { getTenants, getPayrolls, getEmployees, getEmployee, getTenant, getEmployeeCases, getEmployeeCaseValues, buildCase } from "./api/FetchClient";
+import { getTenants, getPayrolls, getEmployees, getEmployee, getTenant, getEmployeeCases, getEmployeeCaseValues, buildCase, addCase } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 
 
@@ -115,12 +115,19 @@ export default createBrowserRouter([
             loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId),
             shouldRevalidate: ({actionResult}) => !actionResult,
             action: async ({request, params}) => {
-              const _case = await request.json();
+              const { caseData, intent } = await request.json();
               const caseChangeSetup = {
                 employeeId: Number(params.employeeId),
-                case: mapCase(_case)
+                case: mapCase(caseData)
               }
-              return buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId, caseChangeSetup);
+
+              switch (intent) {
+                case "addCase":
+                  // TODO AJO maybe redirect?
+                  return addCase(params.tenantId, params.payrollId, params.employeeId, caseChangeSetup)
+                case "buildCase":
+                  return buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId, caseChangeSetup);
+              } 
             }
           },
           {
