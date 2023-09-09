@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { useLoaderData, Form, useActionData, useSubmit, useRouteLoaderData } from "react-router-dom";
 import CaseComponent from "../../components/case/CaseComponent";
 import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
-import { createContext } from "react";
+import { createContext, useRef } from "react";
 
 export const CaseFormContext = createContext();
 
@@ -12,17 +12,23 @@ function CasesForm({ displayOnly = false }) {
   const actionData = useActionData(); 
   const caseData = actionData || loaderData;
 
+  const formRef = useRef();
+  const attachments = useRef({});
   const submit = useSubmit();
 
-  const action = (intent) => {
-    const submitData = { caseData, intent, userId: user.id, divisionId: payroll.divisionId };
+  const action = (intent, attachments = {}) => {
+    const submitData = { caseData, intent, attachments, userId: user.id, divisionId: payroll.divisionId };
     submit(submitData, { method: "post", encType: "application/json" });
   }
   const buildCase = () => action("buildCase");
-  const handleSubmit = () => action("addCase");
+  const handleSubmit = () => {
+    if (formRef?.current?.reportValidity()) {
+      action("addCase", attachments.current);
+    }
+  }
 
   return (
-    <CaseFormContext.Provider value={{ buildCase, displayOnly }}>
+    <CaseFormContext.Provider value={{ buildCase, displayOnly, attachments: attachments.current }}>
       <CasesFormWrapper
         // title to the right ( was employee name )
         title="Testing"
@@ -30,7 +36,7 @@ function CasesForm({ displayOnly = false }) {
         inputCase={caseData}
         outputCase={caseData}
       >
-      <Form method="post">
+      <Form method="post" ref={formRef}>
         <Box>
           {caseData && <CaseComponent _case={caseData} />}
         </Box>

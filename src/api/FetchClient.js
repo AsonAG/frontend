@@ -12,10 +12,6 @@ const employeesUrl = (tenantId) => `${tenantUrl(tenantId)}/employees`;
 const employeeUrl = (tenantId, employeeId) => `${employeesUrl(tenantId)}/${employeeId}`;
 const usersUrl = (tenantId) => `${tenantUrl(tenantId)}/users`;
 
-function getUserEmail() {
-    return "ajo@ason.ch";
-}
-
 function defaultParams() {
     const headers = new Headers();
     if (import.meta.env.PROD) {

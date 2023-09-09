@@ -9,11 +9,11 @@ export const FieldContext = createContext();
 
 
 function FieldComponent({ field }) {
-	const { buildCase, displayOnly } = useContext(CaseFormContext);
+	const { buildCase, displayOnly, attachments } = useContext(CaseFormContext);
 	const fieldIsReadonly = displayOnly || (field.attributes?.["input.readOnly"] ?? false);
 	const displayName = !displayOnly ? field.displayName : '';
 	return (
-		<FieldContext.Provider value={{ field, displayName, buildCase, isReadonly: fieldIsReadonly }}  >
+		<FieldContext.Provider value={{ field, displayName, buildCase, attachments, isReadonly: fieldIsReadonly }}  >
 			<Box
 				display="grid"
 				gridTemplateColumns="repeat( auto-fill, 400px 21px)"

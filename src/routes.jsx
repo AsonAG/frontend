@@ -29,7 +29,7 @@ import {
 import EmployeeView from "./scenes/employees/EmployeeView";
 
 
-function mapCase(_case) {
+function mapCase(_case, attachments) {
   return {
     caseName: _case.name,
     values: _case.fields.map(f => ({
@@ -37,9 +37,10 @@ function mapCase(_case) {
       caseFieldName: f.name,
       value: f.value,
       start: f.start,
-      end: f.end
+      end: f.end,
+      documents: attachments[f.id]
     })),
-    relatedCases: _case.relatedCases.map(c => mapCase(c))
+    relatedCases: _case.relatedCases.map(c => mapCase(c, attachments))
   };
 }
 
@@ -109,7 +110,6 @@ export default createBrowserRouter([
           {
             index: true,
             element: <CasesTable />,
-            // TODO AJO TEST
             loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "EmployeeData"),
           },
           {
@@ -128,12 +128,12 @@ export default createBrowserRouter([
             loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId),
             shouldRevalidate: ({actionResult}) => !actionResult,
             action: async ({request, params}) => {
-              const { caseData, intent, userId, divisionId } = await request.json();
+              const { caseData, intent, userId, divisionId, attachments } = await request.json();
               const caseChangeSetup = {
                 userId,
                 divisionId,
                 employeeId: Number(params.employeeId),
-                case: mapCase(caseData)
+                case: mapCase(caseData, attachments)
               }
 
               switch (intent) {
