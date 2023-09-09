@@ -2,11 +2,10 @@ import { useEffect, useState, useMemo, useContext } from "react";
 import { useParams } from "react-router";
 import { getLookupValues } from "../../../../../api/FetchClient";
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
-import { CaseFormContext } from "../../../../../scenes/global/CasesForm";
+import { FieldContext } from "../../FieldComponent";
 
-// TODO AJO handle readonly
-function FieldValueLookupComponent({ field, isReadonly}) {
-  const { buildCase } = useContext(CaseFormContext);  
+function FieldValueLookupComponent() {
+  const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
   const { tenantId, payrollId } = useParams();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,11 +13,12 @@ function FieldValueLookupComponent({ field, isReadonly}) {
   const isMultiOptions = field.attributes["input.multiLookup"];
 
   const getValueFromOption = (option) => option ? option[field.lookupSettings["valueFieldName"]] : null;
+  const getLabelFromOption = (option) => typeof option === "string" ? option : (option[field.lookupSettings["textFieldName"]] ?? '')
   const isOptionEqualToValue = (option, value) => getValueFromOption(option) === value;
 
   const selectedOptions = useMemo(() => {
     if (loading) {
-      return null;
+      return [];
     }
 
     if (!options?.length) {
@@ -62,19 +62,19 @@ function FieldValueLookupComponent({ field, isReadonly}) {
   return (
     <Autocomplete
       multiple={isMultiOptions}
-      isOptionEqualToValue={isOptionEqualToValue}
-      getOptionLabel={(option) => typeof option === "string" ? option : option[field.lookupSettings["textFieldName"]]}
+      // isOptionEqualToValue={isOptionEqualToValue}
+      getOptionLabel={getLabelFromOption}
       value={selectedOptions}
       onChange={handleChange}
       options={options}
       loading={loading}
-      disable={isReadonly}
+      disabled={isReadonly}
       fullWidth
       renderInput={(params) => (
         <TextField
           {...params}
           required
-          label={field.displayName}
+          label={displayName}
           InputProps={{
             ...params.InputProps,
             endAdornment: (

@@ -100,6 +100,11 @@ export default createBrowserRouter([
             loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "EmployeeData"),
           },
           {
+            path: ":caseName",
+            element: <CasesForm displayOnly />, // TODO AJO fix header
+            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId)
+          },
+          {
             path: "new",
             element: <CasesTable />,
             loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "NotAvailable"),

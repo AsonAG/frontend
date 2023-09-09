@@ -7,14 +7,30 @@ import { AuthProvider } from "react-oidc-context";
 import authConfig from "./auth/authConfig";
 import SignIn from "./auth/SignIn";
 
+
+function Authentication({children}) {
+  if (import.meta.env.DEV) {
+    return children;
+  }
+  return (
+    <AuthProvider {...authConfig}>
+      <SignIn>
+        {children}
+      </SignIn>
+    </AuthProvider>
+  )
+}
+
+if (import.meta.env.DEV) {
+
+}
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <AuthProvider {...authConfig}>
-      <SignIn>
-        <RouterProvider router={routes} />
-      </SignIn>
-    </AuthProvider>
+    <Authentication>
+      <RouterProvider router={routes} />
+    </Authentication>
   </React.StrictMode>
 );
 

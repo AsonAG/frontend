@@ -1,16 +1,18 @@
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { useContext } from "react";
+import { FieldContext } from "../FieldComponent";
 
-function FieldValueDateComponent({field, propertyName, displayName, isReadonly, required = true})
-{
+function FieldValueDateComponent({propertyName, displayName, required = true}) {
+	const { field, isReadonly, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const fieldValue = field[propertyName];
 	const value = fieldValue ? dayjs.utc(fieldValue) : null;
 
-	displayName ??= field.displayName;
+	displayName ??= fieldDisplayName;
 
 	const handleDateChange = (newDate) => {
 		field[propertyName] = newDate?.format();
-		// TODO AJO submit
+		buildCase();
 	};
 
 	return (

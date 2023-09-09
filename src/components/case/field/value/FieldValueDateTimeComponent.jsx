@@ -1,18 +1,20 @@
 import { DateTimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { useContext } from "react";
+import { FieldContext } from "../FieldComponent";
 
-function FieldValueDateTimeComponent({ field, isReadonly })
-{
+function FieldValueDateTimeComponent() {
+	const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
 	const value = field.value ? dayjs.utc(field.value) : null;
 
 	const handleChange = (newDate) => {
 		field.value = newDate.format();
-		// TODO AJO submit
+		buildCase();
 	};
 
 	return (
 		<DateTimePicker
-			label={field.displayName + "*"}
+			label={displayName}
 			value={value}
 			onChange={handleChange}
 			timezone="UTC"

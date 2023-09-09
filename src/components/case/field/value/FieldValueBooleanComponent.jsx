@@ -1,10 +1,9 @@
 import { FormControl, FormControlLabel, Checkbox } from "@mui/material";
 import { useContext } from "react";
-import { CaseFormContext } from "../../../../scenes/global/CasesForm";
+import { FieldContext } from "../FieldComponent";
 
-
-function FieldValueBooleanComponent({ field, isReadonly }) {
-    const { buildCase } = useContext(CaseFormContext);
+function FieldValueBooleanComponent() {
+    const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
     const checked = field.value ? field.value.toLowerCase() === "true" : false;
 
     function handleChange(e) {
@@ -16,7 +15,7 @@ function FieldValueBooleanComponent({ field, isReadonly }) {
         <FormControlLabel
             required
             name={field.name}
-            label={field.displayName}
+            label={displayName}
             labelPlacement="start"
             control={
                 <Checkbox

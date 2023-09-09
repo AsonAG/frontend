@@ -12,11 +12,11 @@ function FieldPeriodSelector({field}) {
 
     return (
         <Stack gap={3} direction="row">
-            <FieldValueDateComponent field={field} propertyName="start" displayName="Start" />
+            <FieldValueDateComponent propertyName="start" displayName="Start" />
 
             <Box>
                 {field.timeType != "Moment" && (
-                    <FieldValueDateComponent field={field} propertyName="end" displayName="End" required={field.endMandatory} />
+                    <FieldValueDateComponent propertyName="end" displayName="End" required={field.endMandatory} />
                 )}
             </Box>
         </Stack>

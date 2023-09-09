@@ -1,5 +1,7 @@
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import { FieldContext } from "../FieldComponent";
+import { useContext } from "react";
 
 
 function toBase64(file) {
@@ -26,7 +28,8 @@ function toBase64(file) {
 
 
 // TODO AJO fix file upload
-function FieldValueFileComponent({field}) {
+function FieldValueFileComponent() {
+  const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
   const extensions = field.attributes?.["input.attachmentExtensions"];
   // const required = attributes?.["input.attachment"] === "Mandatory";
   const required = true;

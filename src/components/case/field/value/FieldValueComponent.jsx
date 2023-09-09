@@ -13,22 +13,17 @@ import FieldValueTextComponent from "./FieldValueTextComponent";
 import FieldValueDateComponent from "./FieldValueDateComponent";
 import FieldValueDateTimeComponent from "./FieldValueDateTimeComponent";
 import FieldValueBooleanComponent from "./FieldValueBooleanComponent";
-import { CaseFormContext } from "../../../../scenes/global/CasesForm";
+import { FieldContext } from "../FieldComponent";
 
-function FieldValueComponent({ field }) {
-	const isReadonly =
-		useContext(CaseFormContext) || 
-		field.attributes?.["input.readOnly"];
-
+function FieldValueComponent() {
+	const { field } = useContext(FieldContext);
 	// TODO validation
-	const props = {field, isReadonly}
-
 	if (field.lookupSettings && "lookupName" in field.lookupSettings) {
-		return <FieldValueLookupComponent {...props} />;
+		return <FieldValueLookupComponent />;
 	}
 	
 	if (field.attributes?.["input.list"]) {
-		return <FieldValueListComponent {...props} />
+		return <FieldValueListComponent />
 	} 
 	switch (field.valueType) {
 		case "None":
@@ -38,17 +33,17 @@ function FieldValueComponent({ field }) {
 				</Box>
 			);
 		case "Document":
-			return <FieldValueFileComponent {...props} />;
+			return <FieldValueFileComponent />;
 		case "Date": 
-			return <FieldValueDateComponent {...props} propertyName="value" />;
+			return <FieldValueDateComponent propertyName="value" />;
 		case "DateTime":
-			return <FieldValueDateTimeComponent {...props} />;
+			return <FieldValueDateTimeComponent />;
 		case "Boolean":
-			return <FieldValueBooleanComponent {...props} />;
+			return <FieldValueBooleanComponent />;
 		case "WebResource":
 			return (
 				<Stack>
-					<FieldValueTextComponent {...props} />
+					<FieldValueTextComponent />
 					<Box m="6px">
 						<Link href={field.value} target="_blank" rel="noopener">
 							{field.value}
@@ -67,10 +62,10 @@ function FieldValueComponent({ field }) {
 		case "Month":
 		case "Percent":
 		case "Money":
-			return <FieldValueNumberComponent {...props} />;
+			return <FieldValueNumberComponent />;
 			
 		default:
-			return <FieldValueTextComponent {...props} />;
+			return <FieldValueTextComponent />;
 	}
 };
 

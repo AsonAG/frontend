@@ -14,7 +14,9 @@ const employeeUrl = (tenantId, employeeId) => `${employeesUrl(tenantId)}/${emplo
 
 function defaultParams() {
     const headers = new Headers();
-    headers.set('Authorization', `Bearer ${getUser()?.access_token}`);
+    if (import.meta.env.PROD) {
+        headers.set('Authorization', `Bearer ${getUser()?.access_token}`);
+    }
     headers.set('Accept', 'application/json');
     headers.set('Content-Type', 'application/json');
     return { headers, signal: AbortSignal.timeout(60000) };

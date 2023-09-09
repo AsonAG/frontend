@@ -6,7 +6,7 @@ import { createContext } from "react";
 
 export const CaseFormContext = createContext();
 
-function CasesForm() {
+function CasesForm({ displayOnly = false }) {
   const loaderData = useLoaderData();
   const actionData = useActionData(); 
   const caseData = actionData || loaderData;
@@ -20,20 +20,23 @@ function CasesForm() {
   const handleSubmit = () => {};
 
   return (
-    <CaseFormContext.Provider value={{buildCase}}>
-      <CasesFormWrapper
+    <CaseFormContext.Provider value={{ buildCase, displayOnly }}>
+
+      {
+        // TODO fix cases form wrappre
+      /* <CasesFormWrapper
         // title to the right ( was employee name )
         title="Testing"
         onSubmit={handleSubmit}
         inputCase={caseData}
         outputCase={caseData}
-      >
+      > */}
       <Form method="post">
         <Box>
           {caseData && <CaseComponent _case={caseData} />}
         </Box>
       </Form>
-    </CasesFormWrapper>
+    {/* </CasesFormWrapper> */}
   </CaseFormContext.Provider>
   )
  

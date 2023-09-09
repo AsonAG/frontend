@@ -1,8 +1,9 @@
 import { NumericFormat } from "react-number-format";
 import { InputAdornment, TextField } from "@mui/material";
 import { validateMinMax } from "../../../../services/validators/FieldValueValidator";
-import { useContext } from "react";
-import { CaseFormContext } from "../../../../scenes/global/CasesForm";
+import { useState, useContext } from "react";
+import { FieldContext } from "../FieldComponent";
+import { useUpdateEffect } from "usehooks-ts";
 
 function getDecimalParams(valueType) {
   switch(valueType) {
@@ -16,42 +17,52 @@ function getDecimalParams(valueType) {
   }
 }
 
-function FieldValueNumberComponent({ field, isReadonly }) {
-  const { buildCase } = useContext(CaseFormContext);
+function FieldValueNumberComponent() {
+  const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
+  const [value, setValue] = useState(field.value);
 
   const handleBlur = () => {
-    // TODO validate
-    if (validateMinMax(field.value, field.attributes)) {
-      
+    if (field.value === value) {
+      return;
     }
+
+    if (!validateMinMax(value, field.attributes)) {
+      // TODO AJO set invalid state
+    }
+
+    field.value = value;
+    buildCase();
   }
 
-  const handleChange = (e) => {
-    field.value = e.target.value;
+  const handleChange = (values) => {
+    setValue(values.value);
   }
+
+  useUpdateEffect(() => {
+    setValue(field.value);
+  }, [field.value]);
 
   return (
     <NumericFormat
-      value={field.value}
+      value={value}
       onValueChange={handleChange}
-
       valueIsNumericString
       // TODO AJO 
-      // thousandSeparator={
-      //   attributes?.["input.thousandSeparator"]
-      //     ? attributes["input.thousandSeparator"]
-      //     : " "
-      // }
+      thousandSeparator={
+        field.attributes?.["input.thousandSeparator"]
+          ? field.attributes["input.thousandSeparator"]
+          : " "
+      }
       {...getDecimalParams(field.valueType)}
       customInput={TextField}
-      label={field.displayName}
-      type={getInputTypeFromJsonType(field.valueType)}
+      label={displayName}
+      type={getInputTypeFromValueType(field.valueType)}
       name={field.name}
       required
       onBlur={handleBlur}
       disabled={isReadonly}
       InputProps={{
-        endAdornment: getAdornmentFromJsonType(
+        endAdornment: getAdornmentFromValueType(
           field.valueType,
           field.attributes
         ),
@@ -63,8 +74,8 @@ function FieldValueNumberComponent({ field, isReadonly }) {
   );
 };
 
-const getInputTypeFromJsonType = (jsonType) => {
-  switch (jsonType) {
+const getInputTypeFromValueType = (valueType) => {
+  switch (valueType) {
     case "String":
       return "text";
     case "Boolean":
@@ -74,13 +85,13 @@ const getInputTypeFromJsonType = (jsonType) => {
     case "Decimal":
       return "numeric";
     default:
-      return jsonType;
+      return valueType;
   }
 };
 
-const getAdornmentFromJsonType = (jsonType, attributes) => {
+const getAdornmentFromValueType = (valueType, attributes) => {
   let adornment;
-  switch (jsonType) {
+  switch (valueType) {
     case "Money":
       adornment = attributes?.["input.currency"];
       break;
