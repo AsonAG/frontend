@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { useLoaderData, Form, useActionData, useSubmit } from "react-router-dom";
+import { useLoaderData, Form, useActionData, useSubmit, useRouteLoaderData } from "react-router-dom";
 import CaseComponent from "../../components/case/CaseComponent";
 import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
 import { createContext } from "react";
@@ -7,21 +7,20 @@ import { createContext } from "react";
 export const CaseFormContext = createContext();
 
 function CasesForm({ displayOnly = false }) {
+  const { user, payroll } = useRouteLoaderData("root");
   const loaderData = useLoaderData();
   const actionData = useActionData(); 
   const caseData = actionData || loaderData;
+  console.log(payroll);
 
   const submit = useSubmit();
 
-  const buildCase = () => {
-    const submitData = { caseData, intent: "buildCase" };
+  const action = (intent) => {
+    const submitData = { caseData, intent, userId: user.id, divisionId: payroll.divisionId };
     submit(submitData, { method: "post", encType: "application/json" });
   }
-
-  const handleSubmit = () => {
-    const submitData = { caseData, intent: "addCase" };
-    submit(submitData, { method: "post", encType: "application/json" });
-  };
+  const buildCase = () => action("buildCase");
+  const handleSubmit = () => action("addCase");
 
   return (
     <CaseFormContext.Provider value={{ buildCase, displayOnly }}>

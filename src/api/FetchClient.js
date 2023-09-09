@@ -1,4 +1,4 @@
-import getUser from '../auth/getUser';
+import getAuthUser from '../auth/getUser';
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const tenantsUrl = `${baseUrl}/tenants`;
@@ -10,12 +10,16 @@ const caseSetsUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}
 const lookupValuesUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/lookups/values`;
 const employeesUrl = (tenantId) => `${tenantUrl(tenantId)}/employees`;
 const employeeUrl = (tenantId, employeeId) => `${employeesUrl(tenantId)}/${employeeId}`;
+const usersUrl = (tenantId) => `${tenantUrl(tenantId)}/users`;
 
+function getUserEmail() {
+    return "ajo@ason.ch";
+}
 
 function defaultParams() {
     const headers = new Headers();
     if (import.meta.env.PROD) {
-        headers.set('Authorization', `Bearer ${getUser()?.access_token}`);
+        headers.set('Authorization', `Bearer ${getAuthUser()?.access_token}`);
     }
     headers.set('Accept', 'application/json');
     headers.set('Content-Type', 'application/json');
@@ -64,6 +68,11 @@ function getPayrolls(tenantId) {
     return get(payrollsUrl(tenantId))
 }
 
+async function getPayroll(tenantId, payrollId) {
+    const response = await get(payrollUrl(tenantId, payrollId));
+    return response.json();
+}
+
 function getEmployees(tenantId, payrollId) {
     return get(employeesUrl(tenantId));
 }
@@ -92,8 +101,27 @@ function addCase(tenantId, payrollId, employeeId, caseChangeSetup) {
     return post(caseSetsUrl(tenantId, payrollId), caseChangeSetup, {employeeId});
 }
 
+async function getUser(tenantId, identifier) {
+    const response = await get(usersUrl(tenantId), {filter: `Identifier eq '${identifier}'`});
+    const users = await response.json();
+    return users?.length ? users[0] : null;
+}
+
 async function getLookupValues(tenantId, payrollId, lookupName) {
     return (await get(lookupValuesUrl(tenantId, payrollId), {lookupNames: lookupName})).json();
 }
 
-export { getTenants, getTenant, getPayrolls, getEmployees, getEmployee, getEmployeeCases, getEmployeeCaseValues, buildCase, addCase, getLookupValues };
+export { 
+    getTenants, 
+    getTenant, 
+    getPayrolls, 
+    getEmployees, 
+    getEmployee, 
+    getEmployeeCases, 
+    getEmployeeCaseValues, 
+    buildCase, 
+    addCase, 
+    getLookupValues,
+    getUser,
+    getPayroll
+};

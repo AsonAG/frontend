@@ -13,7 +13,19 @@ import CasesForm from "./scenes/global/CasesForm";
 
 import App from "./App";
 
-import { getTenants, getPayrolls, getEmployees, getEmployee, getTenant, getEmployeeCases, getEmployeeCaseValues, buildCase, addCase } from "./api/FetchClient";
+import { 
+  getTenants, 
+  getPayrolls, 
+  getEmployees, 
+  getEmployee, 
+  getTenant, 
+  getEmployeeCases, 
+  getEmployeeCaseValues, 
+  buildCase, 
+  addCase,
+  getUser, 
+  getPayroll
+} from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 
 
@@ -71,8 +83,10 @@ export default createBrowserRouter([
     loader: async ({params}) => {
       let response = await getTenant(params.tenantId);
       const tenant = await response.json();
-      console.log("tenant loader");
-      return {tenant};
+      console.log("root loader");
+      const user = await getUser(params.tenantId, "ajo@ason.ch");
+      const payroll = await getPayroll(params.tenantId, params.payrollId);
+      return { tenant, user, payroll };
     },
     // shouldRevalidate: (params) => { console.log(params); return false},
     id: "root",
@@ -115,8 +129,10 @@ export default createBrowserRouter([
             loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId),
             shouldRevalidate: ({actionResult}) => !actionResult,
             action: async ({request, params}) => {
-              const { caseData, intent } = await request.json();
+              const { caseData, intent, userId, divisionId } = await request.json();
               const caseChangeSetup = {
+                userId,
+                divisionId,
                 employeeId: Number(params.employeeId),
                 case: mapCase(caseData)
               }
