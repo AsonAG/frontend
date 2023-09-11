@@ -34,3 +34,11 @@ body,
   background: #555;
 }
 
+::file-selector-button {
+  display: none;
+}
+
+.file-upload-adorned-start {
+  padding: 0 !important;
+  margin: 0 !important;
+}

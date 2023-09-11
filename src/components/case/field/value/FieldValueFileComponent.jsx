@@ -1,9 +1,9 @@
-import { TextField } from "@mui/material";
+import { TextField, Box } from "@mui/material";
 // import { Box, Button, Stack, Typography, Chip, InputLabel, FormControl, OutlinedInput } from "@mui/material";
 import { FieldContext } from "../FieldComponent";
 import { useContext, useState, useEffect } from "react";
 import { toBase64 } from "../../../../services/converters/BinaryConverter";
-
+import { CloudUpload } from "@mui/icons-material";
 
 function FieldValueFileComponent() {
   const { field, isReadonly, displayName, attachments } = useContext(FieldContext);
@@ -32,6 +32,7 @@ function FieldValueFileComponent() {
     setAttachmentFiles(attachments);
   };
 
+  const fileUploadId = `fileupload_${field.id}`;
   return (
     <TextField
       label={displayName}
@@ -40,12 +41,24 @@ function FieldValueFileComponent() {
       disabled={isReadonly}
       type="file"
       InputLabelProps={{
-        shrink: true,
+        shrink: true
       }}
       inputProps={{
         multiple: true,
-        accept: extensions
+        accept: extensions,
+        id: fileUploadId
       }}
+      InputProps={{
+        startAdornment: <label htmlFor={fileUploadId}>
+            <Box sx={{paddingLeft: 2, paddingRight: 1.5, display: 'flex', alignContent: 'center'}}>
+              <CloudUpload />
+            </Box>
+          </label>,
+        classes: {
+          adornedStart: "file-upload-adorned-start"
+        }
+      }}
+      
     />
   );
 };
