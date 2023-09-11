@@ -17,7 +17,6 @@ import { FieldContext } from "../FieldComponent";
 
 function FieldValueComponent() {
 	const { field } = useContext(FieldContext);
-	// TODO validation
 	if (field.lookupSettings && "lookupName" in field.lookupSettings) {
 		return <FieldValueLookupComponent />;
 	}
@@ -44,7 +43,7 @@ function FieldValueComponent() {
 			return (
 				<Stack>
 					<FieldValueTextComponent />
-					<Box m="6px">
+					<Box m={0.75}>
 						<Link href={field.value} target="_blank" rel="noopener">
 							{field.value}
 						</Link>

@@ -11,6 +11,8 @@ const lookupValuesUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payroll
 const employeesUrl = (tenantId) => `${tenantUrl(tenantId)}/employees`;
 const employeeUrl = (tenantId, employeeId) => `${employeesUrl(tenantId)}/${employeeId}`;
 const usersUrl = (tenantId) => `${tenantUrl(tenantId)}/users`;
+const employeeDocumentUrl = (tenantId, employeeId, caseValueId, documentId) => `${employeeUrl(tenantId, employeeId)}/cases/${caseValueId}/documents/${documentId}`;
+const companyDocumentUrl = (tenantId, caseValueId, documentId) => `${tenantUrl(tenantId)}/companycases/${caseValueId}/documents/${documentId}`;
 
 function defaultParams() {
     const headers = new Headers();
@@ -107,6 +109,14 @@ async function getLookupValues(tenantId, payrollId, lookupName) {
     return (await get(lookupValuesUrl(tenantId, payrollId), {lookupNames: lookupName})).json();
 }
 
+async function getDocument(tenantId, caseValueId, documentId, employeeId) {
+    const url = employeeId ? 
+        employeeDocumentUrl(tenantId, employeeId, caseValueId, documentId) :
+        companyDocumentUrl(tenantId, caseValueId, documentId);
+
+    return (await get(url)).json();
+}
+
 export { 
     getTenants, 
     getTenant, 
@@ -119,5 +129,6 @@ export {
     addCase, 
     getLookupValues,
     getUser,
-    getPayroll
+    getPayroll,
+    getDocument
 };

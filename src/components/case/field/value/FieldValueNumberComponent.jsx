@@ -47,9 +47,7 @@ function FieldValueNumberComponent() {
       error={!isValid}
       // TODO AJO 
       thousandSeparator={
-        field.attributes?.["input.thousandSeparator"]
-          ? field.attributes["input.thousandSeparator"]
-          : " "
+        field.attributes?.["input.thousandSeparator"] ?? " "
       }
       {...getDecimalParams(field.valueType)}
       customInput={TextField}

@@ -16,7 +16,7 @@ function FieldValueDateTimeComponent() {
 		<DateTimePicker
 			label={displayName}
 			value={value}
-			onChange={handleChange}
+			onAccept={handleChange}
 			timezone="UTC"
 			name={field.name}
 			disabled={isReadonly}
