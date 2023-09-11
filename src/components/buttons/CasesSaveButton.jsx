@@ -1,36 +1,20 @@
 import SendIcon from "@mui/icons-material/Send";
-import { Box, Button, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 
-export default function CasesSaveButton({ onSubmit, caseIsReadOnly }) {
+export default function CasesSaveButton({ onSubmit }) {
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
+    <Button
+      disableRipple
+      type="submit"
+      variant="contained"
+      color="blueAccent"
+      size="large"
+      onClick={onSubmit}
+      endIcon={<SendIcon htmlColor="#ffffff" />}
     >
-      <Box 
-          className="case-icon-button"
-          >
-      {!caseIsReadOnly && (
-        <Button
-          // disable={}
-          //   fullWidth
-          disableRipple
-          type="submit"
-          variant="contained"
-          color="blueAccent"
-          size="large"
-          onClick={onSubmit}
-          name="intent"
-          value="addCase"
-          endIcon={<SendIcon htmlColor="#ffffff" />}
-        >
-          <Typography fontWeight="bold" color="#ffffff">
-            Send
-          </Typography>
-        </Button>
-      )}
-        </Box>
-
-    </Box>
+      <Typography fontWeight="bold" color="#ffffff">
+        Send
+      </Typography>
+    </Button>
   );
 }

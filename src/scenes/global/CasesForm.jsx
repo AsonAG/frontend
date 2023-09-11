@@ -1,8 +1,9 @@
-import { Box } from "@mui/material";
 import { useLoaderData, Form, useActionData, useSubmit, useRouteLoaderData } from "react-router-dom";
 import CaseComponent from "../../components/case/CaseComponent";
-import CasesFormWrapper from "../../components/cases/CasesFormWrapper";
 import { createContext, useRef } from "react";
+import CaseIndexView from "../../components/cases/CaseIndexView";
+import CasesSaveButton from "../../components/buttons/CasesSaveButton";
+import { Stack, Box } from "@mui/material";
 
 export const CaseFormContext = createContext();
 
@@ -27,22 +28,24 @@ function CasesForm({ displayOnly = false }) {
     }
   }
 
+  const submitButton = !displayOnly && <CasesSaveButton onSubmit={handleSubmit} />;
+
   return (
     <CaseFormContext.Provider value={{ buildCase, displayOnly, attachments: attachments.current }}>
-      <CasesFormWrapper
-        // title to the right ( was employee name )
-        title="Testing"
-        onSubmit={handleSubmit}
-        inputCase={caseData}
-        outputCase={caseData}
+      <Stack
+        useFlexGap
+        direction="row"
       >
-      <Form method="post" ref={formRef}>
-        <Box>
-          {caseData && <CaseComponent _case={caseData} />}
+        <Box sx={{flex: 1, position: 'relative'}}>
+          <Form method="post" ref={formRef} id="case_form">
+            {caseData && <CaseComponent _case={caseData} />}
+          </Form>
         </Box>
-      </Form>
-    </CasesFormWrapper>
-  </CaseFormContext.Provider>
+        <CaseIndexView _case={caseData}>
+          {submitButton}
+        </CaseIndexView>
+      </Stack>
+    </CaseFormContext.Provider>
   )
  
 }

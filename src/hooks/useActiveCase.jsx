@@ -1,64 +1,47 @@
-import { useState, useEffect } from "react";
-import { getMainCaseObject } from "../api/CasesApi";
-import { getOutputCaseKey } from "../components/case/CaseComponent";
-import { useUpdateEffect } from "usehooks-ts";
+import { useLayoutEffect, useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
-// returns a key of the case that is visible in the current viewport
-export default function useActiveCase(outputCase, setActiveCaseKey) {
-  const [scrollPosition, setScrollPosition] = useState(0);
-
-  const handleScroll = (event) => {
-    setScrollPosition(event.currentTarget.scrollTop);
-  };
+export default function useActiveCase() {
+  const [activeCase, setActiveCase] = useState('');
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
+    const caseForm = document.querySelector(".main");
+
+    const headers = Array.from(document
+      .querySelectorAll('div[data-header-observable="true"]'))
+      .map(e => ({name: e.id, top: e.offsetTop}))
+      .toSorted((a, b) => a.top < b.top);
+
+    const onScroll = (event) => {
+      const scrollTop = event.currentTarget.scrollTop;
+      for (const header of headers) {
+        if (scrollTop >= header.top) {
+          console.log("onscroll: setting active case");
+          setActiveCase(header.name);
+        }
+      }
+    }
+
+    caseForm.addEventListener("scroll", onScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      caseForm.removeEventListener("scroll", onScroll);
+    }
+  }, [])
+
+  const { pathName, hash, key } = useLocation();
+
+  useLayoutEffect(() => {
+    if (hash === '')
+      return;
+    const id = decodeURIComponent(hash.replace("#", ''));
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView();
+      console.log("click: setting active case");
+      setActiveCase(id);
     };
-  }, []);
+  }, [pathName, hash, key]);
 
-  useUpdateEffect(() => {
-    iterateThroughCases(outputCase, checkIsCaseActive, setActiveCaseKey);
-  }, [outputCase, scrollPosition]);
-
-  const iterateThroughCases = (cases, func, setterFunc) => {
-    for (const caseObj of Object.values(cases)) {
-      if (func(caseObj, setterFunc)) return true;
-      if (caseObj.relatedCases) {
-        if (iterateThroughCases(caseObj.relatedCases, func, setterFunc))
-          return true;
-      }
-    }
-  };
-
-  const checkIsCaseActive = (_case, setterFunc) => {
-    try {
-      if (
-        scrollPosition + 20 < _case?.ref?.current.offsetTop &&
-        scrollPosition + window.innerHeight > _case?.ref?.current.offsetTop
-      ) {
-        const activeCase = _case;
-        const activeCaseKey = getOutputCaseKey(activeCase);
-        setterFunc(activeCaseKey);
-        return true;
-      }
-    } catch (error) {
-      console.warn(JSON.stringify(error));
-    }
-  };
-  return handleScroll;
+  return activeCase;
 }
-
-const getCaseByKey = (cases, key) => {
-  for (const [caseKey, caseObj] of Object.entries(cases)) {
-    if (caseKey === key) return caseObj;
-    else if (Object.hasOwnProperty.call(caseObj.relatedCases, key))
-      return caseObj.relatedCases[key];
-    else {
-      const relSearchResults = getCaseByKey(caseObj.relatedCases, key);
-      if (relSearchResults) return relSearchResults;
-    }
-  }
-};

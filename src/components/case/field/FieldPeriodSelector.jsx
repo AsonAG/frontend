@@ -10,6 +10,7 @@ function FieldPeriodSelector({field}) {
         return <div></div>
     }
 
+    // TODO AJO fix layout when only start is shown
     return (
         <Stack gap={3} direction="row">
             <FieldValueDateComponent propertyName="start" displayName="Start" />

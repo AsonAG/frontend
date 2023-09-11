@@ -19,7 +19,6 @@ function FieldComponent({ field }) {
 				gridTemplateColumns="repeat( auto-fill, 400px 21px)"
 				rowGap="10px"
 				columnGap="4px"
-				padding="4px 0px 10px 10px"
 			>
 				<FieldValueComponent />
 				<DescriptionComponent description={field.description} />

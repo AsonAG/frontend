@@ -46,11 +46,11 @@ function FieldValueFileComponent() {
       inputProps={{
         multiple: true,
         accept: extensions,
-        id: fileUploadId
+        id: fileUploadId,
       }}
       InputProps={{
         startAdornment: 
-            <Box component="label" htmlFor={fileUploadId} sx={{paddingLeft: 2, paddingRight: 1.5, display: 'flex', alignContent: 'center', flexWrap: 'wrap', height: "100%"}}>
+            <Box component="label" htmlFor={fileUploadId} sx={{paddingLeft: 2, paddingRight: 1.5, display: 'flex', alignContent: 'center', flexWrap: 'wrap', height: "100%", cursor: 'pointer'}}>
               <CloudUpload />
             </Box>,
         classes: {

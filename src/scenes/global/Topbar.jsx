@@ -47,7 +47,7 @@ const Topbar = ({ toggleSidebar, renderSidebarButton }) => {
         },
       }}
     >
-      <AppBar>
+      <AppBar elevation={0}>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Box display="flex" flexDirection="row">
             {renderSidebarButton && (

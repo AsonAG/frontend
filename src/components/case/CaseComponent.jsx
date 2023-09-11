@@ -1,41 +1,29 @@
-import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
-import { Box, Divider, Paper } from "@mui/material";
-import CaseNameHeader from "../../scenes/global/CaseNameHeader";
+import { Paper, Stack, Typography } from "@mui/material";
 import FieldComponent from "./field/FieldComponent";
 
 const CaseComponent = ({ _case }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   return (
-    <Box margin="5px 0 0 0" >
-      <section>
-      <Paper elevation={3} >
-        <CaseNameHeader caseDetails={_case} />
-
-        <Box
-          sx={{ backgroundColor: colors.primary[500] }}
-        >
-          <Divider />
-
-          <Box margin="10px 0 0 10px">
-            {
-              _case.fields?.map((field) => <FieldComponent key={field.id} field={field} />)
-            }
-          </Box>
-
-          <Box>
-            {_case.relatedCases?.map((relatedCase) => (
-              <CaseComponent
-                key={relatedCase.id}
-                _case={relatedCase}
-              />
-            ))}
-          </Box>
-        </Box>
+    <Stack component="section" gap={2}>
+      <Stack id={_case.name} data-header-observable>
+        <Typography variant="h3" fontWeight="bold" gutterBottom sx={{pt: 2}}>
+          {_case.displayName}
+        </Typography>
+        <Typography variant="subtitle">
+          {_case.description}
+        </Typography>
+      </Stack>
+      <Paper elevation={1}>
+        {
+          _case.fields?.map((field) => <FieldComponent key={field.id} field={field} />)
+        }
       </Paper>
-      </section>
-    </Box>
+      {_case.relatedCases?.map((relatedCase) => (
+        <CaseComponent
+          key={relatedCase.id}
+          _case={relatedCase}
+        />
+      ))}
+    </Stack>
   );
 };
 

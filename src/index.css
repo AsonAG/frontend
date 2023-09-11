@@ -10,6 +10,10 @@ body,
   font-family: 'Source Sans Pro', sans-serif;
 }
 
+.main {
+  overflow-y: auto;
+}
+
 .app {
   display: flex;
   position: relative;
@@ -32,6 +36,10 @@ body,
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+input[type="file"] {
+  cursor: pointer;
 }
 
 ::file-selector-button {

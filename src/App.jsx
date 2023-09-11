@@ -56,7 +56,7 @@ function App() {
 								paddingTop="60px"
 							>
 								{ renderSidebar && <Sidebar isCollapsed={isSidebarCollapsed} /> }
-								<main className="content">
+								<main className="main content">
 									<Outlet context={loaderContent}/>
 								</main>
 							</Box>
