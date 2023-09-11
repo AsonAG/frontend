@@ -49,11 +49,10 @@ function FieldValueFileComponent() {
         id: fileUploadId
       }}
       InputProps={{
-        startAdornment: <label htmlFor={fileUploadId}>
-            <Box sx={{paddingLeft: 2, paddingRight: 1.5, display: 'flex', alignContent: 'center'}}>
+        startAdornment: 
+            <Box component="label" htmlFor={fileUploadId} sx={{paddingLeft: 2, paddingRight: 1.5, display: 'flex', alignContent: 'center', flexWrap: 'wrap', height: "100%"}}>
               <CloudUpload />
-            </Box>
-          </label>,
+            </Box>,
         classes: {
           adornedStart: "file-upload-adorned-start"
         }
