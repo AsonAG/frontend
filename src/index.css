@@ -12,6 +12,7 @@ body,
 
 .main {
   overflow-y: auto;
+  position: relative;
 }
 
 .app {

@@ -4,7 +4,7 @@ import FieldComponent from "./field/FieldComponent";
 const CaseComponent = ({ _case }) => {
   return (
     <Stack component="section" gap={2}>
-      <Stack id={_case.name} data-header-observable>
+      <Stack id={_case.name} data-header-jump-anchor>
         <Typography variant="h3" fontWeight="bold" gutterBottom sx={{pt: 2}}>
           {_case.displayName}
         </Typography>

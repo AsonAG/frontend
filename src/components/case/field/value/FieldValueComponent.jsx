@@ -43,11 +43,11 @@ function FieldValueComponent() {
 			return (
 				<Stack>
 					<FieldValueTextComponent />
-					<Box m={0.75}>
+					{field.value && <Box m={0.75}>
 						<Link href={field.value} target="_blank" rel="noopener">
 							{field.value}
 						</Link>
-					</Box>
+					</Box>}
 				</Stack>
 			);
 		case "Integer":

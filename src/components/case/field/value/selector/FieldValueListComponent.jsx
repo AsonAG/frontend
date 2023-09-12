@@ -2,7 +2,6 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useContext, useMemo } from "react";
 import { FieldContext } from "../../FieldComponent";
 
-// TODO AJO test multilist
 function FieldValueListComponent() {
   const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
   const isMultiOptions = field.attributes["input.multiList"];

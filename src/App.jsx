@@ -53,7 +53,7 @@ function App() {
 								flexDirection="row"
 								width="100%"
 								height="100%"
-								paddingTop="60px"
+								paddingTop="64px"
 							>
 								{ renderSidebar && <Sidebar isCollapsed={isSidebarCollapsed} /> }
 								<main className="main content">

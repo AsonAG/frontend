@@ -1,12 +1,4 @@
-import { useState, useEffect, useMemo, useLayoutEffect } from "react";
-
-function collectCaseNames(caseData) {
-  if (caseData.relatedCases) {
-    const relatedCaseNames = caseData.relatedCases.flatMap(c => collectCaseNames(c));
-    return [caseData.name, ...relatedCaseNames];
-  }
-  return [caseData.name];
-}
+import { useState, useEffect } from "react";
 
 function scrollToAsync(element, offset) {
   return new Promise(res => {
@@ -26,32 +18,28 @@ function scrollToAsync(element, offset) {
   })
 }
 
+function getCaseForm() {return document.querySelector(".main");}
+
 export default function useActiveCase(caseData) {
   const [activeCase, setActiveCase] = useState(caseData.name);
-  const [caseHeaders, setCaseHeaders] = useState([]);
-  const headerNames = collectCaseNames(caseData);
 
   const scrollAndSetActive = async (caseName) => {
-    const header = caseHeaders.find(h => h.name === caseName);
-    if (header) {
-      const caseForm = document.querySelector(".main");
-      await scrollToAsync(caseForm, header.top);
+    const element = document.getElementById(caseName);
+    if (element) {
+      await scrollToAsync(getCaseForm(), element.offsetTop);
       setActiveCase(caseName);
     }
   }
-  useLayoutEffect(() => {
-    const headers = Array.from(document
-      .querySelectorAll('div[data-header-observable="true"]'))
-      .map(e => ({name: e.id, top: e.offsetTop}))
-      .toSorted((a, b) => a.top < b.top)
-    setCaseHeaders(headers);
-  }, [JSON.stringify(headerNames)]);
 
   useEffect(() => {
-    const caseForm = document.querySelector(".main");
+    const caseForm = getCaseForm();
     const onScroll = (event) => {
+      const headers = Array.from(document
+        .querySelectorAll('div[data-header-jump-anchor="true"]'))
+        .map(e => ({name: e.id, top: e.offsetTop}))
+        .toSorted((a, b) => a.top < b.top);
       const scrollTop = event.currentTarget.scrollTop;
-      for (const header of caseHeaders) {
+      for (const header of headers) {
         if (scrollTop >= header.top) {
           setActiveCase(header.name);
         }
@@ -62,7 +50,7 @@ export default function useActiveCase(caseData) {
     return () => {
       caseForm.removeEventListener("scroll", onScroll);
     }
-  }, [caseHeaders])
+  }, [])
 
   return { activeCase, scrollAndSetActive };
 }

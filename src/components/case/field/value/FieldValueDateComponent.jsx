@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { useContext } from "react";
 import { FieldContext } from "../FieldComponent";
 
-function FieldValueDateComponent({propertyName, displayName, required = true}) {
+function FieldValueDateComponent({propertyName, displayName, sx, required = true}) {
 	const { field, isReadonly, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const fieldValue = field[propertyName];
 	const value = fieldValue ? dayjs.utc(fieldValue) : null;
@@ -27,6 +27,7 @@ function FieldValueDateComponent({propertyName, displayName, required = true}) {
 			slotProps={{
 				field: { required }
 			}}
+			sx={sx}
 		/>
 	);
 };
