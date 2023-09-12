@@ -7,15 +7,14 @@ function CaseIndexView({ _case, children }) {
   // TODO AJO hide when mobile
   // const { displayOnly } =  useContext(CaseFormContext);
   // const mobileScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  // TODO AJO fix scrolling
-  // const handleScroll = useActiveCase( outputCase, setActiveCaseKey);
 
   // TODO AJO define header height?
-  const activeCase = useActiveCase();
+  const { activeCase, scrollAndSetActive } = useActiveCase(_case);
+
   return (
     <Stack useFlexGap sx={{overflowY: 'auto', position: 'sticky', top: 0, height: "calc(100vh - 64px)" }}>
       <Box sx={{flex: 1}}>
-        <CaseIndexComponent _case={_case} indent={0} activeCase={activeCase} />
+        <CaseIndexComponent _case={_case} indent={0} activeCase={activeCase} onSelect={scrollAndSetActive} />
       </Box>
       {children}
     </Stack>
