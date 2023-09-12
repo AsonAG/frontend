@@ -5,7 +5,7 @@ import { createBrowserRouter, Navigate, redirect, useLoaderData } from "react-ro
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
-import Employees from "./scenes/employees";
+import EmployeesTable from "./components/tables/EmployeesTable";
 import CasesTable from "./components/tables/CasesTable";
 import EventsTable from "./components/tables/EventsTable";
 import DocumentsTable from "./components/tables/DocumentsTable";
@@ -49,9 +49,7 @@ function PayrollRedirect() {
   if (!payrolls) {
     return null;
   }
-
   const firstPayrollId = payrolls[0].id + "";
-
   return <Navigate to={firstPayrollId} replace />;
 }
 
@@ -97,7 +95,7 @@ export default createBrowserRouter([
       },
       {
         path: "hr/employees",
-        element: <Employees />,
+        element: <EmployeesTable />,
         // TODO AJO add payrollid or division id
         loader: ({params}) => getEmployees(params.tenantId)
       },
@@ -114,7 +112,7 @@ export default createBrowserRouter([
           },
           {
             path: ":caseName",
-            element: <CasesForm displayOnly />, // TODO AJO fix header
+            element: <CasesForm displayOnly />,
             loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId)
           },
           {
@@ -124,7 +122,7 @@ export default createBrowserRouter([
           },
           {
             path: "new/:caseName",
-            element: <CasesForm />, // TODO AJO fix header
+            element: <CasesForm />,
             loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId),
             shouldRevalidate: ({actionResult}) => !actionResult,
             action: async ({request, params}) => {

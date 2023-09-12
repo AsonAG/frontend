@@ -1,5 +1,5 @@
 import { React, useState } from "react";
-import TableComponent from "./TableComponent";
+import TableView from "./TableView";
 import { EmployeeButtons } from "../buttons/EmployeeButtons";
 import { useLoaderData } from "react-router-dom";
 
@@ -41,7 +41,8 @@ const EmployeesTable = () => {
   ];
 
   return (
-    <TableComponent
+    <TableView
+      title="Employees"
       error={error}
       setError={setError}
       tableData={employees}

@@ -1,59 +1,57 @@
 import { React } from "react";
-import { useLoaderData, useNavigate } from "react-router-dom";
-import TableComponent from "./TableComponent";
+import { useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
+import TableView from "./TableView";
+
+const columns = [
+  {
+    field: "displayName",
+    headerName: "Name",
+    headerAlign: "left",
+    cellClassName: "name-column--cell",
+    hideable: false,
+    flex: 1,
+  },
+  {
+    field: "description",
+    headerName: "Description",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "clusters",
+    headerName: "Clusters",
+    flex: 1,
+    renderCell: ({ row: { cluster } }) => {
+      if (Array.isArray(cluster)) return cluster.combine(", ");
+    },
+  },
+];
+
 
 const CasesTable = () => {
+  const title = useOutletContext();
   const cases = useLoaderData();
   const navigate = useNavigate();
-  
-  // TODO AJO can we do this better? i.e links
-  const handleRowClick = (params) => {
-    navigate(params.row.name);
-  };
-
-  const columns = [
-    {
-      field: "displayName",
-      headerName: "Name",
-      headerAlign: "left",
-      cellClassName: "name-column--cell",
-      hideable: false,
-      flex: 1,
-    },
-    {
-      field: "description",
-      headerName: "Description",
-      headerAlign: "left",
-      flex: 1,
-    },
-    {
-      field: "clusters",
-      headerName: "Clusters",
-      flex: 1,
-      renderCell: ({ row: { cluster } }) => {
-        if (Array.isArray(cluster)) return cluster.combine(", ");
-      },
-    },
-  ];
 
   return (
-    <TableComponent 
-        tableData={cases}
-        columns={columns}
-        initialState={{
-          columns: {
-            columnVisibilityModel: {
-              clusters: false,
-              description: false,
-            },
+    <TableView 
+      title={title}
+      tableData={cases}
+      columns={columns}
+      initialState={{
+        columns: {
+          columnVisibilityModel: {
+            clusters: false,
+            description: false,
           },
-          sorting: {
-            sortModel: [{ field: "displayName", sort: "asc" }],
-          },
-        }}
-        disableSelectionOnClick
-        onRowClick={handleRowClick}
-      />
+        },
+        sorting: {
+          sortModel: [{ field: "displayName", sort: "asc" }],
+        },
+      }}
+      disableSelectionOnClick
+      onRowClick={params => navigate(params.row.name)}
+    />
   );
 };
 

@@ -35,13 +35,13 @@ function CasesForm({ displayOnly = false }) {
   return (
     <Stack useFlexGap direction="row">
       <Stack sx={{flex: 1}} p={4}>
-          <Header title={title} />
-          <CaseFormContext.Provider value={{ buildCase, displayOnly, attachments: attachments.current }}>
-            <Form method="post" ref={formRef} id="case_form">
-              {caseData && <CaseComponent _case={caseData} />}
-              {submitButton}
-            </Form>
-          </CaseFormContext.Provider>
+        <Header title={title} />
+        <CaseFormContext.Provider value={{ buildCase, displayOnly, attachments: attachments.current }}>
+          <Form method="post" ref={formRef} id="case_form">
+            {caseData && <CaseComponent _case={caseData} />}
+            {submitButton}
+          </Form>
+        </CaseFormContext.Provider>
       </Stack>
       <CaseIndexView _case={caseData} />
     </Stack>

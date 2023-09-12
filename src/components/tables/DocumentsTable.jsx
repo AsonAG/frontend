@@ -7,9 +7,9 @@ import {
 } from "@mui/material";
 import { React, useState } from "react";
 import dayjs from "dayjs";
-import TableComponent from "./TableComponent";
+import TableView from "./TableView";
 import { FileIcon, defaultStyles } from "react-file-icon";
-import { Link, useLoaderData, useParams } from "react-router-dom";
+import { Link, useLoaderData, useOutletContext, useParams } from "react-router-dom";
 import { getDocument } from "../../api/FetchClient";
 
 // TODO AJO localized formatting
@@ -21,6 +21,7 @@ const dateFormatter = (params) =>
 
 const DocumentsTable = () => {
   // TODO AJO localization
+  const title = useOutletContext();
   const events = useLoaderData();
   const params = useParams();
   const [backdropOpen, setBackdropOpen] = useState(false);
@@ -28,7 +29,6 @@ const DocumentsTable = () => {
   const handleFileClick = async (documentId, caseValueId) => {
     setBackdropOpen(true);
     try {
-      console.log(params);
       const document = await getDocument(params.tenantId, caseValueId, documentId, params.employeeId);
       downloadBase64File(document.content, document.contentType, document.name);
     }
@@ -101,17 +101,9 @@ const DocumentsTable = () => {
   ];
 
   return (
-    <Box>
-      <Backdrop
-        sx={{
-          color: "#fff",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-        open={backdropOpen}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      <TableComponent
+    <>
+      <TableView
+        title={title}
         tableData={events}
         columns={columns}
         initialState={{
@@ -135,7 +127,16 @@ const DocumentsTable = () => {
           },
         }}
       />
-    </Box>
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={backdropOpen}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    </>
   );
 };
 

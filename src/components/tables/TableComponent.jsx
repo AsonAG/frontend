@@ -2,7 +2,6 @@ import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
 import { Box } from "@mui/material";
-import ErrorBar from "../errors/ErrorBar";
 import { useEffect, useState } from "react";
 
 const TableComponent = ({
@@ -16,7 +15,6 @@ const TableComponent = ({
   const colors = tokens(theme.palette.mode);
   const [searchText, setSearchText] = useState("");
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
-  const [error, setError] = useState({});
 
 
   useEffect(() => {
@@ -53,10 +51,8 @@ const TableComponent = ({
 
   return (
     <Box
-      height="calc(100vh - 160px)"
-      display="flex"
-      flexDirection="column"
       sx={{
+        flex: 1,
         "& .MuiDataGrid-root": {
           //   border: "none",
         },
@@ -91,12 +87,7 @@ const TableComponent = ({
         },
       }}
     >
-      {error && (
-        <ErrorBar error={error} resetErrorBoundary={() => setError(null)} />
-      )}
       <DataGrid
-        // disableColumnSelector
-        // disableDensitySelector
         loading={loading}
         rows={tableDataFiltered}
         columns={columns}
@@ -109,10 +100,6 @@ const TableComponent = ({
           },
         }}
         initialState={initialState}
-        // justifyContent="center"
-        // alignItems="center"
-        // rowHeight={rowHeight}
-        // getRowHeight={() => 'auto'}
         {...props}
       />
     </Box>

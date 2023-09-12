@@ -1,9 +1,10 @@
 import { React } from "react";
 import dayjs from "dayjs";
-import TableComponent from "./TableComponent";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useOutletContext } from "react-router-dom";
+import TableView from "./TableView";
 
 const EventsTable = () => {
+  const title = useOutletContext();
   const events = useLoaderData();
 
   const dateTimeFormatter = (params) =>
@@ -50,16 +51,17 @@ const EventsTable = () => {
   ];
 
   return (
-    <TableComponent
-        tableData={events}
-        columns={columns}
-        rowHeight={25}
-        initialState={{
-          sorting: {
-            sortModel: [{ field: "created", sort: "desc" }],
-          },
-        }}
-      />
+    <TableView
+      title={title}
+      tableData={events}
+      columns={columns}
+      rowHeight={25}
+      initialState={{
+        sorting: {
+          sortModel: [{ field: "created", sort: "desc" }],
+        },
+      }}
+    />
   );
 };
 
