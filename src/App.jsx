@@ -1,6 +1,6 @@
 import React, { useState, createContext } from "react";
 import { ColorModeContext, useMode } from "./theme";
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { CssBaseline, Divider, ThemeProvider, Stack } from "@mui/material";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -8,10 +8,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { Box } from "@mui/system";
 import { ErrorBoundary } from "react-error-boundary";
 import UnknownErrorPage from "./components/errors/UnknownErrorPage";
 import { Outlet, useParams, useLoaderData } from "react-router-dom";
+import { Box } from "@mui/material";
 
 
 export const ErrorBarContext = createContext();
@@ -36,32 +36,26 @@ function App() {
 			<ColorModeContext.Provider value={colorMode}>
 				<ThemeProvider theme={theme}>
 					<CssBaseline />
-					<Box className="app">
-						<ErrorBoundary
-							FallbackComponent={UnknownErrorPage}
-							onError={(error) =>
-								console.error(JSON.stringify(error, null, 2))
-							}
-						>
+					<ErrorBoundary
+						FallbackComponent={UnknownErrorPage}
+						onError={(error) =>
+							console.error(JSON.stringify(error, null, 2))
+						}
+					>
+						<Stack className="app" sx={{backgroundColor: "background.main"}} divider={<Divider />}>	
 							<Topbar
 								isCollapsed={isSidebarCollapsed}
 								toggleSidebar={toggleSidebar}
-								renderSidebarButton={renderSidebar}
+								renderSidebarButton={false}
 							/>
-							<Box
-								display="flex"
-								flexDirection="row"
-								width="100%"
-								height="100%"
-								paddingTop="64px"
-							>
+							<Stack direction="row" divider={<Divider orientation="vertical"/>} sx={{flexGrow: 1}}>
 								{ renderSidebar && <Sidebar isCollapsed={isSidebarCollapsed} /> }
-								<main className="main content">
+								<Box component="main" sx={{flexGrow: 1}} className="main content">
 									<Outlet context={loaderContent}/>
-								</main>
-							</Box>
-						</ErrorBoundary>
-					</Box>
+								</Box>
+							</Stack>
+						</Stack>
+					</ErrorBoundary>
 				</ThemeProvider>
 			</ColorModeContext.Provider>
 		</LocalizationProvider>

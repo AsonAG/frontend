@@ -1,7 +1,6 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
 
-// color design tokens export
 export const tokens = (mode) => ({
   ...(mode === "dark"
     ? {
@@ -19,7 +18,7 @@ export const tokens = (mode) => ({
           500: "#141b2d", // background 
         },
         blueAccent: "#4985e2",
-        blueAccentReverse: "#461eb7",
+        blueAccentReverse: "#461eb7", /// <---- primary
       }
     : {
         grey: {
@@ -95,39 +94,7 @@ export const themeSettings = (mode) => {
               default: colors.primary[500],
             },
           }),
-    },
-    typography: {
-      fontFamily: ["Made outer sans", "sans-serif"].join(","),
-      fontSize: 12,
-      h1: {
-        fontFamily: ["Made outer sans", "sans-serif"].join(","),
-        fontSize: 40,
-      },
-      h2: {
-        fontFamily: ["Made outer sans", "sans-serif"].join(","),
-        fontSize: 32,
-      },
-      h3: {
-        fontFamily: ["Made outer sans", "sans-serif"].join(","),
-        fontSize: 24,
-      },
-      h4: {
-        fontFamily: ["Made outer sans", "sans-serif"].join(","),
-        fontSize: 18,
-      },
-      h5: {
-        fontFamily: ["Made outer sans", "sans-serif"].join(","),
-        fontSize: 16,
-      },
-      h6: {
-        fontFamily: ["Made outer sans", "sans-serif"].join(","),
-        fontSize: 14,
-      },
     }
-    // button: {
-    //   fontSize: 26,
-    //   fontWeight: 700,
-    // },
   };
 };
 
@@ -135,7 +102,6 @@ export const themeSettings = (mode) => {
 export const ColorModeContext = createContext({
   toggleColorMode: () => {},
 });
-
 export const useMode = () => {
   // const [mode, setMode] = useState("dark");
   const [mode, setMode] = useState("light");
