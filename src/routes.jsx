@@ -164,4 +164,9 @@ export default createBrowserRouter([
       },
     ]
   }
-]);
+],
+{
+  future: {
+    v7_normalizeFormMethod: true
+  }
+});

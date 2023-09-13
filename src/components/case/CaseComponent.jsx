@@ -1,4 +1,4 @@
-import { Paper, Stack, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import FieldComponent from "./field/FieldComponent";
 
 const CaseComponent = ({ _case }) => {

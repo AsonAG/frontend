@@ -29,7 +29,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Authentication>
-      <RouterProvider router={routes} />
+      <RouterProvider router={routes} future={{ v7_startTransition: true }} />
     </Authentication>
   </React.StrictMode>
 );

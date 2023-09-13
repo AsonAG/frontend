@@ -1,6 +1,5 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import FieldValueComponent from "./value/FieldValueComponent";
-import FieldValueDateComponent from "./value/FieldValueDateComponent";
 import { DescriptionComponent } from "../DescriptionComponent";
 import FieldPeriodSelector from "./FieldPeriodSelector";
 import { createContext, useContext } from "react";
@@ -25,7 +24,6 @@ function FieldComponent({ field }) {
 				<FieldValueComponent />
 				<DescriptionComponent description={field.description} />
 
-				{/* TODO AJO check variant */}
 				{displayOnly ? (
 					<Typography color="primary" gridColumn="3 / 4">
 						{field.displayName}

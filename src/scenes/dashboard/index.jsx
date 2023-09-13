@@ -1,19 +1,13 @@
 import {
-  Box,
+  Stack,
 } from "@mui/material";
 import Header from "../../components/Header";
 
-const Dashboard = () => {
-
+function Dashboard() {
   return (
-    <Box m="25px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Dashboard" subtitle="Welcome to your dashboard" />
-      </Box>
-      <Box mt="25px">
-
-      </Box>
-    </Box>
+    <Stack p={4} gap={2} sx={{height: "100%"}}>
+      <Header title="Dashboard" />
+    </Stack>
   );
 };
 

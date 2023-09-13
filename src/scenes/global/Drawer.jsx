@@ -4,11 +4,8 @@ import {
   Divider,
   Toolbar,
   Drawer as MuiDrawer,
-  Typography,
-  Button,
-  Menu as MuiMenu,
-  MenuItem} from "@mui/material";
-import { forwardRef, useState } from "react";
+  Typography} from "@mui/material";
+import { forwardRef } from "react";
 import { NavLink as RouterLink, useRouteLoaderData } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -20,7 +17,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 
@@ -62,7 +59,7 @@ function NavigationItem(props) {
 
 function NavigationMenu({children}) {
   return (
-    <Box component="nav" sx={{flexGrow: 1, p: 1}}>
+    <Box component="nav" sx={{flexGrow: 1, p: 1, overflowY: 'auto'}}>
       {children}
     </Box>
   );
@@ -76,45 +73,6 @@ function NavigationGroup({name, children}) {
     </Box>
   );
 }
-
-// TODO AJO Tenant + PayrollSelector
-function CompanySelector({currentCompany}) {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  return <>
-    <Button
-      id="basic-button"
-      aria-controls={open ? 'basic-menu' : undefined}
-      aria-haspopup="true"
-      aria-expanded={open ? 'true' : undefined}
-      onClick={handleClick}
-      endIcon={<ArrowDropDownIcon />}
-    >
-      {currentCompany.identifier}
-    </Button>
-    <MuiMenu
-      id="basic-menu"
-      anchorEl={anchorEl}
-      open={open}
-      onClose={handleClose}
-      MenuListProps={{
-        'aria-labelledby': 'basic-button',
-      }}
-    >
-      <MenuItem component={Link} to="/tenants">Profile</MenuItem>
-      <MenuItem onClick={handleClose}>My account</MenuItem>
-      <MenuItem onClick={handleClose}>Logout</MenuItem>
-    </MuiMenu>
-  </>
-}
-
 const drawerWidth = 265;
 function Drawer({ temporary, open, onClose }) {
   const { tenant } = useRouteLoaderData("root");
@@ -140,12 +98,13 @@ function Drawer({ temporary, open, onClose }) {
       <Toolbar disableGutters sx={{px: 2}}>
         <Logo />
         <Divider orientation="vertical" variant="middle" flexItem sx={{mx: 2}} />
-        <Stack>
-          <CompanySelector currentCompany={tenant} />
+        <Stack spacing={0.5} sx={{flex: 1}} alignItems="flex-start" pt={0.5}>
+          <Typography variant="body2" color="text.secondary" fontWeight="bold" px={1} >Business Unit</Typography>
+          <PayrollSelector currentCompany={tenant}/>
         </Stack>
       </Toolbar>
       <Divider />
-      <Stack sx={{flexGrow: 1, border: 0, borderRight: 1, borderStyle: 'solid', borderColor: 'divider'}}>
+      <Stack sx={{flexGrow: 1, border: 0, borderRight: 1, borderStyle: 'solid', borderColor: 'divider', overflowY: 'auto'}}>
         <NavigationMenu>
           <NavigationGroup>
             <NavigationItem label="Dashboard" to="" icon={<HomeIcon />} end />
@@ -168,7 +127,6 @@ function Drawer({ temporary, open, onClose }) {
         </NavigationMenu>
         <Divider />
         <Box sx={{p: 2}}>
-          <PayrollSelector />
           <TextField
             id="user-email"
             label="User"

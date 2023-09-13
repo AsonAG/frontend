@@ -1,65 +1,47 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import React, { useState } from "react";
+import { Button, Typography, Menu, MenuItem } from "@mui/material";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Link } from "react-router-dom";
 
 // TODO AJO fix this
-export default function PayrollSelector() {
-  // const [payroll, setPayroll] = useState({
-  //   currentPayrollName: "",
-  //   currentPayrollId: "",
-  //   currentDivisionId: "",
-  // });
+function PayrollSelector({currentCompany}) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
-  // const handleChange = (e) => {
-  //   console.log("User has changed.");
-  //   let payroll = user.availablePayrolls.find(
-  //     (payroll) => payroll.payrollId === e.target.value
-  //   );
-  //   setUser((current) => ({
-  //     ...current,
-  //     currentPayrollName: payroll.payrollName,
-  //     currentPayrollId: payroll.payrollId,
-  //     currentDivisionId: payroll.divisionId,
-  //   }));
-  // };
-
-  // useEffect(() => {
-  //   setPayroll({
-  //     currentPayrollName: user?.currentPayrollName,
-  //     currentPayrollId: user?.currentPayrollId,
-  //     currentDivisionId: user?.currentDivisionId,
-  //   });
-  // }, [user]);
-
-  // if (!user?.currentPayrollId) {
-  //   return null;
-  // }
-  // return (
-  //   <Box>
-  //     <FormControl fullWidth>
-  //       <InputLabel color="primary" id="payroll-selection-label">
-  //         Business Unit
-  //       </InputLabel>
-  //       <Select
-  //         variant="standard"
-  //         id="payroll-main-select"
-  //         label="Payroll"
-  //         labelId="payroll-selection-label"
-  //         onChange={handleChange}
-  //         value={user.currentPayrollId}
-  //       >
-  //         {user.availablePayrolls?.map((option) => {
-  //           return (
-  //             <MenuItem
-  //               key={"payroll-select-item-" + option.payrollId}
-  //               value={option.payrollId}
-  //             >
-  //               {option.payrollName}
-  //             </MenuItem>
-  //           );
-  //         })}
-  //       </Select>
-  //     </FormControl>
-  //   </Box>
-  // );
-  return null;
+  return <>
+    <Button
+      color="blueAccent"
+      onClick={handleClick}
+      endIcon={<ArrowDropDownIcon />}
+      sx={{
+        py: 0,
+        borderRadius: (theme) => theme.spacing(1),
+        "& .MuiButton-endIcon": {
+          ml: 0.25,
+          mt: -0.5
+        }
+      }}
+    >
+      <Typography component="span" variant="button" textOverflow="ellipsis" overflow="hidden">
+        {currentCompany.identifier}
+      </Typography>
+    </Button>
+    <Menu
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+    >
+      <MenuItem component={Link} to="/tenants">Profile</MenuItem>
+      <MenuItem onClick={handleClose}>My account</MenuItem>
+      <MenuItem onClick={handleClose}>Logout</MenuItem>
+    </Menu>
+  </>
 }
+
+export default PayrollSelector;
