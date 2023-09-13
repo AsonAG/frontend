@@ -10,6 +10,7 @@ import CasesTable from "./components/tables/CasesTable";
 import EventsTable from "./components/tables/EventsTable";
 import DocumentsTable from "./components/tables/DocumentsTable";
 import CasesForm from "./scenes/global/CasesForm";
+import getAuthUser from "./auth/getUser";
 
 import App from "./App";
 
@@ -24,8 +25,8 @@ import {
   getEmployeeCaseValues, 
   buildCase, 
   addCase,
-  getUser, 
-  getPayroll
+  getUser,
+  getEmployeeByIdentifier
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 
@@ -45,19 +46,10 @@ function mapCase(_case, attachments) {
   };
 }
 
-function PayrollRedirect() {
-  const payrolls = useLoaderData();
-  if (!payrolls) {
-    return null;
-  }
-  const firstPayrollId = payrolls[0].id + "";
-  return <Navigate to={firstPayrollId} replace />;
-}
-
 export default createBrowserRouter([
   {
     path: "/",
-    element: <App key="root" />,
+    element: <App />,
     children: [
       {
         index: true,
@@ -67,28 +59,33 @@ export default createBrowserRouter([
         path: "tenants",
         element: <Tenants />,
         loader: getTenants,
-        id: "tenants",
-      },
-      {
-        path: "tenants/:tenantId/payrolls",
-        id: "payrolls",
-        loader: ({params}) => getPayrolls(params.tenantId),
-        element: <PayrollRedirect />
-      },
+      }
     ]
   },
   {
-    path: "tenants/:tenantId/payrolls/:payrollId",
-    element: <App key="root" />,
-    loader: async ({ params }) => {
-      let response = await getTenant(params.tenantId);
-      const tenant = await response.json();
-      // TODO AJO fix get user
-      const user = await getUser(params.tenantId, "ajo@ason.ch");
-      const payroll = await getPayroll(params.tenantId, params.payrollId);
-      return { tenant, user, payroll };
+    path: "tenants/:tenantId/payrolls/:payrollId?",
+    element: <App />,
+    loader: async ({params}) => {
+      // TODO AJO optimize this to only query payrolls once...
+      const payrolls = await getPayrolls(params.tenantId);
+      if (!params.payrollId) {
+        return redirect(payrolls[0].id + "");
+      }
+      const payroll = payrolls.find(p => p.id === Number(params.payrollId));
+
+      // TODO AJO query in parallel
+      const tenant = await getTenant(params.tenantId);
+      
+      const authUser = getAuthUser();
+
+      const user = await getUser(params.tenantId, authUser.email);
+
+      const employee = await getEmployeeByIdentifier(params.tenantId, payroll.divisionId, authUser.email);
+
+      
+      return { tenant, user, payrolls, payroll, employee };
     },
-    shouldRevalidate: () => false,
+    shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.payrollId !== nextParams.payrollId,
     id: "root",
     children: [
       {

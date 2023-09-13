@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button, Typography, Menu, MenuItem } from "@mui/material";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
-// TODO AJO fix this
-function PayrollSelector({currentCompany}) {
+function PayrollSelector() {
+  const { payroll, payrolls } = useLoaderData();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -20,6 +20,7 @@ function PayrollSelector({currentCompany}) {
       onClick={handleClick}
       endIcon={<ArrowDropDownIcon />}
       sx={{
+        minWidth: 0,
         py: 0,
         borderRadius: (theme) => theme.spacing(1),
         "& .MuiButton-endIcon": {
@@ -29,7 +30,7 @@ function PayrollSelector({currentCompany}) {
       }}
     >
       <Typography component="span" variant="button" textOverflow="ellipsis" overflow="hidden">
-        {currentCompany.identifier}
+        {payroll.name}
       </Typography>
     </Button>
     <Menu
@@ -37,9 +38,9 @@ function PayrollSelector({currentCompany}) {
       open={open}
       onClose={handleClose}
     >
-      <MenuItem component={Link} to="/tenants">Profile</MenuItem>
-      <MenuItem onClick={handleClose}>My account</MenuItem>
-      <MenuItem onClick={handleClose}>Logout</MenuItem>
+      {
+        payrolls.map(p => <MenuItem key={p.id} component={Link} to={"./../" + p.id} onClick={handleClose}>{p.name}</MenuItem>)
+      }
     </Menu>
   </>
 }

@@ -1,5 +1,5 @@
 import {
-  Box,
+  Container,
 } from "@mui/material";
 import { React } from "react";
 import Header from "../../components/Header";
@@ -10,23 +10,23 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Link, useLoaderData } from "react-router-dom";
 
-const Tenants = () => {
+function Tenants() {
   const tenants = useLoaderData();
   return (
-    <Box m={4} mt="25vh">
-      <Header title="Select a company" subtitle="Select a company" />
+    <Container maxWidth="lg" sx={{mt: 4}}>
+      <Header title="Select a company"/>
       <Paper>
         <List>
           {tenants.map(tenant => (
             <ListItem disablePadding key={tenant.id}>
-              <ListItemButton component={Link} to={`${tenant.id}/payrolls`}>
+              <ListItemButton component={Link} to={`${tenant.id}/payrolls`} state={{tenant}}>
                 <ListItemText primary={tenant.identifier} />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
       </Paper>
-    </Box>
+    </Container>
   );
 };
 

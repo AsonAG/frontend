@@ -58,12 +58,12 @@ function getTenants() {
     return get(tenantsUrl);
 }
 
-function getTenant(tenantId) {
-    return get(tenantUrl(tenantId));
+async function getTenant(tenantId) {
+    return (await get(tenantUrl(tenantId))).json();
 }
 
-function getPayrolls(tenantId) {
-    return get(payrollsUrl(tenantId))
+async function getPayrolls(tenantId) {
+    return (await get(payrollsUrl(tenantId))).json();
 }
 
 async function getPayroll(tenantId, payrollId) {
@@ -77,6 +77,12 @@ function getEmployees(tenantId, payrollId) {
 
 function getEmployee(tenantId, employeeId) {
     return get(employeeUrl(tenantId, employeeId));
+}
+
+async function getEmployeeByIdentifier(tenantId, divisionId, identifier) {
+    const response = await get(employeesUrl(tenantId), {divisionId, filter: `Identifier eq '${identifier}'`});
+    const users = await response.json();
+    return users?.length ? users[0] : null;
 }
 
 function getEmployeeCases(tenantId, payrollId, employeeId, clusterSetName) {
@@ -123,6 +129,7 @@ export {
     getPayrolls, 
     getEmployees, 
     getEmployee, 
+    getEmployeeByIdentifier,
     getEmployeeCases, 
     getEmployeeCaseValues, 
     buildCase, 

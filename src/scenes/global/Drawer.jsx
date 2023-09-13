@@ -5,8 +5,8 @@ import {
   Toolbar,
   Drawer as MuiDrawer,
   Typography} from "@mui/material";
-import { forwardRef } from "react";
-import { NavLink as RouterLink, useRouteLoaderData } from "react-router-dom";
+import { forwardRef, useEffect } from "react";
+import { NavLink as RouterLink, useLoaderData, useLocation, useRouteLoaderData } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -65,7 +65,10 @@ function NavigationMenu({children}) {
   );
 }
 
-function NavigationGroup({name, children}) {
+function NavigationGroup({ name, children, hidden = false}) {
+  if (hidden) {
+    return null;
+  }
   return (
     <Box sx={{py: 0.5}}>
       {name && <Typography p={1} variant="body1" color="text.secondary">{name}</Typography>}
@@ -75,10 +78,11 @@ function NavigationGroup({name, children}) {
 }
 const drawerWidth = 265;
 function Drawer({ temporary, open, onClose }) {
-  const { tenant } = useRouteLoaderData("root");
+  const { tenant, user, employee } = useLoaderData();
+  const location = useLocation();
 
-  // TODO AJO fix this
-  const user = { identifier: "ajo@ason.ch" };
+	useEffect(onClose, [location])
+
   const drawerVariant = temporary ? "temporary" : "permanent";
 
   return (
@@ -100,7 +104,7 @@ function Drawer({ temporary, open, onClose }) {
         <Divider orientation="vertical" variant="middle" flexItem sx={{mx: 2}} />
         <Stack spacing={0.5} sx={{flex: 1}} alignItems="flex-start" pt={0.5}>
           <Typography variant="body2" color="text.secondary" fontWeight="bold" px={1} >Business Unit</Typography>
-          <PayrollSelector currentCompany={tenant}/>
+          <PayrollSelector/>
         </Stack>
       </Toolbar>
       <Divider />
@@ -118,7 +122,7 @@ function Drawer({ temporary, open, onClose }) {
             <NavigationItem label="Events" to="/companyEvents" icon={<WorkHistoryOutlinedIcon />} />
             <NavigationItem label="Documents" to="/companyDocuments" icon={<DescriptionOutlinedIcon />} />
           </NavigationGroup>
-          <NavigationGroup name="Employee">
+          <NavigationGroup name="Employee" hidden={employee === null}>
             <NavigationItem label="New event" to="/ESS" icon={<AddOutlinedIcon />} />
             <NavigationItem label="My Profile" to="/personalData" icon={<PersonOutlineOutlinedIcon />} />
             <NavigationItem label="Tasks" to="/ECT" icon={<FormatListBulletedIcon />} />
@@ -133,7 +137,7 @@ function Drawer({ temporary, open, onClose }) {
             variant="standard"
             disabled
             InputLabelProps={{ shrink: true }}
-            value={user.identifier}
+            value={user?.identifier}
           />
 
           <TextField
