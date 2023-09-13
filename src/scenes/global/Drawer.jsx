@@ -145,7 +145,7 @@ function Drawer() {
       <Stack sx={{flexGrow: 1, border: 0, borderRight: 1, borderStyle: 'solid', borderColor: 'divider'}}>
         <NavigationMenu>
           <NavigationGroup>
-            <NavigationItem label="Dashboard" to="" icon={<HomeIcon />} />
+            <NavigationItem label="Dashboard" to="" icon={<HomeIcon />} end />
           </NavigationGroup>
           <NavigationGroup name="HR">
             <NavigationItem label="Employees" to="hr/employees" icon={<PeopleOutlinedIcon />} />
