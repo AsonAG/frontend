@@ -8,15 +8,13 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useContext, useState } from "react";
-import { ColorModeContext, tokens } from "../../theme";
+import { ColorModeContext } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import { AccountCircle } from "@mui/icons-material";
-import Logo from "../../components/Logo";
-import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from "react-router-dom";
 
-const Topbar = ({ toggleSidebar, renderSidebarButton }) => {
+function Topbar({ children }) {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -36,20 +34,8 @@ const Topbar = ({ toggleSidebar, renderSidebarButton }) => {
 
   return (
     <AppBar elevation={0} sx={{ backgroundColor: "background.default", position: "static" }}>
-      <Toolbar>
-        {renderSidebarButton && (
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-            onClick={toggleSidebar}
-          >
-            <MenuIcon />
-          </IconButton>
-        )}
-        {/* <Logo /> */}
+      <Toolbar disableGutters sx={{px: 2}}>
+        {children}
         <Box sx={{flexGrow: 1}} />
 
         <IconButton onClick={colorMode.toggleColorMode} size="large">

@@ -116,15 +116,19 @@ function CompanySelector({currentCompany}) {
 }
 
 const drawerWidth = 265;
-function Drawer() {
-  const { tenant } = useRouteLoaderData("root");
+function Drawer({ temporary, open, onClose }) {
+  // const { tenant } = useRouteLoaderData("root");
+  const tenant = {identifier: "TEST"};
 
   // TODO AJO fix this
   const user = { identifier: "ajo@ason.ch" };
+  const drawerVariant = temporary ? "temporary" : "permanent";
 
   return (
     <MuiDrawer 
-      variant="permanent"
+      variant={drawerVariant}
+      open={open}
+      onClose={onClose}
       sx={{
         width: drawerWidth, 
         flexShrink: 0,
