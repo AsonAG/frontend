@@ -81,6 +81,8 @@ export const themeSettings = (mode) => {
             },
             blueAccent: {
               main: colors.blueAccent,
+              hover: "rgba(70, 30, 183, 0.05)",
+              active: "rgba(70, 30, 183, 0.15)"
             },
             blueAccentReverse: {
               main: colors.blueAccentReverse,

@@ -1,26 +1,17 @@
 import {
   Box,
   TextField,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Divider,
-  Collapse,
   Toolbar,
   Drawer as MuiDrawer,
   Typography,
   Button,
   Menu as MuiMenu,
-  MenuItem
-} from "@mui/material";
+  MenuItem} from "@mui/material";
 import { forwardRef, useState } from "react";
 import { NavLink as RouterLink, useRouteLoaderData } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import PersonIcon from "@mui/icons-material/Person";
-import WorkIcon from "@mui/icons-material/Work";
-import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PayrollSelector from "../../components/selectors/PayrollSelector";
 import { Stack } from "@mui/system";
@@ -29,120 +20,112 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Logo from "../../components/Logo";
+import styled from "@emotion/styled";
 
-const Link = forwardRef(function Link(itemProps, ref) {
+const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+}))(({theme}) => {
+  return {
+    display: "block",
+    textDecoration: "none",
+    padding: theme.spacing(1),
+    borderRadius: theme.spacing(1),
+    color: theme.palette.text.primary,
+    "&:hover": {
+      "color": theme.palette.blueAccent.main,
+      "backgroundColor": theme.palette.blueAccent.hover
+    },
+    "&.active": {
+      "color": theme.palette.blueAccent.main,
+      "backgroundColor": theme.palette.blueAccent.active
+    },
+    "&.active:hover": {
+      "color": theme.palette.blueAccent.main,
+    }
+  }
 });
 
-const iconWidth = (theme) => theme.spacing(4);
-
 function ListItemLink(props) {
-  const { icon, label, to, indent } = props;
-
+  const { icon, label, to } = props;
   return (
-    <li>
-      <ListItemButton 
-        component={Link} 
-        to={to} 
-        sx={{pl: 2 + indent}} 
-        end 
-        style={({ isActive }) => {return {color: isActive ? "#461eb7" : "" }}}
-        disableGutters
-      >
-        {icon ? <ListItemIcon sx={{ minWidth: iconWidth }} >{icon}</ListItemIcon> : null}
-        <ListItemText primary={label} />
-      </ListItemButton>
-    </li>
+    <Link to={to} end>
+      <Stack direction="row" spacing={1}>
+        {icon}
+        <Typography sx={{flexGrow: 1}}>{label}</Typography>
+      </Stack>
+    </Link>
   );
 }
 
-function mapItems(items, indent) {
-  return items.map(nav => {
-    if (nav.items) {
-      return <SubMenu key={nav.text} menu={nav} indent={indent} />
+function NavigationMenu() {
+  return <Box component="nav" sx={{flexGrow: 1, p: 1}}>
+    {
+      navigation.map((n, i) => <NavigationGroup key={i} {...n} />)
     }
-    return <ListItemLink key={nav.text} {...nav} indent={indent} />
-  })
-}
-
-function Menu({ navigation, ...boxProps }) {
-  return <Box component="nav" {...boxProps}>
-      <Stack component={List} divider={<Divider />} >
-      { mapItems(navigation, 0) }
-    </Stack>;
   </Box>
 }
 
-function SubMenu({menu, indent}) {
-  const [open, setOpen] = useState(true);
-
-  const toggleOpen = () => setOpen(o => !o);
-
-  return <List>
-    <ListItemButton onClick={toggleOpen} sx={{pl: 2 + indent}}>
-      <ListItemIcon sx={{ minWidth: iconWidth }}>
-        {menu.icon}
-      </ListItemIcon>
-      <ListItemText primary={menu.label} />
-      {open ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-    </ListItemButton>
-    <Collapse in={open} mountOnEnter>
-      { mapItems(menu.items, indent + 1.5) }
-  </Collapse>
-  </List>
+function NavigationGroup({groupName, items}) {
+  return <Box sx={{py: 0.5}}>
+    {groupName && <Typography p={1} variant="body1" color="text.secondary">{groupName}</Typography>}
+    {
+      items.map(i => <ListItemLink key={i.label} {...i} />)
+    }
+  </Box>
   
 }
 
 const navigation = [
   {
-    label: "Dashboard",
-    to: "",
-    icon: <HomeIcon />
-  },
+    groupName: null,
+    items: [
+      {
+        label: "Dashboard",
+        to: "",
+        icon: <HomeIcon />
+      }
+    ]
+  }
+  ,
   {
-    label: "HR",
-    icon: <WorkIcon />,
+    groupName: "HR",
     items: [
       {
         label: "Employees",
         to: "hr/employees",
         icon: <PeopleOutlinedIcon />
       },
+    ]
+  },
+  {
+    groupName: "Company",
+    items: [
       {
-        label: "Company",
-        icon: <ApartmentOutlinedIcon />,
-        items: [
-          {
-            label: "New event",
-            to: "/company",
-            icon: <AddOutlinedIcon />
-          },
-          {
-            label: "Data",
-            to: "/companyData",
-            icon: <CasesOutlinedIcon />
-          },
-          {
-            label: "Events",
-            to: "/companyEvents",
-            icon: <WorkHistoryOutlinedIcon />
-          },
-          {
-            label: "Documents",
-            to: "/companyDocuments",
-            icon: <DescriptionOutlinedIcon />
-          }
-        ]
+        label: "New event",
+        to: "/company",
+        icon: <AddOutlinedIcon />
+      },
+      {
+        label: "Data",
+        to: "/companyData",
+        icon: <CasesOutlinedIcon />
+      },
+      {
+        label: "Events",
+        to: "/companyEvents",
+        icon: <WorkHistoryOutlinedIcon />
+      },
+      {
+        label: "Documents",
+        to: "/companyDocuments",
+        icon: <DescriptionOutlinedIcon />
       }
     ]
   },
   {
-    label: "Employee",
-    icon: <PersonIcon />,
+    groupName: "Employee",
     items: [
       {
         label: "New event",
@@ -234,7 +217,7 @@ function Drawer() {
       </Toolbar>
       <Divider />
       <Stack sx={{flexGrow: 1, border: 0, borderRight: 1, borderStyle: 'solid', borderColor: 'divider'}}>
-        <Menu navigation={navigation} sx={{flexGrow: 1}} />
+        <NavigationMenu />
         <Divider />
         <Box sx={{p: 2}}>
           <PayrollSelector />
