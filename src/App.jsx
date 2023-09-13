@@ -2,7 +2,7 @@ import React, { useState, createContext } from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, Divider, ThemeProvider, Stack } from "@mui/material";
 import Topbar from "./scenes/global/Topbar";
-import Sidebar from "./scenes/global/Sidebar";
+import Drawer from "./scenes/global/Drawer";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de';
@@ -42,14 +42,14 @@ function App() {
 							console.error(JSON.stringify(error, null, 2))
 						}
 					>
-						<Stack className="app" sx={{backgroundColor: "background.main"}} divider={<Divider />}>	
-							<Topbar
-								isCollapsed={isSidebarCollapsed}
-								toggleSidebar={toggleSidebar}
-								renderSidebarButton={false}
-							/>
-							<Stack direction="row" divider={<Divider orientation="vertical"/>} sx={{flexGrow: 1}}>
-								{ renderSidebar && <Sidebar isCollapsed={isSidebarCollapsed} /> }
+						<Stack className="app" direction="row" sx={{backgroundColor: "background.main"}}>
+							{ renderSidebar && <Drawer isCollapsed={isSidebarCollapsed} /> }
+							<Stack sx={{flexGrow: 1}} divider={<Divider />}>
+								<Topbar
+									isCollapsed={isSidebarCollapsed}
+									toggleSidebar={toggleSidebar}
+									renderSidebarButton={false}
+								/>
 								<Box component="main" sx={{flexGrow: 1}} className="main content">
 									<Outlet context={loaderContent}/>
 								</Box>

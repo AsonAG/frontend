@@ -13,6 +13,7 @@ import CasesForm from "./scenes/global/CasesForm";
 
 import App from "./App";
 
+// TODO AJO error states when network requests fail
 import { 
   getTenants, 
   getPayrolls, 
@@ -82,6 +83,7 @@ export default createBrowserRouter([
     loader: async ({ params }) => {
       let response = await getTenant(params.tenantId);
       const tenant = await response.json();
+      // TODO AJO fix get user
       const user = await getUser(params.tenantId, "ajo@ason.ch");
       const payroll = await getPayroll(params.tenantId, params.payrollId);
       return { tenant, user, payroll };

@@ -49,7 +49,7 @@ const Topbar = ({ toggleSidebar, renderSidebarButton }) => {
             <MenuIcon />
           </IconButton>
         )}
-        <Logo />
+        {/* <Logo /> */}
         <Box sx={{flexGrow: 1}} />
 
         <IconButton onClick={colorMode.toggleColorMode} size="large">

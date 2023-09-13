@@ -25,7 +25,8 @@ function FieldComponent({ field }) {
 
 				{displayOnly ? (
 					<Stack direction="column" justifyContent="center">
-						<Typography variant="h5" color="primary">
+						{/* TODO AJO check variant */}
+						<Typography color="primary">
 							{field.displayName}
 						</Typography>
 					</Stack>

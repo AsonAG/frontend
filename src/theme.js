@@ -94,6 +94,21 @@ export const themeSettings = (mode) => {
               default: colors.primary[500],
             },
           }),
+    },
+    typography: {
+      fontSize: 12,
+      h1: {
+        fontSize: "2.25rem",
+      },
+      h2: {
+        fontSize: "1.625rem",
+      },
+      h3: {
+        fontSize: "1.25rem",
+      },
+      button: {
+        textTransform: 'none'
+      }
     }
   };
 };

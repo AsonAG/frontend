@@ -6,7 +6,13 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Collapse
+  Collapse,
+  Toolbar,
+  Drawer as MuiDrawer,
+  Typography,
+  Button,
+  Menu as MuiMenu,
+  MenuItem
 } from "@mui/material";
 import { forwardRef, useState } from "react";
 import { NavLink as RouterLink, useRouteLoaderData } from "react-router-dom";
@@ -25,22 +31,29 @@ import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import Logo from "../../components/Logo";
 
 const Link = forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 });
+
+const iconWidth = (theme) => theme.spacing(4);
 
 function ListItemLink(props) {
   const { icon, label, to, indent } = props;
 
   return (
     <li>
-      <ListItemButton component={Link} to={to} sx={{pl: 2 + indent}} style={({ isActive }) => {
-        return {
-          color: isActive ? "#461eb7" : ""
-        }
-      }}>
-        {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
+      <ListItemButton 
+        component={Link} 
+        to={to} 
+        sx={{pl: 2 + indent}} 
+        end 
+        style={({ isActive }) => {return {color: isActive ? "#461eb7" : "" }}}
+        disableGutters
+      >
+        {icon ? <ListItemIcon sx={{ minWidth: iconWidth }} >{icon}</ListItemIcon> : null}
         <ListItemText primary={label} />
       </ListItemButton>
     </li>
@@ -57,8 +70,8 @@ function mapItems(items, indent) {
 }
 
 function Menu({ navigation, ...boxProps }) {
-  return <Box {...boxProps}>
-      <Stack component={List} divider={<Divider />} disablePadding>
+  return <Box component="nav" {...boxProps}>
+      <Stack component={List} divider={<Divider />} >
       { mapItems(navigation, 0) }
     </Stack>;
   </Box>
@@ -69,9 +82,9 @@ function SubMenu({menu, indent}) {
 
   const toggleOpen = () => setOpen(o => !o);
 
-  return <>
+  return <List>
     <ListItemButton onClick={toggleOpen} sx={{pl: 2 + indent}}>
-      <ListItemIcon>
+      <ListItemIcon sx={{ minWidth: iconWidth }}>
         {menu.icon}
       </ListItemIcon>
       <ListItemText primary={menu.label} />
@@ -80,7 +93,7 @@ function SubMenu({menu, indent}) {
     <Collapse in={open} mountOnEnter>
       { mapItems(menu.items, indent + 1.5) }
   </Collapse>
-  </>
+  </List>
   
 }
 
@@ -155,38 +168,97 @@ const navigation = [
   }
 ]
 
-function Sidebar() {
+// TODO AJO Tenant + PayrollSelector
+function CompanySelector({currentCompany}) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return <>
+    <Button
+      id="basic-button"
+      aria-controls={open ? 'basic-menu' : undefined}
+      aria-haspopup="true"
+      aria-expanded={open ? 'true' : undefined}
+      onClick={handleClick}
+      endIcon={<ArrowDropDownIcon />}
+    >
+      {currentCompany.identifier}
+    </Button>
+    <MuiMenu
+      id="basic-menu"
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+      MenuListProps={{
+        'aria-labelledby': 'basic-button',
+      }}
+    >
+      <MenuItem component={Link} to="/tenants">Profile</MenuItem>
+      <MenuItem onClick={handleClose}>My account</MenuItem>
+      <MenuItem onClick={handleClose}>Logout</MenuItem>
+    </MuiMenu>
+  </>
+}
+
+const drawerWidth = 265;
+function Drawer() {
   const { tenant } = useRouteLoaderData("root");
 
   // TODO AJO fix this
-  const user = {identifier: "ajo@ason.ch", tenantIdentifier: "Blabla"};
+  const user = { identifier: "ajo@ason.ch" };
 
-  const content = <Stack component="nav" sx={{width: 260}}>
-    <Menu navigation={navigation} sx={{flexGrow: 1}} />
-    <Divider />
-    <Box sx={{p: 2}}>
-      <PayrollSelector />
-      <TextField
-        id="user-email"
-        label="User"
-        variant="standard"
-        disabled
-        InputLabelProps={{ shrink: true }}
-        value={user.identifier}
-      />
+  return (
+    <MuiDrawer 
+      variant="permanent"
+      sx={{
+        width: drawerWidth, 
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: drawerWidth,
+          boxSizing: 'border-box',
+          border: 'none'
+        }
+      }}>
+      <Toolbar disableGutters sx={{px: 2}}>
+        <Logo />
+        <Divider orientation="vertical" variant="middle" flexItem sx={{mx: 2}} />
+        <Stack>
+          <CompanySelector currentCompany={tenant} />
+        </Stack>
+      </Toolbar>
+      <Divider />
+      <Stack sx={{flexGrow: 1, border: 0, borderRight: 1, borderStyle: 'solid', borderColor: 'divider'}}>
+        <Menu navigation={navigation} sx={{flexGrow: 1}} />
+        <Divider />
+        <Box sx={{p: 2}}>
+          <PayrollSelector />
+          <TextField
+            id="user-email"
+            label="User"
+            variant="standard"
+            disabled
+            InputLabelProps={{ shrink: true }}
+            value={user.identifier}
+          />
 
-      <TextField
-        id="user-tenant"
-        label="Company"
-        variant="standard"
-        disabled
-        InputLabelProps={{ shrink: true }}
-        defaultValue={tenant.identifier}
-      />
-    </Box>
-  </Stack>
-
-  return content;
+          <TextField
+            id="user-tenant"
+            label="Company"
+            variant="standard"
+            disabled
+            InputLabelProps={{ shrink: true }}
+            defaultValue={tenant.identifier}
+          />
+        </Box>
+      </Stack>
+    </MuiDrawer>
+  )
 };
 
-export default Sidebar;
+export default Drawer;

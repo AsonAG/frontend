@@ -8,10 +8,10 @@ export default function Logo() {
   const location = matches ? matches[0].pathname : "/";
 
   return (
-    <Link to={location}>
+    <Link to={location} style={{height: 32}} >
       <img
           alt="logo"
-          height={48}
+          height={32}
           src="/logo512.png"
           style={{ cursor: "pointer" }}
         />
