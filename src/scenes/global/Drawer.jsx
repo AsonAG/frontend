@@ -47,10 +47,11 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
   }
 });
 
-function ListItemLink(props) {
-  const { icon, label, to } = props;
+function NavigationItem(props) {
+  const { icon, label, to, end } = props;
+
   return (
-    <Link to={to} end>
+    <Link to={to} end={end}>
       <Stack direction="row" spacing={1}>
         {icon}
         <Typography sx={{flexGrow: 1}}>{label}</Typography>
@@ -59,97 +60,22 @@ function ListItemLink(props) {
   );
 }
 
-function NavigationMenu() {
-  return <Box component="nav" sx={{flexGrow: 1, p: 1}}>
-    {
-      navigation.map((n, i) => <NavigationGroup key={i} {...n} />)
-    }
-  </Box>
+function NavigationMenu({children}) {
+  return (
+    <Box component="nav" sx={{flexGrow: 1, p: 1}}>
+      {children}
+    </Box>
+  );
 }
 
-function NavigationGroup({groupName, items}) {
-  return <Box sx={{py: 0.5}}>
-    {groupName && <Typography p={1} variant="body1" color="text.secondary">{groupName}</Typography>}
-    {
-      items.map(i => <ListItemLink key={i.label} {...i} />)
-    }
-  </Box>
-  
+function NavigationGroup({name, children}) {
+  return (
+    <Box sx={{py: 0.5}}>
+      {name && <Typography p={1} variant="body1" color="text.secondary">{name}</Typography>}
+      {children}
+    </Box>
+  );
 }
-
-const navigation = [
-  {
-    groupName: null,
-    items: [
-      {
-        label: "Dashboard",
-        to: "",
-        icon: <HomeIcon />
-      }
-    ]
-  }
-  ,
-  {
-    groupName: "HR",
-    items: [
-      {
-        label: "Employees",
-        to: "hr/employees",
-        icon: <PeopleOutlinedIcon />
-      },
-    ]
-  },
-  {
-    groupName: "Company",
-    items: [
-      {
-        label: "New event",
-        to: "/company",
-        icon: <AddOutlinedIcon />
-      },
-      {
-        label: "Data",
-        to: "/companyData",
-        icon: <CasesOutlinedIcon />
-      },
-      {
-        label: "Events",
-        to: "/companyEvents",
-        icon: <WorkHistoryOutlinedIcon />
-      },
-      {
-        label: "Documents",
-        to: "/companyDocuments",
-        icon: <DescriptionOutlinedIcon />
-      }
-    ]
-  },
-  {
-    groupName: "Employee",
-    items: [
-      {
-        label: "New event",
-        to: "/ESS",
-        icon: <AddOutlinedIcon />
-      },
-      {
-        label: "My Profile",
-        to: "/personalData",
-        icon: <PersonOutlineOutlinedIcon />
-      },
-      {
-        label: "Tasks",
-        to: "/ECT",
-        icon: <FormatListBulletedIcon />
-      },
-      {
-        label: "Documents",
-        to: "/personalDocuments",
-        icon: <DescriptionOutlinedIcon />
-      }
-    ]
-  }
-]
 
 // TODO AJO Tenant + PayrollSelector
 function CompanySelector({currentCompany}) {
@@ -217,7 +143,26 @@ function Drawer() {
       </Toolbar>
       <Divider />
       <Stack sx={{flexGrow: 1, border: 0, borderRight: 1, borderStyle: 'solid', borderColor: 'divider'}}>
-        <NavigationMenu />
+        <NavigationMenu>
+          <NavigationGroup>
+            <NavigationItem label="Dashboard" to="" icon={<HomeIcon />} />
+          </NavigationGroup>
+          <NavigationGroup name="HR">
+            <NavigationItem label="Employees" to="hr/employees" icon={<PeopleOutlinedIcon />} />
+          </NavigationGroup>
+          <NavigationGroup name="Company">
+            <NavigationItem label="New event" to="/company" icon={<AddOutlinedIcon />} />
+            <NavigationItem label="Data" to="/companyData" icon={<CasesOutlinedIcon />} />
+            <NavigationItem label="Events" to="/companyEvents" icon={<WorkHistoryOutlinedIcon />} />
+            <NavigationItem label="Documents" to="/companyDocuments" icon={<DescriptionOutlinedIcon />} />
+          </NavigationGroup>
+          <NavigationGroup name="Employee">
+            <NavigationItem label="New event" to="/ESS" icon={<AddOutlinedIcon />} />
+            <NavigationItem label="My Profile" to="/personalData" icon={<PersonOutlineOutlinedIcon />} />
+            <NavigationItem label="Tasks" to="/ECT" icon={<FormatListBulletedIcon />} />
+            <NavigationItem label="Documents" to="/personalDocuments" icon={<DescriptionOutlinedIcon />} />
+          </NavigationGroup>
+        </NavigationMenu>
         <Divider />
         <Box sx={{p: 2}}>
           <PayrollSelector />

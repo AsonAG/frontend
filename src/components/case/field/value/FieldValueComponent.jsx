@@ -27,7 +27,7 @@ function FieldValueComponent() {
 	switch (field.valueType) {
 		case "None":
 			return (
-				<Box marginLeft="14px" marginBottom="5px">
+				<Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center'}}>
 					<Typography>{field.displayName}</Typography>
 				</Box>
 			);
