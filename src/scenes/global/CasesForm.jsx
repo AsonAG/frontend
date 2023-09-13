@@ -3,8 +3,9 @@ import CaseComponent from "../../components/case/CaseComponent";
 import { createContext, useRef } from "react";
 import CaseIndexView from "../../components/cases/CaseIndexView";
 import CasesSaveButton from "../../components/buttons/CasesSaveButton";
-import { Stack } from "@mui/material";
+import { Container, Stack, useMediaQuery } from "@mui/material";
 import Header from "../../components/Header";
+import { useTheme } from "@emotion/react";
 
 export const CaseFormContext = createContext();
 
@@ -18,6 +19,10 @@ function CasesForm({ displayOnly = false }) {
   const formRef = useRef();
   const attachments = useRef({});
   const submit = useSubmit();
+  const theme = useTheme();
+  // this breakpoint was chosen because at this point the datefields + input field
+  // don't have enough space
+  const hideIndex = useMediaQuery(theme.breakpoints.down("md"));
 
   const action = (intent, attachments = {}) => {
     const submitData = { caseData, intent, attachments, userId: user.id, divisionId: payroll.divisionId };
@@ -35,15 +40,19 @@ function CasesForm({ displayOnly = false }) {
   return (
     <Stack useFlexGap direction="row">
       <Stack sx={{flex: 1}} p={4}>
-        <Header title={title} />
-        <CaseFormContext.Provider value={{ buildCase, displayOnly, attachments: attachments.current }}>
-          <Form method="post" ref={formRef} id="case_form">
-            {caseData && <CaseComponent _case={caseData} />}
-            {submitButton}
-          </Form>
-        </CaseFormContext.Provider>
+        <Container maxWidth="lg">
+          <Header title={title} />
+          <CaseFormContext.Provider value={{ buildCase, displayOnly, attachments: attachments.current }}>
+            <Form method="post" ref={formRef} id="case_form">
+              <Stack alignItems="flex-end" spacing={4}>
+                {caseData && <CaseComponent _case={caseData} />}
+                {submitButton}
+              </Stack>
+            </Form>
+          </CaseFormContext.Provider>
+        </Container>
       </Stack>
-      <CaseIndexView _case={caseData} />
+      { !hideIndex && <CaseIndexView _case={caseData} /> }
     </Stack>
   )
  

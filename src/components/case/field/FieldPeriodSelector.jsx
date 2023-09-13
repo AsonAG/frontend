@@ -1,4 +1,3 @@
-import { Stack, Box } from "@mui/system";
 import FieldValueDateComponent from "./value/FieldValueDateComponent";
 
 function FieldPeriodSelector({field}) {
@@ -6,21 +5,18 @@ function FieldPeriodSelector({field}) {
         field.timeType != "Timeless" &&
         !field.attributes?.["input.hideStartEnd"];
 
-    if (!isStartEndVisible) {
-        return <div></div>
-    }
+    const startComponent = isStartEndVisible ? 
+        <FieldValueDateComponent propertyName="start" displayName="Start"/> : 
+        <div></div>;
 
-    return (
-        <Stack useFlexGap gap={3} direction="row">
-            <FieldValueDateComponent propertyName="start" displayName="Start" sx={{flex: 1}} />
+    const endComponent = isStartEndVisible && field.timeType != "Moment" ?
+        <FieldValueDateComponent propertyName="end" displayName="End" required={field.endMandatory} /> :
+        <div></div>
 
-            <Box sx={{flex: 1}}>
-                {field.timeType != "Moment" && (
-                    <FieldValueDateComponent propertyName="end" displayName="End" required={field.endMandatory} />
-                )}
-            </Box>
-        </Stack>
-    );
+    return <>
+        {startComponent}
+        {endComponent}
+    </>;
 }
 
 export default FieldPeriodSelector;

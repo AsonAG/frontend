@@ -13,7 +13,7 @@ export default function CasesSaveButton({ onSubmit }) {
       endIcon={<SendIcon htmlColor="#ffffff" />}
     >
       <Typography fontWeight="bold" color="#ffffff">
-        Send
+        Save
       </Typography>
     </Button>
   );

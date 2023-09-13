@@ -3,7 +3,7 @@ import FieldComponent from "./field/FieldComponent";
 
 const CaseComponent = ({ _case }) => {
   return (
-    <Stack component="section" gap={2}>
+    <Stack component="section" gap={2} width="100%">
       <Stack id={_case.name} data-header-jump-anchor>
         <Typography variant="h3" fontWeight="bold" gutterBottom sx={{pt: 2}}>
           {_case.displayName}
@@ -12,11 +12,9 @@ const CaseComponent = ({ _case }) => {
           {_case.description}
         </Typography>
       </Stack>
-      <Paper elevation={1}>
-        {
-          _case.fields?.map((field) => <FieldComponent key={field.id} field={field} />)
-        }
-      </Paper>
+      {
+        _case.fields?.map((field) => <FieldComponent key={field.id} field={field} />)
+      }
       {_case.relatedCases?.map((relatedCase) => (
         <CaseComponent
           key={relatedCase.id}

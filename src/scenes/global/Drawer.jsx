@@ -117,8 +117,7 @@ function CompanySelector({currentCompany}) {
 
 const drawerWidth = 265;
 function Drawer({ temporary, open, onClose }) {
-  // const { tenant } = useRouteLoaderData("root");
-  const tenant = {identifier: "TEST"};
+  const { tenant } = useRouteLoaderData("root");
 
   // TODO AJO fix this
   const user = { identifier: "ajo@ason.ch" };
