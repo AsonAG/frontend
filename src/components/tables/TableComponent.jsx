@@ -67,7 +67,7 @@ function TableComponent({
           "& .MuiDataGrid-cell:focus": {
             outline: 'none'
           },
-          "& .MuiDataGrid-cell:active": {
+          "& .MuiDataGrid-cell:focus-within": {
             outline: 'none'
           },
           "& .MuiDataGrid-columnHeader:focus": {
