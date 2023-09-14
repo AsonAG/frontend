@@ -72,6 +72,9 @@ function TableComponent({
           },
           "& .MuiDataGrid-columnHeader:focus": {
             outline: 'none'
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: "primary.hover"
           }
         }}
         initialState={initialState}
