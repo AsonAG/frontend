@@ -18,11 +18,6 @@ function Topbar({ children }) {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
   const [anchorEl, setAnchorEl] = useState(null);
-  const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
-
-  const handleLogout = () => {
-    // TODO AJO handle logout
-  };
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);

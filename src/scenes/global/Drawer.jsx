@@ -20,6 +20,7 @@ import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
+import UserAccountComponent from "./UserAccountComponent";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -131,23 +132,15 @@ function Drawer({ temporary, open, onClose }) {
         </NavigationMenu>
         <Divider />
         <Box sx={{p: 2}}>
-          <TextField
-            id="user-email"
-            label="User"
-            variant="standard"
-            disabled
-            InputLabelProps={{ shrink: true }}
-            value={user?.identifier}
-          />
-
-          <TextField
+          <UserAccountComponent user={user} />
+          {/* <TextField
             id="user-tenant"
             label="Company"
             variant="standard"
             disabled
             InputLabelProps={{ shrink: true }}
             defaultValue={tenant.identifier}
-          />
+          /> */}
         </Box>
       </Stack>
     </MuiDrawer>

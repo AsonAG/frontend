@@ -31,11 +31,11 @@ const EmployeesTable = () => {
     {
       field: "id",
       headerName: "",
-      flex: 3,
       headerAlign: "left",
       align: "left",
       hideable: false,
       sortable: false,
+      width: 160,
       renderCell: ({ row: { id } }) => <EmployeeButtons employeeId={id} />,
     },
   ];
