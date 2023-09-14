@@ -57,11 +57,7 @@ function Topbar({ children }) {
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem component={Link} to={settingsLink}>
-            User settings
-          </MenuItem>
           <MenuItem component={Link} to="/tenants" onClick={handleClose}>Switch company</MenuItem>
-          <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
       </Toolbar>
     </AppBar>
