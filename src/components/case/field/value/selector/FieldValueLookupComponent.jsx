@@ -62,7 +62,6 @@ function FieldValueLookupComponent() {
   return (
     <Autocomplete
       multiple={isMultiOptions}
-      // isOptionEqualToValue={isOptionEqualToValue}
       getOptionLabel={getLabelFromOption}
       value={selectedOptions}
       onChange={handleChange}
@@ -75,6 +74,10 @@ function FieldValueLookupComponent() {
           {...params}
           required
           label={displayName}
+          inputProps={{
+            ...params.inputProps,
+            required: (selectedOptions?.length ?? 0) === 0
+          }}
           InputProps={{
             ...params.InputProps,
             endAdornment: (

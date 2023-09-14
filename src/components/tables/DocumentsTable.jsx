@@ -64,6 +64,7 @@ function DocumentsTable({ defaultTitle }) {
                     onClick={() => handleFileClick(doc.id, caseValue.id)}
                     component={Link}
                     alignItems="center"
+                    key={doc.id}
                   >
                     <Box width="24px" marginRight="15px">
                       <FileIcon

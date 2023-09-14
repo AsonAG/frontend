@@ -4,13 +4,13 @@ import { tokens } from "../../theme";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 
-const TableComponent = ({
+function TableComponent({
   tableData,
   loading,
   columns,
   initialState,
   ...props
-}) => {
+}){
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [searchText, setSearchText] = useState("");

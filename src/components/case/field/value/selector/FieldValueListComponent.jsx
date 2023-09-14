@@ -32,7 +32,6 @@ function FieldValueListComponent() {
   };
 
   return <Autocomplete
-    required
     name={field.name}
     multiple={isMultiOptions}
     value={selectedOptions}
@@ -40,7 +39,17 @@ function FieldValueListComponent() {
     options={options}
     getOptionLabel={getLabelFromOption}
     disabled={isReadonly}
-    renderInput={props => <TextField {...props} label={displayName} />}
+    renderInput={props => (
+      <TextField
+        {...props}
+        required
+        label={displayName} 
+        inputProps={{
+          ...props.inputProps,
+          required: (selectedOptions?.length ?? 0) === 0
+        }}
+      />
+    )}
     fullWidth
   />
 }
