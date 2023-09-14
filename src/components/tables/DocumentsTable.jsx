@@ -19,9 +19,9 @@ const dateTimeFormatter = (params) =>
 const dateFormatter = (params) =>
   params?.value ? dayjs(params.value).format("YYYY-MM-DD") : null;
 
-const DocumentsTable = () => {
+function DocumentsTable({ defaultTitle }) {
   // TODO AJO localization
-  const title = useOutletContext();
+  const title = useOutletContext() || defaultTitle;
   const events = useLoaderData();
   const params = useParams();
   const [backdropOpen, setBackdropOpen] = useState(false);

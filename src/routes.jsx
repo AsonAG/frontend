@@ -48,6 +48,35 @@ function mapCase(_case, attachments) {
   };
 }
 
+const caseFormRouteData = {
+  element: <CasesForm />,
+  loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, null, params.employeeId),
+  shouldRevalidate: ({actionResult}) => !actionResult,
+  action: async ({request, params}) => {
+    const { caseData, intent, userId, divisionId, attachments } = await request.json();
+    const caseChangeSetup = {
+      userId,
+      divisionId,
+      case: mapCase(caseData, attachments)
+    }
+    if (params.employeeId) {
+      caseChangeSetup.employeeId = Number(params.employeeId);
+    }
+
+    switch (intent) {
+      case "addCase":
+        const response = await addCase(params.tenantId, params.payrollId, caseChangeSetup, params.employeeId)
+        if (response.ok) {
+          return redirect("../new");
+        }
+        // TODO validation errors
+        return response;
+      case "buildCase":
+        return buildCase(params.tenantId, params.payrollId, params.caseName, caseChangeSetup, params.employeeId);
+    } 
+  }
+}
+
 export default createBrowserRouter([
   {
     path: "/",
@@ -102,8 +131,11 @@ export default createBrowserRouter([
       },
       {
         path: "hr/employees/:employeeId",
-        element: <EmployeeView />,
-        loader: ({params}) => getEmployee(params.tenantId, params.employeeId),
+        element: <EmployeeView routeLoaderDataName="employee"/>,
+        loader: async ({params}) => {
+          const employee = await getEmployee(params.tenantId, params.employeeId);
+          return { employee };
+        },
         id: "employee",
         children: [
           {
@@ -114,7 +146,7 @@ export default createBrowserRouter([
           {
             path: ":caseName",
             element: <CasesForm displayOnly />,
-            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId)
+            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, null, params.employeeId)
           },
           {
             path: "new",
@@ -123,30 +155,7 @@ export default createBrowserRouter([
           },
           {
             path: "new/:caseName",
-            element: <CasesForm />,
-            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId),
-            shouldRevalidate: ({actionResult}) => !actionResult,
-            action: async ({request, params}) => {
-              const { caseData, intent, userId, divisionId, attachments } = await request.json();
-              const caseChangeSetup = {
-                userId,
-                divisionId,
-                employeeId: Number(params.employeeId),
-                case: mapCase(caseData, attachments)
-              }
-
-              switch (intent) {
-                case "addCase":
-                  const response = await addCase(params.tenantId, params.payrollId, caseChangeSetup, params.employeeId)
-                  if (response.ok) {
-                    return redirect("../new");
-                  }
-                  // TODO validation errors
-                  return response;
-                case "buildCase":
-                  return buildCase(params.tenantId, params.payrollId, params.caseName, caseChangeSetup, params.employeeId);
-              } 
-            }
+            ...caseFormRouteData
           },
           {
             path: "events",
@@ -156,7 +165,7 @@ export default createBrowserRouter([
           {
             path: "documents",
             element: <DocumentsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId, {filter: "DocumentCount gt 0"})
+            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId, "DocumentCount gt 0")
           }
         ]
       },
@@ -165,55 +174,73 @@ export default createBrowserRouter([
         children: [
           {
             index: true,
-            element: <CasesTable />,
+            element: <CasesTable defaultTitle="Company Data" />,
             loader: ({params}) => getCompanyCases(params.tenantId, params.payrollId, "CompanyData"),
           },
           {
             path: ":caseName",
-            element: <CasesForm displayOnly />,
-            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName)
+            element: <CasesForm displayOnly defaultTitle="Company Data"/>,
+            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, null)
           },
           {
             path: "new",
-            element: <CasesTable />,
+            element: <CasesTable defaultTitle="New Company event" />,
             loader: ({params}) => getCompanyCases(params.tenantId, params.payrollId, "NotAvailable"),
           },
           {
             path: "new/:caseName",
-            element: <CasesForm />,
-            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName),
-            shouldRevalidate: ({actionResult}) => !actionResult,
-            action: async ({request, params}) => {
-              const { caseData, intent, userId, divisionId, attachments } = await request.json();
-              const caseChangeSetup = {
-                userId,
-                divisionId,
-                case: mapCase(caseData, attachments)
-              }
-
-              switch (intent) {
-                case "addCase":
-                  const response = await addCase(params.tenantId, params.payrollId, caseChangeSetup)
-                  if (response.ok) {
-                    return redirect("../new");
-                  }
-                  // TODO validation errors
-                  return response;
-                case "buildCase":
-                  return buildCase(params.tenantId, params.payrollId, params.caseName, caseChangeSetup);
-              } 
-            }
+            ...caseFormRouteData,
+            element: <CasesForm defaultTitle="New Company event" />
           },
           {
             path: "events",
-            element: <EventsTable />,
+            element: <EventsTable defaultTitle="Company events" />,
             loader: ({params}) => getCompanyCaseValues(params.tenantId, params.payrollId),
 
           },
           {
             path: "documents",
+            element: <DocumentsTable defaultTitle="Company documents" />,
+            loader: ({params}) => getCompanyCaseValues(params.tenantId, params.payrollId, "DocumentCount gt 0"),
+          }
+        ]
+      },
+      {
+        path: "employees/:employeeId",
+        element: <EmployeeView routeLoaderDataName="root" />,
+        children: [
+          {
+            index: true,
+            element: <CasesTable />,
+            loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "EmployeeData"),
+          },
+          {
+            path: ":caseName",
+            element: <CasesForm displayOnly />,
+            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, null, params.employeeId)
+          },
+          {
+            path: "new",
+            element: <CasesTable />,
+            loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "ESS"),
+          },
+          {
+            path: "new/:caseName",
+            ...caseFormRouteData
+          },
+          {
+            path: "tasks",
+            element: <CasesTable />,
+            loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "ECT"),
+          },
+          {
+            path: "tasks/:caseName",
+            ...caseFormRouteData
+          },
+          {
+            path: "documents",
             element: <DocumentsTable />,
-            loader: ({params}) => getCompanyCaseValues(params.tenantId, params.payrollId, {filter: "DocumentCount gt 0"}),
+            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId, "DocumentCount gt 0")
           }
         ]
       },

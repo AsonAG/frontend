@@ -24,24 +24,21 @@ function defaultParams() {
     return { headers, signal: AbortSignal.timeout(60000) };
 }
 
-function appendQueryParams(url, queryParams) {
-    if (queryParams) {
-        const urlSearchParams = new URLSearchParams(queryParams);
-        if (urlSearchParams.size > 0) {
-            return `${url}?${new URLSearchParams(queryParams)}`;
-        }
+function appendSearchParams(url, searchParams) {
+    if (searchParams && searchParams.size > 0) {
+        return `${url}?${new URLSearchParams(searchParams)}`;
     }
     return url;
 }
 
 
-async function get(url, queryParams) {
-    url = appendQueryParams(url, queryParams);
+async function get(url, searchParams) {
+    url = appendSearchParams(url, searchParams);
     return fetch(url, {method: "GET", ...defaultParams()});
 }
 
-async function post(url, body, queryParams) {
-    url = appendQueryParams(url, queryParams);
+async function post(url, body, searchParams) {
+    url = appendSearchParams(url, searchParams);
     let fetchParams = {
         method: "POST",
         ...defaultParams()
@@ -67,64 +64,92 @@ async function getPayrolls(tenantId) {
 }
 
 async function getPayroll(tenantId, payrollId) {
-    const response = await get(payrollUrl(tenantId, payrollId));
-    return response.json();
+    return (await get(payrollUrl(tenantId, payrollId))).json();
 }
 
 function getEmployees(tenantId, payrollId) {
     return get(employeesUrl(tenantId));
 }
 
-function getEmployee(tenantId, employeeId) {
-    return get(employeeUrl(tenantId, employeeId));
+async function getEmployee(tenantId, employeeId) {
+    return (await get(employeeUrl(tenantId, employeeId))).json();
 }
 
 async function getEmployeeByIdentifier(tenantId, divisionId, identifier) {
-    const response = await get(employeesUrl(tenantId), {divisionId, filter: `Identifier eq '${identifier}'`});
+    const searchParams = new URLSearchParams();
+    searchParams.append("divisionId", divisionId);
+    searchParams.append("filter", `Identifier eq '${identifier}'`);
+    const response = await get(employeesUrl(tenantId), searchParams);
     const users = await response.json();
     return users?.length ? users[0] : null;
 }
 
 function getEmployeeCases(tenantId, payrollId, employeeId, clusterSetName) {
-    return get(caseSetsUrl(tenantId, payrollId), {employeeId, clusterSetName, caseType: "Employee"});
+    const searchParams = new URLSearchParams();
+    searchParams.append("employeeId", employeeId);
+    searchParams.append("clusterSetName", clusterSetName);
+    searchParams.append("caseType", "Employee");
+    return get(caseSetsUrl(tenantId, payrollId), searchParams);
 }
 
 // TODO AJO user id?
-function getEmployeeCaseValues(tenantId, payrollId, employeeId, queryParams) {
-    queryParams = queryParams ?? {};
+function getEmployeeCaseValues(tenantId, payrollId, employeeId, filter) {
+    const searchParams = new URLSearchParams();
+    searchParams.append("employeeId", employeeId);
+    searchParams.append("caseType", "Employee");
+    if (filter) {
+        searchParams.append("filter", filter);
+    }
     const url = `${payrollUrl(tenantId, payrollId)}/changes/values`;
-    return get(url, {employeeId, caseType: "Employee", ...queryParams});
+    return get(url, searchParams);
 }
 
 function getCompanyCases(tenantId, payrollId, clusterSetName) {
-    return get(caseSetsUrl(tenantId, payrollId), {clusterSetName, caseType: "Company"});
+    const searchParams = new URLSearchParams();
+    searchParams.append("caseType", "Company");
+    searchParams.append("clusterSetName", clusterSetName);
+    return get(caseSetsUrl(tenantId, payrollId), searchParams);
 }
 
-function getCompanyCaseValues(tenantId, payrollId, queryParams) {
-    queryParams = queryParams ?? {};
+function getCompanyCaseValues(tenantId, payrollId, filter) {
+    const searchParams = new URLSearchParams();
+    searchParams.append("caseType", "Company");
+    if (filter) {
+        searchParams.append("filter", filter);
+    }
     const url = `${payrollUrl(tenantId, payrollId)}/changes/values`;
-    return get(url, {caseType: "Company", ...queryParams});
+    return get(url, searchParams);
 }
 
 
 function buildCase(tenantId, payrollId, caseName, caseChangeSetup, employeeId) {
-    const queryParams = employeeId ? {employeeId} : {};
+    const searchParams = new URLSearchParams();
+    if (employeeId) {
+        searchParams.append("employeeId", employeeId);
+    }
     const url = `${caseSetsUrl(tenantId, payrollId)}/${encodeURIComponent(caseName)}`;
-    return post(url, caseChangeSetup, queryParams);
+    return post(url, caseChangeSetup, searchParams);
 }
 function addCase(tenantId, payrollId, caseChangeSetup, employeeId) {
-    const queryParams = employeeId ? {employeeId} : {};
-    return post(caseSetsUrl(tenantId, payrollId), caseChangeSetup, queryParams);
+    const searchParams = new URLSearchParams();
+    if (employeeId) {
+        searchParams.append("employeeId", employeeId);
+    }
+    return post(caseSetsUrl(tenantId, payrollId), caseChangeSetup, searchParams);
 }
 
 async function getUser(tenantId, identifier) {
-    const response = await get(usersUrl(tenantId), {filter: `Identifier eq '${identifier}'`});
+    const searchParams = new URLSearchParams();
+    searchParams.append("filter", `Identifier eq '${identifier}'`);
+    const response = await get(usersUrl(tenantId), searchParams);
     const users = await response.json();
     return users?.length ? users[0] : null;
 }
 
 async function getLookupValues(tenantId, payrollId, lookupName) {
-    return (await get(lookupValuesUrl(tenantId, payrollId), {lookupNames: lookupName})).json();
+    const searchParams = new URLSearchParams();
+    searchParams.append("lookupNames", lookupName);
+    return (await get(lookupValuesUrl(tenantId, payrollId), searchParams)).json();
 }
 
 async function getDocument(tenantId, caseValueId, documentId, employeeId) {

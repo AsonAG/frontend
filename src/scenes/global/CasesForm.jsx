@@ -9,9 +9,9 @@ import { useTheme } from "@emotion/react";
 
 export const CaseFormContext = createContext();
 
-function CasesForm({ displayOnly = false }) {
+function CasesForm({ defaultTitle, displayOnly = false }) {
   const { user, payroll } = useRouteLoaderData("root");
-  const title = useOutletContext();
+  const title = useOutletContext() || defaultTitle;
   const loaderData = useLoaderData();
   const actionData = useActionData(); 
   const caseData = actionData || loaderData;

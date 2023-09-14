@@ -1,7 +1,7 @@
-import { Outlet, useLoaderData } from "react-router-dom";
+import { Outlet, useRouteLoaderData } from "react-router-dom";
 
-function EmployeeView() {
-    const employee = useLoaderData();
+function EmployeeView({ routeLoaderDataName }) {
+    const { employee } = useRouteLoaderData(routeLoaderDataName);
     const header = employee.firstName + " " + employee.lastName;
     return <Outlet context={header} />;
 }

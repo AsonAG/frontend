@@ -3,8 +3,8 @@ import dayjs from "dayjs";
 import { useLoaderData, useOutletContext } from "react-router-dom";
 import TableView from "./TableView";
 
-const EventsTable = () => {
-  const title = useOutletContext();
+function EventsTable({ defaultTitle }) {
+  const title = useOutletContext() || defaultTitle;
   const events = useLoaderData();
 
   const dateTimeFormatter = (params) =>

@@ -28,8 +28,8 @@ const columns = [
 ];
 
 
-const CasesTable = () => {
-  const title = useOutletContext();
+const CasesTable = ({defaultTitle}) => {
+  const title = useOutletContext() || defaultTitle;
   const cases = useLoaderData();
   const navigate = useNavigate();
 
