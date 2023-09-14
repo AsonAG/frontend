@@ -40,7 +40,7 @@ function CasesForm({ defaultTitle, displayOnly = false }) {
   return (
     <Stack useFlexGap direction="row">
       <Stack sx={{flex: 1}} p={4}>
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{p: 0}}>
           <Header title={title} />
           <CaseFormContext.Provider value={{ buildCase, displayOnly, attachments: attachments.current }}>
             <Form method="post" ref={formRef} id="case_form">

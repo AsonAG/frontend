@@ -9,10 +9,7 @@ const lightModeDesignTokens = {
       hover: "rgba(70, 30, 183, 0.05)",
       active: "rgba(70, 30, 183, 0.15)",
     },
-    secondary: {
-      main: '#ff0000',
-    },
-    divider: 'rgba(70, 30, 183, 0.12)'
+    divider: 'rgba(70, 30, 183, 0.16)'
   }
 }
 
@@ -23,9 +20,6 @@ const darkModeDesignTokens = {
       main: '#4985e2',
       hover: "rgba(73, 133, 226, 0.05)",
       active: "rgba(73, 133, 226, 0.15)",
-    },
-    secondary: {
-      main: '#f00',
     },
     divider: 'rgba(73, 133, 226, 0.12)'
   }

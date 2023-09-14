@@ -11,7 +11,7 @@ export function DescriptionComponent({ description }) {
     return <div></div>;
   }
 
-  const content = isHtml(description) ? <Markup content={description} /> : <>{description}</>;
+  const content = isHtml(description) ? <Markup content={description} /> : description;
 
   return (
     <Box>

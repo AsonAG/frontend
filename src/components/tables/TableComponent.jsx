@@ -20,7 +20,8 @@ function TableComponent({
     return (
       <Box
         sx={{
-          p: 0.5,
+          pt: 1,
+          pl: 1,
           pb: 0,
         }}
       >
