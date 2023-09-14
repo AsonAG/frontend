@@ -16,7 +16,7 @@ export function DescriptionComponent({ description }) {
   return (
     <Box>
         <Tooltip arrow title={content} placement="top">
-          <HelpOutlineOutlinedIcon color="secondary" />
+          <HelpOutlineOutlinedIcon color="disabled" />
         </Tooltip>
     </Box>
   );

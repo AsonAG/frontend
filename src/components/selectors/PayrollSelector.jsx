@@ -18,7 +18,7 @@ function PayrollSelector() {
 
   return <>
     <Button
-      color="blueAccent"
+      color="primary"
       onClick={handleClick}
       endIcon={<ArrowDropDownIcon />}
       sx={{

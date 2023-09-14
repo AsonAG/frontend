@@ -7,7 +7,7 @@ export default function CasesSaveButton({ onSubmit }) {
       disableRipple
       type="button"
       variant="contained"
-      color="blueAccent"
+      color="primary"
       size="large"
       onClick={onSubmit}
       endIcon={<SendIcon htmlColor="#ffffff" />}

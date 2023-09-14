@@ -31,15 +31,15 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
     borderRadius: theme.spacing(1),
     color: theme.palette.text.primary,
     "&:hover": {
-      "color": theme.palette.blueAccent.main,
-      "backgroundColor": theme.palette.blueAccent.hover
+      "color": theme.palette.primary.main,
+      "backgroundColor": theme.palette.primary.hover
     },
     "&.active": {
-      "color": theme.palette.blueAccent.main,
-      "backgroundColor": theme.palette.blueAccent.active
+      "color": theme.palette.primary.main,
+      "backgroundColor": theme.palette.primary.active
     },
     "&.active:hover": {
-      "color": theme.palette.blueAccent.main,
+      "color": theme.palette.primary.light,
     }
   }
 });
@@ -137,7 +137,7 @@ function Drawer({ temporary, open, onClose }) {
             <Typography 
               component={RouterLink} 
               variant="body2" 
-              color="blueAccent.main" 
+              color="primary.main" 
               to="/tenants" 
               sx={{
                 textDecoration: "none",

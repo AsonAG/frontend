@@ -9,8 +9,8 @@ function CaseIndexComponent({ _case, indent,  activeCase, onSelect}) {
   const isActive = _case.name === activeCase;
 
   const styling = isActive ? {
-    borderLeftColor: "#461eb7",
-    color: "#461eb7"
+    borderLeftColor: "primary.main",
+    color: "primary.main"
   } : {
     borderLeftColor: "transparent",
   };

@@ -1,18 +1,13 @@
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
-import { useTheme } from "@emotion/react";
-import { tokens } from "../../theme";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 
 function TableComponent({
   tableData,
-  loading,
   columns,
   initialState,
   ...props
 }){
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const [searchText, setSearchText] = useState("");
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
 
@@ -53,44 +48,13 @@ function TableComponent({
     <Box
       sx={{
         flex: 1,
-        "& .MuiDataGrid-root": {
-          //   border: "none",
-        },
-        "& .MuiDataGrid-cell": {
-          //   borderBottom: "none",
-        },
-        "& .name-column--cell": {
-          //   color: colors.greenAccent[300],
-          marginLeft: "5px",
-        },
-        "& .MuiDataGrid-columnHeaderTitle": {
-          color: colors.blueAccent,
-          marginLeft: "5px",
-          fontWeight: "bold",
-        },
-        "& .MuiDataGrid-columnHeaders": {
-          backgroundColor: colors.primary[400],
-          //   borderBottom: "none",
-        },
-        "& .MuiDataGrid-virtualScroller": {
-          backgroundColor: colors.primary[500],
-        },
-        "& .MuiDataGrid-footerContainer": {
-          //   borderTop: "none",
-          backgroundColor: colors.primary[500],
-        },
-        "& .MuiCheckbox-root": {
-          color: `${colors.blueAccent} !important`,
-        },
-        "& .name-column--cell:hover": {
-          color: `${colors.blueAccentReverse} !important`,
-        },
+
       }}
     >
       <DataGrid
-        loading={loading}
         rows={tableDataFiltered}
         columns={columns}
+        disableColumnMenu
         components={{ Toolbar: QuickSearchToolbar }}
         componentsProps={{
           toolbar: {
@@ -98,6 +62,17 @@ function TableComponent({
             onChange: (event) => requestSearch(event.target.value),
             clearSearch: () => requestSearch(""),
           },
+        }}
+        sx={{
+          "& .MuiDataGrid-cell:focus": {
+            outline: 'none'
+          },
+          "& .MuiDataGrid-cell:active": {
+            outline: 'none'
+          },
+          "& .MuiDataGrid-columnHeader:focus": {
+            outline: 'none'
+          }
         }}
         initialState={initialState}
         {...props}

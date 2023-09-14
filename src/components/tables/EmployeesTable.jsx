@@ -5,7 +5,6 @@ import { useLoaderData } from "react-router-dom";
 
 const EmployeesTable = () => {
   const employees = useLoaderData();
-  const [error, setError] = useState();
 
   const columns = [
     {
@@ -43,8 +42,6 @@ const EmployeesTable = () => {
   return (
     <TableView
       title="Employees"
-      error={error}
-      setError={setError}
       tableData={employees}
       columns={columns}
       rowHeight={50}

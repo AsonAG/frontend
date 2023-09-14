@@ -24,7 +24,7 @@ function UserAccountComponent({ user, ...stackProps }) {
             <ButtonGroup variant="outlined">
                 <Button 
                     sx={buttonSx}
-                    color="blueAccent"
+                    color="primary"
                     component={Link}
                     to={settingsLink}
                 >
@@ -32,7 +32,7 @@ function UserAccountComponent({ user, ...stackProps }) {
                 </Button>
                 <Button
                     sx={buttonSx}
-                    color="blueAccent"
+                    color="primary"
                     endIcon={<LogoutIcon sx={{height: 16}} />}
                     onClick={handleLogout}
                 >

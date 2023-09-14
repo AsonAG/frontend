@@ -4,6 +4,7 @@ import {
   CircularProgress,
   Stack,
   Typography,
+  Button
 } from "@mui/material";
 import { React, useState } from "react";
 import dayjs from "dayjs";
@@ -55,25 +56,24 @@ function DocumentsTable({ defaultTitle }) {
       renderCell: ({ row: caseValue }) => {
         if (Array.isArray(caseValue.documents)) {
           return (
-            <Stack spacing={2}>
+            <Stack>
               {caseValue.documents.map((doc) => {
                 const extension = doc.name?.split(".").pop();
                 return (
-                  <Box
-                    display="inline-flex"
+                  <Stack
+                    sx={{py: 1}}
+                    direction="row"
+                    spacing={1}
                     onClick={() => handleFileClick(doc.id, caseValue.id)}
-                    component={Link}
+                    component={Button}
                     alignItems="center"
                     key={doc.id}
                   >
-                    <Box width="24px" marginRight="15px">
-                      <FileIcon
-                        extension={extension}
-                        {...defaultStyles[extension]}
-                      />
+                    <Box width="24px">
+                      <FileIcon extension={extension} {...defaultStyles[extension]}/>
                     </Box>
                     <Typography>{doc.name}</Typography>
-                  </Box>
+                  </Stack>
                 );
               })}
             </Stack>
@@ -118,15 +118,6 @@ function DocumentsTable({ defaultTitle }) {
           },
         }}
         getRowHeight={() => "auto"}
-        sx={{
-          "&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell": { py: "8px" },
-          "&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell": {
-            py: "12px",
-          },
-          "&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell": {
-            py: "22px",
-          },
-        }}
       />
       <Backdrop
         sx={{
