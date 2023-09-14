@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Button, Typography, Menu, MenuItem } from "@mui/material";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Link, useLoaderData } from "react-router-dom";
+import { useDocumentTitle } from "usehooks-ts";
 
 function PayrollSelector() {
   const { payroll, payrolls } = useLoaderData();
   const [anchorEl, setAnchorEl] = useState(null);
+  useDocumentTitle(`Ason - ${payroll.name}`);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

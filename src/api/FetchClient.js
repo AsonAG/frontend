@@ -89,7 +89,6 @@ function getEmployeeCases(tenantId, payrollId, employeeId, clusterSetName) {
     return get(caseSetsUrl(tenantId, payrollId), {employeeId, clusterSetName, caseType: "Employee"});
 }
 
-
 // TODO AJO user id?
 function getEmployeeCaseValues(tenantId, payrollId, employeeId, queryParams) {
     queryParams = queryParams ?? {};
@@ -97,12 +96,25 @@ function getEmployeeCaseValues(tenantId, payrollId, employeeId, queryParams) {
     return get(url, {employeeId, caseType: "Employee", ...queryParams});
 }
 
-function buildCase(tenantId, payrollId, caseName, employeeId, caseChangeSetup) {
-    const url = `${caseSetsUrl(tenantId, payrollId)}/${encodeURIComponent(caseName)}`;
-    return post(url, caseChangeSetup, {employeeId});
+function getCompanyCases(tenantId, payrollId, clusterSetName) {
+    return get(caseSetsUrl(tenantId, payrollId), {clusterSetName, caseType: "Company"});
 }
-function addCase(tenantId, payrollId, employeeId, caseChangeSetup) {
-    return post(caseSetsUrl(tenantId, payrollId), caseChangeSetup, {employeeId});
+
+function getCompanyCaseValues(tenantId, payrollId, queryParams) {
+    queryParams = queryParams ?? {};
+    const url = `${payrollUrl(tenantId, payrollId)}/changes/values`;
+    return get(url, {caseType: "Company", ...queryParams});
+}
+
+
+function buildCase(tenantId, payrollId, caseName, caseChangeSetup, employeeId) {
+    const queryParams = employeeId ? {employeeId} : {};
+    const url = `${caseSetsUrl(tenantId, payrollId)}/${encodeURIComponent(caseName)}`;
+    return post(url, caseChangeSetup, queryParams);
+}
+function addCase(tenantId, payrollId, caseChangeSetup, employeeId) {
+    const queryParams = employeeId ? {employeeId} : {};
+    return post(caseSetsUrl(tenantId, payrollId), caseChangeSetup, queryParams);
 }
 
 async function getUser(tenantId, identifier) {
@@ -124,16 +136,18 @@ async function getDocument(tenantId, caseValueId, documentId, employeeId) {
 }
 
 export { 
-    getTenants, 
-    getTenant, 
-    getPayrolls, 
-    getEmployees, 
-    getEmployee, 
+    getTenants,
+    getTenant,
+    getPayrolls,
+    getEmployees,
+    getEmployee,
     getEmployeeByIdentifier,
-    getEmployeeCases, 
-    getEmployeeCaseValues, 
-    buildCase, 
-    addCase, 
+    getEmployeeCases,
+    getEmployeeCaseValues,
+    getCompanyCases,
+    getCompanyCaseValues,
+    buildCase,
+    addCase,
     getLookupValues,
     getUser,
     getPayroll,

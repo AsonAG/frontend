@@ -26,7 +26,9 @@ import {
   buildCase, 
   addCase,
   getUser,
-  getEmployeeByIdentifier
+  getEmployeeByIdentifier,
+  getCompanyCases,
+  getCompanyCaseValues
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 
@@ -135,27 +137,83 @@ export default createBrowserRouter([
 
               switch (intent) {
                 case "addCase":
-                  const response = await addCase(params.tenantId, params.payrollId, params.employeeId, caseChangeSetup)
+                  const response = await addCase(params.tenantId, params.payrollId, caseChangeSetup, params.employeeId)
                   if (response.ok) {
-                    throw redirect("../new");
+                    return redirect("../new");
                   }
                   // TODO validation errors
                   return response;
                 case "buildCase":
-                  return buildCase(params.tenantId, params.payrollId, params.caseName, params.employeeId, caseChangeSetup);
+                  return buildCase(params.tenantId, params.payrollId, params.caseName, caseChangeSetup, params.employeeId);
               } 
             }
           },
           {
             path: "events",
             element: <EventsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId),
+            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId)
+          },
+          {
+            path: "documents",
+            element: <DocumentsTable />,
+            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId, {filter: "DocumentCount gt 0"})
+          }
+        ]
+      },
+      {
+        path: "company",
+        children: [
+          {
+            index: true,
+            element: <CasesTable />,
+            loader: ({params}) => getCompanyCases(params.tenantId, params.payrollId, "CompanyData"),
+          },
+          {
+            path: ":caseName",
+            element: <CasesForm displayOnly />,
+            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName)
+          },
+          {
+            path: "new",
+            element: <CasesTable />,
+            loader: ({params}) => getCompanyCases(params.tenantId, params.payrollId, "NotAvailable"),
+          },
+          {
+            path: "new/:caseName",
+            element: <CasesForm />,
+            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName),
+            shouldRevalidate: ({actionResult}) => !actionResult,
+            action: async ({request, params}) => {
+              const { caseData, intent, userId, divisionId, attachments } = await request.json();
+              const caseChangeSetup = {
+                userId,
+                divisionId,
+                case: mapCase(caseData, attachments)
+              }
+
+              switch (intent) {
+                case "addCase":
+                  const response = await addCase(params.tenantId, params.payrollId, caseChangeSetup)
+                  if (response.ok) {
+                    return redirect("../new");
+                  }
+                  // TODO validation errors
+                  return response;
+                case "buildCase":
+                  return buildCase(params.tenantId, params.payrollId, params.caseName, caseChangeSetup);
+              } 
+            }
+          },
+          {
+            path: "events",
+            element: <EventsTable />,
+            loader: ({params}) => getCompanyCaseValues(params.tenantId, params.payrollId),
 
           },
           {
             path: "documents",
             element: <DocumentsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId, {filter: "DocumentCount gt 0"}),
+            loader: ({params}) => getCompanyCaseValues(params.tenantId, params.payrollId, {filter: "DocumentCount gt 0"}),
           }
         ]
       },

@@ -20,8 +20,6 @@ export const ErrorBarContext = createContext();
 
 dayjs.extend(utc);
 
-// TODO AJO document title
-// TODO AJO handle tenant selection state
 function App() {
 	const { payrollId } = useParams();
 	const [theme, colorMode] = useMode();

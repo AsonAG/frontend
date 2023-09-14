@@ -65,7 +65,7 @@ const DocumentsTable = () => {
                     component={Link}
                     alignItems="center"
                   >
-                    <Box width="30px" marginRight="15px">
+                    <Box width="24px" marginRight="15px">
                       <FileIcon
                         extension={extension}
                         {...defaultStyles[extension]}

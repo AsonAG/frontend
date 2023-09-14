@@ -117,10 +117,10 @@ function Drawer({ temporary, open, onClose }) {
             <NavigationItem label="Employees" to="hr/employees" icon={<PeopleOutlinedIcon />} />
           </NavigationGroup>
           <NavigationGroup name="Company">
-            <NavigationItem label="New event" to="/company" icon={<AddOutlinedIcon />} />
-            <NavigationItem label="Data" to="/companyData" icon={<CasesOutlinedIcon />} />
-            <NavigationItem label="Events" to="/companyEvents" icon={<WorkHistoryOutlinedIcon />} />
-            <NavigationItem label="Documents" to="/companyDocuments" icon={<DescriptionOutlinedIcon />} />
+            <NavigationItem label="New event" to="company/new" icon={<AddOutlinedIcon />} end />
+            <NavigationItem label="Data" to="company" icon={<CasesOutlinedIcon />} end />
+            <NavigationItem label="Events" to="company/events" icon={<WorkHistoryOutlinedIcon />} end />
+            <NavigationItem label="Documents" to="company/documents" icon={<DescriptionOutlinedIcon />} end />
           </NavigationGroup>
           <NavigationGroup name="Employee" hidden={employee === null}>
             <NavigationItem label="New event" to="/ESS" icon={<AddOutlinedIcon />} />

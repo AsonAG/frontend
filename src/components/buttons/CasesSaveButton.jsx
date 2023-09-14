@@ -5,7 +5,7 @@ export default function CasesSaveButton({ onSubmit }) {
   return (
     <Button
       disableRipple
-      type="submit"
+      type="button"
       variant="contained"
       color="blueAccent"
       size="large"

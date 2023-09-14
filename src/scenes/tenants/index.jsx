@@ -9,9 +9,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Link, useLoaderData } from "react-router-dom";
+import { useDocumentTitle } from "usehooks-ts";
 
 function Tenants() {
   const tenants = useLoaderData();
+  useDocumentTitle("Ason - Tenants");
   return (
     <Container maxWidth="lg" sx={{mt: 4}}>
       <Header title="Select a company"/>
