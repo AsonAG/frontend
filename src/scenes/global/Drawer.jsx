@@ -1,12 +1,11 @@
 import {
   Box,
-  TextField,
   Divider,
   Toolbar,
   Drawer as MuiDrawer,
   Typography} from "@mui/material";
 import { forwardRef, useEffect } from "react";
-import { NavLink as RouterLink, useLoaderData, useLocation, useRouteLoaderData } from "react-router-dom";
+import { NavLink as RouterLink, useLoaderData, useLocation } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -131,17 +130,28 @@ function Drawer({ temporary, open, onClose }) {
           </NavigationGroup>
         </NavigationMenu>
         <Divider />
-        <Box sx={{p: 2}}>
-          <UserAccountComponent user={user} />
-          {/* <TextField
-            id="user-tenant"
-            label="Company"
-            variant="standard"
-            disabled
-            InputLabelProps={{ shrink: true }}
-            defaultValue={tenant.identifier}
-          /> */}
-        </Box>
+        <Stack sx={{p: 2}} spacing={1}>
+          <Typography>Company</Typography>
+          <Stack spacing={1} direction="row">
+            <Typography variant="body2" textOverflow="ellipsis" overflow="hidden">{tenant.identifier}</Typography>
+            <Typography 
+              component={RouterLink} 
+              variant="body2" 
+              color="blueAccent.main" 
+              to="/tenants" 
+              sx={{
+                textDecoration: "none",
+                "&: hover": {
+                  fontWeight: "bold"
+                }
+              }}
+            >
+              Change
+            </Typography>
+          </Stack>
+        </Stack>
+        <Divider />
+        <UserAccountComponent user={user} sx={{p: 2}} />
       </Stack>
     </MuiDrawer>
   )

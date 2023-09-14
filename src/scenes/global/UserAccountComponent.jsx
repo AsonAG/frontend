@@ -7,7 +7,7 @@ const buttonSx = {
 };
 const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
 
-function UserAccountComponent({ user }) {
+function UserAccountComponent({ user, ...stackProps }) {
     if (!user)
         return null;
 
@@ -16,7 +16,7 @@ function UserAccountComponent({ user }) {
     };
 
     return (
-        <Stack spacing={2}>
+        <Stack spacing={2} {...stackProps}>
             <Stack>
                 <Typography gutterBottom>{user.firstName} {user.lastName}</Typography>
                 <Typography variant="body2">{user.identifier}</Typography>
