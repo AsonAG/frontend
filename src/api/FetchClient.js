@@ -25,7 +25,7 @@ function defaultParams() {
 }
 
 function appendSearchParams(url, searchParams) {
-    if (searchParams && searchParams.size > 0) {
+    if (searchParams && [...searchParams].length > 0) {
         return `${url}?${new URLSearchParams(searchParams)}`;
     }
     return url;

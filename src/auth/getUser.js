@@ -13,7 +13,9 @@ function getAuthenticatedUser () {
 
 function getFakeUser() {
   return {
-    email: "ajo@ason.ch"
+    profile: {
+      email: "ajo@ason.ch"
+    }
   }
 }
 

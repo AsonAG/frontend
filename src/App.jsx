@@ -17,8 +17,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Logo from "./components/Logo";
 
 
-export const ErrorBarContext = createContext();
-
 dayjs.extend(utc);
 dayjs.extend(localizedFormat);
 dayjs.locale('de');

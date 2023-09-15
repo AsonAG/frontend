@@ -9,7 +9,7 @@ import SignIn from "./auth/SignIn";
 
 
 function Authentication({children}) {
-  if (import.meta.env.DEV) {
+  if (!import.meta.env.PROD) {
     return children;
   }
   return (
