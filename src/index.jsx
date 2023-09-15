@@ -21,10 +21,6 @@ function Authentication({children}) {
   )
 }
 
-if (import.meta.env.DEV) {
-
-}
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

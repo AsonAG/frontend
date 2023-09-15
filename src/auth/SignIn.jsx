@@ -1,7 +1,12 @@
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Stack } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useAuth, hasAuthParams } from "react-oidc-context";
 
+function Centered({children}) {
+    return  <Stack justifyContent="center" alignItems="center" sx={{height: "100%"}}>
+                {children}
+            </Stack>;
+}
 
 // TODO AJO test fresh login
 function SignIn({children}) {
@@ -20,16 +25,16 @@ function SignIn({children}) {
     }, [auth, hasTriedSignin]);
 
     if (auth.isLoading) {
-        return <CircularProgress />;
+        return <Centered><CircularProgress /></Centered>
     }
 
     if (auth.error) {
-        return <div>Oops... {auth.error.message}</div>;
+        return <Centered>Oops... {auth.error.message}</Centered>;
     }
 
 
     if (!auth.isAuthenticated) {
-        return <div>Unable to log in</div>;
+        return <Centered>Unable to log in</Centered>;
     }
 
     return children;
