@@ -8,6 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/de';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { ErrorBoundary } from "react-error-boundary";
 import UnknownErrorPage from "./components/errors/UnknownErrorPage";
 import { Outlet, useParams } from "react-router-dom";
@@ -19,6 +20,8 @@ import Logo from "./components/Logo";
 export const ErrorBarContext = createContext();
 
 dayjs.extend(utc);
+dayjs.extend(localizedFormat);
+dayjs.locale('de');
 
 function App() {
 	const { payrollId } = useParams();

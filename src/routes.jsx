@@ -1,7 +1,7 @@
 
 import * as React from "react";
 
-import { createBrowserRouter, Navigate, redirect, useLoaderData } from "react-router-dom";
+import { createBrowserRouter, Navigate, redirect } from "react-router-dom";
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
@@ -107,11 +107,11 @@ export default createBrowserRouter([
       // TODO AJO query in parallel
       const tenant = await getTenant(params.tenantId);
       
-      const authUser = getAuthUser();
+      const authUserEmail = getAuthUser()?.profile.email;
 
-      const user = await getUser(params.tenantId, authUser.email);
+      const user = await getUser(params.tenantId, authUserEmail);
 
-      const employee = await getEmployeeByIdentifier(params.tenantId, payroll.divisionId, authUser.email);
+      const employee = await getEmployeeByIdentifier(params.tenantId, payroll.divisionId, authUserEmail);
 
       
       return { tenant, user, payrolls, payroll, employee };

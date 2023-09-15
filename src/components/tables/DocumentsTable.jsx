@@ -7,21 +7,13 @@ import {
   Button
 } from "@mui/material";
 import { React, useState } from "react";
-import dayjs from "dayjs";
 import TableView from "./TableView";
 import { FileIcon, defaultStyles } from "react-file-icon";
-import { Link, useLoaderData, useOutletContext, useParams } from "react-router-dom";
+import { useLoaderData, useOutletContext, useParams } from "react-router-dom";
 import { getDocument } from "../../api/FetchClient";
-
-// TODO AJO localized formatting
-const dateTimeFormatter = (params) =>
-  params?.value ? dayjs(params.value).format("YYYY-MM-DD HH:mm") : null;
-
-const dateFormatter = (params) =>
-  params?.value ? dayjs(params.value).format("YYYY-MM-DD") : null;
+import { dateColumns } from "./caseValueDateColumns";
 
 function DocumentsTable({ defaultTitle }) {
-  // TODO AJO localization
   const title = useOutletContext() || defaultTitle;
   const events = useLoaderData();
   const params = useParams();
@@ -42,12 +34,7 @@ function DocumentsTable({ defaultTitle }) {
     {
       field: "caseFieldName",
       headerName: "Name (event field name)",
-      flex: 3,
-    },
-    {
-      field: "caseName",
-      headerName: "Case",
-      flex: 3,
+      flex: 2,
     },
     {
       field: "documents",
@@ -81,24 +68,7 @@ function DocumentsTable({ defaultTitle }) {
         }
       },
     },
-    {
-      field: "start",
-      headerName: "Start",
-      flex: 3,
-      valueFormatter: dateFormatter,
-    },
-    {
-      field: "end",
-      headerName: "End",
-      flex: 3,
-      valueFormatter: dateFormatter,
-    },
-    {
-      field: "created",
-      headerName: "Created",
-      flex: 3,
-      valueFormatter: dateTimeFormatter,
-    },
+    ...dateColumns
   ];
 
   return (
@@ -108,11 +78,6 @@ function DocumentsTable({ defaultTitle }) {
         tableData={events}
         columns={columns}
         initialState={{
-          columns: {
-            columnVisibilityModel: {
-              caseName: false,
-            },
-          },
           sorting: {
             sortModel: [{ field: "created", sort: "desc" }],
           },

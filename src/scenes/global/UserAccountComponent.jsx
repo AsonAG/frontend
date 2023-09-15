@@ -1,6 +1,7 @@
 import { Typography, Stack, ButtonGroup, Button } from "@mui/material";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Link } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
 
 const buttonSx = {
     flexGrow: 1, lineHeight: 1, py: 1
@@ -8,11 +9,14 @@ const buttonSx = {
 const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
 
 function UserAccountComponent({ user, ...stackProps }) {
+    const auth = useAuth();
     if (!user)
         return null;
 
     const handleLogout = () => {
-        // TODO AJO handle logout
+        if (auth.isAuthenticated) {
+            auth.removeUser();
+        }
     };
 
     return (
@@ -35,6 +39,7 @@ function UserAccountComponent({ user, ...stackProps }) {
                     color="primary"
                     endIcon={<LogoutIcon sx={{height: 16}} />}
                     onClick={handleLogout}
+                    disabled={!auth.isAuthenticated}
                 >
                     Logout
                 </Button>

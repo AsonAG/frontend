@@ -14,6 +14,7 @@ const authConfig = {
   automaticSilentRenew: true,
   
   userStore: new WebStorageStateStore({ store: window.localStorage }),
+  loadUserInfo: true,
 
 
   onSignIn: async (user) => {
