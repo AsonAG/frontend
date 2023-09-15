@@ -129,7 +129,7 @@ const routeData = [
         path: "hr/employees/:employeeId",
         element: <EmployeeView routeLoaderDataName="employee"/>,
         loader: async ({params}) => {
-          const employee = await getEmployee(params.tenantId, params.payrollId, params.employeeId);
+          const employee = await getEmployee(params.tenantId, params.employeeId);
           return { employee };
         },
         id: "employee",
