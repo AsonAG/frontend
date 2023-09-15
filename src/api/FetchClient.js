@@ -9,6 +9,7 @@ const payrollUrl = (tenantId, payrollId) => `${tenantUrl(tenantId)}/payrolls/${p
 const caseSetsUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/cases/sets`;
 const lookupValuesUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/lookups/values`;
 const employeesUrl = (tenantId) => `${tenantUrl(tenantId)}/employees`;
+const payrollEmployeesUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/employees`;
 const employeeUrl = (tenantId, employeeId) => `${employeesUrl(tenantId)}/${employeeId}`;
 const usersUrl = (tenantId) => `${tenantUrl(tenantId)}/users`;
 const employeeDocumentUrl = (tenantId, employeeId, caseValueId, documentId) => `${employeeUrl(tenantId, employeeId)}/cases/${caseValueId}/documents/${documentId}`;
@@ -68,18 +69,17 @@ async function getPayroll(tenantId, payrollId) {
 }
 
 function getEmployees(tenantId, payrollId) {
-    return get(employeesUrl(tenantId));
+    return get(payrollEmployeesUrl(tenantId, payrollId));
 }
 
 async function getEmployee(tenantId, employeeId) {
     return (await get(employeeUrl(tenantId, employeeId))).json();
 }
 
-async function getEmployeeByIdentifier(tenantId, divisionId, identifier) {
+async function getEmployeeByIdentifier(tenantId, payrollId, identifier) {
     const searchParams = new URLSearchParams();
-    searchParams.append("divisionId", divisionId);
     searchParams.append("filter", `Identifier eq '${identifier}'`);
-    const response = await get(employeesUrl(tenantId), searchParams);
+    const response = await get(payrollEmployeesUrl(tenantId, payrollId), searchParams);
     const users = await response.json();
     return users?.length ? users[0] : null;
 }

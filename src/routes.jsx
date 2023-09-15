@@ -77,7 +77,7 @@ const caseFormRouteData = {
   }
 }
 
-export default createBrowserRouter([
+const routeData = [
   {
     path: "/",
     element: <App />,
@@ -108,7 +108,7 @@ export default createBrowserRouter([
       const [tenant, user, employee] = await Promise.all([
         getTenant(params.tenantId),
         getUser(params.tenantId, authUserEmail),
-        getEmployeeByIdentifier(params.tenantId, payroll.divisionId, authUserEmail)
+        getEmployeeByIdentifier(params.tenantId, params.payrollId, authUserEmail)
       ]);
       
       return { tenant, user, payrolls, payroll, employee };
@@ -123,14 +123,13 @@ export default createBrowserRouter([
       {
         path: "hr/employees",
         element: <EmployeesTable />,
-        // TODO AJO add payrollid or division id
-        loader: ({params}) => getEmployees(params.tenantId)
+        loader: ({params}) => getEmployees(params.tenantId, params.payrollId)
       },
       {
         path: "hr/employees/:employeeId",
         element: <EmployeeView routeLoaderDataName="employee"/>,
         loader: async ({params}) => {
-          const employee = await getEmployee(params.tenantId, params.employeeId);
+          const employee = await getEmployee(params.tenantId, params.payrollId, params.employeeId);
           return { employee };
         },
         id: "employee",
@@ -243,9 +242,13 @@ export default createBrowserRouter([
       },
     ]
   }
-],
+];
+
+const browserRouter = createBrowserRouter(routeData,
 {
   future: {
     v7_normalizeFormMethod: true
   }
 });
+
+export { routeData, browserRouter };

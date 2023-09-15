@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { RouterProvider } from "react-router-dom";
-import routes from "./routes";
+import { browserRouter } from "./routes";
 import { AuthProvider } from "react-oidc-context";
 import authConfig from "./auth/authConfig";
 import SignIn from "./auth/SignIn";
@@ -25,7 +25,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Authentication>
-      <RouterProvider router={routes} future={{ v7_startTransition: true }} />
+      <RouterProvider router={browserRouter} future={{ v7_startTransition: true }} />
     </Authentication>
   </React.StrictMode>
 );

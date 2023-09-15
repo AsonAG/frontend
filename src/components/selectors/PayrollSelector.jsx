@@ -1,19 +1,32 @@
 import React, { useState } from "react";
 import { Button, Typography, Menu, MenuItem } from "@mui/material";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, generatePath, matchRoutes, useLoaderData, useParams } from "react-router-dom";
 import { useDocumentTitle } from "usehooks-ts";
+import { routeData } from "../../routes";
 
 function PayrollSelector() {
   const { payroll, payrolls } = useLoaderData();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const queryParams = useParams();
   useDocumentTitle(`Ason - ${payroll.name}`);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+    const route = matchRoutes(routeData, window.location).map(r => r.route.path).join("/");
+    if (route) {
+      setAnchorEl(event.currentTarget);
+      
+      const menuItems = payrolls.map(p => {
+        const to = "/" + generatePath(route, {...queryParams, payrollId: p.id});
+        return <MenuItem key={p.id} component={Link} to={to} onClick={handleClose}>{p.name}</MenuItem>;
+      })
+      setMenuItems(menuItems);
+    }
   };
   const handleClose = () => {
     setAnchorEl(null);
+    setMenuItems([]);
   };
 
   return <>
@@ -40,9 +53,7 @@ function PayrollSelector() {
       open={open}
       onClose={handleClose}
     >
-      {
-        payrolls.map(p => <MenuItem key={p.id} component={Link} to={"./../" + p.id} onClick={handleClose}>{p.name}</MenuItem>)
-      }
+      {menuItems}
     </Menu>
   </>
 }
