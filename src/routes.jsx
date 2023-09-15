@@ -67,9 +67,9 @@ const caseFormRouteData = {
       case "addCase":
         const response = await addCase(params.tenantId, params.payrollId, caseChangeSetup, params.employeeId)
         if (response.ok) {
-          return redirect("../new");
+          return redirect("..");
         }
-        // TODO validation errors
+        // TODO  AJO validation errors
         return response;
       case "buildCase":
         return buildCase(params.tenantId, params.payrollId, params.caseName, caseChangeSetup, params.employeeId);
@@ -104,15 +104,12 @@ export default createBrowserRouter([
       }
       const payroll = payrolls.find(p => p.id === Number(params.payrollId));
 
-      // TODO AJO query in parallel
-      const tenant = await getTenant(params.tenantId);
-      
       const authUserEmail = getAuthUser()?.profile.email;
-
-      const user = await getUser(params.tenantId, authUserEmail);
-
-      const employee = await getEmployeeByIdentifier(params.tenantId, payroll.divisionId, authUserEmail);
-
+      const [tenant, user, employee] = await Promise.all([
+        getTenant(params.tenantId),
+        getUser(params.tenantId, authUserEmail),
+        getEmployeeByIdentifier(params.tenantId, payroll.divisionId, authUserEmail)
+      ]);
       
       return { tenant, user, payrolls, payroll, employee };
     },

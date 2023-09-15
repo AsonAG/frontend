@@ -12,21 +12,19 @@ const authConfig = {
   post_logout_redirect_uri: import.meta.env.VITE_REDIRECT_URL,
 
   automaticSilentRenew: true,
+  revokeTokensOnSignout: true,
   
   userStore: new WebStorageStateStore({ store: window.localStorage }),
   loadUserInfo: true,
 
 
-  onSignIn: async (user) => {
+  onSigninCallback: async (user) => {
     window.history.replaceState(
       {},
       window.document.title,
-      window.location.pathname
+      user?.state?.location || window.location.pathname
     );
-  },
-  
-  onSignOut: async (user) => {
-  },
+  }
 };
 
 

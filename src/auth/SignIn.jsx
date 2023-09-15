@@ -8,7 +8,6 @@ function Centered({children}) {
             </Stack>;
 }
 
-// TODO AJO test fresh login
 function SignIn({children}) {
     const auth = useAuth();
     const [hasTriedSignin, setHasTriedSignin] = useState(false);
@@ -19,7 +18,8 @@ function SignIn({children}) {
             !auth.isAuthenticated && !auth.activeNavigator && !auth.isLoading &&
             !hasTriedSignin
         ) {
-            auth.signinRedirect();
+            const state = { location: window.location.pathname };
+            auth.signinRedirect({ state });
             setHasTriedSignin(true);
         }
     }, [auth, hasTriedSignin]);

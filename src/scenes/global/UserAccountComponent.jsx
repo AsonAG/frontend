@@ -9,16 +9,21 @@ const buttonSx = {
 const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
 
 function UserAccountComponent({ user, ...stackProps }) {
-    const auth = useAuth();
+    let handleLogout = () => {};
+    if (import.meta.env.PROD) {
+        // Authentication Provider is only mounted in PROD.
+        const auth = useAuth();
+        
+        handleLogout = () => {
+            if (auth.isAuthenticated) {
+                auth.removeUser();
+            }
+        };
+    }
+
     if (!user)
         return null;
-
-    const handleLogout = () => {
-        if (auth.isAuthenticated) {
-            auth.removeUser();
-        }
-    };
-
+    
     return (
         <Stack spacing={2} {...stackProps}>
             <Stack>
@@ -39,7 +44,6 @@ function UserAccountComponent({ user, ...stackProps }) {
                     color="primary"
                     endIcon={<LogoutIcon sx={{height: 16}} />}
                     onClick={handleLogout}
-                    disabled={!auth.isAuthenticated}
                 >
                     Logout
                 </Button>

@@ -19,7 +19,6 @@ const UnknownErrorPage = (props) => {
           Sorry, this feature doesn't work yet. We are working hard to fix it
           for you...
         </Typography>
-        {/* TODO AJO check variant */}
         <Typography fontWeight="bold">
           Please open the main page again.
         </Typography>
