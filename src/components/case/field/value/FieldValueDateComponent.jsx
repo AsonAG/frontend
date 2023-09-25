@@ -1,22 +1,27 @@
-import { DatePicker } from "@mui/x-date-pickers";
+import { DatePicker, DateTimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { FieldContext } from "../FieldComponent";
 
-function FieldValueDateComponent({propertyName, displayName, sx, required = true}) {
+function _InternalDateComponent({Picker, propertyName, displayName, sx, required = true}) {
 	const { field, isReadonly, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
+	const inputRef = useRef();
 	const fieldValue = field[propertyName];
 	const value = fieldValue ? dayjs.utc(fieldValue) : null;
 
 	displayName ??= fieldDisplayName;
 
-	const handleDateChange = (newDate) => {
-		field[propertyName] = newDate?.format();
-		buildCase();
+	const handleDateChange = (newDate, context) => {
+		const validationError = context.validationError ? "Invalid date" : "";
+		inputRef.current?.setCustomValidity(validationError);
+		if(!validationError) {
+			field[propertyName] = newDate?.format();
+			buildCase();
+		}
 	};
 
 	return (
-		<DatePicker
+		<Picker
 			label={displayName}
 			value={value}
 			onChange={handleDateChange}
@@ -24,12 +29,19 @@ function FieldValueDateComponent({propertyName, displayName, sx, required = true
 			timezone="UTC"
 			disabled={isReadonly}
 			views={["year", "month", "day"]}
+			inputRef={inputRef}
 			slotProps={{
-				field: { required }
+				field: { required },
+				openPickerButton: { tabIndex: -1 }
 			}}
 			sx={sx}
 		/>
 	);
 };
 
-export default FieldValueDateComponent;
+function FieldValueDateComponent(props) { return _InternalDateComponent({Picker: DatePicker, ...props}); }
+function FieldValueDateTimeComponent(props) { return _InternalDateComponent({Picker: DateTimePicker, ...props}); }
+
+
+
+export { FieldValueDateComponent, FieldValueDateTimeComponent };

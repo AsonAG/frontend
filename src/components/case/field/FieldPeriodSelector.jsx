@@ -1,4 +1,4 @@
-import FieldValueDateComponent from "./value/FieldValueDateComponent";
+import { FieldValueDateComponent } from "./value/FieldValueDateComponent";
 
 function FieldPeriodSelector({field}) {
     const isStartEndVisible =

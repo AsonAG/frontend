@@ -15,6 +15,7 @@ import getAuthUser from "./auth/getUser";
 import App from "./App";
 
 // TODO AJO error states when network requests fail
+// TODO AJO DEMOGROUP -> COMPANY -> NEW EVENT -> ZAHLT DIE FIRMA EINEN 13. MONATSLOHN AUS? -> error
 import { 
   getTenants, 
   getPayrolls, 
@@ -132,6 +133,7 @@ const routeData = [
           const employee = await getEmployee(params.tenantId, params.employeeId);
           return { employee };
         },
+        shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.employeeId !== nextParams.employeeId,
         id: "employee",
         children: [
           {

@@ -10,8 +10,7 @@ import FieldValueLookupComponent from "./selector/FieldValueLookupComponent";
 import FieldValueNumberComponent from "./FieldValueNumberComponent";
 import FieldValueListComponent from "./selector/FieldValueListComponent";
 import FieldValueTextComponent from "./FieldValueTextComponent";
-import FieldValueDateComponent from "./FieldValueDateComponent";
-import FieldValueDateTimeComponent from "./FieldValueDateTimeComponent";
+import { FieldValueDateComponent, FieldValueDateTimeComponent } from "./FieldValueDateComponent";
 import FieldValueBooleanComponent from "./FieldValueBooleanComponent";
 import { FieldContext } from "../FieldComponent";
 
