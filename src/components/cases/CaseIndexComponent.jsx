@@ -18,7 +18,7 @@ function CaseIndexComponent({ _case, indent,  activeCase, onSelect}) {
   return <List disablePadding>
     <ListItem disablePadding>
       <ListItemButton onClick={() => onSelect(_case.name)} sx={{ pl: 2 + indent, borderLeftWidth: "3px", borderLeftStyle: "solid", ...styling }}>
-        <ListItemText primaryTypographyProps={{textOverflow:"ellipsis", overflow: "hidden"}}>{_case.name}</ListItemText>
+        <ListItemText primaryTypographyProps={{textOverflow:"ellipsis", overflow: "hidden"}}>{_case.displayName}</ListItemText>
       </ListItemButton>
     </ListItem>
     { _case?.relatedCases?.map(c => <CaseIndexComponent key={c.id} _case={c} indent={indent + 1} activeCase={activeCase} onSelect={onSelect} />) }
