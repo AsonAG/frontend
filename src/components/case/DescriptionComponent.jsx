@@ -1,4 +1,4 @@
-import { Box, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import { Markup } from "interweave";
 
@@ -14,10 +14,8 @@ export function DescriptionComponent({ description }) {
   const content = isHtml(description) ? <Markup content={description} /> : description;
 
   return (
-    <Box>
-        <Tooltip arrow title={content} placement="top">
-          <HelpOutlineOutlinedIcon color="disabled" />
-        </Tooltip>
-    </Box>
+    <Tooltip arrow title={content} placement="top">
+      <HelpOutlineOutlinedIcon color="disabled" />
+    </Tooltip>
   );
 }
