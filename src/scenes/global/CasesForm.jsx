@@ -2,7 +2,7 @@ import { useLoaderData, Form, useActionData, useSubmit, useRouteLoaderData, useO
 import CaseComponent from "../../components/case/CaseComponent";
 import { createContext, useRef } from "react";
 import CaseIndexView from "../../components/cases/CaseIndexView";
-import CasesSaveButton from "../../components/buttons/CasesSaveButton";
+import { CaseFormButtons } from "../../components/buttons/CaseFormButtons";
 import { Container, Stack, useMediaQuery } from "@mui/material";
 import Header from "../../components/Header";
 import { useTheme } from "@emotion/react";
@@ -35,7 +35,7 @@ function CasesForm({ defaultTitle, displayOnly = false }) {
     }
   }
 
-  const submitButton = !displayOnly && <CasesSaveButton onSubmit={handleSubmit} />;
+  const buttons = !displayOnly && <CaseFormButtons onSubmit={handleSubmit} />;
 
   return (
     <Stack useFlexGap direction="row">
@@ -46,7 +46,7 @@ function CasesForm({ defaultTitle, displayOnly = false }) {
             <Form method="post" ref={formRef} id="case_form">
               <Stack alignItems="flex-end" spacing={4}>
                 {caseData && <CaseComponent _case={caseData} />}
-                {submitButton}
+                {buttons}
               </Stack>
             </Form>
           </CaseFormContext.Provider>
