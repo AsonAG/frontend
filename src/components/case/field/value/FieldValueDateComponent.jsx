@@ -28,7 +28,6 @@ function _InternalDateComponent({Picker, propertyName, displayName, sx, required
 			name={field.name}
 			timezone="UTC"
 			disabled={isReadonly}
-			views={["year", "month", "day"]}
 			inputRef={inputRef}
 			slotProps={{
 				field: { required },
@@ -40,7 +39,7 @@ function _InternalDateComponent({Picker, propertyName, displayName, sx, required
 };
 
 function FieldValueDateComponent(props) { return _InternalDateComponent({Picker: DatePicker, ...props}); }
-function FieldValueDateTimeComponent(props) { return _InternalDateComponent({Picker: DateTimePicker, ...props}); }
+function FieldValueDateTimeComponent(props) { return _InternalDateComponent({Picker: DateTimePicker, propertyName: "value", ...props}); }
 
 
 

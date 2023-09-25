@@ -28,7 +28,7 @@ export default function CasesSaveButton({ onSubmit }) {
       onClick={onSubmit}
       endIcon={icon}
     >
-      <Typography fontWeight="bold" color="#ffffff">
+      <Typography fontWeight="bold" color="common.white">
         Save
       </Typography>
     </Button>
