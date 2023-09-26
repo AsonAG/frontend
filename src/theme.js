@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
-import { useTernaryDarkMode } from "usehooks-ts";
+import { useLocalStorage } from "usehooks-ts";
+import { useMediaQuery } from "@mui/material";
 
 const lightModeDesignTokens = {
   palette: {
@@ -50,8 +51,23 @@ function createThemeSettings(mode) {
 }
 
 export const useCreateTheme = () => {
-  const { isDarkMode } = useTernaryDarkMode();
+  const { isDarkMode } = useDarkMode();
   const mode = isDarkMode ? 'dark' : 'light';
   const theme = useMemo(() => createTheme(createThemeSettings(mode)), [mode]);
   return theme;
 };
+
+export function useDarkMode() {
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [darkMode, setDarkMode] = useLocalStorage('ason-dark-mode', 'system');
+  
+  let isDarkMode = darkMode === 'dark';
+  if (darkMode === 'system') {
+    isDarkMode = prefersDarkMode;
+  }
+
+  return {
+    isDarkMode,
+    setDarkMode
+  }
+}
