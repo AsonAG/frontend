@@ -96,7 +96,7 @@ const routeData = [
   },
   {
     path: "tenants/:tenantId/payrolls/:payrollId?",
-    element: <App />,
+    element: <App renderDrawer />,
     loader: async ({params}) => {
       // TODO AJO optimize this to only query payrolls once...
       const payrolls = await getPayrolls(params.tenantId);
