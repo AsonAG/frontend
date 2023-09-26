@@ -1,18 +1,15 @@
 import {
   Box,
   IconButton,
-  useTheme,
   AppBar,
   Toolbar,
 } from "@mui/material";
-import { useContext } from "react";
-import { ColorModeContext } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import { useTernaryDarkMode } from "usehooks-ts";
 
 function Topbar({ children }) {
-  const theme = useTheme();
-  const colorMode = useContext(ColorModeContext);
+  const { isDarkMode, setTernaryDarkMode } = useTernaryDarkMode();
 
   return (
     <AppBar elevation={0} sx={{ backgroundColor: "background.default", position: "static" }}>
@@ -20,8 +17,8 @@ function Topbar({ children }) {
         {children}
         <Box sx={{flexGrow: 1}} />
 
-        <IconButton onClick={colorMode.toggleColorMode} size="large">
-          {theme.palette.mode === "dark" ? (
+        <IconButton onClick={() => setTernaryDarkMode(isDarkMode ? 'light' : 'dark')} size="large">
+          {isDarkMode ? (
             <DarkModeOutlinedIcon />
           ) : (
             <LightModeOutlinedIcon />

@@ -1,4 +1,5 @@
-import { DatePicker, DateTimePicker } from "@mui/x-date-pickers";
+import { DatePicker, DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
 import { useContext, useRef } from "react";
 import { FieldContext } from "../FieldComponent";
@@ -21,20 +22,23 @@ function _InternalDateComponent({Picker, propertyName, displayName, sx, required
 	};
 
 	return (
-		<Picker
-			label={displayName}
-			value={value}
-			onChange={handleDateChange}
-			name={field.name}
-			timezone="UTC"
-			disabled={isReadonly}
-			inputRef={inputRef}
-			slotProps={{
-				field: { required },
-				openPickerButton: { tabIndex: -1 }
-			}}
-			sx={sx}
-		/>
+		// TODO AJO: user default selection and manual selection option
+		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
+			<Picker
+				label={displayName}
+				value={value}
+				onChange={handleDateChange}
+				name={field.name}
+				timezone="UTC"
+				disabled={isReadonly}
+				inputRef={inputRef}
+				slotProps={{
+					field: { required },
+					openPickerButton: { tabIndex: -1 }
+				}}
+				sx={sx}
+			/>
+		</LocalizationProvider>
 	);
 };
 

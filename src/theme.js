@@ -1,5 +1,6 @@
-import { createContext, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
+import { useTernaryDarkMode } from "usehooks-ts";
 
 const lightModeDesignTokens = {
   palette: {
@@ -25,8 +26,7 @@ const darkModeDesignTokens = {
   }
 }
 
-// mui theme settings
-export const themeSettings = (mode) => {
+function createThemeSettings(mode) {
   const palette = mode === "light" ? lightModeDesignTokens : darkModeDesignTokens;
 
   return {
@@ -47,24 +47,11 @@ export const themeSettings = (mode) => {
       }
     }
   };
-};
+}
 
-// context for color mode
-export const ColorModeContext = createContext({
-  toggleColorMode: () => {},
-});
-export const useMode = () => {
-  // const [mode, setMode] = useState("dark");
-  const [mode, setMode] = useState("light");
-
-  const colorMode = useMemo(
-    () => ({
-      toggleColorMode: () =>
-        setMode((prev) => (prev === "light" ? "dark" : "light")),
-    }),
-    []
-  );
-
-  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-  return [theme, colorMode];
+export const useCreateTheme = () => {
+  const { isDarkMode } = useTernaryDarkMode();
+  const mode = isDarkMode ? 'dark' : 'light';
+  const theme = useMemo(() => createTheme(createThemeSettings(mode)), [mode]);
+  return theme;
 };
