@@ -49,7 +49,7 @@ function mapCase(_case, attachments) {
 
 const caseFormRouteData = {
   element: <CasesForm />,
-  loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, null, params.employeeId),
+  loader: ({params}) => buildCase(params, null),
   shouldRevalidate: ({actionResult}) => !actionResult,
   action: async ({request, params}) => {
     const { caseData, intent, userId, divisionId, attachments } = await request.json();
@@ -64,14 +64,14 @@ const caseFormRouteData = {
 
     switch (intent) {
       case "addCase":
-        const response = await addCase(params.tenantId, params.payrollId, caseChangeSetup, params.employeeId)
+        const response = await addCase(params, caseChangeSetup)
         if (response.ok) {
           return redirect("..");
         }
         // TODO  AJO validation errors
         return response;
       case "buildCase":
-        return buildCase(params.tenantId, params.payrollId, params.caseName, caseChangeSetup, params.employeeId);
+        return buildCase(params, caseChangeSetup);
     } 
   }
 }
@@ -113,7 +113,7 @@ const routeData = [
       }
       const payroll = payrolls.find(p => p.id === Number(params.payrollId));
       const authUserEmail = getAuthUser()?.profile.email;
-      const employee = await getEmployeeByIdentifier(params.tenantId, params.payrollId, authUserEmail);
+      const employee = await getEmployeeByIdentifier(params, authUserEmail);
       return { tenant, user, payrolls, payroll, employee };
     }),
     shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.payrollId !== nextParams.payrollId,
@@ -126,13 +126,13 @@ const routeData = [
       {
         path: "hr/employees",
         element: <EmployeesTable />,
-        loader: ({params}) => getEmployees(params.tenantId, params.payrollId)
+        loader: ({params}) => getEmployees(params)
       },
       {
         path: "hr/employees/:employeeId",
         element: <EmployeeView routeLoaderDataName="employee"/>,
         loader: async ({params}) => {
-          const employee = await getEmployee(params.tenantId, params.employeeId);
+          const employee = await getEmployee(params);
           return { employee };
         },
         shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.employeeId !== nextParams.employeeId,
@@ -141,17 +141,17 @@ const routeData = [
           {
             index: true,
             element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "EmployeeData"),
+            loader: ({params}) => getEmployeeCases(params, "EmployeeData"),
           },
           {
             path: ":caseName",
             element: <CasesForm displayOnly />,
-            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, null, params.employeeId)
+            loader: ({params}) => buildCase(params, null)
           },
           {
             path: "new",
             element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "NotAvailable"),
+            loader: ({params}) => getEmployeeCases(params, "NotAvailable"),
           },
           {
             path: "new/:caseName",
@@ -160,12 +160,12 @@ const routeData = [
           {
             path: "events",
             element: <EventsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId)
+            loader: ({params}) => getEmployeeCaseValues(params)
           },
           {
             path: "documents",
             element: <DocumentsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId, "DocumentCount gt 0")
+            loader: ({params}) => getEmployeeCaseValues(params, "DocumentCount gt 0")
           }
         ]
       },
@@ -175,17 +175,17 @@ const routeData = [
           {
             index: true,
             element: <CasesTable defaultTitle="Company Data" />,
-            loader: ({params}) => getCompanyCases(params.tenantId, params.payrollId, "CompanyData"),
+            loader: ({params}) => getCompanyCases(params, "CompanyData"),
           },
           {
             path: ":caseName",
             element: <CasesForm displayOnly defaultTitle="Company Data"/>,
-            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, null)
+            loader: ({params}) => buildCase(params, null)
           },
           {
             path: "new",
             element: <CasesTable defaultTitle="New Company event" />,
-            loader: ({params}) => getCompanyCases(params.tenantId, params.payrollId, "NotAvailable"),
+            loader: ({params}) => getCompanyCases(params, "NotAvailable"),
           },
           {
             path: "new/:caseName",
@@ -195,13 +195,13 @@ const routeData = [
           {
             path: "events",
             element: <EventsTable defaultTitle="Company events" />,
-            loader: ({params}) => getCompanyCaseValues(params.tenantId, params.payrollId),
+            loader: ({params}) => getCompanyCaseValues(params),
 
           },
           {
             path: "documents",
             element: <DocumentsTable defaultTitle="Company documents" />,
-            loader: ({params}) => getCompanyCaseValues(params.tenantId, params.payrollId, "DocumentCount gt 0"),
+            loader: ({params}) => getCompanyCaseValues(params, "DocumentCount gt 0"),
           }
         ]
       },
@@ -212,17 +212,17 @@ const routeData = [
           {
             index: true,
             element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "EmployeeData"),
+            loader: ({params}) => getEmployeeCases(params, "EmployeeData"),
           },
           {
             path: ":caseName",
             element: <CasesForm displayOnly />,
-            loader: ({params}) => buildCase(params.tenantId, params.payrollId, params.caseName, null, params.employeeId)
+            loader: ({params}) => buildCase(params, null)
           },
           {
             path: "new",
             element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "ESS"),
+            loader: ({params}) => getEmployeeCases(params, "ESS"),
           },
           {
             path: "new/:caseName",
@@ -231,7 +231,7 @@ const routeData = [
           {
             path: "tasks",
             element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params.tenantId, params.payrollId, params.employeeId, "ECT"),
+            loader: ({params}) => getEmployeeCases(params, "ECT"),
           },
           {
             path: "tasks/:caseName",
@@ -240,7 +240,7 @@ const routeData = [
           {
             path: "documents",
             element: <DocumentsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params.tenantId, params.payrollId, params.employeeId, "DocumentCount gt 0")
+            loader: ({params}) => getEmployeeCaseValues(params, "DocumentCount gt 0")
           }
         ]
       },

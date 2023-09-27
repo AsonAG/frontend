@@ -13,17 +13,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Logo from "./components/Logo";
 import { useTranslation } from "react-i18next";
 import { getLanguageCode } from "./services/converters/LanguageConverter";
+import { getDateLocale } from "./services/converters/DateLocaleExtractor";
 
 
 dayjs.extend(utc);
 dayjs.extend(localizedFormat);
 
-// need to hardcode supported locales
-// vite (atm) can't deal with dynamic dayjs imports
-const supportedLocales = {
-	"de": () => import("dayjs/locale/de"),
-	"en": () => import("dayjs/locale/en")
-};
+// dynamically load these when we support more locales
+import "dayjs/locale/de";
+import "dayjs/locale/en";
 
 
 function App({renderDrawer = false}) {
@@ -33,8 +31,7 @@ function App({renderDrawer = false}) {
 	const { i18n } = useTranslation();
 	
 	useEffect(() => {
-		const [locale] = user?.culture.split("-") ?? ['en'];
-		supportedLocales[locale]().then(() => dayjs.locale(locale));
+		dayjs.locale(getDateLocale(user))
 		const languageCode = getLanguageCode(user?.language);
 		i18n.changeLanguage(languageCode);
 

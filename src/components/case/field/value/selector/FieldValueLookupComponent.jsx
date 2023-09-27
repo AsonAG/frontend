@@ -45,7 +45,7 @@ function FieldValueLookupComponent() {
     let active = true;
 
     (async () => {
-      const lookupData = await getLookupValues(tenantId, payrollId, field.lookupSettings.lookupName);
+      const lookupData = await getLookupValues({tenantId, payrollId}, field.lookupSettings.lookupName);
       const lookupValues = lookupData[0].values.map(lv => JSON.parse(lv.value));
 
       if (active) {

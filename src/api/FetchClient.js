@@ -1,19 +1,19 @@
+import { generatePath } from 'react-router-dom';
 import getAuthUser from '../auth/getUser';
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
-const tenantsUrl = `${baseUrl}/tenants`;
-
-const tenantUrl = (tenantId) => `${tenantsUrl}/${tenantId}`;
-const payrollsUrl = (tenantId) => `${tenantUrl(tenantId)}/payrolls`;
-const payrollUrl = (tenantId, payrollId) => `${tenantUrl(tenantId)}/payrolls/${payrollId}`;
-const caseSetsUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/cases/sets`;
-const lookupValuesUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/lookups/values`;
-const employeesUrl = (tenantId) => `${tenantUrl(tenantId)}/employees`;
-const payrollEmployeesUrl = (tenantId, payrollId) => `${payrollUrl(tenantId, payrollId)}/employees`;
-const employeeUrl = (tenantId, employeeId) => `${employeesUrl(tenantId)}/${employeeId}`;
-const usersUrl = (tenantId) => `${tenantUrl(tenantId)}/users`;
-const employeeDocumentUrl = (tenantId, employeeId, caseValueId, documentId) => `${employeeUrl(tenantId, employeeId)}/cases/${caseValueId}/documents/${documentId}`;
-const companyDocumentUrl = (tenantId, caseValueId, documentId) => `${tenantUrl(tenantId)}/companycases/${caseValueId}/documents/${documentId}`;
+const tenantsUrl          = "/tenants";
+const tenantUrl           = "/tenants/:tenantId";
+const payrollsUrl         = "/tenants/:tenantId/payrolls";
+const payrollUrl          = "/tenants/:tenantId/payrolls/:payrollId";
+const caseSetsUrl         = "/tenants/:tenantId/payrolls/:payrollId/cases/sets";
+const caseSetUrl         = "/tenants/:tenantId/payrolls/:payrollId/cases/sets/:caseName";
+const lookupValuesUrl     = "/tenants/:tenantId/payrolls/:payrollId/lookups/values";
+const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
+const employeeUrl         = "/tenants/:tenantId/employees/:employeeId";
+const usersUrl            = "/tenants/:tenantId/users";
+const employeeDocumentUrl = "/tenants/:tenantId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
+const companyDocumentUrl  = "/tenants/:tenantId/companycases/:caseValueId/documents/:documentId";
 
 class TenantDataCache {
     tenantDataCache = {};
@@ -33,9 +33,9 @@ class TenantDataCache {
     loadTenantData(tenantId) {
         const authUserEmail = getAuthUser()?.profile.email;
         return Promise.all([
-          getTenant(tenantId),
-          getUser(tenantId, authUserEmail),
-          getPayrolls(tenantId)
+          getTenant({tenantId}),
+          getUser({tenantId}, authUserEmail),
+          getPayrolls({tenantId})
         ]);
     }
 }
@@ -50,9 +50,15 @@ class FetchRequestBuilder {
     localizeRequest = false;
     body = null;
     url = null;
+    routeParams = {};
+    addUserQueryParam = false;
 
-    constructor(url) {
-        this.url = url;
+    constructor(url, routeParams) {
+        if (!url) {
+            throw new Error("Url cannot be empty");
+        }
+        this.url = baseUrl + generatePath(url, routeParams);
+        this.routeParams = routeParams || {};
 
         if (import.meta.env.PROD) {
             this.headers.set('Authorization', `Bearer ${getAuthUser()?.access_token}`);
@@ -61,8 +67,8 @@ class FetchRequestBuilder {
         this.headers.set('Content-Type', 'application/json');
     }
 
-    withUrl(url) {
-        this.url = url;
+    withRouteParams(routeParams) {
+        this.routeParams = routeParams;
         return this;
     }
 
@@ -71,9 +77,8 @@ class FetchRequestBuilder {
         return this;
     }
 
-    withLocalization(tenantId) {
+    withLocalization() {
         this.localizeRequest = true;
-        this.tenantId = tenantId;
         return this;
     }
 
@@ -96,13 +101,21 @@ class FetchRequestBuilder {
         return this;
     }
 
+    withUser() {
+        this.addUserQueryParam = true;
+        return this;
+    }
+
     async fetch() {
-        if (!this.url) {
-            throw new Error("Url cannot be empty");
-        }
-        if (this.localizeRequest && this.tenantId) {
-            const data = await tenantDataCache.getData(this.tenantId);
-            this.searchParams.append("language", data.user.language);
+        if (this.routeParams.tenantId) {
+            if (this.localizeRequest) {
+                const data = await tenantDataCache.getData(this.routeParams.tenantId);
+                this.searchParams.append("language", data.user.language);
+            }
+            if (this.addUserQueryParam) {
+                const data = await tenantDataCache.getData(this.routeParams.tenantId);
+                this.searchParams.append("userId", data.user.id);
+            }
         }
         let url = this.url;
         if ([...this.searchParams].length > 0) {
@@ -127,114 +140,108 @@ export function getTenants() {
     return new FetchRequestBuilder(tenantsUrl).fetch();
 }
 
-export function getTenant(tenantId) {
-    return new FetchRequestBuilder(tenantUrl(tenantId)).fetchJson();
+export function getTenant(routeParams) {
+    return new FetchRequestBuilder(tenantUrl, routeParams).fetchJson();
 }
 
-export function getPayrolls(tenantId) {
-    return new FetchRequestBuilder(payrollsUrl(tenantId)).fetchJson();
+export function getPayrolls(routeParams) {
+    return new FetchRequestBuilder(payrollsUrl, routeParams).fetchJson();
 }
 
-export function getPayroll(tenantId, payrollId) {
-    return new FetchRequestBuilder(payrollUrl(tenantId, payrollId)).fetchJson();
+export function getPayroll(routeParams) {
+    return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
 }
 
-export function getEmployees(tenantId, payrollId) {
-    return new FetchRequestBuilder(payrollEmployeesUrl(tenantId, payrollId)).fetch();
+export function getEmployees(routeParams) {
+    return new FetchRequestBuilder(payrollEmployeesUrl, routeParams).fetch();
 }
 
-export async function getEmployee(tenantId, employeeId) {
-    return new FetchRequestBuilder(employeeUrl(tenantId, employeeId)).fetchJson();
+export async function getEmployee(routeParams) {
+    return new FetchRequestBuilder(employeeUrl, routeParams).fetchJson();
 }
 
-export async function getEmployeeByIdentifier(tenantId, payrollId, identifier) {
-    const employees = await new FetchRequestBuilder()
-        .withUrl(payrollEmployeesUrl(tenantId, payrollId))
+export async function getEmployeeByIdentifier(routeParams, identifier) {
+    const employees = await new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
         .withQueryParam("filter", `Identifier eq '${identifier}'`)
         .fetchJson();
     return employees?.length ? employees[0] : null;
 }
 
-export function getEmployeeCases(tenantId, payrollId, employeeId, clusterSetName) {
-    return new FetchRequestBuilder()
-        .withUrl(caseSetsUrl(tenantId, payrollId))
-        .withQueryParam("employeeId", employeeId)
+export function getEmployeeCases(routeParams, clusterSetName) {
+    return new FetchRequestBuilder(caseSetsUrl, routeParams)
+        .withQueryParam("employeeId", routeParams.employeeId)
         .withQueryParam("clusterSetName", clusterSetName)
         .withQueryParam("caseType", "Employee")
-        .withLocalization(tenantId)
+        .withLocalization()
         .fetch();
 }
 
-// TODO AJO user id?
-export function getEmployeeCaseValues(tenantId, payrollId, employeeId, filter) {
-    return new FetchRequestBuilder()
-        .withUrl(`${payrollUrl(tenantId, payrollId)}/changes/values`)
-        .withQueryParam("employeeId", employeeId)
+export function getEmployeeCaseValues(routeParams, filter) {
+    const url = payrollUrl + "/changes/values";
+    return new FetchRequestBuilder(url, routeParams)
+        .withQueryParam("employeeId", routeParams.employeeId)
         .withQueryParam("caseType", "Employee")
         .withQueryParam("filter", filter)
-        .withLocalization(tenantId)
+        .withLocalization()
+        .withUser()
         .fetch();
 }
 
-export function getCompanyCases(tenantId, payrollId, clusterSetName) {
-    return new FetchRequestBuilder()
-        .withUrl(caseSetsUrl(tenantId, payrollId))
+export function getCompanyCases(routeParams, clusterSetName) {
+    return new FetchRequestBuilder(caseSetsUrl, routeParams)
         .withQueryParam("clusterSetName", clusterSetName)
         .withQueryParam("caseType", "Company")
-        .withLocalization(tenantId)
+        .withLocalization()
         .fetch();
 }
 
-export function getCompanyCaseValues(tenantId, payrollId, filter) {
-    return new FetchRequestBuilder()
-        .withUrl(`${payrollUrl(tenantId, payrollId)}/changes/values`)
+export function getCompanyCaseValues(routeParams, filter) {
+    const url = payrollUrl + "/changes/values";
+    return new FetchRequestBuilder(url, routeParams)
         .withQueryParam("caseType", "Company")
         .withQueryParam("filter", filter)
-        .withLocalization(tenantId)
+        .withLocalization()
+        .withUser()
         .fetch();
 }
 
-export function buildCase(tenantId, payrollId, caseName, caseChangeSetup, employeeId) {
-    return new FetchRequestBuilder()
-        .withUrl(`${caseSetsUrl(tenantId, payrollId)}/${encodeURIComponent(caseName)}`)
+export function buildCase(routeParams, caseChangeSetup) {
+    return new FetchRequestBuilder(caseSetUrl, routeParams)
         .withMethod("POST")
         .withBody(caseChangeSetup)
-        .withQueryParam("employeeId", employeeId)
-        .withLocalization(tenantId)
+        .withQueryParam("employeeId", routeParams.employeeId)
+        .withLocalization()
         .fetch();
 }
 
-export function addCase(tenantId, payrollId, caseChangeSetup, employeeId) {
-    return new FetchRequestBuilder()
-        .withUrl(caseSetsUrl(tenantId, payrollId))
+export function addCase(routeParams, caseChangeSetup) {
+    return new FetchRequestBuilder(caseSetsUrl, routeParams)
         .withMethod("POST")
         .withBody(caseChangeSetup)
-        .withQueryParam("employeeId", employeeId)
-        .withLocalization(tenantId)
+        .withQueryParam("employeeId", routeParams.employeeId)
+        .withLocalization()
         .fetch();
 }
 
-export async function getUser(tenantId, identifier) {
-    const users = await new FetchRequestBuilder()
-        .withUrl(usersUrl(tenantId))
+export async function getUser(routeParams, identifier) {
+    const users = await new FetchRequestBuilder(usersUrl, routeParams)
         .withQueryParam("filter", `Identifier eq '${identifier}'`)
         .fetchJson();
     const user = users?.length ? users[0] : null;
     return user;
 }
 
-export function getLookupValues(tenantId, payrollId, lookupName) {
-    return new FetchRequestBuilder()
-        .withUrl(lookupValuesUrl(tenantId, payrollId))
+export function getLookupValues(routeParams, lookupName) {
+    return new FetchRequestBuilder(lookupValuesUrl, routeParams)
         .withQueryParam("lookupNames", lookupName)
-        .withLocalization(tenantId)
+        .withLocalization()
         .fetchJson();
 }
 
-export function getDocument(tenantId, caseValueId, documentId, employeeId) {
-    const url = employeeId ? 
-        employeeDocumentUrl(tenantId, employeeId, caseValueId, documentId) :
-        companyDocumentUrl(tenantId, caseValueId, documentId);
+export function getDocument(routeParams) {
+    const url = routeParams.employeeId ? 
+        employeeDocumentUrl :
+        companyDocumentUrl;
 
-    return new FetchRequestBuilder(url).fetchJson();
+    return new FetchRequestBuilder(url, routeParams).fetchJson();
 }

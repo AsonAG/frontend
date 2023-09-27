@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { useContext, useRef } from "react";
 import { FieldContext } from "../FieldComponent";
 import { useRouteLoaderData } from "react-router-dom";
+import { getDateLocale } from "../../../../services/converters/DateLocaleExtractor";
 
 function _InternalDateComponent({Picker, propertyName, displayName, sx, required = true}) {
 	const { user } = useRouteLoaderData('root');
@@ -22,9 +23,8 @@ function _InternalDateComponent({Picker, propertyName, displayName, sx, required
 			buildCase();
 		}
 	};
-
 	return (
-		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={user?.culture ?? 'en'}>
+		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
 			<Picker
 				label={displayName}
 				value={value}
