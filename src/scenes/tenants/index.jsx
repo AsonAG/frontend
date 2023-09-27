@@ -10,13 +10,15 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Link, useLoaderData } from "react-router-dom";
 import { useDocumentTitle } from "usehooks-ts";
+import { useTranslation } from "react-i18next";
 
 function Tenants() {
   const tenants = useLoaderData();
+  const { t } = useTranslation();
   useDocumentTitle("Ason - Tenants");
   return (
     <Container maxWidth="lg" sx={{mt: 4}}>
-      <Header title="Select a company"/>
+      <Header title={t("Select a company")}/>
       <Paper>
         <List>
           {tenants.map(tenant => (

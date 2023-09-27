@@ -1,6 +1,7 @@
 import SendIcon from "@mui/icons-material/Send";
 import { CircularProgress, Stack } from "@mui/material";
 import { Button, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { useNavigation } from "react-router-dom";
 import { Link } from "react-router-dom";
 
@@ -17,6 +18,7 @@ function CaseFormButtons({ onSubmit }) {
   const isRedirecting = navigation.state === "loading" && navigation.json && navigation.formAction !== navigation.location.pathname;
   const isProcessing = isSubmitting || isRedirecting;
   const icon = isProcessing ? <CircularProgress {...iconProps} /> : <SendIcon {...iconProps} />;
+  const { t } = useTranslation();
 
   return (
     <Stack direction="row" spacing={2}>
@@ -27,7 +29,7 @@ function CaseFormButtons({ onSubmit }) {
         relative="path"
       >
         <Typography>
-          Cancel
+          {t("Cancel")}
         </Typography>
       </Button>
       <Button
@@ -40,7 +42,7 @@ function CaseFormButtons({ onSubmit }) {
         endIcon={icon}
       >
         <Typography fontWeight="bold" color="common.white">
-          Save
+          {t("Save")}
         </Typography>
       </Button>
     </Stack>

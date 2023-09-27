@@ -2,6 +2,7 @@ import { Typography, Stack, ButtonGroup, Button } from "@mui/material";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Link } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
+import { useTranslation } from "react-i18next";
 
 const buttonSx = {
     flexGrow: 1, lineHeight: 1, py: 1
@@ -9,6 +10,7 @@ const buttonSx = {
 const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
 
 function UserAccountComponent({ user, ...stackProps }) {
+    const { t } = useTranslation();
     let handleLogout = () => {};
     if (import.meta.env.PROD) {
         // Authentication Provider is only mounted in PROD.
@@ -37,7 +39,7 @@ function UserAccountComponent({ user, ...stackProps }) {
                     component={Link}
                     to={settingsLink}
                 >
-                    Settings
+                    {t("Settings")}
                 </Button>
                 <Button
                     sx={buttonSx}

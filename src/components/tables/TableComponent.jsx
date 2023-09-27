@@ -1,6 +1,7 @@
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function TableComponent({
   tableData,
@@ -10,6 +11,7 @@ function TableComponent({
 }){
   const [searchText, setSearchText] = useState("");
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
+  const { t } = useTranslation();
 
 
   useEffect(() => {
@@ -63,6 +65,9 @@ function TableComponent({
             onChange: (event) => requestSearch(event.target.value),
             clearSearch: () => requestSearch(""),
           },
+          pagination: {
+            labelRowsPerPage: t('Rows per page:')
+          }
         }}
         sx={{
           "& .MuiDataGrid-cell:focus": {

@@ -20,6 +20,7 @@ import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import UserAccountComponent from "./UserAccountComponent";
+import { useTranslation } from "react-i18next";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -80,6 +81,7 @@ const drawerWidth = 265;
 function Drawer({ temporary, open, onClose }) {
   const { tenant, user, employee } = useLoaderData();
   const location = useLocation();
+  const { t } = useTranslation();
 
 	useEffect(onClose, [location])
 
@@ -103,7 +105,7 @@ function Drawer({ temporary, open, onClose }) {
         <Logo />
         <Divider orientation="vertical" variant="middle" flexItem sx={{mx: 2}} />
         <Stack spacing={0.5} sx={{flex: 1}} alignItems="flex-start" pt={0.5}>
-          <Typography variant="body2" color="text.secondary" fontWeight="bold" px={1} >Business Unit</Typography>
+          <Typography variant="body2" color="text.secondary" fontWeight="bold" px={1} >{t("Business Unit")}</Typography>
           <PayrollSelector/>
         </Stack>
       </Toolbar>
@@ -111,27 +113,27 @@ function Drawer({ temporary, open, onClose }) {
       <Stack sx={{flexGrow: 1, border: 0, borderRight: 1, borderStyle: 'solid', borderColor: 'divider', overflowY: 'auto'}}>
         <NavigationMenu>
           <NavigationGroup>
-            <NavigationItem label="Dashboard" to="" icon={<HomeIcon />} end />
+            <NavigationItem label={t("Dashboard")} to="" icon={<HomeIcon />} end />
           </NavigationGroup>
-          <NavigationGroup name="HR">
-            <NavigationItem label="Employees" to="hr/employees" icon={<PeopleOutlinedIcon />} />
+          <NavigationGroup name={t("HR")}>
+            <NavigationItem label={t("Employees")} to="hr/employees" icon={<PeopleOutlinedIcon />} />
           </NavigationGroup>
-          <NavigationGroup name="Company">
-            <NavigationItem label="New event" to="company/new" icon={<AddOutlinedIcon />} end />
-            <NavigationItem label="Data" to="company" icon={<CasesOutlinedIcon />} end />
-            <NavigationItem label="Events" to="company/events" icon={<WorkHistoryOutlinedIcon />} end />
-            <NavigationItem label="Documents" to="company/documents" icon={<DescriptionOutlinedIcon />} end />
+          <NavigationGroup name={t("Company")}>
+            <NavigationItem label={t("New event")} to="company/new" icon={<AddOutlinedIcon />} end />
+            <NavigationItem label={t("Data")} to="company" icon={<CasesOutlinedIcon />} end />
+            <NavigationItem label={t("Events")} to="company/events" icon={<WorkHistoryOutlinedIcon />} end />
+            <NavigationItem label={t("Documents")} to="company/documents" icon={<DescriptionOutlinedIcon />} end />
           </NavigationGroup>
-          <NavigationGroup name="Employee" hidden={employee === null}>
-            <NavigationItem label="New event" to={`employees/${employee?.id}/new`} icon={<AddOutlinedIcon />} end />
-            <NavigationItem label="My Profile" to={`employees/${employee?.id}`} icon={<PersonOutlineOutlinedIcon />} end />
-            <NavigationItem label="Tasks" to={`employees/${employee?.id}/tasks`} icon={<FormatListBulletedIcon />} end />
-            <NavigationItem label="Documents" to={`employees/${employee?.id}/documents`} icon={<DescriptionOutlinedIcon />} end />
+          <NavigationGroup name={t("Employee")} hidden={employee === null}>
+            <NavigationItem label={t("New event")} to={`employees/${employee?.id}/new`} icon={<AddOutlinedIcon />} end />
+            <NavigationItem label={t("My Profile")} to={`employees/${employee?.id}`} icon={<PersonOutlineOutlinedIcon />} end />
+            <NavigationItem label={t("Tasks")} to={`employees/${employee?.id}/tasks`} icon={<FormatListBulletedIcon />} end />
+            <NavigationItem label={t("Documents")} to={`employees/${employee?.id}/documents`} icon={<DescriptionOutlinedIcon />} end />
           </NavigationGroup>
         </NavigationMenu>
         <Divider />
         <Stack sx={{p: 2}} spacing={1}>
-          <Typography>Company</Typography>
+          <Typography>{t("Company")}</Typography>
           <Stack spacing={1} direction="row">
             <Typography variant="body2" textOverflow="ellipsis" overflow="hidden">{tenant.identifier}</Typography>
             <Typography 
@@ -146,7 +148,7 @@ function Drawer({ temporary, open, onClose }) {
                 }
               }}
             >
-              Change
+              {t("Select...")}
             </Typography>
           </Stack>
         </Stack>

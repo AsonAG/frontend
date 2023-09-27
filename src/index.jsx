@@ -6,6 +6,7 @@ import { browserRouter } from "./routes";
 import { AuthProvider } from "react-oidc-context";
 import authConfig from "./auth/authConfig";
 import SignIn from "./auth/SignIn";
+import "./translations";
 
 
 function Authentication({children}) {

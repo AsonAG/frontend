@@ -11,13 +11,15 @@ import TableView from "./TableView";
 import { FileIcon, defaultStyles } from "react-file-icon";
 import { useLoaderData, useOutletContext, useParams } from "react-router-dom";
 import { getDocument } from "../../api/FetchClient";
-import { dateColumns } from "./caseValueDateColumns";
+import { createDateColumns } from "./caseValueDateColumns";
+import { useTranslation } from "react-i18next";
 
 function DocumentsTable({ defaultTitle }) {
   const title = useOutletContext() || defaultTitle;
   const events = useLoaderData();
   const params = useParams();
   const [backdropOpen, setBackdropOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleFileClick = async (documentId, caseValueId) => {
     setBackdropOpen(true);
@@ -33,12 +35,12 @@ function DocumentsTable({ defaultTitle }) {
   const columns = [
     {
       field: "caseFieldName",
-      headerName: "Name (event field name)",
+      headerName: t("Name (event field name)"),
       flex: 2,
     },
     {
       field: "documents",
-      headerName: "Documents",
+      headerName: t("Documents"),
       flex: 3,
       renderCell: ({ row: caseValue }) => {
         if (Array.isArray(caseValue.documents)) {
@@ -68,7 +70,7 @@ function DocumentsTable({ defaultTitle }) {
         }
       },
     },
-    ...dateColumns
+    ...createDateColumns()
   ];
 
   return (

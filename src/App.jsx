@@ -11,6 +11,8 @@ import { Outlet, useLoaderData } from "react-router-dom";
 import { Box } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import Logo from "./components/Logo";
+import { useTranslation } from "react-i18next";
+import { getLanguageCode } from "./services/converters/LanguageConverter";
 
 
 dayjs.extend(utc);
@@ -28,11 +30,15 @@ function App({renderDrawer = false}) {
 	const theme = useCreateTheme();
 	const useTemporaryDrawer = useMediaQuery(theme.breakpoints.down("lg"));
 	const { user } = useLoaderData();
+	const { i18n } = useTranslation();
 	
 	useEffect(() => {
 		const [locale] = user?.culture.split("-") ?? ['en'];
 		supportedLocales[locale]().then(() => dayjs.locale(locale));
-	}, [user?.culture]);
+		const languageCode = getLanguageCode(user?.language);
+		i18n.changeLanguage(languageCode);
+
+	}, [user?.culture, user?.language]);
 
 	const [drawerOpen, setDrawerOpen] = useState(false);
 

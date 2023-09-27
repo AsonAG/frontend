@@ -1,30 +1,32 @@
-import { React, useState } from "react";
+import { React } from "react";
 import TableView from "./TableView";
 import { EmployeeButtons } from "../buttons/EmployeeButtons";
 import { useLoaderData } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const EmployeesTable = () => {
   const employees = useLoaderData();
+  const { t } = useTranslation();
 
   const columns = [
     {
       field: "firstName",
-      headerName: "First name",
+      headerName: t("First name"),
       flex: 3,
     },
     {
       field: "lastName",
-      headerName: "Last name",
+      headerName: t("Last name"),
       flex: 3,
     },
     {
       field: "identifier",
-      headerName: "Email",
+      headerName: t("Email"),
       flex: 3,
     },
     {
       field: "divisions",
-      headerName: "Division",
+      headerName: t("Division"),
       flex: 3,
     },
     {
@@ -41,7 +43,7 @@ const EmployeesTable = () => {
 
   return (
     <TableView
-      title="Employees"
+      title={t("Employees")}
       tableData={employees}
       columns={columns}
       rowHeight={50}
