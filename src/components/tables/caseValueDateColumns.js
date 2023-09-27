@@ -1,10 +1,10 @@
 import dayjs from "dayjs";
 
 const dateTimeFormatter = (params) =>
-  params?.value ? dayjs(params.value).format("L LT") : null;
+  params?.value ? dayjs.utc(params.value).format("L LT") : null;
 
 const dateFormatter = (params) =>
-  params?.value ? dayjs(params.value).format("L") : null;
+  params?.value ? dayjs.utc(params.value).format("L") : null;
 
 
 const dateColumns = [
