@@ -3,8 +3,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
 import { useContext, useRef } from "react";
 import { FieldContext } from "../FieldComponent";
+import { useRouteLoaderData } from "react-router-dom";
 
 function _InternalDateComponent({Picker, propertyName, displayName, sx, required = true}) {
+	const { user } = useRouteLoaderData('root');
 	const { field, isReadonly, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const inputRef = useRef();
 	const fieldValue = field[propertyName];
@@ -22,8 +24,7 @@ function _InternalDateComponent({Picker, propertyName, displayName, sx, required
 	};
 
 	return (
-		// TODO AJO: user default selection and manual selection option
-		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
+		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={user.culture}>
 			<Picker
 				label={displayName}
 				value={value}

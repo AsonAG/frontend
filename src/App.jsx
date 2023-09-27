@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCreateTheme } from "./theme";
 import { CssBaseline, Divider, ThemeProvider, Stack, useMediaQuery, IconButton } from "@mui/material";
 import Topbar from "./scenes/global/Topbar";
 import Drawer from "./scenes/global/Drawer";
 
-import 'dayjs/locale/de';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-import { Outlet } from "react-router-dom";
+import { Outlet, useLoaderData } from "react-router-dom";
 import { Box } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import Logo from "./components/Logo";
@@ -16,12 +15,26 @@ import Logo from "./components/Logo";
 
 dayjs.extend(utc);
 dayjs.extend(localizedFormat);
-dayjs.locale('de');
+
+// need to hardcode supported locales
+// vite (atm) can't deal with dynamic dayjs imports
+const supportedLocales = {
+	"de": () => import("dayjs/locale/de"),
+	"en": () => import("dayjs/locale/en")
+};
+
 
 function App({renderDrawer = false}) {
 	const theme = useCreateTheme();
 	const useTemporaryDrawer = useMediaQuery(theme.breakpoints.down("lg"));
+	const { user } = useLoaderData();
 	
+
+	useEffect(() => {
+		const [locale] = user.culture.split("-");
+		supportedLocales[locale]().then(() => dayjs.locale(locale));
+	}, [user.culture]);
+
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
 	const drawerButton = useTemporaryDrawer && renderDrawer && 

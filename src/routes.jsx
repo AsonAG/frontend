@@ -91,6 +91,7 @@ const routeData = [
   {
     path: "/",
     element: <App />,
+    loader: () => {return {user: {culture: 'en'}};},
     children: [
       {
         index: true,
