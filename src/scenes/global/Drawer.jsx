@@ -86,6 +86,7 @@ function Drawer({ temporary, open, onClose }) {
 	useEffect(onClose, [location])
 
   const drawerVariant = temporary ? "temporary" : "permanent";
+  const isHrUser = user?.attributes.roles.includes("hr");
 
   return (
     <MuiDrawer 
@@ -115,10 +116,10 @@ function Drawer({ temporary, open, onClose }) {
           <NavigationGroup>
             <NavigationItem label={t("Dashboard")} to="" icon={<HomeIcon />} end />
           </NavigationGroup>
-          <NavigationGroup name={t("HR")}>
+          <NavigationGroup name={t("HR")} hidden={!isHrUser}>
             <NavigationItem label={t("Employees")} to="hr/employees" icon={<PeopleOutlinedIcon />} />
           </NavigationGroup>
-          <NavigationGroup name={t("Company")}>
+          <NavigationGroup name={t("Company")} hidden={!isHrUser}>
             <NavigationItem label={t("New event")} to="company/new" icon={<AddOutlinedIcon />} end />
             <NavigationItem label={t("Data")} to="company" icon={<CasesOutlinedIcon />} end />
             <NavigationItem label={t("Events")} to="company/events" icon={<WorkHistoryOutlinedIcon />} end />
