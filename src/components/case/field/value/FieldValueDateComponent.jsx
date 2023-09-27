@@ -24,7 +24,7 @@ function _InternalDateComponent({Picker, propertyName, displayName, sx, required
 	};
 
 	return (
-		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={user.culture}>
+		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={user?.culture ?? 'en'}>
 			<Picker
 				label={displayName}
 				value={value}

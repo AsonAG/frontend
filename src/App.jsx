@@ -29,11 +29,10 @@ function App({renderDrawer = false}) {
 	const useTemporaryDrawer = useMediaQuery(theme.breakpoints.down("lg"));
 	const { user } = useLoaderData();
 	
-
 	useEffect(() => {
-		const [locale] = user.culture.split("-");
+		const [locale] = user?.culture.split("-") ?? ['en'];
 		supportedLocales[locale]().then(() => dayjs.locale(locale));
-	}, [user.culture]);
+	}, [user?.culture]);
 
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
