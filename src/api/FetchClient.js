@@ -15,166 +15,226 @@ const usersUrl = (tenantId) => `${tenantUrl(tenantId)}/users`;
 const employeeDocumentUrl = (tenantId, employeeId, caseValueId, documentId) => `${employeeUrl(tenantId, employeeId)}/cases/${caseValueId}/documents/${documentId}`;
 const companyDocumentUrl = (tenantId, caseValueId, documentId) => `${tenantUrl(tenantId)}/companycases/${caseValueId}/documents/${documentId}`;
 
-function defaultParams() {
-    const headers = new Headers();
-    if (import.meta.env.PROD) {
-        headers.set('Authorization', `Bearer ${getAuthUser()?.access_token}`);
-    }
-    headers.set('Accept', 'application/json');
-    headers.set('Content-Type', 'application/json');
-    return { headers, signal: AbortSignal.timeout(60000) };
-}
+class TenantDataCache {
+    tenantDataCache = {};
 
-function appendSearchParams(url, searchParams) {
-    if (searchParams && [...searchParams].length > 0) {
-        return `${url}?${new URLSearchParams(searchParams)}`;
-    }
-    return url;
-}
+    async getData(tenantId) {
+        let data = this.tenantDataCache[tenantId];
+  
+        if (!data) {
+            data = this.tenantDataCache[tenantId] = this.loadTenantData(tenantId);
+        }
+        
+        const [tenant, user, payrolls] = await data;
 
-
-async function get(url, searchParams) {
-    url = appendSearchParams(url, searchParams);
-    return fetch(url, {method: "GET", ...defaultParams()});
-}
-
-async function post(url, body, searchParams) {
-    url = appendSearchParams(url, searchParams);
-    let fetchParams = {
-        method: "POST",
-        ...defaultParams()
-    };
-
-    if (body) {
-        fetchParams = {...fetchParams, body: JSON.stringify(body)};
+        return {tenant, user, payrolls};
     }
 
-    return fetch(url, fetchParams);
+    loadTenantData(tenantId) {
+        const authUserEmail = getAuthUser()?.profile.email;
+        return Promise.all([
+          getTenant(tenantId),
+          getUser(tenantId, authUserEmail),
+          getPayrolls(tenantId)
+        ]);
+    }
 }
 
-function getTenants() {
-    return get(tenantsUrl);
+export const tenantDataCache = new TenantDataCache();
+
+class FetchRequestBuilder {
+    method = "GET";
+    headers = new Headers();
+    searchParams = new URLSearchParams();
+    signal = AbortSignal.timeout(60000);
+    localizeRequest = false;
+    body = null;
+    url = null;
+
+    constructor(url) {
+        this.url = url;
+
+        if (import.meta.env.PROD) {
+            this.headers.set('Authorization', `Bearer ${getAuthUser()?.access_token}`);
+        }
+        this.headers.set('Accept', 'application/json');
+        this.headers.set('Content-Type', 'application/json');
+    }
+
+    withUrl(url) {
+        this.url = url;
+        return this;
+    }
+
+    withMethod(method) {
+        this.method = method;
+        return this;
+    }
+
+    withLocalization(tenantId) {
+        this.localizeRequest = true;
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    withBody(body) {
+        if(body) {
+            this.body = JSON.stringify(body);
+        }
+        return this;
+    }
+
+    withQueryParam(key, value) {
+        if(value) {
+            this.searchParams.append(key, value);
+        }
+        return this;
+    }
+
+    withTimout(timeout) {
+        this.signal = AbortSignal.timeout(timeout);
+        return this;
+    }
+
+    async fetch() {
+        if (!this.url) {
+            throw new Error("Url cannot be empty");
+        }
+        if (this.localizeRequest && this.tenantId) {
+            const data = await tenantDataCache.getData(this.tenantId);
+            this.searchParams.append("language", data.user.language);
+        }
+        let url = this.url;
+        if ([...this.searchParams].length > 0) {
+            url = `${url}?${this.searchParams}`;
+        }
+
+        return fetch(url, {
+            method: this.method,
+            headers: this.headers,
+            body: this.body,
+            signal: this.signal
+        });
+    }
+
+    async fetchJson() {
+        return (await this.fetch()).json();
+    }
+
 }
 
-async function getTenant(tenantId) {
-    return (await get(tenantUrl(tenantId))).json();
+export function getTenants() {
+    return new FetchRequestBuilder(tenantsUrl).fetch();
 }
 
-async function getPayrolls(tenantId) {
-    return (await get(payrollsUrl(tenantId))).json();
+export function getTenant(tenantId) {
+    return new FetchRequestBuilder(tenantUrl(tenantId)).fetchJson();
 }
 
-async function getPayroll(tenantId, payrollId) {
-    return (await get(payrollUrl(tenantId, payrollId))).json();
+export function getPayrolls(tenantId) {
+    return new FetchRequestBuilder(payrollsUrl(tenantId)).fetchJson();
 }
 
-function getEmployees(tenantId, payrollId) {
-    return get(payrollEmployeesUrl(tenantId, payrollId));
+export function getPayroll(tenantId, payrollId) {
+    return new FetchRequestBuilder(payrollUrl(tenantId, payrollId)).fetchJson();
 }
 
-async function getEmployee(tenantId, employeeId) {
-    return (await get(employeeUrl(tenantId, employeeId))).json();
+export function getEmployees(tenantId, payrollId) {
+    return new FetchRequestBuilder(payrollEmployeesUrl(tenantId, payrollId)).fetch();
 }
 
-async function getEmployeeByIdentifier(tenantId, payrollId, identifier) {
-    const searchParams = new URLSearchParams();
-    searchParams.append("filter", `Identifier eq '${identifier}'`);
-    const response = await get(payrollEmployeesUrl(tenantId, payrollId), searchParams);
-    const users = await response.json();
-    return users?.length ? users[0] : null;
+export async function getEmployee(tenantId, employeeId) {
+    return new FetchRequestBuilder(employeeUrl(tenantId, employeeId)).fetchJson();
 }
 
-function getEmployeeCases(tenantId, payrollId, employeeId, clusterSetName) {
-    const searchParams = new URLSearchParams();
-    searchParams.append("employeeId", employeeId);
-    searchParams.append("clusterSetName", clusterSetName);
-    searchParams.append("caseType", "Employee");
-    return get(caseSetsUrl(tenantId, payrollId), searchParams);
+export async function getEmployeeByIdentifier(tenantId, payrollId, identifier) {
+    const employees = await new FetchRequestBuilder()
+        .withUrl(payrollEmployeesUrl(tenantId, payrollId))
+        .withQueryParam("filter", `Identifier eq '${identifier}'`)
+        .fetchJson();
+    return employees?.length ? employees[0] : null;
+}
+
+export function getEmployeeCases(tenantId, payrollId, employeeId, clusterSetName) {
+    return new FetchRequestBuilder()
+        .withUrl(caseSetsUrl(tenantId, payrollId))
+        .withQueryParam("employeeId", employeeId)
+        .withQueryParam("clusterSetName", clusterSetName)
+        .withQueryParam("caseType", "Employee")
+        .withLocalization(tenantId)
+        .fetch();
 }
 
 // TODO AJO user id?
-function getEmployeeCaseValues(tenantId, payrollId, employeeId, filter) {
-    const searchParams = new URLSearchParams();
-    searchParams.append("employeeId", employeeId);
-    searchParams.append("caseType", "Employee");
-    if (filter) {
-        searchParams.append("filter", filter);
-    }
-    const url = `${payrollUrl(tenantId, payrollId)}/changes/values`;
-    return get(url, searchParams);
+export function getEmployeeCaseValues(tenantId, payrollId, employeeId, filter) {
+    return new FetchRequestBuilder()
+        .withUrl(`${payrollUrl(tenantId, payrollId)}/changes/values`)
+        .withQueryParam("employeeId", employeeId)
+        .withQueryParam("caseType", "Employee")
+        .withQueryParam("filter", filter)
+        .withLocalization(tenantId)
+        .fetch();
 }
 
-function getCompanyCases(tenantId, payrollId, clusterSetName) {
-    const searchParams = new URLSearchParams();
-    searchParams.append("caseType", "Company");
-    searchParams.append("clusterSetName", clusterSetName);
-    return get(caseSetsUrl(tenantId, payrollId), searchParams);
+export function getCompanyCases(tenantId, payrollId, clusterSetName) {
+    return new FetchRequestBuilder()
+        .withUrl(caseSetsUrl(tenantId, payrollId))
+        .withQueryParam("clusterSetName", clusterSetName)
+        .withQueryParam("caseType", "Company")
+        .withLocalization(tenantId)
+        .fetch();
 }
 
-function getCompanyCaseValues(tenantId, payrollId, filter) {
-    const searchParams = new URLSearchParams();
-    searchParams.append("caseType", "Company");
-    if (filter) {
-        searchParams.append("filter", filter);
-    }
-    const url = `${payrollUrl(tenantId, payrollId)}/changes/values`;
-    return get(url, searchParams);
+export function getCompanyCaseValues(tenantId, payrollId, filter) {
+    return new FetchRequestBuilder()
+        .withUrl(`${payrollUrl(tenantId, payrollId)}/changes/values`)
+        .withQueryParam("caseType", "Company")
+        .withQueryParam("filter", filter)
+        .withLocalization(tenantId)
+        .fetch();
 }
 
-
-function buildCase(tenantId, payrollId, caseName, caseChangeSetup, employeeId) {
-    const searchParams = new URLSearchParams();
-    if (employeeId) {
-        searchParams.append("employeeId", employeeId);
-    }
-    const url = `${caseSetsUrl(tenantId, payrollId)}/${encodeURIComponent(caseName)}`;
-    return post(url, caseChangeSetup, searchParams);
-}
-function addCase(tenantId, payrollId, caseChangeSetup, employeeId) {
-    const searchParams = new URLSearchParams();
-    if (employeeId) {
-        searchParams.append("employeeId", employeeId);
-    }
-    return post(caseSetsUrl(tenantId, payrollId), caseChangeSetup, searchParams);
+export function buildCase(tenantId, payrollId, caseName, caseChangeSetup, employeeId) {
+    return new FetchRequestBuilder()
+        .withUrl(`${caseSetsUrl(tenantId, payrollId)}/${encodeURIComponent(caseName)}`)
+        .withMethod("POST")
+        .withBody(caseChangeSetup)
+        .withQueryParam("employeeId", employeeId)
+        .withLocalization(tenantId)
+        .fetch();
 }
 
-async function getUser(tenantId, identifier) {
-    const searchParams = new URLSearchParams();
-    searchParams.append("filter", `Identifier eq '${identifier}'`);
-    const response = await get(usersUrl(tenantId), searchParams);
-    const users = await response.json();
-    return users?.length ? users[0] : null;
+export function addCase(tenantId, payrollId, caseChangeSetup, employeeId) {
+    return new FetchRequestBuilder()
+        .withUrl(caseSetsUrl(tenantId, payrollId))
+        .withMethod("POST")
+        .withBody(caseChangeSetup)
+        .withQueryParam("employeeId", employeeId)
+        .withLocalization(tenantId)
+        .fetch();
 }
 
-async function getLookupValues(tenantId, payrollId, lookupName) {
-    const searchParams = new URLSearchParams();
-    searchParams.append("lookupNames", lookupName);
-    return (await get(lookupValuesUrl(tenantId, payrollId), searchParams)).json();
+export async function getUser(tenantId, identifier) {
+    const users = await new FetchRequestBuilder()
+        .withUrl(usersUrl(tenantId))
+        .withQueryParam("filter", `Identifier eq '${identifier}'`)
+        .fetchJson();
+    const user = users?.length ? users[0] : null;
+    return user;
 }
 
-async function getDocument(tenantId, caseValueId, documentId, employeeId) {
+export function getLookupValues(tenantId, payrollId, lookupName) {
+    return new FetchRequestBuilder()
+        .withUrl(lookupValuesUrl(tenantId, payrollId))
+        .withQueryParam("lookupNames", lookupName)
+        .withLocalization(tenantId)
+        .fetchJson();
+}
+
+export function getDocument(tenantId, caseValueId, documentId, employeeId) {
     const url = employeeId ? 
         employeeDocumentUrl(tenantId, employeeId, caseValueId, documentId) :
         companyDocumentUrl(tenantId, caseValueId, documentId);
 
-    return (await get(url)).json();
+    return new FetchRequestBuilder(url).fetchJson();
 }
-
-export { 
-    getTenants,
-    getTenant,
-    getPayrolls,
-    getEmployees,
-    getEmployee,
-    getEmployeeByIdentifier,
-    getEmployeeCases,
-    getEmployeeCaseValues,
-    getCompanyCases,
-    getCompanyCaseValues,
-    buildCase,
-    addCase,
-    getLookupValues,
-    getUser,
-    getPayroll,
-    getDocument
-};

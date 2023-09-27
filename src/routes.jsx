@@ -17,19 +17,17 @@ import App from "./App";
 // TODO AJO error states when network requests fail
 // TODO AJO DEMOGROUP -> COMPANY -> NEW EVENT -> ZAHLT DIE FIRMA EINEN 13. MONATSLOHN AUS? -> error
 import { 
-  getTenants, 
-  getPayrolls, 
-  getEmployees, 
-  getEmployee, 
-  getTenant, 
-  getEmployeeCases, 
-  getEmployeeCaseValues, 
-  buildCase, 
+  getTenants,
+  getEmployees,
+  getEmployee,
+  getEmployeeCases,
+  getEmployeeCaseValues,
+  buildCase,
   addCase,
-  getUser,
   getEmployeeByIdentifier,
   getCompanyCases,
-  getCompanyCaseValues
+  getCompanyCaseValues,
+  tenantDataCache
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 
@@ -78,6 +76,17 @@ const caseFormRouteData = {
   }
 }
 
+
+function tenantDataAwareLoader(loader) {
+  return async (props) => {
+    if (!props.params.tenantId) {
+      throw new Error("No tenant found");
+    }
+    const tenantData = await tenantDataCache.getData(props.params.tenantId);
+    return loader({...tenantData, ...props});
+  }
+}
+
 const routeData = [
   {
     path: "/",
@@ -97,23 +106,15 @@ const routeData = [
   {
     path: "tenants/:tenantId/payrolls/:payrollId?",
     element: <App renderDrawer />,
-    loader: async ({params}) => {
-      // TODO AJO optimize this to only query payrolls once...
-      const payrolls = await getPayrolls(params.tenantId);
+    loader: tenantDataAwareLoader(async ({params, tenant, user, payrolls}) => {
       if (!params.payrollId) {
         return redirect(payrolls[0].id + "");
       }
       const payroll = payrolls.find(p => p.id === Number(params.payrollId));
-
       const authUserEmail = getAuthUser()?.profile.email;
-      const [tenant, user, employee] = await Promise.all([
-        getTenant(params.tenantId),
-        getUser(params.tenantId, authUserEmail),
-        getEmployeeByIdentifier(params.tenantId, params.payrollId, authUserEmail)
-      ]);
-      
+      const employee = await getEmployeeByIdentifier(params.tenantId, params.payrollId, authUserEmail);
       return { tenant, user, payrolls, payroll, employee };
-    },
+    }),
     shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.payrollId !== nextParams.payrollId,
     id: "root",
     children: [
