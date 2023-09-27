@@ -27,7 +27,7 @@ function TableComponent({
           pb: 0,
         }}
       >
-        <GridToolbarQuickFilter />
+        <GridToolbarQuickFilter placeholder={t("Search...")} />
       </Box>
     );
   }

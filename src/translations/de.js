@@ -23,7 +23,8 @@ const translations = {
         "Field": "Feld",
         "Value": "Wert",
         "Created": "Erstellt",
-        "Name (event field name)": "Name (Ereignisfeldname)"
+        "Name (event field name)": "Name (Ereignisfeldname)",
+        "Search...": "Suchen..."
     },
 };
 
