@@ -213,6 +213,7 @@ export function buildCase(routeParams, caseChangeSetup) {
         .withBody(caseChangeSetup)
         .withQueryParam("employeeId", routeParams.employeeId)
         .withLocalization()
+        .withUser()
         .fetch();
 }
 
@@ -222,6 +223,7 @@ export function addCase(routeParams, caseChangeSetup) {
         .withBody(caseChangeSetup)
         .withQueryParam("employeeId", routeParams.employeeId)
         .withLocalization()
+        .withUser()
         .fetch();
 }
 
