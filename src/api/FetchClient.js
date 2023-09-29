@@ -173,6 +173,7 @@ export function getEmployeeCases(routeParams, clusterSetName) {
         .withQueryParam("clusterSetName", clusterSetName)
         .withQueryParam("caseType", "Employee")
         .withLocalization()
+        .withUser()
         .fetch();
 }
 
@@ -192,6 +193,7 @@ export function getCompanyCases(routeParams, clusterSetName) {
         .withQueryParam("clusterSetName", clusterSetName)
         .withQueryParam("caseType", "Company")
         .withLocalization()
+        .withUser()
         .fetch();
 }
 
