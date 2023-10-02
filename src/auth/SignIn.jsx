@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth, hasAuthParams } from "react-oidc-context";
 import { Centered } from "../components/Centered";
+import { Loading } from "../components/Loading";
 
 
 function SignIn({children}) {
