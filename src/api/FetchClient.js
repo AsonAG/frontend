@@ -152,7 +152,9 @@ export function getPayroll(routeParams) {
 }
 
 export async function getEmployees(routeParams) {
-    return new FetchRequestBuilder(payrollEmployeesUrl, routeParams).fetchJson();
+    return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
+        .withQueryParam("orderBy", `firstName asc`)
+        .fetchJson();
 }
 
 export async function getEmployee(routeParams) {

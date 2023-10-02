@@ -1,59 +1,38 @@
-import { React } from "react";
-import TableView from "./TableView";
-import { EmployeeButtons } from "../buttons/EmployeeButtons";
+import { React, Suspense } from "react";
 import { useTranslation } from "react-i18next";
+import { useAsyncValue, useLoaderData, Await } from "react-router-dom";
+import { Divider, Stack, useMediaQuery } from "@mui/material";
+import Header from "../Header";
+import { EmployeeRow } from "./EmployeeRow";
+import { ErrorView } from "../ErrorView";
+import { Loading } from "../Loading";
+import { useTheme } from "@emotion/react";
+
+export function EmployeeTableRoute() {
+  const { t } = useTranslation();
+  const routeData = useLoaderData();
+  
+  return (
+      <Stack p={4} spacing={2} sx={{minHeight: "100%"}}>
+          <Header title={t("Employees")} />
+          <Suspense fallback={<Loading />}>
+              <Await resolve={routeData.data} errorElement={<ErrorView />}>
+                  <EmployeeTable />
+              </Await>
+          </Suspense>
+          
+      </Stack>
+  )
+}
 
 export function EmployeeTable() {
-  const { t } = useTranslation();
-
-  const columns = [
-    {
-      field: "firstName",
-      headerName: t("First name"),
-      flex: 3,
-    },
-    {
-      field: "lastName",
-      headerName: t("Last name"),
-      flex: 3,
-    },
-    {
-      field: "identifier",
-      headerName: t("Email"),
-      flex: 3,
-    },
-    {
-      field: "divisions",
-      headerName: t("Division"),
-      flex: 3,
-    },
-    {
-      field: "id",
-      headerName: "",
-      headerAlign: "left",
-      align: "left",
-      hideable: false,
-      sortable: false,
-      width: 160,
-      renderCell: ({ row: { id } }) => <EmployeeButtons employeeId={id} />,
-    },
-  ];
+  const employees = useAsyncValue();
+  const theme = useTheme();
+  const variant = useMediaQuery(theme.breakpoints.down("md")) ? "dense" : "default";
 
   return (
-    <TableView
-      title={t("Employees")}
-      columns={columns}
-      rowHeight={50}
-      initialState={{
-        columns: {
-          columnVisibilityModel: {
-            divisions: false,
-          },
-        },
-        sorting: {
-          sortModel: [{ field: "firstName", sort: "asc" }],
-        },
-      }}
-    />
+    <Stack gap={1.5} divider={<Divider />}>
+      {employees.map((employee, index) => <EmployeeRow key={index} employee={employee} variant={variant} />)}
+    </Stack>
   );
 };

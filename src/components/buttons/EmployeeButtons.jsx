@@ -1,41 +1,47 @@
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Button, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { React } from "react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-export const EmployeeButtons = ({employeeId}) => {
+export function EmployeeButtons ({ employeeId, variant }) {
   const { t } = useTranslation();
 
+  const stackProps = variant === "dense" ? 
+    { spacing: 1 } :
+    { spacing: 2, minWidth: 428 };
+
   return (
-    <Box>
-      <EmployeeButton title={t("New event")} to={employeeId + "/new"}>
+    <Stack direction="row" {...stackProps}>
+      <EmployeeButton title={t("New event")} to={employeeId + "/new"} variant={variant}>
         <AddOutlinedIcon />
       </EmployeeButton>
-
-      <EmployeeButton title={t("Data")} to={employeeId + ""}>
-        <PersonOutlineOutlinedIcon />
-      </EmployeeButton>
-
-      <EmployeeButton title={t("Events")}to={employeeId + "/events"}>
+      <EmployeeButton title={t("Events")}to={employeeId + "/events"} variant={variant}>
         <WorkHistoryOutlinedIcon />
       </EmployeeButton>
-
-      <EmployeeButton title={t("Documents")} to={employeeId + "/documents"}>
+      <EmployeeButton title={t("Documents")} to={employeeId + "/documents"} variant={variant}>
         <DescriptionOutlinedIcon />
       </EmployeeButton>
-    </Box>
+    </Stack>
   );
 };
-const EmployeeButton = ({ title, to, children }) => {
+function EmployeeButton({ title, to, children, variant }) {
+  if (variant === "dense") {
+    return (
+      <Tooltip title={title} placement="top" arrow size="sm">
+        <IconButton component={Link} to={to} color="primary">
+          {children}
+        </IconButton>
+      </Tooltip>
+    );
+  }
+
   return (
-    <Tooltip title={title} placement="top" arrow size="sm">
-      <IconButton component={Link} to={to}>
-        {children}
-      </IconButton>
-    </Tooltip>
+    <Button component={Link} to={to} variant="outlined" startIcon={children}>
+      <Typography>{title}</Typography>
+    </Button>
   );
+  
 };
