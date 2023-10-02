@@ -21,7 +21,7 @@ function CaseFormButtons({ onSubmit }) {
   const { t } = useTranslation();
 
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction="row" spacing={2} alignSelf="flex-end">
       <Button
         disableRipple
         LinkComponent={Link}

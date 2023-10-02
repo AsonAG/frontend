@@ -7,7 +7,6 @@ const tenantUrl           = "/tenants/:tenantId";
 const payrollsUrl         = "/tenants/:tenantId/payrolls";
 const payrollUrl          = "/tenants/:tenantId/payrolls/:payrollId";
 const caseSetsUrl         = "/tenants/:tenantId/payrolls/:payrollId/cases/sets";
-const caseSetUrl          = "/tenants/:tenantId/payrolls/:payrollId/cases/sets/:caseName";
 const lookupValuesUrl     = "/tenants/:tenantId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
 const employeeUrl         = "/tenants/:tenantId/employees/:employeeId";
@@ -208,7 +207,9 @@ export function getCompanyCaseValues(routeParams, filter) {
 }
 
 export function buildCase(routeParams, caseChangeSetup) {
-    return new FetchRequestBuilder(caseSetUrl, routeParams)
+    // manually construct path, generatePath does not handle encoding properly
+    const url = caseSetsUrl + "/" + encodeURIComponent(routeParams.caseName);
+    return new FetchRequestBuilder(url, routeParams)
         .withMethod("POST")
         .withBody(caseChangeSetup)
         .withQueryParam("employeeId", routeParams.employeeId)
