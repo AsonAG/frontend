@@ -1,11 +1,9 @@
 import { React } from "react";
 import TableView from "./TableView";
 import { EmployeeButtons } from "../buttons/EmployeeButtons";
-import { useLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-const EmployeesTable = () => {
-  const employees = useLoaderData();
+export function EmployeeTable() {
   const { t } = useTranslation();
 
   const columns = [
@@ -44,7 +42,6 @@ const EmployeesTable = () => {
   return (
     <TableView
       title={t("Employees")}
-      tableData={employees}
       columns={columns}
       rowHeight={50}
       initialState={{
@@ -60,5 +57,3 @@ const EmployeesTable = () => {
     />
   );
 };
-
-export default EmployeesTable;

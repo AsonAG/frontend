@@ -1,15 +1,15 @@
 
 import * as React from "react";
 
-import { createBrowserRouter, Navigate, redirect } from "react-router-dom";
+import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom";
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
-import EmployeesTable from "./components/tables/EmployeesTable";
-import CasesTable from "./components/tables/CasesTable";
-import EventsTable from "./components/tables/EventsTable";
-import DocumentsTable from "./components/tables/DocumentsTable";
-import CasesForm from "./scenes/global/CasesForm";
+import { EmployeeTable } from "./components/tables/EmployeesTable";
+import { CaseTable } from "./components/tables/CasesTable";
+import { EventTable } from "./components/tables/EventsTable";
+import { DocumentTable } from "./components/tables/DocumentsTable";
+import { CaseForm } from "./scenes/global/CasesForm";
 import getAuthUser from "./auth/getUser";
 
 import App from "./App";
@@ -28,6 +28,7 @@ import {
   tenantDataCache
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
+import { ErrorView } from "./components/ErrorView";
 
 function tenantDataAwareLoader(loader) {
   return async (props) => {
@@ -44,6 +45,7 @@ const routeData = [
     path: "/",
     element: <App />,
     loader: () => {return {user: null};},
+    ErrorBoundary: ErrorView,
     children: [
       {
         index: true,
@@ -70,6 +72,7 @@ const routeData = [
     }),
     shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.payrollId !== nextParams.payrollId,
     id: "root",
+    ErrorBoundary: ErrorView,
     children: [
       {
         index: true,
@@ -77,8 +80,12 @@ const routeData = [
       },
       {
         path: "hr/employees",
-        element: <EmployeesTable />,
-        loader: ({params}) => getEmployees(params)
+        element: <EmployeeTable />,
+        loader: ({params}) =>  {
+          return defer({
+            data: getEmployees(params)
+          });
+        }
       },
       {
         path: "hr/employees/:employeeId",
@@ -89,34 +96,51 @@ const routeData = [
         },
         shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.employeeId !== nextParams.employeeId,
         id: "employee",
+        ErrorBoundary: ErrorView,
         children: [
           {
             index: true,
-            element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params, "EmployeeData"),
+            element: <CaseTable />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getEmployeeCases(params, "EmployeeData")
+              });
+            }
           },
           {
             path: ":caseName",
-            element: <CasesForm displayOnly />
+            element: <CaseForm displayOnly />
           },
           {
             path: "new",
-            element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params, "NotAvailable"),
+            element: <CaseTable />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getEmployeeCases(params, "NotAvailable")
+              });
+            }
           },
           {
             path: "new/:caseName",
-            Component: CasesForm,
+            Component: CaseForm,
           },
           {
             path: "events",
-            element: <EventsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params)
+            element: <EventTable />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getEmployeeCaseValues(params)
+              });
+            }
           },
           {
             path: "documents",
-            element: <DocumentsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params, "DocumentCount gt 0")
+            element: <DocumentTable />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getEmployeeCaseValues(params, "DocumentCount gt 0")
+              });
+            }
           }
         ]
       },
@@ -125,32 +149,47 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CasesTable defaultTitle="Company Data" />,
-            loader: ({params}) => getCompanyCases(params, "CompanyData"),
+            element: <CaseTable defaultTitle="Company Data" />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getCompanyCases(params, "CompanyData")
+              });
+            }
           },
           {
             path: ":caseName",
-            element: <CasesForm displayOnly defaultTitle="Company Data"/>
+            element: <CaseForm displayOnly defaultTitle="Company Data"/>
           },
           {
             path: "new",
-            element: <CasesTable defaultTitle="New Company event" />,
-            loader: ({params}) => getCompanyCases(params, "NotAvailable"),
+            element: <CaseTable defaultTitle="New Company event" />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getCompanyCases(params, "NotAvailable")
+              });
+            }
           },
           {
             path: "new/:caseName",
-            element: <CasesForm defaultTitle="New Company event" />
+            element: <CaseForm defaultTitle="New Company event" />
           },
           {
             path: "events",
-            element: <EventsTable defaultTitle="Company events" />,
-            loader: ({params}) => getCompanyCaseValues(params),
-
+            element: <EventTable defaultTitle="Company events" />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getCompanyCaseValues(params)
+              });
+            }
           },
           {
             path: "documents",
-            element: <DocumentsTable defaultTitle="Company documents" />,
-            loader: ({params}) => getCompanyCaseValues(params, "DocumentCount gt 0"),
+            element: <DocumentTable defaultTitle="Company documents" />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getCompanyCaseValues(params, "DocumentCount gt 0")
+              });
+            }
           }
         ]
       },
@@ -160,35 +199,51 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params, "EmployeeData"),
+            element: <CaseTable />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getEmployeeCases(params, "EmployeeData")
+              });
+            }
           },
           {
             path: ":caseName",
-            element: <CasesForm displayOnly />
+            element: <CaseForm displayOnly />
           },
           {
             path: "new",
-            element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params, "ESS"),
+            element: <CaseTable />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getEmployeeCases(params, "ESS")
+              });
+            }
           },
           {
             path: "new/:caseName",
-            Component: CasesForm
+            Component: CaseForm
           },
           {
             path: "tasks",
-            element: <CasesTable />,
-            loader: ({params}) => getEmployeeCases(params, "ECT"),
+            element: <CaseTable />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getEmployeeCases(params, "ECT")
+              });
+            }
           },
           {
             path: "tasks/:caseName",
-            Component: CasesForm,
+            Component: CaseForm,
           },
           {
             path: "documents",
-            element: <DocumentsTable />,
-            loader: ({params}) => getEmployeeCaseValues(params, "DocumentCount gt 0")
+            element: <DocumentTable />,
+            loader: ({params}) =>  {
+              return defer({
+                data: getEmployeeCaseValues(params, "DocumentCount gt 0")
+              });
+            }
           }
         ]
       },

@@ -151,8 +151,8 @@ export function getPayroll(routeParams) {
     return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
 }
 
-export function getEmployees(routeParams) {
-    return new FetchRequestBuilder(payrollEmployeesUrl, routeParams).fetch();
+export async function getEmployees(routeParams) {
+    return new FetchRequestBuilder(payrollEmployeesUrl, routeParams).fetchJson();
 }
 
 export async function getEmployee(routeParams) {
@@ -173,7 +173,7 @@ export function getEmployeeCases(routeParams, clusterSetName) {
         .withQueryParam("caseType", "Employee")
         .withLocalization()
         .withUser()
-        .fetch();
+        .fetchJson();
 }
 
 export function getEmployeeCaseValues(routeParams, filter) {
@@ -184,7 +184,7 @@ export function getEmployeeCaseValues(routeParams, filter) {
         .withQueryParam("filter", filter)
         .withLocalization()
         .withUser()
-        .fetch();
+        .fetchJson();
 }
 
 export function getCompanyCases(routeParams, clusterSetName) {
@@ -193,7 +193,7 @@ export function getCompanyCases(routeParams, clusterSetName) {
         .withQueryParam("caseType", "Company")
         .withLocalization()
         .withUser()
-        .fetch();
+        .fetchJson();
 }
 
 export function getCompanyCaseValues(routeParams, filter) {
@@ -203,11 +203,11 @@ export function getCompanyCaseValues(routeParams, filter) {
         .withQueryParam("filter", filter)
         .withLocalization()
         .withUser()
-        .fetch();
+        .fetchJson();
 }
 
 export function buildCase(routeParams, caseChangeSetup) {
-    // manually construct path, generatePath does not handle encoding properly
+        // manually construct path, generatePath does not handle encoding properly
     const url = caseSetsUrl + "/" + encodeURIComponent(routeParams.caseName);
     return new FetchRequestBuilder(url, routeParams)
         .withMethod("POST")

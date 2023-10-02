@@ -9,14 +9,14 @@ import {
 import { React, useState } from "react";
 import TableView from "./TableView";
 import { FileIcon, defaultStyles } from "react-file-icon";
-import { useLoaderData, useOutletContext, useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { getDocument } from "../../api/FetchClient";
 import { createDateColumns } from "./caseValueDateColumns";
 import { useTranslation } from "react-i18next";
 
-function DocumentsTable({ defaultTitle }) {
+
+export function DocumentTable({ defaultTitle }) {
   const title = useOutletContext() || defaultTitle;
-  const events = useLoaderData();
   const params = useParams();
   const [backdropOpen, setBackdropOpen] = useState(false);
   const { t } = useTranslation();
@@ -77,7 +77,6 @@ function DocumentsTable({ defaultTitle }) {
     <>
       <TableView
         title={title}
-        tableData={events}
         columns={columns}
         initialState={{
           sorting: {
@@ -106,5 +105,3 @@ function downloadBase64File(base64Data, contentType, fileName) {
   downloadLink.download = fileName;
   downloadLink.click();
 }
-
-export default DocumentsTable;

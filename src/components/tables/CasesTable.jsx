@@ -1,15 +1,13 @@
 import { React } from "react";
-import { useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import TableView from "./TableView";
 import { useTranslation } from "react-i18next";
 
 
-const CasesTable = ({defaultTitle}) => {
+export function CaseTable({defaultTitle}) {
   const title = useOutletContext() || defaultTitle;
-  const cases = useLoaderData();
   const navigate = useNavigate();
   const { t } = useTranslation(); 
-
 
   const columns = [
     {
@@ -39,7 +37,6 @@ const CasesTable = ({defaultTitle}) => {
   return (
     <TableView 
       title={title}
-      tableData={cases}
       columns={columns}
       initialState={{
         columns: {
@@ -57,5 +54,3 @@ const CasesTable = ({defaultTitle}) => {
     />
   );
 };
-
-export default CasesTable;

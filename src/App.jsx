@@ -55,7 +55,7 @@ function App({renderDrawer = false}) {
 						{drawerButton}
 						{topbarLogo}
 					</Topbar>
-					<Container component="main" maxWidth="lg" sx={{p: 0}} className="main content">
+					<Container component="main" maxWidth="lg" className="main content">
 						<Outlet />
 					</Container>
 				</Stack>
