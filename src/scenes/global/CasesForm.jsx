@@ -18,7 +18,7 @@ function CasesForm({ defaultTitle, displayOnly = false }) {
   const navigate = useNavigate();
   const { user, payroll } = useRouteLoaderData("root");
   const params = useParams();
-  const { caseData, caseErrors, fatalError, attachments, loading, buildCase, addCase } = useCaseData(params, user, payroll, () => navigate(".."));
+  const { caseData, caseErrors, fatalError, attachments, loading, buildCase, addCase } = useCaseData(params, user, payroll);
   const formRef = useRef();
   
 
@@ -29,7 +29,7 @@ function CasesForm({ defaultTitle, displayOnly = false }) {
   
   const handleSubmit = () => {
     if (formRef?.current?.reportValidity()) {
-      addCase();
+      addCase(() => navigate(".."));
     }
   }
 
@@ -53,10 +53,8 @@ function CasesForm({ defaultTitle, displayOnly = false }) {
   return (
     <Stack direction="row">
       <Stack sx={{flex: 1}} p={4}>
-        <Container maxWidth="lg" sx={{p: 0}}>
-          <Header title={title} />
-          {content}
-        </Container>
+        <Header title={title} />
+        {content}
       </Stack>
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }
     </Stack>
