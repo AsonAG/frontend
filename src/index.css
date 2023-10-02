@@ -8,7 +8,7 @@ body,
   margin: 0;
 }
 
-.main {
+#scroll-container {
   overflow-y: auto;
   position: relative;
 }

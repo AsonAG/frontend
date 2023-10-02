@@ -18,7 +18,7 @@ function scrollToAsync(element, offset) {
   })
 }
 
-function getCaseForm() {return document.querySelector(".main");}
+function getScrollContainer() {return document.querySelector("#scroll-container");}
 
 export default function useActiveCase(caseData) {
   const [activeCase, setActiveCase] = useState(caseData.name);
@@ -26,13 +26,13 @@ export default function useActiveCase(caseData) {
   const scrollAndSetActive = async (caseName) => {
     const element = document.getElementById(caseName);
     if (element) {
-      await scrollToAsync(getCaseForm(), element.offsetTop);
+      await scrollToAsync(getScrollContainer(), element.offsetTop);
       setActiveCase(caseName);
     }
   }
 
   useEffect(() => {
-    const caseForm = getCaseForm();
+    const caseForm = getScrollContainer();
     const onScroll = (event) => {
       const headers = Array.from(document
         .querySelectorAll('div[data-header-jump-anchor="true"]'))
