@@ -11,12 +11,11 @@ function FieldValueBooleanComponent() {
         buildCase();
     }
 
-    return <FormControl required>
+    return <FormControl>
         <FormControlLabel
-            required
             name={field.name}
             label={displayName}
-            labelPlacement="start"
+            labelPlacement="end"
             control={
                 <Checkbox
                     checked={checked}
