@@ -1,12 +1,7 @@
-import { CircularProgress, Stack } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useAuth, hasAuthParams } from "react-oidc-context";
+import { Centered } from "../components/Centered";
 
-function Centered({children}) {
-    return  <Stack justifyContent="center" alignItems="center" sx={{height: "100%"}}>
-                {children}
-            </Stack>;
-}
 
 function SignIn({children}) {
     const auth = useAuth();
@@ -25,7 +20,7 @@ function SignIn({children}) {
     }, [auth, hasTriedSignin]);
 
     if (auth.isLoading) {
-        return <Centered><CircularProgress /></Centered>
+        return <Loading />
     }
 
     if (auth.error) {

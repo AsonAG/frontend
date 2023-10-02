@@ -53,7 +53,7 @@ const CasesTable = ({defaultTitle}) => {
         },
       }}
       disableSelectionOnClick
-      onRowClick={params => navigate(params.row.name)}
+      onRowClick={params => navigate(encodeURIComponent(params.row.name))}
     />
   );
 };

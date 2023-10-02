@@ -22,60 +22,12 @@ import {
   getEmployee,
   getEmployeeCases,
   getEmployeeCaseValues,
-  buildCase,
-  addCase,
   getEmployeeByIdentifier,
   getCompanyCases,
   getCompanyCaseValues,
   tenantDataCache
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
-
-
-function mapCase(_case, attachments) {
-  return {
-    caseName: _case.name,
-    values: _case.fields.map(f => ({
-      caseName: _case.name,
-      caseFieldName: f.name,
-      value: f.value,
-      start: f.start,
-      end: f.end,
-      documents: attachments[f.id]
-    })),
-    relatedCases: _case.relatedCases.map(c => mapCase(c, attachments))
-  };
-}
-
-const caseFormRouteData = {
-  element: <CasesForm />,
-  loader: ({params}) => buildCase(params, null),
-  shouldRevalidate: ({actionResult}) => !actionResult,
-  action: async ({request, params}) => {
-    const { caseData, intent, userId, divisionId, attachments } = await request.json();
-    const caseChangeSetup = {
-      userId,
-      divisionId,
-      case: mapCase(caseData, attachments)
-    }
-    if (params.employeeId) {
-      caseChangeSetup.employeeId = Number(params.employeeId);
-    }
-
-    switch (intent) {
-      case "addCase":
-        const response = await addCase(params, caseChangeSetup)
-        if (response.ok) {
-          return redirect("..");
-        }
-        // TODO  AJO validation errors
-        return response;
-      case "buildCase":
-        return buildCase(params, caseChangeSetup);
-    } 
-  }
-}
-
 
 function tenantDataAwareLoader(loader) {
   return async (props) => {
@@ -145,8 +97,7 @@ const routeData = [
           },
           {
             path: ":caseName",
-            element: <CasesForm displayOnly />,
-            loader: ({params}) => buildCase(params, null)
+            element: <CasesForm displayOnly />
           },
           {
             path: "new",
@@ -155,7 +106,7 @@ const routeData = [
           },
           {
             path: "new/:caseName",
-            ...caseFormRouteData
+            Component: CasesForm,
           },
           {
             path: "events",
@@ -179,8 +130,7 @@ const routeData = [
           },
           {
             path: ":caseName",
-            element: <CasesForm displayOnly defaultTitle="Company Data"/>,
-            loader: ({params}) => buildCase(params, null)
+            element: <CasesForm displayOnly defaultTitle="Company Data"/>
           },
           {
             path: "new",
@@ -189,7 +139,6 @@ const routeData = [
           },
           {
             path: "new/:caseName",
-            ...caseFormRouteData,
             element: <CasesForm defaultTitle="New Company event" />
           },
           {
@@ -216,8 +165,7 @@ const routeData = [
           },
           {
             path: ":caseName",
-            element: <CasesForm displayOnly />,
-            loader: ({params}) => buildCase(params, null)
+            element: <CasesForm displayOnly />
           },
           {
             path: "new",
@@ -226,7 +174,7 @@ const routeData = [
           },
           {
             path: "new/:caseName",
-            ...caseFormRouteData
+            Component: CasesForm
           },
           {
             path: "tasks",
@@ -235,7 +183,7 @@ const routeData = [
           },
           {
             path: "tasks/:caseName",
-            ...caseFormRouteData
+            Component: CasesForm,
           },
           {
             path: "documents",
