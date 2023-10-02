@@ -5,7 +5,7 @@ import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
-import { EmployeeTable } from "./components/tables/EmployeeTable";
+import { EmployeeTableRoute } from "./components/tables/EmployeeTable";
 import { CaseTable } from "./components/tables/CaseTable";
 import { EventTable } from "./components/tables/EventTable";
 import { DocumentTable } from "./components/tables/DocumentTable";
@@ -80,8 +80,9 @@ const routeData = [
       },
       {
         path: "hr/employees",
-        element: <EmployeeTable />,
-        loader: ({params}) =>  {
+        element: <EmployeeTableRoute />,
+        loader: ({params, request}) =>  {
+          console.log(request);
           return defer({
             data: getEmployees(params)
           });
