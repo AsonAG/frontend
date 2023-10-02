@@ -17,7 +17,7 @@ function mapCase(_case, attachments) {
   };
 }
 
-export function useCaseData(params, user, payroll, onCaseAdded) {
+export function useCaseData(params, user, payroll) {
     const attachments = useRef({});
     const [caseData, setCaseData] = useState(null);
     const [caseErrors, setCaseErrors] = useState([]);
@@ -73,7 +73,7 @@ export function useCaseData(params, user, payroll, onCaseAdded) {
       }
     }
 
-    async function _addCase() {
+    async function _addCase(onCaseAdded) {
       const caseResponse = await addCase(params, getCaseChangeSetup());
       if (caseResponse.ok) {
         const newCase = await caseResponse.json();

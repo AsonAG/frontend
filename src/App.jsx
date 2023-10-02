@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { Outlet, useLoaderData } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Container } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import Logo from "./components/Logo";
 import { useTranslation } from "react-i18next";
@@ -55,9 +55,9 @@ function App({renderDrawer = false}) {
 						{drawerButton}
 						{topbarLogo}
 					</Topbar>
-					<Box component="main" sx={{flexGrow: 1}} className="main content">
+					<Container component="main" maxWidth="lg" sx={{p: 0}} className="main content">
 						<Outlet />
-					</Box>
+					</Container>
 				</Stack>
 			</Stack>
 		</ThemeProvider>
