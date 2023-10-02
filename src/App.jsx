@@ -55,9 +55,11 @@ function App({renderDrawer = false}) {
 						{drawerButton}
 						{topbarLogo}
 					</Topbar>
-					<Container component="main" maxWidth="lg" className="main content">
-						<Outlet />
-					</Container>
+					<div id="scroll-container">
+						<Container component="main" maxWidth="lg" className="main content">
+							<Outlet />
+						</Container>
+					</div>
 				</Stack>
 			</Stack>
 		</ThemeProvider>
