@@ -56,7 +56,7 @@ function App({renderDrawer = false}) {
 						{topbarLogo}
 					</Topbar>
 					<div id="scroll-container">
-						<Container component="main" maxWidth="lg" className="main content">
+						<Container component="main" maxWidth="lg">
 							<Outlet />
 						</Container>
 					</div>
