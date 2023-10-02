@@ -1,12 +1,11 @@
 import { React } from "react";
-import { useLoaderData, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import TableView from "./TableView";
 import { createDateColumns } from "./caseValueDateColumns";
 import { useTranslation } from "react-i18next";
 
-function EventsTable({ defaultTitle }) {
+export function EventTable({ defaultTitle }) {
   const title = useOutletContext() || defaultTitle;
-  const events = useLoaderData();
   const { t } = useTranslation();
 
   const columns = [
@@ -31,7 +30,6 @@ function EventsTable({ defaultTitle }) {
   return (
     <TableView
       title={title}
-      tableData={events}
       columns={columns}
       rowHeight={25}
       initialState={{
@@ -42,5 +40,3 @@ function EventsTable({ defaultTitle }) {
     />
   );
 };
-
-export default EventsTable;

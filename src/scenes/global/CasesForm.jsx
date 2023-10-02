@@ -3,7 +3,7 @@ import CaseComponent from "../../components/case/CaseComponent";
 import { createContext, useRef } from "react";
 import CaseIndexView from "../../components/cases/CaseIndexView";
 import { CaseFormButtons } from "../../components/buttons/CaseFormButtons";
-import { Container, Stack, useMediaQuery } from "@mui/material";
+import { Stack, useMediaQuery } from "@mui/material";
 import Header from "../../components/Header";
 import { useTheme } from "@emotion/react";
 import { useCaseData } from "../../hooks/useCaseData.js";
@@ -13,7 +13,7 @@ import { ErrorView } from "../../components/ErrorView";
 
 export const CaseFormContext = createContext();
 
-function CasesForm({ defaultTitle, displayOnly = false }) {
+export function CaseForm({ defaultTitle, displayOnly = false }) {
   const title = useOutletContext() || defaultTitle;
   const navigate = useNavigate();
   const { user, payroll } = useRouteLoaderData("root");
@@ -51,7 +51,7 @@ function CasesForm({ defaultTitle, displayOnly = false }) {
   }
 
   return (
-    <Stack direction="row">
+    <Stack direction="row" minHeight="100%">
       <Stack sx={{flex: 1}} p={4}>
         <Header title={title} />
         {content}
@@ -61,5 +61,3 @@ function CasesForm({ defaultTitle, displayOnly = false }) {
   )
  
 }
-
-export default CasesForm;

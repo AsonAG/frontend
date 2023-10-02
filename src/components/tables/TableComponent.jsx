@@ -2,17 +2,17 @@ import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAsyncValue } from "react-router-dom";
 
 function TableComponent({
-  tableData,
   columns,
   initialState,
   ...props
 }){
+  const tableData = useAsyncValue();
   const [searchText, setSearchText] = useState("");
   const [tableDataFiltered, setTableDataFiltered] = useState([]);
   const { t } = useTranslation();
-
 
   useEffect(() => {
     setTableDataFiltered(tableData);
