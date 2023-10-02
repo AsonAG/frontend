@@ -5,10 +5,10 @@ import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
-import { EmployeeTable } from "./components/tables/EmployeesTable";
-import { CaseTable } from "./components/tables/CasesTable";
-import { EventTable } from "./components/tables/EventsTable";
-import { DocumentTable } from "./components/tables/DocumentsTable";
+import { EmployeeTable } from "./components/tables/EmployeeTable";
+import { CaseTable } from "./components/tables/CaseTable";
+import { EventTable } from "./components/tables/EventTable";
+import { DocumentTable } from "./components/tables/DocumentTable";
 import { CaseForm } from "./scenes/global/CasesForm";
 import getAuthUser from "./auth/getUser";
 
