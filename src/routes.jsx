@@ -150,7 +150,7 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CaseTableRoute defaultTitle="Company Data" />,
+            element: <CaseTableRoute defaultTitle="Company data" />,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "CompanyData")
@@ -159,7 +159,7 @@ const routeData = [
           },
           {
             path: ":caseName",
-            element: <CaseForm displayOnly defaultTitle="Company Data"/>
+            element: <CaseForm displayOnly defaultTitle="Company data"/>
           },
           {
             path: "new",

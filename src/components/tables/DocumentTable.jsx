@@ -76,7 +76,7 @@ export function DocumentTable({ defaultTitle }) {
   return (
     <>
       <TableView
-        title={title}
+        title={t(title)}
         columns={columns}
         initialState={{
           sorting: {

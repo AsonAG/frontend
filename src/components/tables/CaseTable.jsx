@@ -4,6 +4,8 @@ import { Stack, Card, CardActionArea, CardContent, Typography } from "@mui/mater
 import Header from "../Header";
 import { Loading } from "../Loading";
 import { ErrorView } from "../ErrorView";
+import { useTranslation } from "react-i18next";
+import { Centered } from "../Centered";
 
 const styling = {
   flex: "1 1 300px",
@@ -36,11 +38,12 @@ function CaseCard({_case}) {
 }
 
 export function CaseTableRoute({defaultTitle}) {
+  const { t } = useTranslation();
   const title = useOutletContext() || defaultTitle;
   const routeData = useLoaderData();
   return (
     <Stack p={4} spacing={2} sx={{minHeight: "100%"}}>
-        <Header title={title} />
+        <Header title={t(title)} />
         <Suspense fallback={<Loading />}>
             <Await resolve={routeData.data} errorElement={<ErrorView />}>
                 <CaseTable />
@@ -54,6 +57,12 @@ export function CaseTableRoute({defaultTitle}) {
 export function CaseTable() {
   const cases = useAsyncValue();
   const sorted = cases.toSorted(sortByDisplayName);
+  const { t } = useTranslation();
+
+  if (!sorted.length) {
+    return <Centered><Typography>{t("No data")}</Typography></Centered>
+  }
+
   return (
     <Stack spacing={3} direction="row" useFlexGap flexWrap="wrap">
       {sorted.map(c => <CaseCard key={c.id} _case={c} />)}

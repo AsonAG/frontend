@@ -29,7 +29,7 @@ export function EventTable({ defaultTitle }) {
 
   return (
     <TableView
-      title={title}
+      title={t(title)}
       columns={columns}
       rowHeight={25}
       initialState={{
