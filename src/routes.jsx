@@ -8,7 +8,7 @@ import Dashboard from "./scenes/dashboard";
 import { EmployeeTableRoute } from "./components/tables/EmployeeTable";
 import { CaseTableRoute } from "./components/tables/CaseTable";
 import { EventTable } from "./components/tables/EventTable";
-import { DocumentTable } from "./components/tables/DocumentTable";
+import { DocumentTableRoute } from "./components/tables/DocumentTable";
 import { CaseForm } from "./scenes/global/CasesForm";
 import getAuthUser from "./auth/getUser";
 
@@ -136,10 +136,10 @@ const routeData = [
           },
           {
             path: "documents",
-            element: <DocumentTable />,
+            element: <DocumentTableRoute />,
             loader: ({params}) =>  {
               return defer({
-                data: getEmployeeCaseValues(params, "DocumentCount gt 0")
+                data: getEmployeeCaseValues(params, "DocumentCount gt 0", "created desc")
               });
             }
           }
@@ -185,10 +185,10 @@ const routeData = [
           },
           {
             path: "documents",
-            element: <DocumentTable defaultTitle="Company documents" />,
+            element: <DocumentTableRoute defaultTitle="Company documents" />,
             loader: ({params}) =>  {
               return defer({
-                data: getCompanyCaseValues(params, "DocumentCount gt 0")
+                data: getCompanyCaseValues(params, "DocumentCount gt 0", "created desc")
               });
             }
           }
@@ -239,10 +239,10 @@ const routeData = [
           },
           {
             path: "documents",
-            element: <DocumentTable />,
+            element: <DocumentTableRoute />,
             loader: ({params}) =>  {
               return defer({
-                data: getEmployeeCaseValues(params, "DocumentCount gt 0")
+                data: getEmployeeCaseValues(params, "DocumentCount gt 0", "created desc")
               });
             }
           }

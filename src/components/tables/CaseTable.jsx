@@ -22,7 +22,7 @@ function CaseCard({_case}) {
     <Card sx={styling}>
       <CardActionArea component={Link} to={encodeURIComponent(_case.name)} sx={{height: "100%"}}>
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography gutterBottom variant="h3" fontWeight="bold" component="div">
             {_case.displayName}
           </Typography>
           {

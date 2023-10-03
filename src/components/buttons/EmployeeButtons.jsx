@@ -11,7 +11,7 @@ export function EmployeeButtons ({ employeeId, variant }) {
 
   const stackProps = variant === "dense" ? 
     { spacing: 1 } :
-    { spacing: 2, minWidth: 428 };
+    { spacing: 2 };
 
   return (
     <Stack direction="row" {...stackProps}>
