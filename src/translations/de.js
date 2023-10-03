@@ -24,7 +24,12 @@ const translations = {
         "Value": "Wert",
         "Created": "Erstellt",
         "Name (event field name)": "Name (Ereignisfeldname)",
-        "Search...": "Suchen..."
+        "Search...": "Suchen...",
+        "New Company event": "Neues Firmenereignis",
+        "Company events": "Firmenereignisse",
+        "Company documents": "Firmendokumente",
+        "Company data": "Firmendaten",
+        "No data": "Keine Daten"
     },
 };
 

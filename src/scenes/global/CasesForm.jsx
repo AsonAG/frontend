@@ -10,10 +10,12 @@ import { useCaseData } from "../../hooks/useCaseData.js";
 import { Loading } from "../../components/Loading";
 import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
 import { ErrorView } from "../../components/ErrorView";
+import { useTranslation } from "react-i18next";
 
 export const CaseFormContext = createContext();
 
 export function CaseForm({ defaultTitle, displayOnly = false }) {
+  const { t } = useTranslation();
   const title = useOutletContext() || defaultTitle;
   const navigate = useNavigate();
   const { user, payroll } = useRouteLoaderData("root");
@@ -53,7 +55,7 @@ export function CaseForm({ defaultTitle, displayOnly = false }) {
   return (
     <Stack direction="row" minHeight="100%">
       <Stack sx={{flex: 1}} p={4}>
-        <Header title={title} />
+        <Header title={t(title)} />
         {content}
       </Stack>
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }
