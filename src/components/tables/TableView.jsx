@@ -16,7 +16,6 @@ function TableView({title, ...tableProps}) {
                     <TableComponent {...tableProps} />
                 </Await>
             </Suspense>
-            
         </Stack>
     )
 }
