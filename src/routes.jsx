@@ -6,7 +6,7 @@ import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
 import { EmployeeTableRoute } from "./components/tables/EmployeeTable";
-import { CaseTable } from "./components/tables/CaseTable";
+import { CaseTableRoute } from "./components/tables/CaseTable";
 import { EventTable } from "./components/tables/EventTable";
 import { DocumentTable } from "./components/tables/DocumentTable";
 import { CaseForm } from "./scenes/global/CasesForm";
@@ -101,7 +101,7 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CaseTable />,
+            element: <CaseTableRoute />,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "EmployeeData")
@@ -114,7 +114,7 @@ const routeData = [
           },
           {
             path: "new",
-            element: <CaseTable />,
+            element: <CaseTableRoute />,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "NotAvailable")
@@ -150,7 +150,7 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CaseTable defaultTitle="Company Data" />,
+            element: <CaseTableRoute defaultTitle="Company Data" />,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "CompanyData")
@@ -163,7 +163,7 @@ const routeData = [
           },
           {
             path: "new",
-            element: <CaseTable defaultTitle="New Company event" />,
+            element: <CaseTableRoute defaultTitle="New Company event" />,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "NotAvailable")
@@ -200,7 +200,7 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CaseTable />,
+            element: <CaseTableRoute />,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "EmployeeData")
@@ -213,7 +213,7 @@ const routeData = [
           },
           {
             path: "new",
-            element: <CaseTable />,
+            element: <CaseTableRoute />,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "ESS")
@@ -226,7 +226,7 @@ const routeData = [
           },
           {
             path: "tasks",
-            element: <CaseTable />,
+            element: <CaseTableRoute />,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "ECT")
