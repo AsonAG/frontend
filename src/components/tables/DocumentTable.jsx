@@ -88,6 +88,7 @@ function DocumentView({ caseValueId, documentRef, onClose }) {
   const [isLoading, setLoading] = useState(true);
   const open = !!documentRef;
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadData = async () => {
@@ -109,7 +110,7 @@ function DocumentView({ caseValueId, documentRef, onClose }) {
   const dialogContent = isLoading ?
     <Loading /> :
     (<Box sx={{minHeight: "100%", width: "100%", border: 'none'}} component="object" data={documentDataUrl} type={documentRef?.contentType}>
-      <Centered><Typography>Unable to display document. Tap the button to download it.</Typography></Centered>
+      <Centered><Typography>{t("Preview not available.")}</Typography></Centered>
     </Box>);
 
   const dialogProps = (isMobile ? getDialogMobileProps : getDialogDesktopProps)(open);

@@ -14,6 +14,7 @@ function formatDate(date, includeTime) {
 function DesktopEventTable() {
   const events = useAsyncValue();
   const { t } = useTranslation();
+  const sx = { wordBreak: "break-word" };
 
   return (
     <TableContainer component={Paper}>
@@ -32,12 +33,12 @@ function DesktopEventTable() {
           {events.map((event) => {
             return <TableRow 
               key={event.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 }}}
             >
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row" sx={sx}>
                 {event.caseName}
               </TableCell>
-              <TableCell>{event.caseFieldName}</TableCell>
+              <TableCell sx={sx}>{event.caseFieldName}</TableCell>
               <TableCell>{event.value}</TableCell>
               <TableCell>{formatDate(event.start)}</TableCell>
               <TableCell>{formatDate(event.end)}</TableCell>
@@ -76,7 +77,7 @@ function MobileEventTable() {
                     <Typography fontWeight="500">{event.value}</Typography>
                     {
                       event.start && <>
-                        <Typography variant="body2">{t("valid from:")}</Typography>
+                        <Typography variant="body2">{t("valid from")}:</Typography>
                         <Typography variant="body2">{formatDate(event.start)}</Typography>
                         { 
                           event.end && <>

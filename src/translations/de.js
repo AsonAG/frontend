@@ -29,7 +29,10 @@ const translations = {
         "Company events": "Firmenereignisse",
         "Company documents": "Firmendokumente",
         "Company data": "Firmendaten",
-        "No data": "Keine Daten"
+        "No data": "Keine Daten",
+        "Preview not available.": "Vorschau nicht verfügbar.",
+        "valid from": "Gültig ab",
+        "until": "bis"
     },
 };
 
