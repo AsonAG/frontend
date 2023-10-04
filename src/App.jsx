@@ -44,7 +44,9 @@ function App({renderDrawer = false}) {
 			<MenuIcon />
 		</IconButton>;
 	const topbarLogo = !(renderDrawer && !useTemporaryDrawer) && <Logo />;
-	
+
+	const containerProps = {px: 0, sm: {px: 0}}
+
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
@@ -56,7 +58,7 @@ function App({renderDrawer = false}) {
 						{topbarLogo}
 					</Topbar>
 					<div id="scroll-container">
-						<Container component="main" maxWidth="lg">
+						<Container component="main" maxWidth="lg" sx={containerProps}>
 							<Outlet />
 						</Container>
 					</div>
