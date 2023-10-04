@@ -54,7 +54,7 @@ export function CaseForm({ defaultTitle, displayOnly = false }) {
 
   return (
     <Stack direction="row" minHeight="100%">
-      <Stack sx={{flex: 1}} p={4}>
+      <Stack sx={{flex: 1}} px={{xs: 4, sm: 1, lg: 4}} py={4}>
         <Header title={t(title)} />
         {content}
       </Stack>

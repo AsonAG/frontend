@@ -1,29 +1,9 @@
-import { React, Suspense } from "react";
-import { useOutletContext, useLoaderData, Await, useAsyncValue } from "react-router-dom";
+import { React } from "react";
+import { useAsyncValue } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery, useTheme } from "@mui/material";
-import Header from "../Header";
-import { Loading } from "../Loading";
-import { ErrorView } from "../ErrorView";
 import dayjs from "dayjs";
 
-export function EventTableRoute({defaultTitle}) {
-  const routeData = useLoaderData();
-  const title = useOutletContext() || defaultTitle;
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  return (
-    <Stack px={{xs: 0, sm: 3, lg: 4}} spacing={2} sx={{minHeight: "100%"}}>
-      <Header title={t(title)} />
-      <Suspense fallback={<Loading />}>
-        <Await resolve={routeData.data} errorElement={<ErrorView />}>
-          { isMobile ? <MobileEventTable /> : <EventTable /> }
-        </Await>
-      </Suspense>
-    </Stack>
-  );
-}
 
 function formatDate(date, includeTime) {
   if (!date) return null;
@@ -31,12 +11,51 @@ function formatDate(date, includeTime) {
   return dayjs.utc(date).format(formatString);
 }
 
-export function MobileEventTable() {
+function DesktopEventTable() {
   const events = useAsyncValue();
   const { t } = useTranslation();
 
   return (
     <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>{t("Case")}</TableCell>
+            <TableCell>{t("Field")}</TableCell>
+            <TableCell>{t("Value")}</TableCell>
+            <TableCell>{t("Start")}</TableCell>
+            <TableCell>{t("End")}</TableCell>
+            <TableCell>{t("Created")}</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {events.map((event) => {
+            return <TableRow 
+              key={event.id}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {event.caseName}
+              </TableCell>
+              <TableCell>{event.caseFieldName}</TableCell>
+              <TableCell>{event.value}</TableCell>
+              <TableCell>{formatDate(event.start)}</TableCell>
+              <TableCell>{formatDate(event.end)}</TableCell>
+              <TableCell>{formatDate(event.created, true)}</TableCell>
+            </TableRow>
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+function MobileEventTable() {
+  const events = useAsyncValue();
+  const { t } = useTranslation();
+
+  return (
+    <TableContainer>
       <Table>
         <TableHead>
           <TableRow>
@@ -80,40 +99,7 @@ export function MobileEventTable() {
 }
 
 export function EventTable() {
-  const events = useAsyncValue();
-  const { t } = useTranslation();
-
-  return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>{t("Case")}</TableCell>
-            <TableCell>{t("Field")}</TableCell>
-            <TableCell>{t("Value")}</TableCell>
-            <TableCell>{t("Start")}</TableCell>
-            <TableCell>{t("End")}</TableCell>
-            <TableCell>{t("Created")}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {events.map((event) => {
-            return <TableRow 
-              key={event.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {event.caseName}
-              </TableCell>
-              <TableCell>{event.caseFieldName}</TableCell>
-              <TableCell>{event.value}</TableCell>
-              <TableCell>{formatDate(event.start)}</TableCell>
-              <TableCell>{formatDate(event.end)}</TableCell>
-              <TableCell>{formatDate(event.created, true)}</TableCell>
-            </TableRow>
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  return isMobile ? <MobileEventTable /> : <DesktopEventTable />;
 }

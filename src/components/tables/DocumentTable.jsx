@@ -11,35 +11,15 @@ import {
   Button,
   Slide
 } from "@mui/material";
-import { React, useEffect, useState, Suspense } from "react";
-import { useOutletContext, useParams, useAsyncValue, useLoaderData, Await } from "react-router-dom";
+import { React, useEffect, useState } from "react";
+import { useParams, useAsyncValue } from "react-router-dom";
 import { getDocument } from "../../api/FetchClient";
 import { useTranslation } from "react-i18next";
-import Header from "../Header";
 import { Loading } from "../Loading";
-import { ErrorView } from "../ErrorView";
 import dayjs from "dayjs";
 import { Close } from "@mui/icons-material";
 import { Centered } from "../Centered";
-import { useTheme } from "@emotion/react";
 import { useIsMobile } from "../../hooks/useIsMobile";
-
-export function DocumentTableRoute({defaultTitle}) {
-  const routeData = useLoaderData();
-  const title = useOutletContext() || defaultTitle;
-  const { t } = useTranslation();
-  return (
-    <Stack p={4} gap={2} useFlexGap sx={{height: "100%"}}>
-      <Header title={t(title)} />
-      <Suspense fallback={<Loading />}>
-        <Await resolve={routeData.data} errorElement={<ErrorView />}>
-          <DocumentTable />
-        </Await>
-      </Suspense>
-    </Stack>
-  );
-}
-
 
 export function DocumentTable() {
   const caseValues = useAsyncValue();
