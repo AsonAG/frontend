@@ -1,9 +1,6 @@
-import { React, Suspense } from "react";
-import { useOutletContext, Await, useAsyncValue, useLoaderData, Link } from "react-router-dom";
+import { React } from "react";
+import { useAsyncValue, Link } from "react-router-dom";
 import { Stack, Card, CardActionArea, CardContent, Typography } from "@mui/material";
-import Header from "../Header";
-import { Loading } from "../Loading";
-import { ErrorView } from "../ErrorView";
 import { useTranslation } from "react-i18next";
 import { Centered } from "../Centered";
 
@@ -36,23 +33,6 @@ function CaseCard({_case}) {
     </Card>
   )
 }
-
-export function CaseTableRoute({defaultTitle}) {
-  const { t } = useTranslation();
-  const title = useOutletContext() || defaultTitle;
-  const routeData = useLoaderData();
-  return (
-    <Stack p={4} spacing={2} sx={{minHeight: "100%"}}>
-        <Header title={t(title)} />
-        <Suspense fallback={<Loading />}>
-            <Await resolve={routeData.data} errorElement={<ErrorView />}>
-                <CaseTable />
-            </Await>
-        </Suspense>
-    </Stack>
-  );
-}
-
 
 export function CaseTable() {
   const cases = useAsyncValue();

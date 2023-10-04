@@ -1,13 +1,7 @@
-import { Typography, Box } from "@mui/material";
+import { Typography } from "@mui/material";
 
-const Header = ({ title }) => {
-  return (
-    <Box mb="15px">
-      <Typography variant="h2" fontWeight="bold">
-        {title} 
-      </Typography>
-    </Box>
-  );
+function Header({ title, ...otherProps }) {
+  return <Typography variant="h2" fontWeight="bold" pb={2} {...otherProps}>{title}</Typography>;
 };
 
 export default Header;

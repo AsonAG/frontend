@@ -6,9 +6,10 @@ import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
 import { EmployeeTableRoute } from "./components/tables/EmployeeTable";
-import { CaseTableRoute } from "./components/tables/CaseTable";
-import { EventTableRoute } from "./components/tables/EventTable";
-import { DocumentTableRoute } from "./components/tables/DocumentTable";
+import { CaseTable } from "./components/tables/CaseTable";
+import { AsyncDataRoute } from "./routes/AsyncDataRoute";
+import { EventTable } from "./components/tables/EventTable";
+import { DocumentTable } from "./components/tables/DocumentTable";
 import { CaseForm } from "./scenes/global/CasesForm";
 import getAuthUser from "./auth/getUser";
 
@@ -101,7 +102,7 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CaseTableRoute />,
+            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "EmployeeData")
@@ -114,7 +115,7 @@ const routeData = [
           },
           {
             path: "new",
-            element: <CaseTableRoute />,
+            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "NotAvailable")
@@ -127,7 +128,7 @@ const routeData = [
           },
           {
             path: "events",
-            element: <EventTableRoute />,
+            element: <AsyncDataRoute fullWidthContent><EventTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCaseValues(params, null, "created desc")
@@ -136,7 +137,7 @@ const routeData = [
           },
           {
             path: "documents",
-            element: <DocumentTableRoute />,
+            element: <AsyncDataRoute><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCaseValues(params, "DocumentCount gt 0", "created desc")
@@ -150,7 +151,7 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CaseTableRoute defaultTitle="Company data" />,
+            element: <AsyncDataRoute defaultTitle="Company data" ><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "CompanyData")
@@ -163,7 +164,7 @@ const routeData = [
           },
           {
             path: "new",
-            element: <CaseTableRoute defaultTitle="New Company event" />,
+            element: <AsyncDataRoute defaultTitle="New Company event"><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "NotAvailable")
@@ -176,7 +177,7 @@ const routeData = [
           },
           {
             path: "events",
-            element: <EventTableRoute defaultTitle="Company events" />,
+            element: <AsyncDataRoute defaultTitle="Company events" disableXsPadding><EventTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCaseValues(params, null, "created desc")
@@ -185,7 +186,7 @@ const routeData = [
           },
           {
             path: "documents",
-            element: <DocumentTableRoute defaultTitle="Company documents" />,
+            element: <AsyncDataRoute defaultTitle="Company documents"><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCaseValues(params, "DocumentCount gt 0", "created desc")
@@ -200,7 +201,7 @@ const routeData = [
         children: [
           {
             index: true,
-            element: <CaseTableRoute />,
+            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "EmployeeData")
@@ -213,7 +214,7 @@ const routeData = [
           },
           {
             path: "new",
-            element: <CaseTableRoute />,
+            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "ESS")
@@ -226,7 +227,7 @@ const routeData = [
           },
           {
             path: "tasks",
-            element: <CaseTableRoute />,
+            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "ECT")
@@ -239,7 +240,7 @@ const routeData = [
           },
           {
             path: "documents",
-            element: <DocumentTableRoute />,
+            element: <AsyncDataRoute><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCaseValues(params, "DocumentCount gt 0", "created desc")
