@@ -46,10 +46,12 @@ export function DocumentTable() {
   const [selectedDocument, setSelectedDocument] = useState(null);
 
   return (
-    <Stack spacing={3} divider={<Divider />}>
-      {caseValues.map(caseValue => <CaseValueRow key={caseValue.id} caseValue={caseValue} onSelect={setSelectedDocument} />)}
+    <>
+      <Stack spacing={3} divider={<Divider />} pb={3}>
+        {caseValues.map(caseValue => <CaseValueRow key={caseValue.id} caseValue={caseValue} onSelect={setSelectedDocument} />)}
+      </Stack>
       <DocumentView {...selectedDocument} onClose={() => setSelectedDocument(null)} />
-    </Stack>
+    </>
   );
 };
 
@@ -64,7 +66,7 @@ function CaseValueRow({ caseValue, onSelect }) {
   const { t } = useTranslation();
   return (
     <Stack direction="row" spacing={1.5}>
-      <Stack flex={1} flexShrink={0}>
+      <Stack flex={1}>
         <Typography variant="h6" component="div" sx={style}>{caseValue.caseFieldName}</Typography>
         <Typography variant="body2" sx={style}>{t("Created")}: {created}</Typography>
       </Stack>
