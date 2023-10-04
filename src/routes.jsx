@@ -7,7 +7,7 @@ import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
 import { EmployeeTableRoute } from "./components/tables/EmployeeTable";
 import { CaseTableRoute } from "./components/tables/CaseTable";
-import { EventTable } from "./components/tables/EventTable";
+import { EventTableRoute } from "./components/tables/EventTable";
 import { DocumentTableRoute } from "./components/tables/DocumentTable";
 import { CaseForm } from "./scenes/global/CasesForm";
 import getAuthUser from "./auth/getUser";
@@ -127,10 +127,10 @@ const routeData = [
           },
           {
             path: "events",
-            element: <EventTable />,
+            element: <EventTableRoute />,
             loader: ({params}) =>  {
               return defer({
-                data: getEmployeeCaseValues(params)
+                data: getEmployeeCaseValues(params, null, "created desc")
               });
             }
           },
@@ -176,10 +176,10 @@ const routeData = [
           },
           {
             path: "events",
-            element: <EventTable defaultTitle="Company events" />,
+            element: <EventTableRoute defaultTitle="Company events" />,
             loader: ({params}) =>  {
               return defer({
-                data: getCompanyCaseValues(params)
+                data: getCompanyCaseValues(params, null, "created desc")
               });
             }
           },
