@@ -207,8 +207,8 @@ export function getCompanyCaseValues(routeParams, filter, orderBy) {
         .withQueryParam("caseType", "Company")
         .withQueryParam("filter", filter)
         .withQueryParam("orderBy", orderBy)
-        .withQueryParam("result", "ItemsWithCount")
-        .withQueryParam("top", 10)
+        // .withQueryParam("result", "ItemsWithCount")
+        // .withQueryParam("top", 10)
         .withLocalization()
         .withUser()
         .fetchJson();
