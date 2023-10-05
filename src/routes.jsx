@@ -5,12 +5,12 @@ import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
-import { EmployeeTableRoute } from "./components/tables/EmployeeTable";
+import { EmployeeTable } from "./components/tables/EmployeeTable";
 import { CaseTable } from "./components/tables/CaseTable";
 import { AsyncDataRoute } from "./routes/AsyncDataRoute";
 import { EventTable } from "./components/tables/EventTable";
 import { DocumentDialog, DocumentTable } from "./components/tables/DocumentTable";
-import { CaseForm } from "./scenes/global/CasesForm";
+import { CaseForm } from "./scenes/global/CaseForm";
 import getAuthUser from "./auth/getUser";
 
 import App from "./App";
@@ -81,7 +81,7 @@ const routeData = [
       },
       {
         path: "hr/employees",
-        element: <EmployeeTableRoute />,
+        element: <AsyncDataRoute defaultTitle="Employees"><EmployeeTable /></AsyncDataRoute>,
         loader: ({params, request}) =>  {
           console.log(request);
           return defer({

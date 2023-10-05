@@ -3,7 +3,7 @@ import FieldValueComponent from "./value/FieldValueComponent";
 import { DescriptionComponent } from "../DescriptionComponent";
 import FieldPeriodSelector from "./FieldPeriodSelector";
 import { createContext, useContext } from "react";
-import { CaseFormContext } from "../../../scenes/global/CasesForm";
+import { CaseFormContext } from "../../../scenes/global/CaseForm";
 import { useTheme } from "@emotion/react";
 
 export const FieldContext = createContext();

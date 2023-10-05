@@ -3,9 +3,11 @@ import { forwardRef } from "react";
 import { NavLink as RouterLink } from "react-router-dom";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
-  return <RouterLink ref={ref} {...itemProps} role={undefined} />;
-}))(({theme}) => {
+  const { disableBgHover, flex, ...linkProps } = itemProps; // do not pass custom props to component
+  return <RouterLink ref={ref} {...linkProps} role={undefined} />;
+}))(({theme, flex, disableBgHover}) => {
   return {
+    flex,
     display: "block",
     textDecoration: "none",
     padding: theme.spacing(1),
@@ -13,11 +15,11 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
     color: theme.palette.text.primary,
     "&:hover": {
       "color": theme.palette.primary.main,
-      "backgroundColor": theme.palette.primary.hover
+      "backgroundColor": !disableBgHover ? theme.palette.primary.hover : undefined
     },
     "&.active": {
       "color": theme.palette.primary.main,
-      "backgroundColor": theme.palette.primary.active
+      "backgroundColor": !disableBgHover ? theme.palette.primary.active : undefined
     },
     "&.active:hover": {
       "color": theme.palette.primary.light,
