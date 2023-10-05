@@ -9,7 +9,7 @@ import { EmployeeTableRoute } from "./components/tables/EmployeeTable";
 import { CaseTable } from "./components/tables/CaseTable";
 import { AsyncDataRoute } from "./routes/AsyncDataRoute";
 import { EventTable } from "./components/tables/EventTable";
-import { DocumentTable } from "./components/tables/DocumentTable";
+import { DocumentDialog, DocumentTable } from "./components/tables/DocumentTable";
 import { CaseForm } from "./scenes/global/CasesForm";
 import getAuthUser from "./auth/getUser";
 
@@ -191,7 +191,13 @@ const routeData = [
               return defer({
                 data: getCompanyCaseValues(params, "DocumentCount gt 0", "created desc")
               });
-            }
+            },
+            children: [
+              {
+                path: ":caseValueId/i/:documentId",
+                Component: DocumentDialog
+              }
+            ]
           }
         ]
       },
@@ -245,7 +251,13 @@ const routeData = [
               return defer({
                 data: getEmployeeCaseValues(params, "DocumentCount gt 0", "created desc")
               });
-            }
+            },
+            children: [
+              {
+                path: ":caseValueId/i/:documentId",
+                Component: DocumentDialog
+              }
+            ]
           }
         ]
       },
