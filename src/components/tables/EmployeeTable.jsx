@@ -20,7 +20,6 @@ export function EmployeeTableRoute() {
                   <EmployeeTable />
               </Await>
           </Suspense>
-          
       </Stack>
   )
 }
