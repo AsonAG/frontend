@@ -5,13 +5,13 @@ import {
   Typography,
   Box,
   IconButton,
-  Button,
   useMediaQuery,
   useTheme,
-  Fab
+  Fab,
+  Chip
 } from "@mui/material";
 import { React, useEffect, useState } from "react";
-import { useParams, useAsyncValue, Outlet, useNavigate } from "react-router-dom";
+import { useParams, useAsyncValue, Outlet, useNavigate, NavLink } from "react-router-dom";
 import { getDocument } from "../../api/FetchClient";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../Loading";
@@ -58,16 +58,32 @@ function toFirstDocument(caseValue) {
 export function DocumentDialog() {
   const params = useParams();
   const caseValues = useAsyncValue();
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
+
   const caseValueId = Number(params.caseValueId);
   const caseValue = caseValues.find(v => v.id === caseValueId);
   const documentId = Number(params.documentId);
   const documentRef = caseValue.documents.find(d => d.id === documentId)
-  
-  const isMobile = useIsMobile();
-  const { t } = useTranslation();
-  const navigate = useNavigate();
 
-  const onClose = () => navigate("..");
+  const Layout = isMobile ? MobileLayout : DesktopLayout;
+  return <Layout caseValue={caseValue} documentRef={documentRef} onClose={() => navigate("..")} />
+}
+
+function MobileLayout({caseValue, onClose}) {
+  const { t } = useTranslation();
+  return (
+    <Dialog open fullScreen onClose={onClose}>
+      <DialogHeader title={t("Attachments")} onClose={onClose}  />
+      <AttachmentChips caseValue={caseValue}/>
+      <Divider sx={{py: 1}} />
+      <DocumentPreview flex={1} />
+    </Dialog>
+  );
+}
+
+function DesktopLayout({caseValue, documentRef, onClose}) {
+  const { t } = useTranslation();
 
   const layoutProps = {
     sx: {
@@ -91,8 +107,9 @@ export function DocumentDialog() {
       <Divider sx={{gridArea: "2 / 1 / 2 / span 3"}} />
       <Divider sx={{gridArea: "1 / 2 / span 3 / 2"}} orientation="vertical" />
     </Dialog>
-  )
+  );
 }
+
 
 function DocumentPreview(boxProps) {
   const params = useParams();
@@ -185,6 +202,30 @@ function AttachmentView({caseValue, ...stackProps}) {
   )
 }
 
-function AttachmentChips({caseValue}) {
+const hiddenScrollbar = {
+  overflow: "scroll",
+  scrollbarWidth: 'none',
+  "&::-webkit-scrollbar": {
+    width: 0,
+    height: 0
+  }
+}
 
+function AttachmentChips({ caseValue }) {
+  return (
+    <Stack direction="row" px={2} spacing={1} sx={hiddenScrollbar}>
+      {
+        caseValue.documents.map(doc => 
+          <NavLink key={doc.id} to={`../${caseValue.id}/i/${doc.id}`}>
+            {
+              ({isActive}) => (
+                <Chip color="primary" variant={isActive ? "filled" : "outlined"} label={doc.name} />
+              )
+            }
+          </NavLink>
+          
+        )
+      }
+    </Stack>
+  )
 }
