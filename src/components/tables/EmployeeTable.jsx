@@ -36,7 +36,7 @@ const sx = {
 function EmployeeRow({ employee, variant }) {
   return (
     <Stack direction="row" alignItems="center" gap={2} marginX={-1} sx={sx}>
-      <Link to={employee.id + ""} flex={1} disableBgHover>
+      <Link to={employee.id + "/data"} flex={1} disableBgHover>
         <Stack>
           <Typography gutterBottom>{employee.firstName} {employee.lastName}</Typography>
           <Typography variant="body2" sx={{textOverflow: 'ellipsis', overflow: 'hidden'}}>{employee.identifier}</Typography>

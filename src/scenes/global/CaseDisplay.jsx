@@ -1,4 +1,4 @@
-import { useParams, useRouteLoaderData, useOutletContext } from "react-router-dom";
+import { useParams, useRouteLoaderData, useOutletContext, useAsyncValue } from "react-router-dom";
 import { CaseComponent } from "../../components/case/CaseComponent";
 import CaseIndexView from "../../components/cases/CaseIndexView";
 import { Stack, useMediaQuery } from "@mui/material";
@@ -12,11 +12,13 @@ import { ReadonlyFieldComponent } from "../../components/case/field/ReadonlyFiel
 
 
 export function CaseDisplay({ defaultTitle }) {
+  const caseName = useCaseName();
   const { t } = useTranslation();
   const title = useOutletContext() || defaultTitle;
   const { user, payroll } = useRouteLoaderData("root");
   const params = useParams();
-  const { caseData, fatalError, loading } = useCaseData(params, user, payroll);
+  const caseDataParams = {caseName, ...params};
+  const { caseData, fatalError, loading } = useCaseData(caseDataParams, user, payroll);
   
 
   const theme = useTheme();
@@ -44,5 +46,13 @@ export function CaseDisplay({ defaultTitle }) {
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }
     </Stack>
   )
- 
+}
+
+function useCaseName() {
+  const cases = useAsyncValue();
+  if (cases && cases.length > 0) {
+    return cases[0].name;
+  }
+
+  return "";
 }
