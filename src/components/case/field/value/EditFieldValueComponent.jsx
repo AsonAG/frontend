@@ -6,7 +6,7 @@ import {
 	Stack,
 } from "@mui/material";
 import FieldValueFileComponent from "./FieldValueFileComponent";
-import { FieldValueLookupComponent, FieldValueListComponent } from "./selector/FieldValueLookupComponent";
+import { FieldValueLookupComponent, FieldValueListComponent } from "./FieldValueDropdownComponent";
 import FieldValueNumberComponent from "./FieldValueNumberComponent";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 import { FieldValueDateComponent, FieldValueDateTimeComponent } from "./FieldValueDateComponent";
