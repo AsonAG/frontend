@@ -2,18 +2,20 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { getLookupValues } from "../api/FetchClient";
 
+function getOptionData(option, index) {
+  if (!option) return null;
+  if (typeof option === "string") return option;
+  return option[index];
+}
 
 function useDropdownData({ options, loading, fieldValue, multiple, labelIndex, valueIndex, onChange }) {
-  const getOptionLabel = (option) => typeof option === "string" ? option : (option[labelIndex] ?? '')
-  const getOptionValue = (option) => option ? option[valueIndex] : null;
+  const getOptionLabel = (option) => getOptionData(option, labelIndex);
+  const getOptionValue = (option) => getOptionData(option, valueIndex);
   const isOptionEqualToValue = (option, value) => getOptionValue(option) === value;
 
   const selectedValues = useMemo(() => {
-    if (loading) {
+    if (loading || !options?.length) {
       return [];
-    }
-    if (!options?.length) {
-      return fieldValue;
     }
     const findValue = (value) => options.find(o => isOptionEqualToValue(o, value)) ?? value;
     if (multiple) {
