@@ -1,7 +1,6 @@
 import { Stack, Typography } from "@mui/material";
 
 export function CaseComponent({ _case, FieldRenderComponent }) {
-  console.log("rendering case");
   return (
     <Stack component="section" gap={2} width="100%">
       <Stack id={_case.name} data-header-jump-anchor>
