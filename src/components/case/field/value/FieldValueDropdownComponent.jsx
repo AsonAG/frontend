@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
-import { FieldContext } from "../../EditFieldComponent";
-import { useLookupData, useListData } from "../../../../../hooks/useDropdownData";
+import { FieldContext } from "../EditFieldComponent";
+import { useLookupData, useListData } from "../../../../hooks/useDropdownData";
 
 
 export function FieldValueLookupComponent() { return <FieldValueDropdownComponent useDataHook={useLookupData} />;}
