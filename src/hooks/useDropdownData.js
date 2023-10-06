@@ -29,7 +29,9 @@ function useDropdownData({ options, loading, fieldValue, multiple, labelIndex, v
     onChange(outputValue);
   };
 
-  return { multiple, options, loading, getOptionLabel, value: selectedValues, onChange: handleChange };
+  const getLabels = () => multiple ? selectedValues.map(getOptionLabel).join(", ") : getOptionLabel(selectedValues);
+
+  return { multiple, options, loading, getLabels, getOptionLabel, value: selectedValues, onChange: handleChange };
 }
 
 export function useListData(field, onChange) {

@@ -3,6 +3,7 @@ import { DescriptionComponent } from "../DescriptionComponent";
 import { useIsMobile } from "../../../hooks/useIsMobile";
 import { formatDate } from "../../../utils/DateUtils";
 import { useTranslation } from "react-i18next";
+import { useListData, useLookupData } from "../../../hooks/useDropdownData";
 
 
 export function ReadonlyFieldComponent({ field }) {
@@ -24,11 +25,11 @@ export function ReadonlyFieldComponent({ field }) {
 function ReadonlyValueComponent({field}) {
   const { t } = useTranslation();
 	if (field.lookupSettings && "lookupName" in field.lookupSettings) {
-		// return <FieldValueLookupComponent />;
+		return <ReadonlyDropdownDisplayComponent field={field} useDataHook={useLookupData} />;
 	}
 	
 	if (field.attributes?.["input.list"]) {
-		// return <FieldValueListComponent />
+    return <ReadonlyDropdownDisplayComponent field={field} useDataHook={useListData} />;
 	} 
 	switch (field.valueType) {
 		case "None":
@@ -58,4 +59,13 @@ function ReadonlyValueComponent({field}) {
 		default:
 			return field.value;
 	}
+}
+
+function ReadonlyDropdownDisplayComponent({field, useDataHook}) {
+  const data = useDataHook(field);
+  if (data.loading) {
+    return "Loading...";
+  }
+
+  return data.getLabels();
 }
