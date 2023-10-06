@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import { getLookupValues } from "../api/FetchClient";
 
 function getOptionData(option, index) {
-  if (!option) return null;
+  if (!option) return '';
+  if (Array.isArray(option) && !option.length) return '';
   if (typeof option === "string") return option;
   return option[index];
 }
