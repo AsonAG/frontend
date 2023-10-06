@@ -6,7 +6,7 @@ import { FieldContext } from "../FieldComponent";
 import { useRouteLoaderData } from "react-router-dom";
 import { getDateLocale } from "../../../../services/converters/DateLocaleExtractor";
 
-function _InternalDateComponent({Picker, propertyName, displayName, sx, required = true}) {
+function _InternalDateComponent({Picker, propertyName, displayName, sx, size = "medium", required = true}) {
 	const { user } = useRouteLoaderData('root');
 	const { field, isReadonly, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const inputRef = useRef();
@@ -34,7 +34,7 @@ function _InternalDateComponent({Picker, propertyName, displayName, sx, required
 				disabled={isReadonly}
 				inputRef={inputRef}
 				slotProps={{
-					field: { required },
+					textField: { required, size },
 					openPickerButton: { tabIndex: -1 }
 				}}
 				sx={sx}

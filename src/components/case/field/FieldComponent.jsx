@@ -1,29 +1,31 @@
 import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
 import FieldValueComponent from "./value/FieldValueComponent";
 import { DescriptionComponent } from "../DescriptionComponent";
-import FieldPeriodSelector from "./FieldPeriodSelector";
+import { FieldValueDateComponent } from "./value/FieldValueDateComponent";
 import { createContext, useContext } from "react";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
 import { useTheme } from "@emotion/react";
+import { useTranslation } from "react-i18next";
+import { FieldPeriodSelector } from "./FieldPeriodSelector";
 
 export const FieldContext = createContext();
 
 
-function FieldComponent({ field }) {
+export function FieldComponent({ field }) {
 	const { buildCase, displayOnly, attachments } = useContext(CaseFormContext);
 	const fieldIsReadonly = displayOnly || (field.attributes?.["input.readOnly"] ?? false);
-	const displayName = !displayOnly ? field.displayName : '';
 	const theme = useTheme();
 	const mobile = useMediaQuery(theme.breakpoints.down(725));
+	const displayName = !displayOnly && !mobile ? field.displayName : '';
 
 	return (
 		<FieldContext.Provider value={{ field, displayName, buildCase, attachments, isReadonly: fieldIsReadonly }}  >
 			{
-				displayOnly ?
-					<ReadonlyLayout field={field} /> :
 				mobile ?
 					<MobileLayout field={field} /> :
-					<DefaultLayout field={field} />
+					displayOnly ?
+						<ReadonlyLayout field={field} /> :
+						<DefaultLayout field={field} />
 			}
 		</FieldContext.Provider>
 	);
@@ -59,27 +61,24 @@ function ReadonlyLayout({field}) {
 	);
 }
 
+
+const componentProps = {
+	sx: {flex: 1},
+	size: "small"
+};
+
 function MobileLayout({field}) {
-	return <>
-		<Box
-			display="grid"
-			gridTemplateColumns="3fr 22px "
-			alignItems="center"
-			columnGap="8px"
-		>
-			<FieldValueComponent />
-			<DescriptionComponent description={field.description} />
-		</Box>
-		<Box
-			display="grid"
-			gridTemplateColumns="1fr 1fr"
-			alignItems="center"
-			columnGap="8px"
-		>
-			<FieldPeriodSelector field={field} />
-		</Box>
-		</>;
+	const renderPeriodPickerContainer = (children) => <Stack spacing={1} direction="row">{children}</Stack>;
+	return (
+		<Stack spacing={1}>
+			<Stack direction="row" spacing={1}>
+				<Typography color="disabled" flex={1}>{field.displayName} *</Typography>
+				<DescriptionComponent description={field.description} />
+			</Stack>
+			<FieldValueComponent excludeNoneValue />
+			<FieldPeriodSelector field={field} renderIntoContainer={renderPeriodPickerContainer} componentProps={componentProps} />
+		</Stack>
+	);
 }
 
-
-export default FieldComponent;
+function isPeriodPickerDisabled(field) { return field.timeType === "Timeless" || field.attributes?.["input.hideStartEnd"];}
