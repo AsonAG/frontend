@@ -84,7 +84,6 @@ const routeData = [
         path: "hr/employees",
         element: <AsyncDataRoute defaultTitle="Employees"><EmployeeTable /></AsyncDataRoute>,
         loader: ({params, request}) =>  {
-          console.log(request);
           return defer({
             data: getEmployees(params)
           });

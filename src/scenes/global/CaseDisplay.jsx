@@ -23,7 +23,6 @@ export function CaseDisplay({ defaultTitle }) {
   // this breakpoint was chosen because at this point the datefields + input field
   // don't have enough space
   const hideIndex = useMediaQuery(theme.breakpoints.down("md"));
-  console.log(caseData);
   
   let content = null;
   if (fatalError) {

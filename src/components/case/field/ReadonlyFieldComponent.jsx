@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next";
 export function ReadonlyFieldComponent({ field }) {
   const isMobile = useIsMobile();
   const direction = isMobile ? "column" : "row";
-  console.log("render readonly field");
   return (
     <Stack spacing={1} direction={direction}>
       <Stack direction="row" spacing={1} flex={1}>
