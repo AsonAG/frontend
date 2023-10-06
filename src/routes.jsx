@@ -101,17 +101,13 @@ const routeData = [
         ErrorBoundary: ErrorView,
         children: [
           {
-            index: true,
-            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
+            path: "data",
+            element: <AsyncDataRoute disableScaffold><CaseDisplay /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "EmployeeData")
               });
             }
-          },
-          {
-            path: ":caseName",
-            element: <CaseDisplay />
           },
           {
             path: "new",
@@ -150,17 +146,13 @@ const routeData = [
         path: "company",
         children: [
           {
-            index: true,
-            element: <AsyncDataRoute defaultTitle="Company data" ><CaseTable /></AsyncDataRoute>,
+            path: "data",
+            element: <AsyncDataRoute disableScaffold><CaseDisplay defaultTitle="Company data" /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "CompanyData")
               });
             }
-          },
-          {
-            path: ":caseName",
-            element: <CaseDisplay defaultTitle="Company data"/>
           },
           {
             path: "new",
@@ -206,17 +198,13 @@ const routeData = [
         element: <EmployeeView routeLoaderDataName="root" />,
         children: [
           {
-            index: true,
-            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
+            path: "data",
+            element: <AsyncDataRoute disableScaffold><CaseDisplay /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "EmployeeData")
               });
             }
-          },
-          {
-            path: ":caseName",
-            element: <CaseDisplay />
           },
           {
             path: "new",

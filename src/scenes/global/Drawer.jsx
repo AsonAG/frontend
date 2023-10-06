@@ -121,13 +121,13 @@ function Drawer({ temporary, open, onClose }) {
           </NavigationGroup>
           <NavigationGroup name={t("Company")} hidden={!isHrUser}>
             <NavigationItem label={t("New event")} to="company/new" icon={<AddOutlinedIcon />} end />
-            <NavigationItem label={t("Data")} to="company" icon={<CasesOutlinedIcon />} end />
+            <NavigationItem label={t("Data")} to="company/data" icon={<CasesOutlinedIcon />} end />
             <NavigationItem label={t("Events")} to="company/events" icon={<WorkHistoryOutlinedIcon />} end />
             <NavigationItem label={t("Documents")} to="company/documents" icon={<DescriptionOutlinedIcon />} end />
           </NavigationGroup>
           <NavigationGroup name={t("Employee")} hidden={employee === null}>
             <NavigationItem label={t("New event")} to={`employees/${employee?.id}/new`} icon={<AddOutlinedIcon />} end />
-            <NavigationItem label={t("My Profile")} to={`employees/${employee?.id}`} icon={<PersonOutlineOutlinedIcon />} end />
+            <NavigationItem label={t("My Profile")} to={`employees/${employee?.id}/data`} icon={<PersonOutlineOutlinedIcon />} end />
             <NavigationItem label={t("Tasks")} to={`employees/${employee?.id}/tasks`} icon={<FormatListBulletedIcon />} end />
             <NavigationItem label={t("Documents")} to={`employees/${employee?.id}/documents`} icon={<DescriptionOutlinedIcon />} end />
           </NavigationGroup>
