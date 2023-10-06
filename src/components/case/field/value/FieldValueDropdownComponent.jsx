@@ -15,7 +15,7 @@ function FieldValueDropdownComponent({useDataHook}) {
     buildCase();
   }
 
-  const data = useDataHook(field, onChange);
+  const {getLabels: _, ...data} = useDataHook(field, onChange);
 
   return (
     <Autocomplete
