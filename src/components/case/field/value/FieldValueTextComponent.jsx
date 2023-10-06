@@ -3,7 +3,7 @@ import { TextField } from "@mui/material";
 import ReactInputMask from "react-input-mask";
 import { MASK_CHAR, validateMask } from "../../../../services/validators/FieldValueValidator";
 import { useUpdateEffect } from "usehooks-ts";
-import { FieldContext } from "../FieldComponent";
+import { FieldContext } from "../EditFieldComponent";
 
 function FieldValueTextComponent() {
   const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);

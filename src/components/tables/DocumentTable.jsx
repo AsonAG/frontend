@@ -15,12 +15,12 @@ import { useParams, useAsyncValue, Outlet, useNavigate, NavLink } from "react-ro
 import { getDocument } from "../../api/FetchClient";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../Loading";
-import dayjs from "dayjs";
 import { ArrowBack, DescriptionOutlined, Download } from "@mui/icons-material";
 import { Centered } from "../Centered";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { TableButton } from "../buttons/TableButton";
 import { Link } from "../Link";
+import { formatDate } from "../../utils/DateUtils";
 
 export function DocumentTable() {
   const caseValues = useAsyncValue();
@@ -38,7 +38,7 @@ export function DocumentTable() {
 };
 
 function CaseValueRow({ caseValue, variant }) {
-  const created = dayjs.utc(caseValue.created).format("L LT")
+  const created = formatDate(caseValue.created, true);
   const { t } = useTranslation();
   return (
     <Stack direction="row" spacing={1.5} alignItems="start">

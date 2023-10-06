@@ -2,10 +2,13 @@ import { useEffect, useState, useMemo, useContext } from "react";
 import { useParams } from "react-router";
 import { getLookupValues } from "../../../../../api/FetchClient";
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
-import { FieldContext } from "../../FieldComponent";
+import { FieldContext } from "../../EditFieldComponent";
+import { useLookupData } from "../../../../../hooks/useLookupData";
+
 
 function FieldValueLookupComponent() {
   const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
+  const data = useLookupData(field);
   const { tenantId, payrollId } = useParams();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);

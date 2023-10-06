@@ -2,11 +2,11 @@ import { DatePicker, DateTimePicker, LocalizationProvider } from "@mui/x-date-pi
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
 import { useContext, useRef } from "react";
-import { FieldContext } from "../FieldComponent";
+import { FieldContext } from "../EditFieldComponent";
 import { useRouteLoaderData } from "react-router-dom";
 import { getDateLocale } from "../../../../services/converters/DateLocaleExtractor";
 
-function _InternalDateComponent({Picker, propertyName, displayName, sx, size = "medium", required = true}) {
+function _InternalDateComponent({Picker, propertyName = "value", displayName, sx, size = "medium", required = true}) {
 	const { user } = useRouteLoaderData('root');
 	const { field, isReadonly, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const inputRef = useRef();
@@ -44,7 +44,7 @@ function _InternalDateComponent({Picker, propertyName, displayName, sx, size = "
 };
 
 function FieldValueDateComponent(props) { return _InternalDateComponent({Picker: DatePicker, ...props}); }
-function FieldValueDateTimeComponent(props) { return _InternalDateComponent({Picker: DateTimePicker, propertyName: "value", ...props}); }
+function FieldValueDateTimeComponent(props) { return _InternalDateComponent({Picker: DateTimePicker, ...props}); }
 
 
 
