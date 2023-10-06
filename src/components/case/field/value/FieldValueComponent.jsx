@@ -14,7 +14,7 @@ import { FieldValueDateComponent, FieldValueDateTimeComponent } from "./FieldVal
 import FieldValueBooleanComponent from "./FieldValueBooleanComponent";
 import { FieldContext } from "../FieldComponent";
 
-function FieldValueComponent() {
+function FieldValueComponent({ excludeNoneValue = false }) {
 	const { field } = useContext(FieldContext);
 	if (field.lookupSettings && "lookupName" in field.lookupSettings) {
 		return <FieldValueLookupComponent />;
@@ -25,7 +25,7 @@ function FieldValueComponent() {
 	} 
 	switch (field.valueType) {
 		case "None":
-			return (
+			return (!excludeNoneValue &&
 				<Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center'}}>
 					<Typography>{field.displayName}</Typography>
 				</Box>
