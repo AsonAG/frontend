@@ -124,7 +124,7 @@ const routeData = [
           },
           {
             path: "new/:caseName",
-            Component: CaseDisplay,
+            Component: CaseForm,
           },
           {
             path: "events",
