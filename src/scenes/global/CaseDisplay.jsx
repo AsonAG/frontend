@@ -1,7 +1,7 @@
 import { useParams, useRouteLoaderData, useOutletContext, useAsyncValue } from "react-router-dom";
 import { CaseComponent } from "../../components/case/CaseComponent";
 import CaseIndexView from "../../components/cases/CaseIndexView";
-import { Stack, useMediaQuery } from "@mui/material";
+import { Stack, Typography, useMediaQuery } from "@mui/material";
 import Header from "../../components/Header";
 import { useTheme } from "@emotion/react";
 import { useCaseData } from "../../hooks/useCaseData.js";
@@ -13,21 +13,22 @@ import { ReadonlyFieldComponent } from "../../components/case/field/ReadonlyFiel
 
 export function CaseDisplay({ defaultTitle }) {
   const caseName = useCaseName();
-  const { t } = useTranslation();
   const title = useOutletContext() || defaultTitle;
+  if (!caseName) return <NoDataView title={title} />;
+
+  const { t } = useTranslation();
   const { user, payroll } = useRouteLoaderData("root");
   const params = useParams();
   const caseDataParams = {caseName, ...params};
-  const { caseData, fatalError, loading } = useCaseData(caseDataParams, user, payroll);
+  const { caseData, fatalError, caseErrors, loading } = useCaseData(caseDataParams, user, payroll);
   
-
   const theme = useTheme();
   // this breakpoint was chosen because at this point the datefields + input field
   // don't have enough space
   const hideIndex = useMediaQuery(theme.breakpoints.down("md"));
   
   let content = null;
-  if (fatalError) {
+  if (fatalError || !!caseErrors.length) {
     content = <ErrorView error={fatalError} />
   } else if (loading) {
     content = <Loading />;
@@ -53,6 +54,15 @@ function useCaseName() {
   if (cases && cases.length > 0) {
     return cases[0].name;
   }
+  return null;
+}
 
-  return "";
+function NoDataView({ title }) {
+  const { t } = useTranslation();
+  return (
+    <Stack sx={{flex: 1}} px={{xs: 4, sm: 1, lg: 4}} py={4}>
+      <Header title={t(title)} />
+      <Typography>{t("No data available.")}</Typography>
+    </Stack>
+  )
 }

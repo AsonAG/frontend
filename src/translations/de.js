@@ -32,7 +32,8 @@ const translations = {
         "No data": "Keine Daten",
         "Preview not available.": "Vorschau nicht verfügbar.",
         "valid from": "Gültig ab",
-        "until": "bis"
+        "until": "bis",
+        "No data available.": "Keine Daten verfügbar."
     },
 };
 
