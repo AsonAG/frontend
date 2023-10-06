@@ -1,6 +1,6 @@
 import { FormControl, FormControlLabel, Checkbox } from "@mui/material";
 import { useContext } from "react";
-import { FieldContext } from "../FieldComponent";
+import { FieldContext } from "../EditFieldComponent";
 
 function FieldValueBooleanComponent() {
     const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);

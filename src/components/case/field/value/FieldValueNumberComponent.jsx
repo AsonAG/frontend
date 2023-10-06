@@ -2,7 +2,7 @@ import { NumericFormat } from "react-number-format";
 import { InputAdornment, TextField } from "@mui/material";
 import { validateMinMax } from "../../../../services/validators/FieldValueValidator";
 import { useState, useContext } from "react";
-import { FieldContext } from "../FieldComponent";
+import { FieldContext } from "../EditFieldComponent";
 import { useUpdateEffect } from "usehooks-ts";
 
 function getDecimalParams(valueType) {
@@ -52,7 +52,7 @@ function FieldValueNumberComponent() {
       {...getDecimalParams(field.valueType)}
       customInput={TextField}
       label={displayName}
-      type={getInputTypeFromValueType(field.valueType)}
+      type="numeric"
       name={field.name}
       required
       onBlur={handleBlur}
@@ -68,21 +68,6 @@ function FieldValueNumberComponent() {
       }}
     />
   );
-};
-
-const getInputTypeFromValueType = (valueType) => {
-  switch (valueType) {
-    case "String":
-      return "text";
-    case "Boolean":
-      return "Boolean";
-    case "Number":
-    case "Money":
-    case "Decimal":
-      return "numeric";
-    default:
-      return valueType;
-  }
 };
 
 const getAdornmentFromValueType = (valueType, attributes) => {

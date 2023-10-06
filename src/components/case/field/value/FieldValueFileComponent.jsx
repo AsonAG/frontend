@@ -1,6 +1,6 @@
 import { TextField, Box } from "@mui/material";
 // import { Box, Button, Stack, Typography, Chip, InputLabel, FormControl, OutlinedInput } from "@mui/material";
-import { FieldContext } from "../FieldComponent";
+import { FieldContext } from "../EditFieldComponent";
 import { useContext, useState, useEffect } from "react";
 import { toBase64 } from "../../../../services/converters/BinaryConverter";
 import { CloudUpload } from "@mui/icons-material";

@@ -1,31 +1,26 @@
 import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
-import FieldValueComponent from "./value/FieldValueComponent";
+import { EditFieldValueComponent } from "./value/EditFieldValueComponent";
 import { DescriptionComponent } from "../DescriptionComponent";
-import { FieldValueDateComponent } from "./value/FieldValueDateComponent";
 import { createContext, useContext } from "react";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
 import { useTheme } from "@emotion/react";
-import { useTranslation } from "react-i18next";
 import { FieldPeriodSelector } from "./FieldPeriodSelector";
 
 export const FieldContext = createContext();
 
-
-export function FieldComponent({ field }) {
-	const { buildCase, displayOnly, attachments } = useContext(CaseFormContext);
-	const fieldIsReadonly = displayOnly || (field.attributes?.["input.readOnly"] ?? false);
+export function EditFieldComponent({ field }) {
+	const { buildCase, attachments } = useContext(CaseFormContext);
+	const isReadonly = field.attributes?.["input.readOnly"] ?? false;
 	const theme = useTheme();
 	const mobile = useMediaQuery(theme.breakpoints.down(725));
-	const displayName = !displayOnly && !mobile ? field.displayName : '';
+	const displayName = !mobile ? field.displayName : '';
 
 	return (
-		<FieldContext.Provider value={{ field, displayName, buildCase, attachments, isReadonly: fieldIsReadonly }}  >
+		<FieldContext.Provider value={{ field, displayName, buildCase, attachments, isReadonly }}  >
 			{
 				mobile ?
 					<MobileLayout field={field} /> :
-					displayOnly ?
-						<ReadonlyLayout field={field} /> :
-						<DefaultLayout field={field} />
+					<DefaultLayout field={field} />
 			}
 		</FieldContext.Provider>
 	);
@@ -39,31 +34,15 @@ function DefaultLayout({field}) {
 			alignItems="center"
 			columnGap="8px"
 		>
-			<FieldValueComponent />
+			<EditFieldValueComponent />
 			<DescriptionComponent description={field.description} />
 			<FieldPeriodSelector field={field} />
 		</Box>
 	)
 }
 
-function ReadonlyLayout({field}) {
-	return (
-		<Box
-			display="grid"
-			gridTemplateColumns="minmax(220px, 1fr) 3fr 22px "
-			alignItems="center"
-			columnGap="8px"
-		>
-			<Typography color="disabled">{field.displayName}</Typography>
-			<FieldValueComponent />
-			<DescriptionComponent description={field.description} />
-		</Box>
-	);
-}
-
-
 const componentProps = {
-	sx: {flex: 1},
+	sx: { flex: 1 },
 	size: "small"
 };
 
@@ -72,13 +51,11 @@ function MobileLayout({field}) {
 	return (
 		<Stack spacing={1}>
 			<Stack direction="row" spacing={1}>
-				<Typography color="disabled" flex={1}>{field.displayName} *</Typography>
+				<Typography color="disabled" flex={1}>{field.displayName}&nbsp;*</Typography>
 				<DescriptionComponent description={field.description} />
 			</Stack>
-			<FieldValueComponent excludeNoneValue />
+			<EditFieldValueComponent excludeNoneValue />
 			<FieldPeriodSelector field={field} renderIntoContainer={renderPeriodPickerContainer} componentProps={componentProps} />
 		</Stack>
 	);
 }
-
-function isPeriodPickerDisabled(field) { return field.timeType === "Timeless" || field.attributes?.["input.hideStartEnd"];}

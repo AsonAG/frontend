@@ -30,6 +30,7 @@ import {
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
+import { CaseDisplay } from "./scenes/global/CaseDisplay";
 
 function tenantDataAwareLoader(loader) {
   return async (props) => {
@@ -111,7 +112,7 @@ const routeData = [
           },
           {
             path: ":caseName",
-            element: <CaseForm displayOnly />
+            element: <CaseDisplay />
           },
           {
             path: "new",
@@ -160,7 +161,7 @@ const routeData = [
           },
           {
             path: ":caseName",
-            element: <CaseForm displayOnly defaultTitle="Company data"/>
+            element: <CaseDisplay defaultTitle="Company data"/>
           },
           {
             path: "new",
@@ -216,7 +217,7 @@ const routeData = [
           },
           {
             path: ":caseName",
-            element: <CaseForm displayOnly />
+            element: <CaseDisplay />
           },
           {
             path: "new",

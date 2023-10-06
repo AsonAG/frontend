@@ -12,9 +12,9 @@ import FieldValueListComponent from "./selector/FieldValueListComponent";
 import FieldValueTextComponent from "./FieldValueTextComponent";
 import { FieldValueDateComponent, FieldValueDateTimeComponent } from "./FieldValueDateComponent";
 import FieldValueBooleanComponent from "./FieldValueBooleanComponent";
-import { FieldContext } from "../FieldComponent";
+import { FieldContext } from "../EditFieldComponent";
 
-function FieldValueComponent({ excludeNoneValue = false }) {
+export function EditFieldValueComponent({ excludeNoneValue = false }) {
 	const { field } = useContext(FieldContext);
 	if (field.lookupSettings && "lookupName" in field.lookupSettings) {
 		return <FieldValueLookupComponent />;
@@ -33,7 +33,7 @@ function FieldValueComponent({ excludeNoneValue = false }) {
 		case "Document":
 			return <FieldValueFileComponent />;
 		case "Date": 
-			return <FieldValueDateComponent propertyName="value" />;
+			return <FieldValueDateComponent />;
 		case "DateTime":
 			return <FieldValueDateTimeComponent />;
 		case "Boolean":
@@ -66,5 +66,3 @@ function FieldValueComponent({ excludeNoneValue = false }) {
 			return <FieldValueTextComponent />;
 	}
 };
-
-export default FieldValueComponent;

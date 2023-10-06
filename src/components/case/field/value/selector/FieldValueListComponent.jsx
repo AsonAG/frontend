@@ -1,6 +1,6 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { useContext, useMemo } from "react";
-import { FieldContext } from "../../FieldComponent";
+import { FieldContext } from "../../EditFieldComponent";
 
 function FieldValueListComponent() {
   const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
