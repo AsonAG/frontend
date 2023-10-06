@@ -53,7 +53,11 @@ export function useCaseData(params, user, payroll) {
         if (typeof response === "string") {
           setCaseErrors([response]);
         } else {
-          setCaseErrors(response.errors.Case);
+          const errors = Object
+            .entries(response.errors)
+            .flatMap(entry => entry[1]
+              .flatMap(e => `${entry[0]}: ${e}`));
+          setCaseErrors(errors);
         }
       }
       else {
@@ -62,8 +66,6 @@ export function useCaseData(params, user, payroll) {
     }
 
     async function _buildCase() {
-      // setFatalError(new Error("Oops"));
-      // return;
       const caseResponse = await buildCase(params, getCaseChangeSetup());
       if (caseResponse.ok) {
         setCaseData(await caseResponse.json());
