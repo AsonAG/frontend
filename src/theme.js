@@ -10,6 +10,9 @@ const lightModeDesignTokens = {
       main: '#461eb7',
       hover: "rgba(70, 30, 183, 0.05)",
       active: "rgba(70, 30, 183, 0.15)",
+    },
+    text: {
+      secondary: "rgba(0, 0, 0, 0.4)"
     }
   }
 }
@@ -21,6 +24,9 @@ const darkModeDesignTokens = {
       main: '#4985e2',
       hover: "rgba(73, 133, 226, 0.05)",
       active: "rgba(73, 133, 226, 0.15)",
+    },
+    text: {
+      secondary: "rgba(255, 255, 255, 0.4)"
     }
   }
 }
