@@ -9,6 +9,7 @@ const payrollUrl          = "/tenants/:tenantId/payrolls/:payrollId";
 const caseSetsUrl         = "/tenants/:tenantId/payrolls/:payrollId/cases/sets";
 const lookupValuesUrl     = "/tenants/:tenantId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
+const caseFieldsUrl       = "/tenants/:tenantId/payrolls/:payrollId/casefields";
 const employeeUrl         = "/tenants/:tenantId/employees/:employeeId";
 const usersUrl            = "/tenants/:tenantId/users";
 const employeeDocumentUrl = "/tenants/:tenantId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
@@ -248,6 +249,29 @@ export function getLookupValues(routeParams, lookupName) {
     return new FetchRequestBuilder(lookupValuesUrl, routeParams)
         .withQueryParam("lookupNames", lookupName)
         .withLocalization()
+        .fetchJson();
+}
+
+export function getDocumentCaseFields(routeParams) {
+    return new FetchRequestBuilder(caseFieldsUrl, routeParams)
+        .withQueryParam("valueType", "Document")
+        .withLocalization()
+        .fetchJson();
+}
+
+export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
+    const url = payrollUrl + "/changes/values";
+    const caseType = !!routeParams.employeeId ? "Employee" : "Company";
+    return new FetchRequestBuilder(url, routeParams)
+        .withQueryParam("employeeId", routeParams.employeeId)
+        .withQueryParam("caseType", caseType)
+        .withQueryParam("orderBy", "start desc")
+        .withQueryParam("result", "ItemsWithCount")
+        .withQueryParam("top", top)
+        .withQueryParam("filter", `CaseFieldName eq '${encodeURIComponent(caseFieldName)}'`)
+        // .withQueryParam("top", 10)
+        .withLocalization()
+        .withUser()
         .fetchJson();
 }
 

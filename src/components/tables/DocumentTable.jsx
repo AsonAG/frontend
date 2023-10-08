@@ -5,111 +5,153 @@ import {
   Typography,
   Box,
   IconButton,
-  useMediaQuery,
+  Button,
   useTheme,
   Fab,
-  Chip
+  Paper,
+  Collapse,
+  Link,
+  CircularProgress
 } from "@mui/material";
 import { React, useEffect, useState } from "react";
-import { useParams, useAsyncValue, Outlet, useNavigate, NavLink } from "react-router-dom";
-import { getDocument } from "../../api/FetchClient";
+import { useParams, useAsyncValue, Outlet, useNavigate, Link as RouterLink } from "react-router-dom";
+import { getDocument, getDocumentsOfCaseField } from "../../api/FetchClient";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../Loading";
-import { ArrowBack, DescriptionOutlined, Download } from "@mui/icons-material";
+import { ArrowBack, Attachment, Download, ExpandLess, ExpandMore } from "@mui/icons-material";
 import { Centered } from "../Centered";
-import { useIsMobile } from "../../hooks/useIsMobile";
-import { TableButton } from "../buttons/TableButton";
-import { Link } from "../Link";
-import { formatDate } from "../../utils/DateUtils";
+import dayjs from "dayjs";
 
 export function DocumentTable() {
-  const caseValues = useAsyncValue();
-  const theme = useTheme();
-  const variant = useMediaQuery(theme.breakpoints.down("sm")) ? "dense" : "default";
+  const caseFields = useAsyncValue();
 
   return (
     <>
-      <Stack spacing={3} divider={<Divider />} pb={3}>
-        {caseValues.map(caseValue => <CaseValueRow key={caseValue.id} caseValue={caseValue} variant={variant} />)}
+      <Stack spacing={3} pb={3}>
+        {caseFields.map(caseField => <DocumentCard key={caseField.id} caseFieldName={caseField.name} />)}
       </Stack>
       <Outlet />
     </>
   );
 };
 
-function CaseValueRow({ caseValue, variant }) {
-  const created = formatDate(caseValue.created, true);
-  const { t } = useTranslation();
+const documentLinkSx = {
+  textDecoration: 'none',
+  color: (theme) => theme.palette.primary.main,
+}
+function CaseValueRow({ caseValue }) {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="start">
-      <Stack flex={1}>
-        <Typography variant="h6" component="div" sx={{wordBreak: "break-word"}}>{caseValue.caseFieldName}</Typography>
-        <Typography variant="body2">{t("Created")}: {created}</Typography>
-      </Stack>
-      <TableButton title={t("Documents")} variant={variant} to={toFirstDocument(caseValue)} icon={<DescriptionOutlined />} />
+    <Stack spacing={1.5} pl={0.5}>
+      {
+        caseValue.documents.map(document => 
+          <Link component={RouterLink} key={document.id} to={`${caseValue.id}/i/${document.id}`} sx={documentLinkSx}>
+            <Stack direction="row" alignItems="center" spacing={0.75}>
+              <Attachment fontSize="small"/>
+              <Typography>{document.name}</Typography>
+            </Stack>
+          </Link>
+        )
+      }
     </Stack>
   )
 }
 
-function toFirstDocument(caseValue) {
-  return `${caseValue.id}/i/${caseValue.documents[0].id}`;
+const documentLoadSteps = 15;
+function useDocuments(caseFieldName) {
+  const params = useParams();
+  const [documents, setDocuments] = useState({count: 0, items: []})
+  const [top, setTop] = useState(documentLoadSteps);
+  const [loading, setLoading] = useState(true);
+
+  function loadMore() {
+    setTop(top => top + documentLoadSteps);
+  }
+
+  useEffect(() => {
+    setLoading(true);
+    const load = async () => {
+      try {
+        const response = await getDocumentsOfCaseField(params, caseFieldName, top);
+        setDocuments(response);
+      }
+      catch {}
+      finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [caseFieldName, params, top]);
+
+  const hasMore = documents.count > documents.items.length;
+
+  return { documents, loading, hasMore, loadMore };
+}
+
+function LoadDocumentsButton({loading, hasMore, onClick}) {
+  const { t } = useTranslation();
+  const text = loading ? "Loading..." :
+    hasMore ? "Load more" : "Showing all documents";
+  return <Button disabled={loading || !hasMore} startIcon={loading && <CircularProgress size="1rem" />} onClick={onClick}>{t(text)}</Button>
+}
+
+function DocumentCard({caseFieldName}) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(true);
+  const { documents, loading, hasMore, loadMore } = useDocuments(caseFieldName);
+  const onClick = () => setOpen(o => !o);
+  const groupedDocuments = Object.groupBy(documents.items, ({start}) => dayjs.utc(start).format("MMMM YYYY"));
+  const entries = Object.entries(groupedDocuments);
+
+  let content = null;
+  if (!loading && !hasMore && documents.items.length === 0) {
+    content = <Typography color="text.disabled">{t("No documents available")}</Typography>;
+  } else {
+    content = <>
+      {entries.map(([key, values]) => <DocumentMonthGroup key={key} month={key} items={values} />)}
+      <LoadDocumentsButton loading={loading} hasMore={hasMore} onClick={loadMore} />
+    </>
+  }
+  return (
+    <Paper>
+      <Stack>
+        <Stack direction="row" alignItems="center" sx={{pl: 2, pr: 1, py: 1}} spacing={2}>
+          <Typography variant="h6" flex={1}>{caseFieldName}</Typography>
+          <IconButton onClick={onClick}>
+            { open ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Stack>
+        <Collapse in={open} mountOnEnter>
+          <Divider />
+          <Stack sx={{px: 2, py: 1}} spacing={1} alignItems="start">
+            {content}
+          </Stack>
+        </Collapse>
+      </Stack>
+    </Paper>
+  )
+}
+
+function DocumentMonthGroup({month, items}) {
+  return (
+    <Stack>
+      <Typography variant="subtitle">{month}</Typography>
+      {items.map(caseValue => <CaseValueRow key={caseValue.id} caseValue={caseValue} />)}
+    </Stack>
+  )
 }
 
 export function DocumentDialog() {
-  const params = useParams();
-  const caseValues = useAsyncValue();
-  const isMobile = useIsMobile();
   const navigate = useNavigate();
-
-  const caseValueId = Number(params.caseValueId);
-  const caseValue = caseValues.find(v => v.id === caseValueId);
-  const documentId = Number(params.documentId);
-  const documentRef = caseValue.documents.find(d => d.id === documentId)
-
-  const Layout = isMobile ? MobileLayout : DesktopLayout;
-  return <Layout caseValue={caseValue} documentRef={documentRef} onClose={() => navigate("..")} />
-}
-
-function MobileLayout({caseValue, onClose}) {
   const { t } = useTranslation();
+  const onClose = () => navigate("..");
   return (
     <Dialog open fullScreen onClose={onClose}>
-      <DialogHeader title={t("Attachments")} onClose={onClose}  />
-      <AttachmentChips caseValue={caseValue}/>
-      <Divider sx={{py: 1}} />
+      <DialogHeader title={t("Document")} onClose={onClose}  />
+      <Divider />
       <DocumentPreview flex={1} />
     </Dialog>
   );
 }
-
-function DesktopLayout({caseValue, documentRef, onClose}) {
-  const { t } = useTranslation();
-
-  const layoutProps = {
-    sx: {
-      display: 'grid',
-      gridTemplate: "[header] 54px [divider-row] 1px [content] 1fr / [preview] 1fr [divider-column] 1px [attachments] 300px",
-      justifyItems: "stretch",
-      alignItems: "stretch",
-      backgroundColor: "transparent",
-      pointerEvents: "none"
-    }
-  }
-
-  return (
-    <Dialog open fullScreen onClose={onClose} PaperProps={layoutProps}>
-      <Box gridArea="1 / 1 / 1 / span 3"  bgcolor="background.default" />
-      <Box gridArea="1 / 3 / span 3"  bgcolor="background.default" />
-      <DialogHeader title={documentRef?.name} onClose={onClose} gridArea="header / preview" sx={{pointerEvents: "auto"}} />
-      <DocumentPreview gridArea="content / preview" />
-      <DialogHeader title={t("Attachments")} gridArea="header / attachments"/>
-      <AttachmentView caseValue={caseValue} gridArea="content / attachments" sx={{pointerEvents: "auto"}}/>
-      <Divider sx={{gridArea: "2 / 1 / 2 / span 3"}} />
-      <Divider sx={{gridArea: "1 / 2 / span 3 / 2"}} orientation="vertical" />
-    </Dialog>
-  );
-}
-
 
 function DocumentPreview(boxProps) {
   const params = useParams();
@@ -161,9 +203,10 @@ function DocumentPreview(boxProps) {
   );
 }
 
-function DialogHeader({title, onClose, ...stackProps}) {
+function DialogHeader({title, onClose}) {
+  const theme = useTheme();
   return (
-    <Stack direction="row" alignItems="center" spacing={2} px={2} py={1} {...stackProps}>
+    <Stack direction="row" alignItems="center" spacing={2} px={2} sx={theme.mixins.toolbar}>
       { onClose && <IconButton onClick={onClose}><ArrowBack /></IconButton> }
       <Typography variant="h6" sx={{flex: 1}}>{title}</Typography>
     </Stack>
@@ -190,42 +233,3 @@ function getDataUrl(document) {
   return `data:${document.contentType};base64,${document.content}`
 }
 
-function AttachmentView({caseValue, ...stackProps}) {
-  return (
-    <Stack {...stackProps} p={1} spacing={1}>
-      {
-        caseValue.documents.map(doc => 
-          <Link key={doc.id} to={`../${caseValue.id}/i/${doc.id}`}>{doc.name}</Link>
-        )
-      }
-    </Stack>
-  )
-}
-
-const hiddenScrollbar = {
-  overflow: "scroll",
-  scrollbarWidth: 'none',
-  "&::-webkit-scrollbar": {
-    width: 0,
-    height: 0
-  }
-}
-
-function AttachmentChips({ caseValue }) {
-  return (
-    <Stack direction="row" px={2} spacing={1} sx={hiddenScrollbar}>
-      {
-        caseValue.documents.map(doc => 
-          <NavLink key={doc.id} to={`../${caseValue.id}/i/${doc.id}`}>
-            {
-              ({isActive}) => (
-                <Chip color="primary" variant={isActive ? "filled" : "outlined"} label={doc.name} />
-              )
-            }
-          </NavLink>
-          
-        )
-      }
-    </Stack>
-  )
-}

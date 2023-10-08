@@ -26,7 +26,8 @@ import {
   getEmployeeByIdentifier,
   getCompanyCases,
   getCompanyCaseValues,
-  tenantDataCache
+  tenantDataCache,
+  getDocumentCaseFields
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -237,7 +238,7 @@ const routeData = [
             element: <AsyncDataRoute><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
-                data: getEmployeeCaseValues(params, "DocumentCount gt 0", "created desc")
+                data: getDocumentCaseFields(params)
               });
             },
             children: [

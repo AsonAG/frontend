@@ -86,7 +86,7 @@ function Drawer({ temporary, open, onClose }) {
 	useEffect(onClose, [location])
 
   const drawerVariant = temporary ? "temporary" : "permanent";
-  const isHrUser = user?.attributes.roles.includes("hr");
+  const isHrUser = user?.attributes.roles?.includes("hr");
 
   return (
     <MuiDrawer 

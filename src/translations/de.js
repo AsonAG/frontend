@@ -7,6 +7,7 @@ const translations = {
         "Data": "Daten",
         "Events": "Ereignisse",
         "Documents": "Dokumente",
+        "Document": "Dokument",
         "Employee": "Mitarbeiter",
         "My Profile": "Mein Profil",
         "Tasks": "Aufgaben",
@@ -35,7 +36,11 @@ const translations = {
         "until": "bis",
         "No data available.": "Keine Daten verfügbar.",
         "Yes": "Ja",
-        "No": "Nein"
+        "No": "Nein",
+        "No documents available": "Keine Dokumente verfügbar",
+        "Showing all documents": "Es werden alle Dokumente angezeigt",
+        "Load more": "Mehr laden",
+        "Loading...": "Laden..."
     },
 };
 
