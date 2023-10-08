@@ -80,7 +80,7 @@ function useDocuments(caseFieldName) {
       }
     };
     load();
-  }, [caseFieldName, params, top]);
+  }, [caseFieldName, params.tenantId, params.payrollId, params.employeeId, top]);
 
   const hasMore = documents.count > documents.items.length;
 
