@@ -74,7 +74,9 @@ function useDocuments(caseFieldName) {
         const response = await getDocumentsOfCaseField(params, caseFieldName, top);
         setDocuments(response);
       }
-      catch {}
+      catch {
+        setDocuments({count: 0, items: []});
+      }
       finally {
         setLoading(false);
       }
@@ -87,30 +89,31 @@ function useDocuments(caseFieldName) {
   return { documents, loading, hasMore, loadMore };
 }
 
-function LoadDocumentsButton({loading, hasMore, onClick}) {
+function LoadDocumentsButton({loading, hasMore, onClick, allLoadedText, sx}) {
   const { t } = useTranslation();
   const text = loading ? "Loading..." :
-    hasMore ? "Load more" : "Showing all documents";
-  return <Button disabled={loading || !hasMore} startIcon={loading && <CircularProgress size="1rem" />} onClick={onClick}>{t(text)}</Button>
+    hasMore ? "Load more" : allLoadedText;
+
+  return (
+    <Button 
+      disabled={loading || !hasMore}
+      startIcon={loading && <CircularProgress size="1rem" sx={{color: (theme) => theme.palette.text.disabled}} />}
+      onClick={onClick}
+      sx={sx}
+    >
+      {t(text)}
+    </Button>
+  );
 }
 
 function DocumentCard({caseFieldName}) {
-  const { t } = useTranslation();
   const [open, setOpen] = useState(true);
   const { documents, loading, hasMore, loadMore } = useDocuments(caseFieldName);
   const onClick = () => setOpen(o => !o);
   const groupedDocuments = Object.groupBy(documents.items, ({start}) => dayjs.utc(start).format("MMMM YYYY"));
   const entries = Object.entries(groupedDocuments);
+  const allLoadedText = documents.items.length === 0 ? "No documents available" : "Showing all documents";
 
-  let content = null;
-  if (!loading && !hasMore && documents.items.length === 0) {
-    content = <Typography color="text.disabled">{t("No documents available")}</Typography>;
-  } else {
-    content = <>
-      {entries.map(([key, values]) => <DocumentMonthGroup key={key} month={key} items={values} />)}
-      <LoadDocumentsButton loading={loading} hasMore={hasMore} onClick={loadMore} />
-    </>
-  }
   return (
     <Paper>
       <Stack>
@@ -122,9 +125,14 @@ function DocumentCard({caseFieldName}) {
         </Stack>
         <Collapse in={open} mountOnEnter>
           <Divider />
-          <Stack sx={{px: 2, py: 1}} spacing={1} alignItems="start">
-            {content}
-          </Stack>
+          {
+            entries.length > 0 && (
+              <Stack sx={{px: 2, pt: 2}} spacing={1} alignItems="start">
+                {entries.map(([key, values]) => <DocumentMonthGroup key={key} month={key} items={values} />)}
+              </Stack>
+            )
+          }
+          <LoadDocumentsButton loading={loading} hasMore={hasMore} onClick={loadMore} allLoadedText={allLoadedText} sx={{m: 1}} />
         </Collapse>
       </Stack>
     </Paper>
