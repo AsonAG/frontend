@@ -41,7 +41,7 @@ const documentLinkSx = {
 }
 function CaseValueRow({ caseValue }) {
   return (
-    <Stack spacing={1.5} pl={0.5}>
+    <Stack pl={0.5}>
       {
         caseValue.documents.map(document => 
           <Link component={RouterLink} key={document.id} to={`${caseValue.id}/i/${document.id}`} sx={documentLinkSx}>
@@ -109,8 +109,13 @@ function LoadDocumentsButton({loading, hasMore, onClick, allLoadedText, sx}) {
 function DocumentCard({caseFieldName}) {
   const [open, setOpen] = useState(true);
   const { documents, loading, hasMore, loadMore } = useDocuments(caseFieldName);
+  const { t } = useTranslation();
   const onClick = () => setOpen(o => !o);
-  const groupedDocuments = Object.groupBy(documents.items, ({start}) => dayjs.utc(start).format("MMMM YYYY"));
+  const groupedDocuments = Object.groupBy(documents.items, 
+    ({start}) => {
+      const date = dayjs.utc(start);
+      return date.isValid() ? date.format("MMMM YYYY") : t("Without date");
+    });
   const entries = Object.entries(groupedDocuments);
   const allLoadedText = documents.items.length === 0 ? "No documents available" : "Showing all documents";
 
