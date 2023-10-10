@@ -16,7 +16,6 @@ import getAuthUser from "./auth/getUser";
 import App from "./App";
 
 // TODO AJO error states when network requests fail
-// TODO AJO DEMOGROUP -> COMPANY -> NEW EVENT -> ZAHLT DIE FIRMA EINEN 13. MONATSLOHN AUS? -> error
 import { 
   getTenants,
   getEmployees,
@@ -137,9 +136,15 @@ const routeData = [
             element: <AsyncDataRoute><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
-                data: getEmployeeCaseValues(params, "DocumentCount gt 0", "created desc")
+                data: getDocumentCaseFields(params)
               });
-            }
+            },
+            children: [
+              {
+                path: ":caseValueId/i/:documentId",
+                Component: DocumentDialog
+              }
+            ]
           }
         ]
       },
@@ -182,7 +187,7 @@ const routeData = [
             element: <AsyncDataRoute defaultTitle="Company documents"><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
-                data: getCompanyCaseValues(params, "DocumentCount gt 0", "created desc")
+                data: getDocumentCaseFields(params)
               });
             },
             children: [

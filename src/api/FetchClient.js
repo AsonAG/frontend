@@ -253,7 +253,9 @@ export function getLookupValues(routeParams, lookupName) {
 }
 
 export function getDocumentCaseFields(routeParams) {
+    const caseType = !!routeParams.employeeId ? "Employee" : "Company";
     return new FetchRequestBuilder(caseFieldsUrl, routeParams)
+        .withQueryParam("caseType", caseType)
         .withQueryParam("valueType", "Document")
         .withLocalization()
         .fetchJson();
@@ -262,13 +264,14 @@ export function getDocumentCaseFields(routeParams) {
 export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
     const url = payrollUrl + "/changes/values";
     const caseType = !!routeParams.employeeId ? "Employee" : "Company";
+    console.log(caseFieldName);
     return new FetchRequestBuilder(url, routeParams)
         .withQueryParam("employeeId", routeParams.employeeId)
         .withQueryParam("caseType", caseType)
         .withQueryParam("orderBy", "start desc")
         .withQueryParam("result", "ItemsWithCount")
         .withQueryParam("top", top)
-        .withQueryParam("filter", `CaseFieldName eq '${encodeURIComponent(caseFieldName)}'`)
+        .withQueryParam("filter", `CaseFieldName eq '${caseFieldName}'`)
         // .withQueryParam("top", 10)
         .withLocalization()
         .withUser()

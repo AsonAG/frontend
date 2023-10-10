@@ -32,7 +32,7 @@ export function CaseForm({ defaultTitle }) {
   
   const handleSubmit = () => {
     if (formRef?.current?.reportValidity()) {
-      addCase(() => navigate(".."));
+      addCase(() => navigate("../events"));
     }
   }
 
