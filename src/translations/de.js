@@ -40,7 +40,8 @@ const translations = {
         "No documents available": "Keine Dokumente verfügbar",
         "Showing all documents": "Es werden alle Dokumente angezeigt",
         "Load more": "Mehr laden",
-        "Loading...": "Laden..."
+        "Loading...": "Laden...",
+        "Without date": "Ohne Datum"
     },
 };
 
