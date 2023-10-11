@@ -258,6 +258,7 @@ export function getDocumentCaseFields(routeParams) {
         .withQueryParam("caseType", caseType)
         .withQueryParam("valueType", "Document")
         .withLocalization()
+        .withLocalization()
         .fetchJson();
 }
 
@@ -272,7 +273,6 @@ export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
         .withQueryParam("result", "ItemsWithCount")
         .withQueryParam("top", top)
         .withQueryParam("filter", `CaseFieldName eq '${caseFieldName}'`)
-        // .withQueryParam("top", 10)
         .withLocalization()
         .withUser()
         .fetchJson();
