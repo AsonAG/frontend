@@ -42,6 +42,13 @@ function DesktopEventTable() {
         </TableHead>
         <TableBody>
           {events.map((event) => {
+            let formattedValue = event.value;
+            if (event.valueType === "Date") {
+              formattedValue = formatDate(event.value);
+            }
+            if (event.valueType === "DateTime") {
+              formattedValue = formatDate(event.value, true);
+            }
             return <TableRow 
               key={event.id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 }}}
@@ -50,7 +57,7 @@ function DesktopEventTable() {
                 {event.caseName}
               </TableCell>
               <TableCell sx={sx}>{event.caseFieldName}</TableCell>
-              <TableCell>{event.value}</TableCell>
+              <TableCell>{formattedValue}</TableCell>
               <TableCell>{formatDate(event.start)}</TableCell>
               <TableCell>{formatDate(event.end)}</TableCell>
               <TableCell>{formatDate(event.created, true)}</TableCell>
