@@ -269,7 +269,6 @@ export function getDocumentCaseFields(routeParams) {
         .withQueryParam("caseType", caseType)
         .withQueryParam("valueType", "Document")
         .withLocalization()
-        .withLocalization()
         .fetchJson();
 }
 

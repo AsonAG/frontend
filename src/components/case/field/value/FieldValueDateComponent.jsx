@@ -19,7 +19,7 @@ function _InternalDateComponent({Picker, propertyName = "value", displayName, sx
 		const validationError = context.validationError ? "Invalid date" : "";
 		inputRef.current?.setCustomValidity(validationError);
 		if(!validationError) {
-			field[propertyName] = newDate?.format();
+			field[propertyName] = newDate?.toISOString();
 			buildCase();
 		}
 	};
