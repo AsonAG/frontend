@@ -1,5 +1,4 @@
-import { Stack } from "@mui/material";
-import Header from "./Header";
+import { Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useOutletContext } from "react-router-dom";
 
@@ -11,7 +10,7 @@ export function ContentLayout({ defaultTitle, disableXsPadding, children, ...sxP
 
   return (
     <Stack px={stackSpacingProps} py={4} spacing={2} sx={{ minHeight: "100%", width: "100%", ...sxProps }}>
-      <Header title={t(title)} px={headerSpacingProps}/>
+      <Typography variant="h2" fontWeight="bold" pb={2} px={headerSpacingProps}>{t(title)}</Typography>
       {children}
     </Stack>
   );

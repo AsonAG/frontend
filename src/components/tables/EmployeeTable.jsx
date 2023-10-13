@@ -14,11 +14,11 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncEmployeeTable() {
   return (
-    <AsyncDataRoute>
-      <ContentLayout defaultTitle="Employees">
+    <ContentLayout defaultTitle="Employees">
+      <AsyncDataRoute>
         <EmployeeTable />
-      </ContentLayout>
-    </AsyncDataRoute>
+      </AsyncDataRoute>
+    </ContentLayout>
   );
 }
 

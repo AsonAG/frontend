@@ -11,14 +11,15 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncTaskTable() {
   return (
-    <AsyncDataRoute>
-      <ContentLayout defaultTitle="Tasks">
+    <ContentLayout defaultTitle="Tasks">
+      <AsyncDataRoute>
         <TaskTable />
-      </ContentLayout>
-    </AsyncDataRoute>
-  )
+      </AsyncDataRoute>
+    </ContentLayout>
+  );
 }
 
+// testing
 function TaskTable() {
   const tasks = useAsyncValue();
 

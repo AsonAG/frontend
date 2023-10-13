@@ -8,11 +8,11 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncEventTable() {
   return (
-    <AsyncDataRoute>
-      <ContentLayout defaultTitle="Events" disableXsPadding>
+    <ContentLayout defaultTitle="Events" disableXsPadding>
+      <AsyncDataRoute>
         <EventTable />
-      </ContentLayout>
-    </AsyncDataRoute>
+      </AsyncDataRoute>
+    </ContentLayout>
   );
 }
 
