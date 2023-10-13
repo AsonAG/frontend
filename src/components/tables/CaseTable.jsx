@@ -8,11 +8,11 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncCaseTable() {
   return (
-    <AsyncDataRoute>
-      <ContentLayout defaultTitle="New event">
+    <ContentLayout defaultTitle="New event">
+      <AsyncDataRoute>
         <CaseTable />
-      </ContentLayout>
-    </AsyncDataRoute>
+      </AsyncDataRoute>
+    </ContentLayout>
   );
 }
 

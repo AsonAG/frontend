@@ -2,12 +2,10 @@ import { useParams, useRouteLoaderData, useOutletContext, useAsyncValue } from "
 import { CaseComponent } from "../../components/case/CaseComponent";
 import CaseIndexView from "../../components/cases/CaseIndexView";
 import { Stack, Typography, useMediaQuery } from "@mui/material";
-import Header from "../../components/Header";
 import { useTheme } from "@emotion/react";
 import { useCaseData } from "../../hooks/useCaseData.js";
 import { Loading } from "../../components/Loading";
 import { ErrorView } from "../../components/ErrorView";
-import { useTranslation } from "react-i18next";
 import { ReadonlyFieldComponent } from "../../components/case/field/ReadonlyFieldComponent";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../../components/ContentLayout";
@@ -19,9 +17,14 @@ export function AsyncCaseDisplay() {
 function CaseDisplay({ defaultTitle }) {
   const caseName = useCaseName();
   const title = useOutletContext() || defaultTitle;
-  if (!caseName) return <NoDataView title={title} />;
+  if (!caseName) {
+    return (
+      <ContentLayout defaultTitle={title} sx={{flex: 1}}>
+        <Typography>{t("No data available")}</Typography>
+      </ContentLayout>
+    );
+  }
 
-  const { t } = useTranslation();
   const { user, payroll } = useRouteLoaderData("root");
   const params = useParams();
   const caseDataParams = {caseName, ...params};
@@ -59,14 +62,4 @@ function useCaseName() {
     return cases[0].name;
   }
   return null;
-}
-
-function NoDataView({ title }) {
-  const { t } = useTranslation();
-  return (
-    <Stack sx={{flex: 1}} px={{xs: 4, sm: 1, lg: 4}} py={4}>
-      <Header title={t(title)} />
-      <Typography>{t("No data available.")}</Typography>
-    </Stack>
-  )
 }

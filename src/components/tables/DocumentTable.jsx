@@ -21,11 +21,11 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncDocumentTable() {
   return (
-    <AsyncDataRoute>
-      <ContentLayout defaultTitle="Documents">
+    <ContentLayout defaultTitle="Documents">
+      <AsyncDataRoute>
         <DocumentTable />
-      </ContentLayout>
-    </AsyncDataRoute>
+      </AsyncDataRoute>
+    </ContentLayout>
   );
 }
 
