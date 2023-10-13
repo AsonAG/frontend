@@ -4,19 +4,17 @@ import { createContext, useRef } from "react";
 import CaseIndexView from "../../components/cases/CaseIndexView";
 import { CaseFormButtons } from "../../components/buttons/CaseFormButtons";
 import { Stack, useMediaQuery } from "@mui/material";
-import Header from "../../components/Header";
 import { useTheme } from "@emotion/react";
 import { useCaseData } from "../../hooks/useCaseData.js";
 import { Loading } from "../../components/Loading";
 import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
 import { ErrorView } from "../../components/ErrorView";
-import { useTranslation } from "react-i18next";
 import { EditFieldComponent } from "../../components/case/field/EditFieldComponent";
+import { ContentLayout } from "../../components/ContentLayout";
 
 export const CaseFormContext = createContext();
 
 export function Component() {
-  const { t } = useTranslation();
   const title = useOutletContext() || "New event";
   const navigate = useNavigate();
   const { user, payroll } = useRouteLoaderData("root");
@@ -55,10 +53,9 @@ export function Component() {
 
   return (
     <Stack direction="row" minHeight="100%">
-      <Stack sx={{flex: 1}} px={{xs: 4, sm: 1, lg: 4}} py={4}>
-        <Header title={t(title)} />
+      <ContentLayout defaultTitle={title} sx={{flex: 1}}>
         {content}
-      </Stack>
+      </ContentLayout>
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }
     </Stack>
   )
