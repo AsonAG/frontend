@@ -24,7 +24,7 @@ import "dayjs/locale/de";
 import "dayjs/locale/en";
 
 
-function App({renderDrawer = false}) {
+export function App({renderDrawer = false}) {
 	const theme = useCreateTheme();
 	const useTemporaryDrawer = useMediaQuery(theme.breakpoints.down("lg"));
 	const { user } = useLoaderData();
@@ -67,5 +67,3 @@ function App({renderDrawer = false}) {
 		</ThemeProvider>
 	);
 }
-
-export default App;

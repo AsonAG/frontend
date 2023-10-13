@@ -9,8 +9,20 @@ import { useTranslation } from "react-i18next";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
+import { ContentLayout } from "../ContentLayout";
 
-export function EmployeeTable() {
+export function AsyncEmployeeTable() {
+  return (
+    <AsyncDataRoute>
+      <ContentLayout defaultTitle="Employees">
+        <EmployeeTable />
+      </ContentLayout>
+    </AsyncDataRoute>
+  );
+}
+
+function EmployeeTable() {
   const employees = useAsyncValue();
   const theme = useTheme();
   const variant = useMediaQuery(theme.breakpoints.down("md")) ? "dense" : "default";
@@ -35,7 +47,7 @@ const sx = {
 
 function EmployeeRow({ employee, variant }) {
   return (
-    <Stack direction="row" alignItems="center" gap={2} marginX={-1} sx={sx}>
+    <Stack direction="row" alignItems="center" gap={2} marginX={-2} sx={sx}>
       <Link to={employee.id + "/data"} flex={1} disableBgHover>
         <Stack>
           <Typography gutterBottom>{employee.firstName} {employee.lastName}</Typography>

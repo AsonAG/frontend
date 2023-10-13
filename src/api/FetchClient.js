@@ -276,7 +276,6 @@ export function getDocumentCaseFields(routeParams) {
 export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
     const url = payrollUrl + "/changes/values";
     const caseType = !!routeParams.employeeId ? "Employee" : "Company";
-    console.log(caseFieldName);
     return new FetchRequestBuilder(url, routeParams)
         .withQueryParam("employeeId", routeParams.employeeId)
         .withQueryParam("caseType", caseType)

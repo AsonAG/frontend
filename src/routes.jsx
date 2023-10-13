@@ -5,15 +5,12 @@ import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
-import { EmployeeTable } from "./components/tables/EmployeeTable";
-import { CaseTable } from "./components/tables/CaseTable";
-import { AsyncDataRoute } from "./routes/AsyncDataRoute";
-import { EventTable } from "./components/tables/EventTable";
-import { DocumentDialog, DocumentTable } from "./components/tables/DocumentTable";
-import { CaseForm } from "./scenes/global/CaseForm";
+import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
+import { AsyncCaseTable } from "./components/tables/CaseTable";
+import { AsyncEventTable } from "./components/tables/EventTable";
 import getAuthUser from "./auth/getUser";
 
-import App from "./App";
+import { App } from "./App";
 
 // TODO AJO error states when network requests fail
 import { 
@@ -31,8 +28,10 @@ import {
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
-import { CaseDisplay } from "./scenes/global/CaseDisplay";
-import { TaskTable } from "./components/tables/TaskTable";
+import { AsyncCaseDisplay } from "./scenes/global/CaseDisplay";
+import { AsyncTaskTable } from "./components/tables/TaskTable";
+import { AsyncDocumentTable } from "./components/tables/DocumentTable";
+import { DocumentDialog } from "./components/DocumentDialog";
 
 function tenantDataAwareLoader(loader) {
   return async (props) => {
@@ -48,7 +47,7 @@ const routeData = [
   {
     path: "/",
     element: <App />,
-    loader: () => {return {user: null};},
+    loader: () => { return { user: null }; },
     ErrorBoundary: ErrorView,
     children: [
       {
@@ -80,12 +79,12 @@ const routeData = [
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        Component: Dashboard,
       },
       {
         path: "hr/employees",
-        element: <AsyncDataRoute defaultTitle="Employees"><EmployeeTable /></AsyncDataRoute>,
-        loader: ({params, request}) =>  {
+        Component: AsyncEmployeeTable,
+        loader: ({params}) =>  {
           return defer({
             data: getEmployees(params)
           });
@@ -98,13 +97,13 @@ const routeData = [
           const employee = await getEmployee(params);
           return { employee };
         },
-        shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.employeeId !== nextParams.employeeId,
+        shouldRevalidate: ({currentParams, nextParams}) => currentParams.payrollId !== nextParams.payrollId || currentParams.employeeId !== nextParams.employeeId,
         id: "employee",
         ErrorBoundary: ErrorView,
         children: [
           {
             path: "data",
-            element: <AsyncDataRoute disableScaffold><CaseDisplay /></AsyncDataRoute>,
+            Component: AsyncCaseDisplay,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "EmployeeData")
@@ -113,7 +112,7 @@ const routeData = [
           },
           {
             path: "new",
-            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
+            Component: AsyncCaseTable,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "NotAvailable")
@@ -122,11 +121,11 @@ const routeData = [
           },
           {
             path: "new/:caseName",
-            Component: CaseForm,
+            lazy: () => import("./scenes/global/CaseForm")
           },
           {
             path: "events",
-            element: <AsyncDataRoute fullWidthContent><EventTable /></AsyncDataRoute>,
+            Component: AsyncEventTable,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCaseValues(params, null, "created desc")
@@ -135,7 +134,7 @@ const routeData = [
           },
           {
             path: "documents",
-            element: <AsyncDataRoute><DocumentTable /></AsyncDataRoute>,
+            Component: AsyncDocumentTable,
             loader: ({params}) =>  {
               return defer({
                 data: getDocumentCaseFields(params)
@@ -155,7 +154,8 @@ const routeData = [
         children: [
           {
             path: "data",
-            element: <AsyncDataRoute disableScaffold><CaseDisplay defaultTitle="Company data" /></AsyncDataRoute>,
+            Component: AsyncCaseDisplay,
+            // element: <AsyncCaseDisplay defaultTitle="Company data" />,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "CompanyData")
@@ -164,7 +164,8 @@ const routeData = [
           },
           {
             path: "new",
-            element: <AsyncDataRoute defaultTitle="New Company event"><CaseTable /></AsyncDataRoute>,
+            Component: AsyncCaseTable,
+            // element: <AsyncDataRoute defaultTitle="New Company event"><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "NotAvailable")
@@ -173,11 +174,13 @@ const routeData = [
           },
           {
             path: "new/:caseName",
-            element: <CaseForm defaultTitle="New Company event" />
+            lazy: () => import("./scenes/global/CaseForm")
+            // element: <CaseForm defaultTitle="New Company event" />
           },
           {
             path: "events",
-            element: <AsyncDataRoute defaultTitle="Company events" disableXsPadding><EventTable /></AsyncDataRoute>,
+            Component: AsyncEventTable,
+            // element: <AsyncDataRoute defaultTitle="Company events" disableXsPadding><EventTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCaseValues(params, null, "created desc")
@@ -186,7 +189,8 @@ const routeData = [
           },
           {
             path: "documents",
-            element: <AsyncDataRoute defaultTitle="Company documents"><DocumentTable /></AsyncDataRoute>,
+            Component: AsyncDocumentTable,
+            // element: <AsyncDataRoute defaultTitle="Company documents"><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getDocumentCaseFields(params)
@@ -201,7 +205,7 @@ const routeData = [
           },
           {
             path: "tasks",
-            element: <AsyncDataRoute defaultTitle="Tasks"><TaskTable /></AsyncDataRoute>,
+            Component: AsyncTaskTable,
             loader: ({params}) =>  {
               return defer({
                 data: getTasks(params, null, "created desc")
@@ -216,7 +220,7 @@ const routeData = [
         children: [
           {
             path: "data",
-            element: <AsyncDataRoute disableScaffold><CaseDisplay /></AsyncDataRoute>,
+            Component: AsyncCaseDisplay,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "EmployeeData")
@@ -225,7 +229,7 @@ const routeData = [
           },
           {
             path: "new",
-            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
+            Component: AsyncCaseTable,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "ESS")
@@ -234,11 +238,11 @@ const routeData = [
           },
           {
             path: "new/:caseName",
-            Component: CaseForm
+            lazy: () => import("./scenes/global/CaseForm")
           },
           {
             path: "tasks",
-            element: <AsyncDataRoute><CaseTable /></AsyncDataRoute>,
+            Component: AsyncCaseTable,
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "ECT")
@@ -247,11 +251,11 @@ const routeData = [
           },
           {
             path: "tasks/:caseName",
-            Component: CaseForm,
+            lazy: () => import("./scenes/global/CaseForm")
           },
           {
             path: "documents",
-            element: <AsyncDataRoute><DocumentTable /></AsyncDataRoute>,
+            Component: AsyncDocumentTable,
             loader: ({params}) =>  {
               return defer({
                 data: getDocumentCaseFields(params)

@@ -15,9 +15,9 @@ import { EditFieldComponent } from "../../components/case/field/EditFieldCompone
 
 export const CaseFormContext = createContext();
 
-export function CaseForm({ defaultTitle }) {
+export function Component() {
   const { t } = useTranslation();
-  const title = useOutletContext() || defaultTitle;
+  const title = useOutletContext() || "New event";
   const navigate = useNavigate();
   const { user, payroll } = useRouteLoaderData("root");
   const params = useParams();
