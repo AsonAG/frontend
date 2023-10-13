@@ -3,6 +3,18 @@ import { useAsyncValue, Link } from "react-router-dom";
 import { Stack, Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Centered } from "../Centered";
+import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
+import { ContentLayout } from "../ContentLayout";
+
+export function AsyncCaseTable() {
+  return (
+    <AsyncDataRoute>
+      <ContentLayout defaultTitle="New event">
+        <CaseTable />
+      </ContentLayout>
+    </AsyncDataRoute>
+  );
+}
 
 const styling = {
   flex: "1 1 300px",
@@ -34,7 +46,7 @@ function CaseCard({_case}) {
   )
 }
 
-export function CaseTable() {
+function CaseTable() {
   const cases = useAsyncValue();
   const sorted = cases.toSorted(sortByDisplayName);
   const { t } = useTranslation();

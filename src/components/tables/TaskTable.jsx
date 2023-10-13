@@ -6,8 +6,20 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { HtmlContent } from '../HtmlContent';
+import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
+import { ContentLayout } from "../ContentLayout";
 
-export function TaskTable() {
+export function AsyncTaskTable() {
+  return (
+    <AsyncDataRoute>
+      <ContentLayout defaultTitle="Tasks">
+        <TaskTable />
+      </ContentLayout>
+    </AsyncDataRoute>
+  )
+}
+
+function TaskTable() {
   const tasks = useAsyncValue();
 
   return (

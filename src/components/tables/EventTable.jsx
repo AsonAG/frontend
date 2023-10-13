@@ -2,13 +2,24 @@ import { React } from "react";
 import { useAsyncValue } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery, useTheme } from "@mui/material";
-import dayjs from "dayjs";
+import { formatDate } from "../../utils/DateUtils";
+import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
+import { ContentLayout } from "../ContentLayout";
 
+export function AsyncEventTable() {
+  return (
+    <AsyncDataRoute>
+      <ContentLayout defaultTitle="Events" disableXsPadding>
+        <EventTable />
+      </ContentLayout>
+    </AsyncDataRoute>
+  );
+}
 
-function formatDate(date, includeTime) {
-  if (!date) return null;
-  const formatString = includeTime ? "L LT" : "L";
-  return dayjs.utc(date).format(formatString);
+function EventTable() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  return isMobile ? <MobileEventTable /> : <DesktopEventTable />;
 }
 
 function DesktopEventTable() {
@@ -97,10 +108,4 @@ function MobileEventTable() {
       </Table>
     </TableContainer>
   )
-}
-
-export function EventTable() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  return isMobile ? <MobileEventTable /> : <DesktopEventTable />;
 }

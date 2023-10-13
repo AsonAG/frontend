@@ -9,9 +9,13 @@ import { Loading } from "../../components/Loading";
 import { ErrorView } from "../../components/ErrorView";
 import { useTranslation } from "react-i18next";
 import { ReadonlyFieldComponent } from "../../components/case/field/ReadonlyFieldComponent";
+import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 
+export function AsyncCaseDisplay() {
+  return <AsyncDataRoute><CaseDisplay defaultTitle="Data" /></AsyncDataRoute>
+}
 
-export function CaseDisplay({ defaultTitle }) {
+function CaseDisplay({ defaultTitle }) {
   const caseName = useCaseName();
   const title = useOutletContext() || defaultTitle;
   if (!caseName) return <NoDataView title={title} />;

@@ -1,28 +1,36 @@
 import {
   Divider,
-  Dialog,
   Stack,
   Typography,
-  Box,
   IconButton,
   Button,
-  useTheme,
-  Fab,
   Paper,
   Collapse,
   Link,
   CircularProgress
 } from "@mui/material";
-import { React, useEffect, useState } from "react";
-import { useParams, useAsyncValue, Outlet, useNavigate, Link as RouterLink } from "react-router-dom";
-import { getDocument, getDocumentsOfCaseField } from "../../api/FetchClient";
+import { React, useState } from "react";
+import { useAsyncValue, Outlet, Link as RouterLink } from "react-router-dom";
+import { useDocuments } from "../../hooks/useDocuments";
 import { useTranslation } from "react-i18next";
-import { Loading } from "../Loading";
-import { ArrowBack, Attachment, Download, ExpandLess, ExpandMore } from "@mui/icons-material";
-import { Centered } from "../Centered";
+import { Attachment, ExpandLess, ExpandMore } from "@mui/icons-material";
+import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import dayjs from "dayjs";
+import { ContentLayout } from "../ContentLayout";
 
-export function DocumentTable() {
+
+export function AsyncDocumentTable() {
+  return (
+    <AsyncDataRoute>
+      <ContentLayout defaultTitle="Documents">
+        <DocumentTable />
+      </ContentLayout>
+    </AsyncDataRoute>
+  );
+}
+
+
+function DocumentTable() {
   const caseFields = useAsyncValue();
 
   return (
@@ -54,39 +62,6 @@ function CaseValueRow({ caseValue }) {
       }
     </Stack>
   )
-}
-
-const documentLoadSteps = 15;
-function useDocuments(caseFieldName) {
-  const params = useParams();
-  const [documents, setDocuments] = useState({count: 0, items: []})
-  const [top, setTop] = useState(documentLoadSteps);
-  const [loading, setLoading] = useState(true);
-
-  function loadMore() {
-    setTop(top => top + documentLoadSteps);
-  }
-
-  useEffect(() => {
-    setLoading(true);
-    const load = async () => {
-      try {
-        const response = await getDocumentsOfCaseField(params, caseFieldName, top);
-        setDocuments(response);
-      }
-      catch {
-        setDocuments({count: 0, items: []});
-      }
-      finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [caseFieldName, params.tenantId, params.payrollId, params.employeeId, top]);
-
-  const hasMore = documents.count > documents.items.length;
-
-  return { documents, loading, hasMore, loadMore };
 }
 
 function LoadDocumentsButton({loading, hasMore, onClick, allLoadedText, sx}) {
@@ -152,97 +127,3 @@ function DocumentMonthGroup({month, items}) {
     </Stack>
   )
 }
-
-export function DocumentDialog() {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const onClose = () => navigate("..");
-  return (
-    <Dialog open fullScreen onClose={onClose}>
-      <DialogHeader title={t("Document")} onClose={onClose}  />
-      <Divider />
-      <DocumentPreview flex={1} />
-    </Dialog>
-  );
-}
-
-function DocumentPreview(boxProps) {
-  const params = useParams();
-  const [doc, setDoc] = useState(null);
-  const [isLoading, setLoading] = useState(true);
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const d = await getDocument(params);
-        setDoc({ url: getDataUrl(d), name: d.name });
-      }
-      catch { }
-      finally {
-        setLoading(false);
-      }
-      
-    }
-    loadData();
-  }, [params]);
-
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  return (
-    <Box sx={{display: "grid", justifyItems: "stretch", alignItems: "stretch", pointerEvents:"none"}} {...boxProps}>
-      <Box sx={{
-        border: "none",
-        objectFit: "contain",
-        maxWidth: "100%",
-        gridArea: "1 / 1", 
-        m: 5, 
-        pointerEvents: "auto"}} component="object" data={doc.url}>
-        <Centered><Typography>{t("Preview not available.")}</Typography></Centered>
-      </Box>
-      <DownloadButton url={doc.url} name={doc.name} sx={{
-        gridArea: "1 / 1", 
-        justifySelf: "end", 
-        alignSelf: "end", 
-        m: 2,
-        pointerEvents: "auto"
-      }} />
-    </Box>
-    
-  );
-}
-
-function DialogHeader({title, onClose}) {
-  const theme = useTheme();
-  return (
-    <Stack direction="row" alignItems="center" spacing={2} px={2} sx={theme.mixins.toolbar}>
-      { onClose && <IconButton onClick={onClose}><ArrowBack /></IconButton> }
-      <Typography variant="h6" sx={{flex: 1}}>{title}</Typography>
-    </Stack>
-  );
-}
-
-function DownloadButton({url, name, sx}) {
-  return (
-    <Fab 
-      component="a" 
-      variant="extended" 
-      href={url} 
-      download={name} 
-      color="primary" 
-      size="large" 
-      sx={sx}>
-        <Download sx={{mr: 1}} />
-        <Typography>Download</Typography>
-    </Fab>
-  );
-}
-
-function getDataUrl(document) {
-  return `data:${document.contentType};base64,${document.content}`
-}
-
