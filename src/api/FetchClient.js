@@ -14,6 +14,7 @@ const employeeUrl         = "/tenants/:tenantId/employees/:employeeId";
 const usersUrl            = "/tenants/:tenantId/users";
 const employeeDocumentUrl = "/tenants/:tenantId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
 const companyDocumentUrl  = "/tenants/:tenantId/companycases/:caseValueId/documents/:documentId";
+const tasksUrl            = "/tenants/:tenantId/tasks";
 
 class TenantDataCache {
     tenantDataCache = {};
@@ -215,8 +216,18 @@ export function getCompanyCaseValues(routeParams, filter, orderBy) {
         .fetchJson();
 }
 
+export function getTasks(routeParams, filter, orderBy) {
+    return new FetchRequestBuilder(tasksUrl, routeParams)
+        .withQueryParam("filter", filter)
+        .withQueryParam("orderBy", orderBy)
+        // .withQueryParam("result", "ItemsWithCount")
+        // .withQueryParam("top", 10)
+        .withLocalization()
+        .fetchJson();
+}
+
 export function buildCase(routeParams, caseChangeSetup) {
-        // manually construct path, generatePath does not handle encoding properly
+    // manually construct path, generatePath does not handle encoding properly
     const url = caseSetsUrl + "/" + encodeURIComponent(routeParams.caseName);
     return new FetchRequestBuilder(url, routeParams)
         .withMethod("POST")
