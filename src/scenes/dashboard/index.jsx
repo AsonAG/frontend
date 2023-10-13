@@ -1,13 +1,8 @@
-import {
-  Stack,
-} from "@mui/material";
-import Header from "../../components/Header";
+import { ContentLayout } from "../../components/ContentLayout";
 
 function Dashboard() {
   return (
-    <Stack p={4} gap={2} sx={{height: "100%"}}>
-      <Header title="Dashboard" />
-    </Stack>
+    <ContentLayout defaultTitle="Dashboard" />
   );
 };
 
