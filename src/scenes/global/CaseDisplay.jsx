@@ -10,6 +10,7 @@ import { ErrorView } from "../../components/ErrorView";
 import { useTranslation } from "react-i18next";
 import { ReadonlyFieldComponent } from "../../components/case/field/ReadonlyFieldComponent";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
+import { ContentLayout } from "../../components/ContentLayout";
 
 export function AsyncCaseDisplay() {
   return <AsyncDataRoute><CaseDisplay defaultTitle="Data" /></AsyncDataRoute>
@@ -44,10 +45,9 @@ function CaseDisplay({ defaultTitle }) {
 
   return (
     <Stack direction="row" minHeight="100%">
-      <Stack sx={{flex: 1}} px={{xs: 4, sm: 1, lg: 4}} py={4}>
-        <Header title={t(title)} />
+      <ContentLayout defaultTitle={title}>
         {content}
-      </Stack>
+      </ContentLayout>
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }
     </Stack>
   )
