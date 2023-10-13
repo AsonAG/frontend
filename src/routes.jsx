@@ -26,11 +26,13 @@ import {
   getCompanyCases,
   getCompanyCaseValues,
   tenantDataCache,
-  getDocumentCaseFields
+  getDocumentCaseFields,
+  getTasks
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
 import { CaseDisplay } from "./scenes/global/CaseDisplay";
+import { TaskTable } from "./components/tables/TaskTable";
 
 function tenantDataAwareLoader(loader) {
   return async (props) => {
@@ -196,7 +198,16 @@ const routeData = [
                 Component: DocumentDialog
               }
             ]
-          }
+          },
+          {
+            path: "tasks",
+            element: <AsyncDataRoute defaultTitle="Tasks"><TaskTable /></AsyncDataRoute>,
+            loader: ({params}) =>  {
+              return defer({
+                data: getTasks(params, null, "created desc")
+              });
+            }
+          },
         ]
       },
       {

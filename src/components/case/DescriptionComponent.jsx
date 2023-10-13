@@ -1,9 +1,9 @@
 import { Tooltip } from "@mui/material";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import { Markup } from "interweave";
+import { HtmlContent } from "../HtmlContent";
 
 
-const isHtml = RegExp.prototype.test.bind(/<\/?[a-z][\s\S]*>/i);
+
 
 export function DescriptionComponent({ description }) {
   
@@ -11,10 +11,8 @@ export function DescriptionComponent({ description }) {
     return <div></div>;
   }
 
-  const content = isHtml(description) ? <Markup content={description} /> : description;
-
   return (
-    <Tooltip arrow title={content} placement="top">
+    <Tooltip arrow title={<HtmlContent content={description} />} placement="top">
       <HelpOutlineOutlinedIcon color="disabled" />
     </Tooltip>
   );
