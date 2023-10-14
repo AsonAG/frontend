@@ -1,4 +1,4 @@
-let langCodes = {
+let langMap = {
   af: "Afrikaans",
   sq: "Albanian",
   an: "Aragonese",
@@ -200,12 +200,10 @@ let langCodes = {
   zu: "Zulu",
 };
 
-export function getLanguageCode(languageCode) {
-  let lang;
+export function getLanguageCode(language) {
   try {
-    lang = Object.entries(langCodes).find((l) => l[1] === languageCode)[0];
+    return Object.entries(langMap).find((l) => l[1] === language)[0];
   } catch (error) {
-    console.warn("Language code: '" + languageCode + "'not found.");
+    return "en";
   }
-  return lang;
 }

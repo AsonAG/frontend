@@ -1,65 +1,61 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { UserContext } from "../../App";
+import React, { useState } from "react";
+import { Button, Typography, Menu, MenuItem } from "@mui/material";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Link, generatePath, matchRoutes, useLoaderData, useParams } from "react-router-dom";
+import { useDocumentTitle } from "usehooks-ts";
+import { routeData } from "../../routes";
 
-export default function PayrollSelector() {
-  const { user, setUser } = useContext(UserContext);
-  const [payroll, setPayroll] = useState({
-    currentPayrollName: "",
-    currentPayrollId: "",
-    currentDivisionId: "",
-  });
-
-  const handleChange = (e) => {
-    console.log("User has changed.");
-    let payroll = user.availablePayrolls.find(
-      (payroll) => payroll.payrollId === e.target.value
-    );
-    setUser((current) => ({
-      ...current,
-      currentPayrollName: payroll.payrollName,
-      currentPayrollId: payroll.payrollId,
-      currentDivisionId: payroll.divisionId,
-    }));
+function PayrollSelector() {
+  const { payroll, payrolls } = useLoaderData();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const queryParams = useParams();
+  useDocumentTitle(`Ason - ${payroll.name}`);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    const route = matchRoutes(routeData, window.location).map(r => r.route.path).join("/");
+    if (route) {
+      setAnchorEl(event.currentTarget);
+      
+      const menuItems = payrolls.map(p => {
+        const to = "/" + generatePath(route, {...queryParams, payrollId: p.id});
+        return <MenuItem key={p.id} component={Link} to={to} onClick={handleClose}>{p.name}</MenuItem>;
+      })
+      setMenuItems(menuItems);
+    }
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+    setMenuItems([]);
   };
 
-  useEffect(() => {
-    setPayroll({
-      currentPayrollName: user?.currentPayrollName,
-      currentPayrollId: user?.currentPayrollId,
-      currentDivisionId: user?.currentDivisionId,
-    });
-  }, [user]);
-
-  if (!user?.currentPayrollId) {
-    return null;
-  }
-  return (
-    <Box>
-      <FormControl fullWidth>
-        <InputLabel color="primary" id="payroll-selection-label">
-          Business Unit
-        </InputLabel>
-        <Select
-          variant="standard"
-          id="payroll-main-select"
-          label="Payroll"
-          labelId="payroll-selection-label"
-          onChange={handleChange}
-          value={user.currentPayrollId}
-        >
-          {user.availablePayrolls?.map((option) => {
-            return (
-              <MenuItem
-                key={"payroll-select-item-" + option.payrollId}
-                value={option.payrollId}
-              >
-                {option.payrollName}
-              </MenuItem>
-            );
-          })}
-        </Select>
-      </FormControl>
-    </Box>
-  );
+  return <>
+    <Button
+      color="primary"
+      onClick={handleClick}
+      endIcon={<ArrowDropDownIcon />}
+      sx={{
+        minWidth: 0,
+        py: 0,
+        borderRadius: (theme) => theme.spacing(1),
+        "& .MuiButton-endIcon": {
+          ml: 0.25,
+          mt: -0.5
+        }
+      }}
+    >
+      <Typography component="span" variant="button" textOverflow="ellipsis" overflow="hidden">
+        {payroll.name}
+      </Typography>
+    </Button>
+    <Menu
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+    >
+      {menuItems}
+    </Menu>
+  </>
 }
+
+export default PayrollSelector;

@@ -1,15 +1,33 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
-import { BrowserRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
+import { browserRouter } from "./routes";
+import { AuthProvider } from "react-oidc-context";
+import authConfig from "./auth/authConfig";
+import SignIn from "./auth/SignIn";
+import "./translations";
+
+
+function Authentication({children}) {
+  if (!import.meta.env.PROD) {
+    return children;
+  }
+  return (
+    <AuthProvider {...authConfig}>
+      <SignIn>
+        {children}
+      </SignIn>
+    </AuthProvider>
+  )
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <Authentication>
+      <RouterProvider router={browserRouter} future={{ v7_startTransition: true }} />
+    </Authentication>
   </React.StrictMode>
 );
 

@@ -1,38 +1,20 @@
-import { Box } from "@mui/system";
 import { Link } from "react-router-dom";
-import { ColorModeContext, tokens } from "../theme";
-import { useTheme } from "@emotion/react";
-import { useContext } from "react";
+import { useMatches } from "react-router-dom";
 
-export default function Logo(props) {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const colorMode = useContext(ColorModeContext);
+
+export default function Logo() {
+  const matches = useMatches();
+
+  const location = matches ? matches[0].pathname : "/";
 
   return (
-    <Box
-      {...props}
-      display="flex"
-      justifyContent="center"
-      flexDirection="column"
-    >
-      <Link to="/">
-        {theme.palette.mode === "dark" ? (
-          <img
-            alt="logo"
-            height="40px"
-            src={`../../assets/logo/logo.png`}
-            style={{ cursor: "pointer" }}
-          />
-        ) : (
-          <img
-            alt="logo"
-            height="40px"
-            src={`../../assets/logo/logo_dark.png`}
-            style={{ cursor: "pointer" }}
-          />
-        )}
-      </Link>
-    </Box>
+    <Link to={location} style={{height: 32}} >
+      <img
+          alt="logo"
+          height={32}
+          src="/logo512.png"
+          style={{ cursor: "pointer" }}
+        />
+    </Link>
   );
 }

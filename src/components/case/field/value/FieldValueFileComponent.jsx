@@ -1,82 +1,64 @@
-import { Box, IconButton, Stack, Typography } from "@mui/material";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import { TextField, Box } from "@mui/material";
+// import { Box, Button, Stack, Typography, Chip, InputLabel, FormControl, OutlinedInput } from "@mui/material";
+import { FieldContext } from "../EditFieldComponent";
+import { useContext, useState, useEffect } from "react";
+import { toBase64 } from "../../../../services/converters/BinaryConverter";
+import { CloudUpload } from "@mui/icons-material";
 
-const FieldValueFileComponent = (
-  fieldDisplayName,
-  fieldValue,
-  fieldKey,
-  slotInputProps,
-  attributes,
-  setAttachmentFiles
-) => {
-  const extensions = attributes?.["input.attachmentExtensions"];
+function FieldValueFileComponent() {
+  const { field, isReadonly, displayName, attachments } = useContext(FieldContext);
+  const extensions = field.attributes?.["input.attachmentExtensions"];
   // const required = attributes?.["input.attachment"] === "Mandatory";
   const required = true;
+  const [attachmentFiles, setAttachmentFiles] = useState([]);
 
-  const uploadFile = async (file) => {
-    const fileEncoded = await convertBase64(file);
-    let [contentType, base64] = fileEncoded.split(";");
-    contentType = contentType.slice(5);
-    base64 = base64.slice(7);
+  useEffect(() => {
+    attachments[field.id] = attachmentFiles;
+  }, [attachmentFiles]);
 
-    setAttachmentFiles((current) => [
-      ...current,
-      {
+  const handleUpload = async (event) => {
+    const files = event.target.files;
+    const attachments = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const data = await toBase64(file);
+      attachments.push({
         name: file.name,
         contentType: file.type,
-        content: base64,
-      },
-    ]);
-  };
-
-  const convertBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-
-      fileReader.onload = (event) => {
-        resolve(event.target.result);
-        // resolve(fileReader.result);
-      };
-
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-
-      fileReader.readAsDataURL(file);
-    });
-  };
-
-  const handleUpload = (event) => {
-    const files = event.target.files;
-    for (let i = 0; i < files.length; i++) {
-      uploadFile(files[i]);
+        content: data
+      });
     }
+
+    setAttachmentFiles(attachments);
   };
 
-  // TODO: refactor color to separate style files
+  const fileUploadId = `fileupload_${field.id}`;
   return (
-    <Stack marginLeft="14px" marginBottom="5px" key={"stack_" + fieldKey}>
-      <Typography color="rgba(0, 0, 0, 0.6)" key={"title_" + fieldKey}>
-        {fieldDisplayName + (required ? "*" : "")}
-      </Typography>
-      <Box width="160px" key={"inputbox_" + fieldKey}>
-        <IconButton
-          variant="contained"
-          component="label"
-          key={"uploadbutton_" + fieldKey}
-        >
-          <FileUploadOutlinedIcon />
-          <input
-            type="file"
-            onChange={handleUpload}
-            accept={extensions}
-            multiple
-            //     hidden
-            required={required}
-          />
-        </IconButton>
-      </Box>
-    </Stack>
+    <TextField
+      label={displayName}
+      onChange={handleUpload}
+      required
+      disabled={isReadonly}
+      type="file"
+      InputLabelProps={{
+        shrink: true
+      }}
+      inputProps={{
+        multiple: true,
+        accept: extensions,
+        id: fileUploadId,
+      }}
+      InputProps={{
+        startAdornment: 
+            <Box component="label" htmlFor={fileUploadId} sx={{paddingLeft: 2, paddingRight: 1.5, display: 'flex', alignContent: 'center', flexWrap: 'wrap', height: "100%", cursor: 'pointer'}}>
+              <CloudUpload />
+            </Box>,
+        classes: {
+          adornedStart: "file-upload-adorned-start"
+        }
+      }}
+      
+    />
   );
 };
 export default FieldValueFileComponent;

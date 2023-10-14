@@ -1,40 +1,51 @@
-import { DatePicker } from "@mui/x-date-pickers";
-import { useEffect, useState } from "react";
+import { DatePicker, DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
+import { useContext, useRef } from "react";
+import { FieldContext } from "../EditFieldComponent";
+import { useRouteLoaderData } from "react-router-dom";
+import { getDateLocale } from "../../../../services/converters/DateLocaleExtractor";
 
-const FieldValueDateComponent = (
-	fieldDisplayName,
-	required,
-	fieldValue,
-	onChange,
-	fieldKey,
-	slotInputProps,
-	caseIsReadOnly
-) => {
-	const [dateValue, setDateValue] = useState(dayjs.utc(fieldValue));
+function _InternalDateComponent({Picker, propertyName = "value", displayName, sx, size = "medium", required = true}) {
+	const { user } = useRouteLoaderData('root');
+	const { field, isReadonly, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
+	const inputRef = useRef();
+	const fieldValue = field[propertyName];
+	const value = fieldValue ? dayjs.utc(fieldValue) : null;
 
-	useEffect(() => {
-		setDateValue(dayjs.utc(fieldValue));
-	}, [fieldValue]);
+	displayName ??= fieldDisplayName;
 
-	const handleDateChange = (newDate) => {
-		setDateValue(newDate);
-		onChange(newDate.format());
+	const handleDateChange = (newDate, context) => {
+		const validationError = context.validationError ? "Invalid date" : "";
+		inputRef.current?.setCustomValidity(validationError);
+		if(!validationError) {
+			field[propertyName] = newDate?.toISOString();
+			buildCase();
+		}
 	};
-
 	return (
-		<DatePicker
-			label={fieldDisplayName + (required && !caseIsReadOnly ? "*" : "")}
-			value={dateValue}
-			onChange={handleDateChange}
-			name={fieldKey}
-			timezone="UTC"
-			key={fieldKey}
-			disabled={caseIsReadOnly}
-			slotProps={{ ...slotInputProps }}
-			views={["year", "month", "day"]}
-		/>
+		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
+			<Picker
+				label={displayName}
+				value={value}
+				onChange={handleDateChange}
+				name={field.name}
+				timezone="UTC"
+				disabled={isReadonly}
+				inputRef={inputRef}
+				slotProps={{
+					textField: { required, size },
+					openPickerButton: { tabIndex: -1 }
+				}}
+				sx={sx}
+			/>
+		</LocalizationProvider>
 	);
 };
 
-export default FieldValueDateComponent;
+function FieldValueDateComponent(props) { return _InternalDateComponent({Picker: DatePicker, ...props}); }
+function FieldValueDateTimeComponent(props) { return _InternalDateComponent({Picker: DateTimePicker, ...props}); }
+
+
+
+export { FieldValueDateComponent, FieldValueDateTimeComponent };
