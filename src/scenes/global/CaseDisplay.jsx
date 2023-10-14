@@ -9,15 +9,17 @@ import { ErrorView } from "../../components/ErrorView";
 import { ReadonlyFieldComponent } from "../../components/case/field/ReadonlyFieldComponent";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../../components/ContentLayout";
+import { useTranslation } from "react-i18next";
 
 export function AsyncCaseDisplay() {
   const title = useOutletContext() || "Data";
   const loading = <ContentLayout defaultTitle={title}><Loading /></ContentLayout>
-  return <AsyncDataRoute loadingElement={loading}><CaseDisplay title={title} /></AsyncDataRoute>
+  return <AsyncDataRoute loadingElement={loading} skipDataCheck><CaseDisplay title={title} /></AsyncDataRoute>
 }
 
 function CaseDisplay({ title }) {
   const caseName = useCaseName();
+  const { t } = useTranslation();
   if (!caseName) {
     return (
       <ContentLayout defaultTitle={title} sx={{flex: 1}}>
