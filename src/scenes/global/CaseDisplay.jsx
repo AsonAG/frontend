@@ -11,12 +11,13 @@ import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../../components/ContentLayout";
 
 export function AsyncCaseDisplay() {
-  return <AsyncDataRoute><CaseDisplay defaultTitle="Data" /></AsyncDataRoute>
+  const title = useOutletContext() || "Data";
+  const loading = <ContentLayout defaultTitle={title}><Loading /></ContentLayout>
+  return <AsyncDataRoute loadingElement={loading}><CaseDisplay title={title} /></AsyncDataRoute>
 }
 
-function CaseDisplay({ defaultTitle }) {
+function CaseDisplay({ title }) {
   const caseName = useCaseName();
-  const title = useOutletContext() || defaultTitle;
   if (!caseName) {
     return (
       <ContentLayout defaultTitle={title} sx={{flex: 1}}>
