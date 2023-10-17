@@ -24,7 +24,8 @@ import {
   getCompanyCaseValues,
   tenantDataCache,
   getDocumentCaseFields,
-  getTasks
+  getTasks,
+  getTask
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -32,6 +33,7 @@ import { AsyncCaseDisplay } from "./scenes/global/CaseDisplay";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { DocumentDialog } from "./components/DocumentDialog";
+import { AsyncTaskView } from "./components/TaskView";
 
 function tenantDataAwareLoader(loader) {
   return async (props) => {
@@ -155,7 +157,6 @@ const routeData = [
           {
             path: "data",
             Component: AsyncCaseDisplay,
-            // element: <AsyncCaseDisplay defaultTitle="Company data" />,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "CompanyData")
@@ -165,7 +166,6 @@ const routeData = [
           {
             path: "new",
             Component: AsyncCaseTable,
-            // element: <AsyncDataRoute defaultTitle="New Company event"><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "NotAvailable")
@@ -175,12 +175,10 @@ const routeData = [
           {
             path: "new/:caseName",
             lazy: () => import("./scenes/global/CaseForm")
-            // element: <CaseForm defaultTitle="New Company event" />
           },
           {
             path: "events",
             Component: AsyncEventTable,
-            // element: <AsyncDataRoute defaultTitle="Company events" disableXsPadding><EventTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCaseValues(params, null, "created desc")
@@ -190,7 +188,6 @@ const routeData = [
           {
             path: "documents",
             Component: AsyncDocumentTable,
-            // element: <AsyncDataRoute defaultTitle="Company documents"><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getDocumentCaseFields(params)
@@ -212,6 +209,15 @@ const routeData = [
               });
             }
           },
+          {
+            path: "tasks/:taskId",
+            Component: AsyncTaskView,
+            loader: ({params}) => {
+              return defer({
+                data: getTask(params)
+              });
+            }
+          }
         ]
       },
       {

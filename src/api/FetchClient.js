@@ -14,7 +14,8 @@ const employeeUrl         = "/tenants/:tenantId/employees/:employeeId";
 const usersUrl            = "/tenants/:tenantId/users";
 const employeeDocumentUrl = "/tenants/:tenantId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
 const companyDocumentUrl  = "/tenants/:tenantId/companycases/:caseValueId/documents/:documentId";
-const tasksUrl            = "/tenants/:tenantId/tasks";
+const tasksUrl            = "/tenants/:tenantId/payrolls/:payrollId/tasks";
+const taskUrl             = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
 
 class TenantDataCache {
     tenantDataCache = {};
@@ -222,6 +223,12 @@ export function getTasks(routeParams, filter, orderBy) {
         .withQueryParam("orderBy", orderBy)
         // .withQueryParam("result", "ItemsWithCount")
         // .withQueryParam("top", 10)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function getTask(routeParams) {
+    return new FetchRequestBuilder(taskUrl, routeParams)
         .withLocalization()
         .fetchJson();
 }
