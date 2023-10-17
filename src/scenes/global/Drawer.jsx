@@ -124,7 +124,7 @@ function Drawer({ temporary, open, onClose }) {
             <NavigationItem label={t("Data")} to="company/data" icon={<CasesOutlinedIcon />} end />
             <NavigationItem label={t("Events")} to="company/events" icon={<WorkHistoryOutlinedIcon />} end />
             <NavigationItem label={t("Documents")} to="company/documents" icon={<DescriptionOutlinedIcon />} />
-            <NavigationItem label={t("Tasks")} to="company/tasks" icon={<FormatListBulletedIcon />} end />
+            <NavigationItem label={t("Tasks")} to="company/tasks" icon={<FormatListBulletedIcon />} />
           </NavigationGroup>
           <NavigationGroup name={t("Employee")} hidden={employee === null}>
             <NavigationItem label={t("New event")} to={`employees/${employee?.id}/new`} icon={<AddOutlinedIcon />} />

@@ -1,5 +1,5 @@
 import { React, useState } from "react";
-import { useAsyncValue } from "react-router-dom";
+import { Link, useAsyncValue, useParams, Outlet } from "react-router-dom";
 import { Stack, Typography, Paper, Button, Chip, Divider, IconButton } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
@@ -11,7 +11,7 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncTaskTable() {
   return (
-    <ContentLayout defaultTitle="Tasks">
+    <ContentLayout title="Tasks">
       <AsyncDataRoute>
         <TaskTable />
       </AsyncDataRoute>
@@ -19,9 +19,15 @@ export function AsyncTaskTable() {
   );
 }
 
-// testing
 function TaskTable() {
   const tasks = useAsyncValue();
+  const { taskId } = useParams();
+
+  if (taskId) {
+    const taskNumber = Number(taskId);
+    const task = tasks.find(t => t.id === taskNumber);
+    return <Outlet context={task} />;
+  }
 
   return (
     <Paper>
@@ -35,15 +41,16 @@ function TaskTable() {
 function TaskRow({ task }) {
   return (
     <Stack direction="row" alignItems="center" spacing={1} px={1}>
-      <TaskButton isCompleted={task.completed !== null} />
-      <Stack spacing={0.5} width={225}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography fontWeight="bold">{task.name}</Typography>
-          <Chip label={task.category} variant="outlined" size="small" sx={{height: 20}}/>
+      <Button component={Link} to={task.id + ""}>
+        <Stack spacing={0.5} width={225}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography fontWeight="bold">{task.name}</Typography>
+            <Chip label={task.category} variant="outlined" size="small" sx={{height: 20}}/>
+          </Stack>
+          <Typography variant="body2">#{task.id} - Assigned on {formatDate(task.scheduled)}</Typography>
         </Stack>
-        <Typography variant="body2">#{task.id} - Assigned on {formatDate(task.scheduled)}</Typography>
-      </Stack>
-      <Typography><HtmlContent content={task.instruction} /></Typography>
+        <Typography><HtmlContent content={task.instruction} /></Typography>
+      </Button>
     </Stack>
   );
 }
