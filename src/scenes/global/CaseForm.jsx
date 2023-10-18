@@ -53,7 +53,7 @@ export function Component() {
 
   return (
     <Stack direction="row" minHeight="100%">
-      <ContentLayout defaultTitle={title} sx={{flex: 1}}>
+      <ContentLayout title={title} sx={{flex: 1}}>
         {content}
       </ContentLayout>
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }
