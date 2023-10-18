@@ -1,6 +1,6 @@
 import { React, useState, forwardRef } from "react";
 import { Link as RouterLink, useAsyncValue, useParams, Outlet } from "react-router-dom";
-import { Stack, Typography, Paper, Button, Chip, Divider, IconButton } from "@mui/material";
+import { Stack, Typography, Paper, Button, Chip, Divider, IconButton, Tooltip } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
@@ -10,6 +10,8 @@ import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { Person, Schedule } from "@mui/icons-material";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -19,13 +21,14 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
     color: theme.palette.text.primary,
     "&:hover": {
       "color": theme.palette.primary.main,
+      "backgroundColor": theme.palette.primary.hover
     }
   }
 });
 
 export function AsyncTaskTable() {
   return (
-    <ContentLayout title="Tasks">
+    <ContentLayout title="Tasks" disableXsPadding>
       <AsyncDataRoute>
         <TaskTable />
       </AsyncDataRoute>
@@ -45,44 +48,36 @@ function TaskTable() {
 
   return (
     <Paper>
-      <Stack spacing={1} divider={<Divider />} py={1}>
+      <Stack divider={<Divider />}>
         {tasks.map((task, index) => <TaskRow key={index} task={task} />)}
       </Stack>
     </Paper>
   );
 };
 
-const taskRowSx = {
-  "&:hover": {
-    backgroundColor: (theme) => theme.palette.main.hover
-  }
-};
-
 function TaskRow({ task }) {
   const { t } = useTranslation();
   return (
-    <Stack direction="row" alignItems="center" spacing={1} px={1} sx={taskRowSx}>
-      <Stack spacing={0.5} width={225}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Link to={task.id + ""}>
-            <Typography fontWeight="bold">{task.name}</Typography>
-          </Link>
-          <Chip label={task.category} variant="outlined" size="small" sx={{height: 20}}/>
+    <Link to={task.id + ""} state={{task}}>
+      <Stack direction="row" alignItems="center" spacing={2} p={2} flexWrap="wrap">
+        <Stack direction="row" alignItems="center" spacing={1} flex={1}>
+          <Typography fontWeight="bold">{task.displayName}&nbsp;(#{task.id})</Typography>
+          <Chip label={task.displayCategory} variant="outlined" size="small" sx={{height: 20}}/>
         </Stack>
-        <Typography variant="body2">#{task.id} - {t("Due on")} {formatDate(task.scheduled)}</Typography>
+        <RowInfo icon={<Person />} label={t("Employee")}><Typography>Aleksandar Josipovic</Typography></RowInfo>
+        <RowInfo icon={<Schedule />} label={t("Due on")}>{formatDate(task.scheduled)}</RowInfo>
       </Stack>
-      <Typography><HtmlContent content={task.instruction} /></Typography>
-    </Stack>
+    </Link>
   );
 }
 
-function TaskButton({isCompleted, onClick}) {
-  const [hover, setHover] = useState(false);
-  const icon = isCompleted ? <CheckCircleIcon /> : 
-    hover ? <CheckCircleOutlinedIcon /> : <CircleOutlinedIcon />;
-  const onMouseEnter = () => setHover(true);
-  const onMouseLeave = () => setHover(false);
+function RowInfo({icon, label, children}) {
   return (
-     <IconButton color="primary" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>{icon}</IconButton>
-  ); 
+    <Tooltip title={label} placement="top">
+      <Stack direction="row" alignItems="center" spacing={0.5}>
+        {icon}
+        {children}
+      </Stack>
+    </Tooltip>
+  )
 }
