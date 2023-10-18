@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 
 export function AsyncCaseDisplay() {
   const title = useOutletContext() || "Data";
-  const loading = <ContentLayout defaultTitle={title}><Loading /></ContentLayout>
+  const loading = <ContentLayout title={title}><Loading /></ContentLayout>
   return <AsyncDataRoute loadingElement={loading} skipDataCheck><CaseDisplay title={title} /></AsyncDataRoute>
 }
 
@@ -22,7 +22,7 @@ function CaseDisplay({ title }) {
   const { t } = useTranslation();
   if (!caseName) {
     return (
-      <ContentLayout defaultTitle={title} sx={{flex: 1}}>
+      <ContentLayout title={title} sx={{flex: 1}}>
         <Typography>{t("No data available")}</Typography>
       </ContentLayout>
     );
@@ -51,7 +51,7 @@ function CaseDisplay({ title }) {
 
   return (
     <Stack direction="row" minHeight="100%">
-      <ContentLayout defaultTitle={title}>
+      <ContentLayout title={title}>
         {content}
       </ContentLayout>
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }

@@ -1,5 +1,5 @@
-import { React, useState } from "react";
-import { Link, useAsyncValue, useParams, Outlet } from "react-router-dom";
+import { React, useState, forwardRef } from "react";
+import { Link as RouterLink, useAsyncValue, useParams, Outlet } from "react-router-dom";
 import { Stack, Typography, Paper, Button, Chip, Divider, IconButton } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
@@ -8,6 +8,20 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { HtmlContent } from '../HtmlContent';
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
+import styled from "@emotion/styled";
+import { useTranslation } from "react-i18next";
+
+const Link = styled(forwardRef(function Link(itemProps, ref) {
+  return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+}))(({theme}) => {
+  return {
+    textDecoration: "none",
+    color: theme.palette.text.primary,
+    "&:hover": {
+      "color": theme.palette.primary.main,
+    }
+  }
+});
 
 export function AsyncTaskTable() {
   return (
@@ -38,19 +52,26 @@ function TaskTable() {
   );
 };
 
+const taskRowSx = {
+  "&:hover": {
+    backgroundColor: (theme) => theme.palette.main.hover
+  }
+};
+
 function TaskRow({ task }) {
+  const { t } = useTranslation();
   return (
-    <Stack direction="row" alignItems="center" spacing={1} px={1}>
-      <Button component={Link} to={task.id + ""}>
-        <Stack spacing={0.5} width={225}>
-          <Stack direction="row" alignItems="center" spacing={1}>
+    <Stack direction="row" alignItems="center" spacing={1} px={1} sx={taskRowSx}>
+      <Stack spacing={0.5} width={225}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Link to={task.id + ""}>
             <Typography fontWeight="bold">{task.name}</Typography>
-            <Chip label={task.category} variant="outlined" size="small" sx={{height: 20}}/>
-          </Stack>
-          <Typography variant="body2">#{task.id} - Assigned on {formatDate(task.scheduled)}</Typography>
+          </Link>
+          <Chip label={task.category} variant="outlined" size="small" sx={{height: 20}}/>
         </Stack>
-        <Typography><HtmlContent content={task.instruction} /></Typography>
-      </Button>
+        <Typography variant="body2">#{task.id} - {t("Due on")} {formatDate(task.scheduled)}</Typography>
+      </Stack>
+      <Typography><HtmlContent content={task.instruction} /></Typography>
     </Stack>
   );
 }

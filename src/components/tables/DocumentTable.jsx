@@ -21,7 +21,7 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncDocumentTable() {
   return (
-    <ContentLayout defaultTitle="Documents">
+    <ContentLayout title="Documents">
       <AsyncDataRoute>
         <DocumentTable />
       </AsyncDataRoute>

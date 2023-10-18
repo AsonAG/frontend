@@ -9,7 +9,7 @@ import { formatCaseValue } from "../../utils/Format";
 
 export function AsyncEventTable() {
   return (
-    <ContentLayout defaultTitle="Events" disableXsPadding>
+    <ContentLayout title="Events" disableXsPadding>
       <AsyncDataRoute>
         <EventTable />
       </AsyncDataRoute>

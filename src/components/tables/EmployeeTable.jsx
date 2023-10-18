@@ -14,7 +14,7 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncEmployeeTable() {
   return (
-    <ContentLayout defaultTitle="Employees">
+    <ContentLayout title="Employees">
       <AsyncDataRoute>
         <EmployeeTable />
       </AsyncDataRoute>
