@@ -36,6 +36,13 @@ function createThemeSettings(mode) {
 
   return {
     ...palette,
+    components: {
+      MuiStack: {
+        defaultProps: {
+          useFlexGap: true
+        }
+      }
+    },
     typography: {
       fontSize: 12,
       h1: {

@@ -9,8 +9,12 @@ import { useTranslation } from "react-i18next";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { formatDate } from "../utils/DateUtils";
 
+const getTaskTitle = (task) => `${task.displayName} (#${task.id})`;
+
 export function AsyncTaskView() {
-  const taskName = useLocation() || "Loading...";
+  const { t } = useTranslation();
+  const { state } = useLocation();
+  const taskName = getTaskTitle(state.task)|| t("Loading...");
   const loadingElement = <ContentLayout title={taskName}><Loading /></ContentLayout>;
   return (
     <AsyncDataRoute loadingElement={loadingElement} skipDataCheck>
@@ -22,7 +26,7 @@ export function AsyncTaskView() {
 function TaskView() {
   const task = useAsyncValue();
   const { t } = useTranslation();
-  const title = `${task.name} (#${task.id})`;
+  const title = getTaskTitle(task);
   const taskCompleted = task.completed !== null;
   const taskComment = task.comment || "";
   const [comment, setComment] = useState(taskComment);
@@ -35,7 +39,7 @@ function TaskView() {
   return (
     <ContentLayout title={title}>
       <Stack spacing={2}>
-        <Chip label={task.category} variant="outlined" size="small" sx={{alignSelf: "start" }}/>
+        <Chip label={task.displayCategory} variant="outlined" size="small" sx={{alignSelf: "start" }}/>
         {
           taskCompleted &&
             <Stack>
@@ -60,7 +64,7 @@ function TaskView() {
         </Stack>
         <Stack>
           <Typography variant="h6" gutterBottom>{t("Instructions")}</Typography>
-          <HtmlContent content={task.instruction} />
+          <HtmlContent content={task.displayInstruction} />
         </Stack>
         <Stack>
           <Typography variant="h6" gutterBottom>{t("Comments")}</Typography>
