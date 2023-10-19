@@ -1,20 +1,21 @@
 
 import { React, useState } from "react";
-import { useAsyncValue, useLocation, Link } from "react-router-dom";
-import { Stack, Typography, Paper, Button, Chip, Divider, IconButton, Box, TextField, Checkbox, FormGroup, FormControlLabel } from "@mui/material";
+import { useAsyncValue, useLocation, Link, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { Stack, Typography, Button, Chip,  TextField } from "@mui/material";
 import { HtmlContent } from './HtmlContent';
 import { ContentLayout } from "./ContentLayout";
 import { Loading } from "./Loading";
 import { useTranslation } from "react-i18next";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { formatDate } from "../utils/DateUtils";
+import dayjs from "dayjs";
 
 const getTaskTitle = (task) => `${task.displayName} (#${task.id})`;
 
 export function AsyncTaskView() {
   const { t } = useTranslation();
   const { state } = useLocation();
-  const taskName = getTaskTitle(state.task)|| t("Loading...");
+  const taskName = state?.task ? getTaskTitle(state.task) : t("Loading...");
   const loadingElement = <ContentLayout title={taskName}><Loading /></ContentLayout>;
   return (
     <AsyncDataRoute loadingElement={loadingElement} skipDataCheck>
@@ -26,6 +27,8 @@ export function AsyncTaskView() {
 function TaskView() {
   const task = useAsyncValue();
   const { t } = useTranslation();
+  const { user } = useRouteLoaderData("root");
+  const submit = useSubmit();
   const title = getTaskTitle(task);
   const taskCompleted = task.completed !== null;
   const taskComment = task.comment || "";
@@ -35,6 +38,18 @@ function TaskView() {
   let buttonText = taskCompleted ? commentText : completeText;
   if (!taskCompleted && comment !== taskComment) {
     buttonText = t("Save comment & complete");
+  }
+  const acceptTask = () => submit({...task, assignedUserId: user.id}, { method: "post", encType: "application/json" });
+  const saveTask = (markCompleted) => {
+    let newTask = null;
+    if (markCompleted) {
+      newTask = {...task, comment, completedUserId: user.id, completed: dayjs.utc().toISOString()};
+    }
+    else {
+      newTask = {...task, comment}
+    }
+    
+    submit(newTask, { method: "post", encType: "application/json" });
   }
   return (
     <ContentLayout title={title}>
@@ -49,13 +64,20 @@ function TaskView() {
         }
         <Stack>
           <Typography variant="h6" gutterBottom>{t("Assigned to")}</Typography>
-          <Typography>{task.assignedUserId}</Typography>
+          {
+            task.assignedUser ?
+              <Typography>{`${task.assignedUser.firstName} ${task.assignedUser.lastName}`}</Typography> :
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Typography>{t("not assigned")}</Typography>
+                <Button variant="outlined" onClick={acceptTask}>{t("Accept task")}</Button>
+              </Stack>
+          }
         </Stack>
         {
-          task.employeeIdentifier &&
+          task.employee &&
             <Stack>
               <Typography variant="h6" gutterBottom>{t("Employee")}</Typography>
-              <Typography>{task.employeeIdentifier}</Typography>
+              <Link to={`../../hr/employees/${task.employee.id}/data`}><Typography>{task.employee.firstName} {task.employee.lastName}</Typography></Link>
             </Stack>
         }
         <Stack>
@@ -69,11 +91,11 @@ function TaskView() {
         <Stack>
           <Typography variant="h6" gutterBottom>{t("Comments")}</Typography>
           <TextField multiline rows={5} value={comment} onChange={event => setComment(event.target.value)}/>
-          { !taskCompleted && <Button variant="outlined" disabled={taskComment === comment} sx={{alignSelf: "end", my: 1}}><Typography>{t("Save comment")}</Typography></Button> }
+          { !taskCompleted && <Button variant="outlined" disabled={taskComment === comment} sx={{alignSelf: "end", my: 1}} onClick={() => saveTask(false)}><Typography>{t("Save comment")}</Typography></Button> }
         </Stack>
         <Stack direction="row" spacing={1} justifyContent="end">
-          <Button component={Link} to=".." relative="path"><Typography>{t("Cancel")}</Typography></Button>
-          <Button variant="contained" disabled={taskCompleted && taskComment === comment}><Typography>{t(buttonText)}</Typography></Button>
+          <Button component={Link} to=".." relative="path"><Typography>{t("Back")}</Typography></Button>
+          <Button variant="contained" disabled={taskCompleted && taskComment === comment} onClick={() => saveTask(!taskCompleted)}><Typography>{t(buttonText)}</Typography></Button>
         </Stack>
       </Stack>
     </ContentLayout>

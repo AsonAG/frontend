@@ -25,7 +25,8 @@ import {
   tenantDataCache,
   getDocumentCaseFields,
   getTasks,
-  getTask
+  getTask,
+  updateTask
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -216,6 +217,11 @@ const routeData = [
               return defer({
                 data: getTask(params)
               });
+            },
+            action: async ({params, request}) => {
+              const data = await request.json();
+              console.log(data);
+              return await updateTask(params, data);
             }
           }
         ]

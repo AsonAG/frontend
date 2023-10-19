@@ -233,6 +233,13 @@ export function getTask(routeParams) {
         .fetchJson();
 }
 
+export function updateTask(routeParams, task) {
+    return new FetchRequestBuilder(taskUrl, routeParams)
+        .withMethod("PUT")
+        .withBody(task)
+        .fetch();
+}
+
 export function buildCase(routeParams, caseChangeSetup) {
     // manually construct path, generatePath does not handle encoding properly
     const url = caseSetsUrl + "/" + encodeURIComponent(routeParams.caseName);
