@@ -153,6 +153,29 @@ const routeData = [
         ]
       },
       {
+        path: "hr/tasks",
+        Component: AsyncTaskTable,
+        loader: ({params}) =>  {
+          return defer({
+            data: getTasks(params, null, "created desc")
+          });
+        }
+      },
+      {
+        path: "hr/tasks/:taskId",
+        Component: AsyncTaskView,
+        loader: ({params}) => {
+          return defer({
+            data: getTask(params)
+          });
+        },
+        action: async ({params, request}) => {
+          const data = await request.json();
+          console.log(data);
+          return await updateTask(params, data);
+        }
+      },
+      {
         path: "company",
         children: [
           {
@@ -201,29 +224,6 @@ const routeData = [
               }
             ]
           },
-          {
-            path: "tasks",
-            Component: AsyncTaskTable,
-            loader: ({params}) =>  {
-              return defer({
-                data: getTasks(params, null, "created desc")
-              });
-            }
-          },
-          {
-            path: "tasks/:taskId",
-            Component: AsyncTaskView,
-            loader: ({params}) => {
-              return defer({
-                data: getTask(params)
-              });
-            },
-            action: async ({params, request}) => {
-              const data = await request.json();
-              console.log(data);
-              return await updateTask(params, data);
-            }
-          }
         ]
       },
       {

@@ -1,14 +1,14 @@
 import { React, forwardRef } from "react";
 import { Link as RouterLink, useAsyncValue, useParams, Outlet } from "react-router-dom";
-import { Stack, Typography, Paper, Chip, Divider, IconButton, Tooltip, Avatar } from "@mui/material";
+import { Stack, Typography, Paper, Chip, Divider, IconButton, Tooltip, Avatar, useTheme, useMediaQuery } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { Person, Schedule } from "@mui/icons-material";
+import { useStringColor } from "../../theme";
+import { CategoryLabel } from "../tasks/CategoryLabel";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -35,47 +35,46 @@ export function AsyncTaskTable() {
 
 function TaskTable() {
   const tasks = useAsyncValue();
-  const { taskId } = useParams();
-
-  if (taskId) {
-    const taskNumber = Number(taskId);
-    const task = tasks.find(t => t.id === taskNumber);
-    return <Outlet context={task} />;
-  }
+  const theme = useTheme();
+  const mobileLayout = useMediaQuery(theme.breakpoints.down("md"));
+  const rowVariant = mobileLayout ? "mobile" : "default";
 
   return (
     <Paper>
       <Stack divider={<Divider />}>
-        {tasks.map((task, index) => <TaskRow key={index} task={task} />)}
+        {tasks.map((task, index) => <TaskRow key={index} task={task} variant={rowVariant}/>)}
       </Stack>
     </Paper>
   );
 };
 
-function TaskRow({ task }) {
+function TaskRow({ task, variant }) {
   const { t } = useTranslation();
+  let stackDirection = "row";
+  let rowInfoSpacing = 0.5;
+  if (variant === "mobile") {
+    stackDirection = "column";
+    rowInfoSpacing = 0.75;
+  }
   return (
     <Link to={task.id + ""} state={{task}}>
-      <Stack direction="row" alignItems="center" spacing={2} p={2} flexWrap="wrap">
-        <Stack direction="row" alignItems="center" spacing={1} flex={1}>
-          <Typography fontWeight="bold">{task.displayName}&nbsp;(#{task.id})</Typography>
-          <Chip label={task.displayCategory} variant="outlined" size="small" sx={{height: 20}}/>
+      <Stack spacing={2} p={2} direction={stackDirection} alignItems="center">
+        <Stack spacing={0.5} flex={1}>
+          <CategoryLabel label={task.displayCategory} sx={{height: 20, alignSelf: "start"}}/>
+          <Typography fontWeight="bold" fontSize="1rem">{task.displayName}&nbsp;(#{task.id})</Typography>
         </Stack>
-        { task.employee && <RowInfo icon={<Person />} label={t("Employee")}><Typography>{task.employee.firstName} {task.employee.lastName}</Typography></RowInfo>}
-        <RowInfo icon={<Schedule />} label={t("Due on")}>{formatDate(task.scheduled)}</RowInfo>
-        {
-          task.assignedUser &&
-            <AssignedUserAvatar user={task.assignedUser} />
-        }
+        { task.employee && <RowInfo icon={<Person fontSize="small"/>} label={t("Employee")} spacing={rowInfoSpacing}><Typography>{task.employee.firstName} {task.employee.lastName}</Typography></RowInfo>}
+        { variant !== "mobile" && task.assignedUser && <AssignedUserAvatar user={task.assignedUser} />}
+        <RowInfo icon={<Schedule fontSize="small"/>} label={t("Due on")} spacing={rowInfoSpacing}><Typography>{formatDate(task.scheduled)}</Typography></RowInfo>
       </Stack>
     </Link>
   );
 }
 
-function RowInfo({icon, label, children}) {
+function RowInfo({icon, label, spacing, children}) {
   return (
     <Tooltip title={label} placement="top">
-      <Stack direction="row" alignItems="center" spacing={0.5}>
+      <Stack direction="row" alignItems="center" spacing={spacing}>
         {icon}
         {children}
       </Stack>
@@ -85,33 +84,14 @@ function RowInfo({icon, label, children}) {
 
 function AssignedUserAvatar({user}) {
   const { t } = useTranslation();
+  const name = `${user.firstName} ${user.lastName}`;
+  const color = useStringColor(name);
   return (
     <Tooltip title={t("Assignee")} placement="top" >
-      <Avatar sx={{bgcolor: stringToColor(user), width: 28, height: 28}}>
+      <Avatar sx={{bgcolor: color, width: 28, height: 28}}>
         <Typography variant="body2" lineHeight={1}>{user.firstName[0]}{user.lastName[0]}</Typography>
       </Avatar>
     </Tooltip>
   )
 }
 
-function stringToColor(user) {
-  let hash = 0;
-  let i;
-
-  for (i = 0; i < user.firstName.length; i += 1) {
-    hash = user.firstName.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  for (i = 0; i < user.lastName.length; i += 1) {
-    hash = user.lastName.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  let color = '#';
-
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-
-  return color;
-}

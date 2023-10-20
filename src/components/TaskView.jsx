@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { formatDate } from "../utils/DateUtils";
 import dayjs from "dayjs";
+import { CategoryLabel } from "./tasks/CategoryLabel";
 
 const getTaskTitle = (task) => `${task.displayName} (#${task.id})`;
 
@@ -54,7 +55,7 @@ function TaskView() {
   return (
     <ContentLayout title={title}>
       <Stack spacing={2}>
-        <Chip label={task.displayCategory} variant="outlined" size="small" sx={{alignSelf: "start" }}/>
+        <CategoryLabel label={task.displayCategory} sx={{alignSelf: "start" }} />
         {
           taskCompleted &&
             <Stack>
@@ -77,7 +78,7 @@ function TaskView() {
           task.employee &&
             <Stack>
               <Typography variant="h6" gutterBottom>{t("Employee")}</Typography>
-              <Link to={`../../hr/employees/${task.employee.id}/data`}><Typography>{task.employee.firstName} {task.employee.lastName}</Typography></Link>
+              <Link to={`../hr/employees/${task.employee.id}/data`}><Typography>{task.employee.firstName} {task.employee.lastName}</Typography></Link>
             </Stack>
         }
         <Stack>
