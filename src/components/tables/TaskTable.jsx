@@ -1,5 +1,5 @@
 import { React, forwardRef } from "react";
-import { Link as RouterLink, useAsyncValue } from "react-router-dom";
+import { Link as RouterLink, useAsyncValue, useLocation } from "react-router-dom";
 import { Stack, Typography, Paper, Divider, Tooltip, Avatar, useTheme, useMediaQuery, ButtonGroup, Button } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
@@ -25,8 +25,9 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
 });
 
 export function AsyncTaskTable() {
+  const { t } = useTranslation(); 
   return (
-    <ContentLayout title="Tasks" disableXsPadding>
+    <ContentLayout title={t("Tasks")} disableXsPadding>
       <AsyncDataRoute skipDataCheck>
         <TaskTable />
       </AsyncDataRoute>
@@ -36,6 +37,8 @@ export function AsyncTaskTable() {
 
 function TaskTable() {
   const tasks = useAsyncValue();
+  const { t } = useTranslation();
+  const { search } = useLocation();
   const theme = useTheme();
   const mobileLayout = useMediaQuery(theme.breakpoints.down("md"));
   const rowVariant = mobileLayout ? "mobile" : "default";
@@ -45,10 +48,10 @@ function TaskTable() {
       <TaskTableFilter />
       {
         tasks.length === 0 ?
-          <Typography>No tasks found</Typography> :
+          <Typography>{t("No tasks found")}</Typography> :
           <Paper>
             <Stack divider={<Divider />}>
-              {tasks.map((task, index) => <TaskRow key={index} task={task} variant={rowVariant}/>)}
+              {tasks.map((task) => <TaskRow key={task.id} task={task} variant={rowVariant} taskFilter={search}/>)}
             </Stack>
           </Paper>
       }
@@ -56,7 +59,7 @@ function TaskTable() {
   );
 };
 
-function TaskRow({ task, variant }) {
+function TaskRow({ task, variant, taskFilter }) {
   const { t } = useTranslation();
   let stackProps = {
     direction: "row",
@@ -71,7 +74,7 @@ function TaskRow({ task, variant }) {
     rowInfoSpacing = 0.75;
   }
   return (
-    <Link to={task.id + ""} state={{task}}>
+    <Link to={task.id + ""} state={{task, taskFilter}}>
       <Stack spacing={2} p={2} {...stackProps}>
         <Stack spacing={0.5} flex={1}>
           <CategoryLabel label={task.displayCategory} sx={{height: 20, alignSelf: "start"}}/>

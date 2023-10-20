@@ -158,19 +158,13 @@ const routeData = [
         loader: tenantDataAwareLoader(async ({params, request, user}) => {
           const [_, queryString] = request.url.split("?");
           const searchParams = new URLSearchParams(queryString);
-          const filters = [];
-          let orderBy = null;
-          if (!searchParams.has("others")) {
-            filters.push("assignedUserId eq " + user.id);
-          }
-          if(!searchParams.has("closed")) {
-            filters.push("completed eq null");
-            orderBy = "scheduled, created";
-          } else {
-            orderBy = "completed desc, scheduled desc, created desc";
+          let filter = null;
+          let orderBy = "completed, scheduled, created";
+          if (!searchParams.has("showall")) {
+            filter = "assignedUserId eq " + user.id;
           }
           return defer({
-            data: getTasks(params, filters.join(" and "), orderBy)
+            data: getTasks(params, filter, orderBy)
           });
         })
       },
