@@ -2,7 +2,8 @@ import { Stack, Typography } from "@mui/material";
 import { React, forwardRef } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import styled from "@emotion/styled";
-import { Check, CircleOutlined, Assignment, AssignmentInd } from "@mui/icons-material";
+import { Assignment, AssignmentInd } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -21,12 +22,11 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
 
 
 export function TaskTableFilter() {
+  const { t } = useTranslation();
   return (
     <Stack direction="row" spacing={2}>
-      <FilterButton filterName="others" label="Mine" icon={<AssignmentInd />}/>
-      <FilterButton filterName="others" include label="All" icon={<Assignment />}/>
-      <FilterButton filterName="closed" label="Open" icon={<CircleOutlined />}/>
-      <FilterButton filterName="closed" include label="Include closed" icon={<Check />}/>
+      <FilterButton filterName="showall" label={t("My tasks")} icon={<AssignmentInd />}/>
+      <FilterButton filterName="showall" include label={t("All tasks")} icon={<Assignment />}/>
     </Stack>
   )
 }
