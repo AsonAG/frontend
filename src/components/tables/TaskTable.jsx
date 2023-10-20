@@ -50,15 +50,21 @@ function TaskTable() {
 
 function TaskRow({ task, variant }) {
   const { t } = useTranslation();
-  let stackDirection = "row";
+  let stackProps = {
+    direction: "row",
+    alignItems: "center",
+    spacing: 2
+  };
   let rowInfoSpacing = 0.5;
   if (variant === "mobile") {
-    stackDirection = "column";
+    stackProps = {
+      spacing: 1
+    };
     rowInfoSpacing = 0.75;
   }
   return (
     <Link to={task.id + ""} state={{task}}>
-      <Stack spacing={2} p={2} direction={stackDirection} alignItems="center">
+      <Stack spacing={2} p={2} {...stackProps}>
         <Stack spacing={0.5} flex={1}>
           <CategoryLabel label={task.displayCategory} sx={{height: 20, alignSelf: "start"}}/>
           <Typography fontWeight="bold" fontSize="1rem">{task.displayName}&nbsp;(#{task.id})</Typography>
