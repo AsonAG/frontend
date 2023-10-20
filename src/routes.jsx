@@ -155,11 +155,24 @@ const routeData = [
       {
         path: "hr/tasks",
         Component: AsyncTaskTable,
-        loader: ({params}) =>  {
+        loader: tenantDataAwareLoader(async ({params, request, user}) => {
+          const [_, queryString] = request.url.split("?");
+          const searchParams = new URLSearchParams(queryString);
+          const filters = [];
+          let orderBy = null;
+          if (!searchParams.has("others")) {
+            filters.push("assignedUserId eq " + user.id);
+          }
+          if(!searchParams.has("closed")) {
+            filters.push("completed eq null");
+            orderBy = "scheduled, created";
+          } else {
+            orderBy = "completed desc, scheduled desc, created desc";
+          }
           return defer({
-            data: getTasks(params, null, "created desc")
+            data: getTasks(params, filters.join(" and "), orderBy)
           });
-        }
+        })
       },
       {
         path: "hr/tasks/:taskId",

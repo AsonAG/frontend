@@ -1,6 +1,6 @@
 import { React, forwardRef } from "react";
-import { Link as RouterLink, useAsyncValue, useParams, Outlet } from "react-router-dom";
-import { Stack, Typography, Paper, Chip, Divider, IconButton, Tooltip, Avatar, useTheme, useMediaQuery } from "@mui/material";
+import { Link as RouterLink, useAsyncValue } from "react-router-dom";
+import { Stack, Typography, Paper, Divider, Tooltip, Avatar, useTheme, useMediaQuery, ButtonGroup, Button } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { Person, Schedule } from "@mui/icons-material";
 import { useStringColor } from "../../theme";
 import { CategoryLabel } from "../tasks/CategoryLabel";
+import { TaskTableFilter } from "../tasks/TaskTableFilter";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -26,7 +27,7 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
 export function AsyncTaskTable() {
   return (
     <ContentLayout title="Tasks" disableXsPadding>
-      <AsyncDataRoute>
+      <AsyncDataRoute skipDataCheck>
         <TaskTable />
       </AsyncDataRoute>
     </ContentLayout>
@@ -40,11 +41,18 @@ function TaskTable() {
   const rowVariant = mobileLayout ? "mobile" : "default";
 
   return (
-    <Paper>
-      <Stack divider={<Divider />}>
-        {tasks.map((task, index) => <TaskRow key={index} task={task} variant={rowVariant}/>)}
-      </Stack>
-    </Paper>
+    <Stack spacing={3}>
+      <TaskTableFilter />
+      {
+        tasks.length === 0 ?
+          <Typography>No tasks found</Typography> :
+          <Paper>
+            <Stack divider={<Divider />}>
+              {tasks.map((task, index) => <TaskRow key={index} task={task} variant={rowVariant}/>)}
+            </Stack>
+          </Paper>
+      }
+    </Stack>
   );
 };
 

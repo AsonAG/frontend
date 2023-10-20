@@ -1,6 +1,6 @@
 
 import { React, useState } from "react";
-import { useAsyncValue, useLocation, Link, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { useAsyncValue, useLocation, Link, useRouteLoaderData, useSubmit, useNavigate } from "react-router-dom";
 import { Stack, Typography, Button, Chip,  TextField } from "@mui/material";
 import { HtmlContent } from './HtmlContent';
 import { ContentLayout } from "./ContentLayout";
@@ -30,6 +30,7 @@ function TaskView() {
   const { t } = useTranslation();
   const { user } = useRouteLoaderData("root");
   const submit = useSubmit();
+  const navigate = useNavigate();
   const title = getTaskTitle(task);
   const taskCompleted = task.completed !== null;
   const taskComment = task.comment || "";
@@ -95,7 +96,7 @@ function TaskView() {
           { !taskCompleted && <Button variant="outlined" disabled={taskComment === comment} sx={{alignSelf: "end", my: 1}} onClick={() => saveTask(false)}><Typography>{t("Save comment")}</Typography></Button> }
         </Stack>
         <Stack direction="row" spacing={1} justifyContent="end">
-          <Button component={Link} to=".." relative="path"><Typography>{t("Back")}</Typography></Button>
+          <Button onClick={() => navigate(-1)}><Typography>{t("Back")}</Typography></Button>
           <Button variant="contained" disabled={taskCompleted && taskComment === comment} onClick={() => saveTask(!taskCompleted)}><Typography>{t(buttonText)}</Typography></Button>
         </Stack>
       </Stack>
