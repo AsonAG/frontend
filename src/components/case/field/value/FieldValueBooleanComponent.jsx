@@ -5,6 +5,8 @@ import { FieldContext } from "../EditFieldComponent";
 function FieldValueBooleanComponent() {
     const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
     const checked = field.value ? field.value.toLowerCase() === "true" : false;
+    // make sure null values are sent as false
+    field.value = checked + "";
 
     function handleChange(e) {
         field.value = e.target.checked + "";
