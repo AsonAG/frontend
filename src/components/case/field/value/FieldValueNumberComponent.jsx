@@ -52,7 +52,6 @@ function FieldValueNumberComponent() {
   const handleBlur = () => {
     const floatValue = parseFloat(value);
     let val = transformValue(field, floatValue);
-    console.log("value after transform, ", val)
     if (field.value == val) {
       return;
     }

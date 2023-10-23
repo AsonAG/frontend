@@ -5,6 +5,7 @@ import { Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, T
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
+import { formatCaseValue } from "../../utils/Format";
 
 export function AsyncEventTable() {
   return (
@@ -42,13 +43,6 @@ function DesktopEventTable() {
         </TableHead>
         <TableBody>
           {events.map((event) => {
-            let formattedValue = event.value;
-            if (event.valueType === "Date") {
-              formattedValue = formatDate(event.value);
-            }
-            if (event.valueType === "DateTime") {
-              formattedValue = formatDate(event.value, true);
-            }
             return <TableRow 
               key={event.id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 }}}
@@ -57,7 +51,7 @@ function DesktopEventTable() {
                 {event.caseName}
               </TableCell>
               <TableCell sx={sx}>{event.caseFieldName}</TableCell>
-              <TableCell>{formattedValue}</TableCell>
+              <TableCell>{formatCaseValue(event, t)}</TableCell>
               <TableCell>{formatDate(event.start)}</TableCell>
               <TableCell>{formatDate(event.end)}</TableCell>
               <TableCell>{formatDate(event.created, true)}</TableCell>
