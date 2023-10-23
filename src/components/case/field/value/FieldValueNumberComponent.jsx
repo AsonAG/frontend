@@ -1,6 +1,5 @@
 import { NumericFormat } from "react-number-format";
 import { InputAdornment, TextField } from "@mui/material";
-import { validateMinMax } from "../../../../services/validators/FieldValueValidator";
 import { useState, useContext } from "react";
 import { FieldContext } from "../EditFieldComponent";
 import { useUpdateEffect } from "usehooks-ts";
@@ -17,17 +16,48 @@ function getDecimalParams(valueType) {
   }
 }
 
+function validateMinMax(floatValue, attributes) {
+  const maxValue = attributes?.["input.maxValue"];
+  const minValue = attributes?.["input.minValue"];
+
+  if (floatValue === null) return true;
+  else if (maxValue && minValue)
+    return floatValue <= maxValue && floatValue >= minValue;
+  else if (maxValue) return floatValue <= maxValue;
+  else if (minValue) return floatValue >= minValue;
+  else return true;
+}
+
+function getValue(field) {
+  if (field.value === null) return null;
+  if (field.valueType === "Percent") {
+    return field.value * 100;
+  }
+  return field.value;
+}
+
+function transformValue(field, value) {
+  if (value === null) return null;
+  if (field.valueType === "Percent") {
+    return value / 100;
+  }
+  return value;
+}
+
 function FieldValueNumberComponent() {
   const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
-  const [value, setValue] = useState(field.value);
+  const [value, setValue] = useState(getValue(field));
   const [isValid, setIsValid] = useState(true);
 
   const handleBlur = () => {
-    if (field.value === value) {
+    const floatValue = parseFloat(value);
+    let val = transformValue(field, floatValue);
+    console.log("value after transform, ", val)
+    if (field.value == val) {
       return;
     }
-    setIsValid(validateMinMax(value, field.attributes));
-    field.value = value;
+    setIsValid(validateMinMax(val, field.attributes));
+    field.value = val?.toString();
     buildCase();
   }
 
@@ -35,8 +65,9 @@ function FieldValueNumberComponent() {
     setValue(values.value);
   }
 
+  // handle server reset
   useUpdateEffect(() => {
-    setValue(field.value);
+    setValue(getValue(field));
   }, [field.value]);
 
   return (
