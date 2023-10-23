@@ -44,8 +44,8 @@ function transformValue(field, value) {
   return value;
 }
 
-function FieldValueNumberComponent() {
-  const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
+export function FieldValueNumberComponent() {
+  const { field, isReadonly, required, displayName, buildCase } = useContext(FieldContext);
   const [value, setValue] = useState(getValue(field));
   const [isValid, setIsValid] = useState(true);
 
@@ -84,7 +84,7 @@ function FieldValueNumberComponent() {
       label={displayName}
       type="numeric"
       name={field.name}
-      required
+      required={required}
       onBlur={handleBlur}
       disabled={isReadonly}
       InputProps={{
@@ -121,5 +121,3 @@ const getAdornmentFromValueType = (valueType, attributes) => {
     </InputAdornment>
   );
 };
-
-export default FieldValueNumberComponent;

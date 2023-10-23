@@ -5,12 +5,12 @@ import {
 	Link,
 	Stack,
 } from "@mui/material";
-import FieldValueFileComponent from "./FieldValueFileComponent";
+import { FieldValueFileComponent } from "./FieldValueFileComponent";
 import { FieldValueLookupComponent, FieldValueListComponent } from "./FieldValueDropdownComponent";
-import FieldValueNumberComponent from "./FieldValueNumberComponent";
-import FieldValueTextComponent from "./FieldValueTextComponent";
+import { FieldValueNumberComponent } from "./FieldValueNumberComponent";
+import { FieldValueTextComponent } from "./FieldValueTextComponent";
 import { FieldValueDateComponent, FieldValueDateTimeComponent } from "./FieldValueDateComponent";
-import FieldValueBooleanComponent from "./FieldValueBooleanComponent";
+import { FieldValueBooleanComponent } from "./FieldValueBooleanComponent";
 import { FieldContext } from "../EditFieldComponent";
 
 export function EditFieldValueComponent({ excludeNoneValue = false }) {

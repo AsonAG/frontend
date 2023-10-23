@@ -1,12 +1,11 @@
 import { useContext, useState } from "react";
 import { TextField } from "@mui/material";
 import ReactInputMask from "react-input-mask";
-import { MASK_CHAR, validateMask } from "../../../../services/validators/FieldValueValidator";
 import { useUpdateEffect } from "usehooks-ts";
 import { FieldContext } from "../EditFieldComponent";
 
-function FieldValueTextComponent() {
-  const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
+export function FieldValueTextComponent() {
+  const { field, isReadonly, required, displayName, buildCase } = useContext(FieldContext);
   const [value, setValue] = useState(field.value);
   const [isValid, setIsValid] = useState(true);
 
@@ -32,7 +31,7 @@ function FieldValueTextComponent() {
   if (!field.attributes?.["input.mask"]) {
     return <TextField
       label={displayName}
-      required
+      required={required}
       value={value || ''}
       onChange={handleChange}
       onBlur={handleBlur}
@@ -53,7 +52,7 @@ function FieldValueTextComponent() {
       maskChar={MASK_CHAR}
       value={value || ''}
       onChange={handleChange}
-      required
+      required={required}
       onBlur={handleBlur}
       disabled={isReadonly}
     >
@@ -66,11 +65,17 @@ function FieldValueTextComponent() {
           minRows={2}
           maxRows={6}
           error={!isValid}
-          required
+          required={required}
         />
       )}
     </ReactInputMask>
   )
 };
 
-export default FieldValueTextComponent;
+const MASK_CHAR = "_";
+const maskRegex = new RegExp(MASK_CHAR, 'g');
+
+function validateMask(stringValue, attributes) {
+  if (!attributes?.["input.mask"]) return true;
+  else return !maskRegex.test(attributes["input.mask"]) && !maskRegex.test(stringValue);
+}

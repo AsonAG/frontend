@@ -1,15 +1,13 @@
 import { TextField, Box } from "@mui/material";
-// import { Box, Button, Stack, Typography, Chip, InputLabel, FormControl, OutlinedInput } from "@mui/material";
 import { FieldContext } from "../EditFieldComponent";
 import { useContext, useState, useEffect } from "react";
 import { toBase64 } from "../../../../services/converters/BinaryConverter";
 import { CloudUpload } from "@mui/icons-material";
 
-function FieldValueFileComponent() {
-  const { field, isReadonly, displayName, attachments } = useContext(FieldContext);
+export function FieldValueFileComponent() {
+  const { field, isReadonly, required, displayName, attachments } = useContext(FieldContext);
   const extensions = field.attributes?.["input.attachmentExtensions"];
   // const required = attributes?.["input.attachment"] === "Mandatory";
-  const required = true;
   const [attachmentFiles, setAttachmentFiles] = useState([]);
 
   useEffect(() => {
@@ -37,7 +35,7 @@ function FieldValueFileComponent() {
     <TextField
       label={displayName}
       onChange={handleUpload}
-      required
+      required={required}
       disabled={isReadonly}
       type="file"
       InputLabelProps={{
@@ -61,4 +59,3 @@ function FieldValueFileComponent() {
     />
   );
 };
-export default FieldValueFileComponent;

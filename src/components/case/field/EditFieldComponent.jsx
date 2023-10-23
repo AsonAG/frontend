@@ -11,12 +11,13 @@ export const FieldContext = createContext();
 export function EditFieldComponent({ field }) {
 	const { buildCase, attachments } = useContext(CaseFormContext);
 	const isReadonly = field.attributes?.["input.readOnly"] ?? false;
+	const required = !field.optional;
 	const theme = useTheme();
 	const mobile = useMediaQuery(theme.breakpoints.down(725));
 	const displayName = !mobile ? field.displayName : '';
 
 	return (
-		<FieldContext.Provider value={{ field, displayName, buildCase, attachments, isReadonly }}  >
+		<FieldContext.Provider value={{ field, displayName, buildCase, attachments, isReadonly, required }} >
 			{
 				mobile ?
 					<MobileLayout field={field} /> :
