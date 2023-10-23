@@ -2,7 +2,7 @@ import { FormControl, FormControlLabel, Checkbox } from "@mui/material";
 import { useContext } from "react";
 import { FieldContext } from "../EditFieldComponent";
 
-function FieldValueBooleanComponent() {
+export function FieldValueBooleanComponent() {
     const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
     const checked = field.value ? field.value.toLowerCase() === "true" : false;
     // make sure null values are sent as false
@@ -28,5 +28,3 @@ function FieldValueBooleanComponent() {
         />
     </FormControl>
 }
-
-export default FieldValueBooleanComponent;

@@ -8,10 +8,10 @@ export function FieldPeriodSelector({ field, renderIntoContainer, componentProps
   }
 
   const periodPickers = <>
-    <FieldValueDateComponent propertyName="start" displayName={t("Start")} {...componentProps} />
+    <FieldValueDateComponent propertyName="start" displayName={t("Start")} required={!field.optional} {...componentProps} />
     {
       field.timeType !== "Moment" &&
-       <FieldValueDateComponent propertyName="end" displayName={t("End")} required={field.endMandatory} {...componentProps} />
+       <FieldValueDateComponent propertyName="end" displayName={t("End")} required={!field.optional && field.endMandatory} {...componentProps} />
     }
   </>;
 

@@ -6,13 +6,13 @@ import { FieldContext } from "../EditFieldComponent";
 import { useRouteLoaderData } from "react-router-dom";
 import { getDateLocale } from "../../../../services/converters/DateLocaleExtractor";
 
-function _InternalDateComponent({Picker, propertyName = "value", displayName, sx, size = "medium", required = true}) {
+function _InternalDateComponent({Picker, propertyName = "value", displayName, sx, size = "medium", required}) {
 	const { user } = useRouteLoaderData('root');
-	const { field, isReadonly, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
+	const { field, isReadonly, required: fieldRequired, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const inputRef = useRef();
 	const fieldValue = field[propertyName];
 	const value = fieldValue ? dayjs.utc(fieldValue) : null;
-
+	required ??= fieldRequired;
 	displayName ??= fieldDisplayName;
 
 	const handleDateChange = (newDate, context) => {

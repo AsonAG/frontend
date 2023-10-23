@@ -8,7 +8,7 @@ export function FieldValueLookupComponent() { return <FieldValueDropdownComponen
 export function FieldValueListComponent() { return <FieldValueDropdownComponent useDataHook={useListData} />;}
 
 function FieldValueDropdownComponent({useDataHook}) {
-  const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
+  const { field, isReadonly, required, displayName, buildCase } = useContext(FieldContext);
 
   function onChange(value) {
     field.value = value;
@@ -25,11 +25,11 @@ function FieldValueDropdownComponent({useDataHook}) {
       renderInput={(params) => (
         <TextField
           {...params}
-          required
+          required={required}
           label={displayName}
           inputProps={{
             ...params.inputProps,
-            required: (data.value?.length ?? 0) === 0
+            required: required && ((data.value?.length ?? 0) === 0)
           }}
           InputProps={{
             ...params.InputProps,
