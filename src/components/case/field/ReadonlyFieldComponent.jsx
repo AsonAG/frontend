@@ -1,9 +1,9 @@
 import { Stack, Typography, Link } from "@mui/material";
 import { DescriptionComponent } from "../DescriptionComponent";
 import { useIsMobile } from "../../../hooks/useIsMobile";
-import { formatDate } from "../../../utils/DateUtils";
 import { useTranslation } from "react-i18next";
 import { useListData, useLookupData } from "../../../hooks/useDropdownData";
+import { formatCaseValue } from "../../../utils/Format";
 
 
 export function ReadonlyFieldComponent({ field }) {
@@ -30,35 +30,8 @@ function ReadonlyValueComponent({field}) {
 	
 	if (field.attributes?.["input.list"]) {
     return <ReadonlyDropdownDisplayComponent field={field} useDataHook={useListData} />;
-	} 
-	switch (field.valueType) {
-		case "None":
-    case "Document":
-			return null;
-		case "Date": 
-      return formatDate(field.value);
-		case "DateTime":
-      return formatDate(field.value, true);
-		case "Boolean":
-      return t(field.value ? "Yes" : "No");
-		case "WebResource":
-      return <Link href={field.value} target="_blank" rel="noopener">{field.value}</Link>
-		case "Integer":
-		case "NumericBoolean":
-		case "Week":
-		case "Decimal":
-		case "Year":
-		case "Day":
-		case "Hour":
-		case "Distance":
-		case "Month":
-		case "Percent":
-		case "Money":
-			return field.value;
-			
-		default:
-			return field.value;
 	}
+  return formatCaseValue(field, t);
 }
 
 function ReadonlyDropdownDisplayComponent({field, useDataHook}) {
