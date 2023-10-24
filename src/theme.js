@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
 import { useLocalStorage } from "usehooks-ts";
 import { useMediaQuery } from "@mui/material";
-import { stringToColor } from "./utils/stringToColor";
 
 const lightModeDesignTokens = {
   palette: {
