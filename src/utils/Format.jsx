@@ -36,7 +36,7 @@ export function formatCaseValue(caseValue, t) {
 		case "Money":
       let moneyValue = caseValue.value;
       if (caseValue.attributes?.["input.currency"]) {
-        moneyValue += caseValue.attributes["input.currency"];
+        moneyValue = `${moneyValue} ${caseValue.attributes["input.currency"]}`;
       }
 			return moneyValue;
 		default:
