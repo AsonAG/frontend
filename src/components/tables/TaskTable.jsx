@@ -7,7 +7,6 @@ import { ContentLayout } from "../ContentLayout";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { Person, Schedule } from "@mui/icons-material";
-import { useStringColor } from "../../theme";
 import { CategoryLabel } from "../tasks/CategoryLabel";
 import { TaskTableFilter } from "../tasks/TaskTableFilter";
 
@@ -101,11 +100,11 @@ function RowInfo({icon, label, spacing, children}) {
 
 function AssignedUserAvatar({user}) {
   const { t } = useTranslation();
+  const theme = useTheme();
   const name = `${user.firstName} ${user.lastName}`;
-  const color = useStringColor(name);
   return (
     <Tooltip title={t("Assignee")} placement="top" >
-      <Avatar sx={{bgcolor: color, width: 28, height: 28}}>
+      <Avatar sx={{width: 28, height: 28, ...theme.bgColorFromString(name)}}>
         <Typography variant="body2" lineHeight={1}>{user.firstName[0]}{user.lastName[0]}</Typography>
       </Avatar>
     </Tooltip>
