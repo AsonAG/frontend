@@ -1,5 +1,5 @@
 
-import { React, useState } from "react";
+import { React, useRef, useState } from "react";
 import { useAsyncValue, useLocation, Link, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { Stack, Typography, Button,  TextField } from "@mui/material";
 import { HtmlContent } from './HtmlContent';
@@ -25,16 +25,26 @@ export function AsyncTaskView() {
   );
 }
 
+function useBacklink() {
+  const { state } = useLocation();
+  let backLinkPath = "..";
+  if (state?.taskFilter) {
+    backLinkPath += state.taskFilter;
+  }
+  return backLinkPath;
+}
+
 function TaskView() {
   const task = useAsyncValue();
   const { t } = useTranslation();
   const { user } = useRouteLoaderData("root");
   const submit = useSubmit();
-  const { state } = useLocation();
   const title = getTaskTitle(task);
   const taskCompleted = task.completed !== null;
   const taskComment = task.comment || "";
   const [comment, setComment] = useState(taskComment);
+  const backLink = useBacklink();
+  const backLinkRef = useRef(backLink);
   let completeText = t("Complete");
   let commentText = t("Save comment");
   let buttonText = taskCompleted ? commentText : completeText;
@@ -53,10 +63,7 @@ function TaskView() {
     
     submit(newTask, { method: "post", encType: "application/json" });
   }
-  let backLinkPath = "..";
-  if (state.taskFilter) {
-    backLinkPath += state.taskFilter;
-  }
+
   return (
     <ContentLayout title={title}>
       <Stack spacing={2}>
@@ -75,7 +82,7 @@ function TaskView() {
               <Typography>{`${task.assignedUser.firstName} ${task.assignedUser.lastName}`}</Typography> :
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography>{t("not assigned")}</Typography>
-                <Button variant="outlined" onClick={acceptTask}>{t("Accept task")}</Button>
+                { !taskCompleted && <Button variant="outlined" onClick={acceptTask}>{t("Accept task")}</Button> }
               </Stack>
           }
         </Stack>
@@ -100,7 +107,7 @@ function TaskView() {
           { !taskCompleted && <Button variant="outlined" disabled={taskComment === comment} sx={{alignSelf: "end", my: 1}} onClick={() => saveTask(false)}><Typography>{t("Save comment")}</Typography></Button> }
         </Stack>
         <Stack direction="row" spacing={1} justifyContent="end">
-          <Button component={Link} to={backLinkPath} relative="path"><Typography>{t("Back")}</Typography></Button>
+          <Button component={Link} to={backLinkRef.current} relative="path"><Typography>{t("Back")}</Typography></Button>
           <Button variant="contained" disabled={taskCompleted && taskComment === comment} onClick={() => saveTask(!taskCompleted)}><Typography>{t(buttonText)}</Typography></Button>
         </Stack>
       </Stack>
