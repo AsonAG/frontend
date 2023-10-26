@@ -1,8 +1,8 @@
 import { Stack, Typography } from "@mui/material";
 import { React, forwardRef } from "react";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import styled from "@emotion/styled";
-import { Assignment, AssignmentInd } from "@mui/icons-material";
+import { Assignment, Check } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
@@ -23,26 +23,17 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
 
 export function TaskTableFilter() {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const completed = searchParams.has("completed");
   return (
     <Stack direction="row" spacing={2}>
-      <FilterButton filterName="showall" label={t("My tasks")} icon={<AssignmentInd />}/>
-      <FilterButton filterName="showall" include label={t("All tasks")} icon={<Assignment />}/>
+      <FilterButton label={t("Open")} to="" active={!completed} icon={<Assignment />}/>
+      <FilterButton label={t("Completed")} to="?completed=true" active={completed} icon={<Check />}/>
     </Stack>
   )
 }
 
-function FilterButton({label, icon, filterName, include = false}) {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  
-  let active = searchParams.has(filterName);
-  if (!include) {
-    active = !active;
-    searchParams.delete(filterName);
-  } else {
-    searchParams.append(filterName, "true");
-  }
-  const to = `?${searchParams}`;
+function FilterButton({ label, to, icon, active }) {
   return (
     <Link to={to} className={active ? 'active' : ''}>
       <Stack direction="row" spacing={0.5}>

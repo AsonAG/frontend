@@ -26,7 +26,7 @@ class TenantDataCache {
         if (!data) {
             data = this.tenantDataCache[tenantId] = this.loadTenantData(tenantId);
         }
-        
+
         const [tenant, user, payrolls] = await data;
 
         return {tenant, user, payrolls};
@@ -221,8 +221,7 @@ export function getTasks(routeParams, filter, orderBy) {
     return new FetchRequestBuilder(tasksUrl, routeParams)
         .withQueryParam("filter", filter)
         .withQueryParam("orderBy", orderBy)
-        // .withQueryParam("result", "ItemsWithCount")
-        // .withQueryParam("top", 10)
+        .withQueryParam("result", "ItemsWithCount")
         .withLocalization()
         .fetchJson();
 }
