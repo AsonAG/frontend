@@ -1,6 +1,6 @@
 import { React, forwardRef } from "react";
 import { Link as RouterLink, useAsyncValue, useLocation } from "react-router-dom";
-import { Stack, Typography, Paper, Divider, Tooltip, Avatar, useTheme, useMediaQuery, ButtonGroup, Button } from "@mui/material";
+import { Stack, Typography, Paper, Divider, Tooltip, Avatar, useTheme, useMediaQuery } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
@@ -46,11 +46,11 @@ function TaskTable() {
     <Stack spacing={3}>
       <TaskTableFilter />
       {
-        tasks.length === 0 ?
+        tasks.count === 0 ?
           <Typography>{t("No tasks found")}</Typography> :
           <Paper>
             <Stack divider={<Divider />}>
-              {tasks.map((task) => <TaskRow key={task.id} task={task} variant={rowVariant} taskFilter={search}/>)}
+              {tasks.items.map((task) => <TaskRow key={task.id} task={task} variant={rowVariant} taskFilter={search}/>)}
             </Stack>
           </Paper>
       }

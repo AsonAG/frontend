@@ -35,6 +35,11 @@ import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { DocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
+import { getDefaultStore } from "jotai";
+import { openTasksAtom } from "./utils/dataAtoms";
+
+
+const store = getDefaultStore();
 
 function tenantDataAwareLoader(loader) {
   return async (props) => {
@@ -158,13 +163,17 @@ const routeData = [
         loader: tenantDataAwareLoader(async ({params, request, user}) => {
           const [_, queryString] = request.url.split("?");
           const searchParams = new URLSearchParams(queryString);
-          let filter = null;
-          let orderBy = "completed, scheduled, created";
-          if (!searchParams.has("showall")) {
-            filter = "assignedUserId eq " + user.id;
+          let dataPromise = null;
+          if (searchParams.has("completed")) {
+            const filter = "completed ne null";
+            const orderBy = `assignedUserId eq ${user.id}, completed, scheduled, created`;
+            dataPromise = getTasks(params, filter, orderBy);
+          } else {
+            store.set(openTasksAtom);
+            dataPromise = store.get(openTasksAtom);
           }
           return defer({
-            data: getTasks(params, filter, orderBy)
+            data: dataPromise
           });
         })
       },
