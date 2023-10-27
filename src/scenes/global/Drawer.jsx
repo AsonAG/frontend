@@ -5,7 +5,7 @@ import {
   Drawer as MuiDrawer,
   Typography,
   Badge} from "@mui/material";
-import { forwardRef, useEffect } from "react";
+import { Suspense, forwardRef, useEffect } from "react";
 import { NavLink as RouterLink, useLoaderData, useLocation } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -62,8 +62,12 @@ function NavigationItem(props) {
 }
 
 function OpenTasksBadgeIcon() {
-  const tasks = useAtomValue(openTasksAtom);
-  return withBadge(tasks.count, <FormatListBulletedIcon />);
+  const icon = <FormatListBulletedIcon />;
+  return (
+    <Suspense fallback={icon}>
+      <BadgeIcon dataAtom={openTasksAtom} icon={icon} />
+    </Suspense>
+  );
 }
 
 function NavigationMenu({children}) {
@@ -88,9 +92,10 @@ function NavigationGroup({ name, children, hidden = false}) {
 
 const badgeSx = {badge: {sx: {height: 16, minWidth: 16, letterSpacing: 0, pl: 0.625, pr: 0.5}}};
 
-function withBadge(count, icon) {
+function BadgeIcon({dataAtom, icon}) {
+  const data = useAtomValue(dataAtom);
   return (
-    <Badge badgeContent={count} color="primary" slotProps={badgeSx}>
+    <Badge badgeContent={data.count} color="primary" slotProps={badgeSx}>
       {icon}
     </Badge>
   )

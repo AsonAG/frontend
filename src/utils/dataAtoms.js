@@ -1,19 +1,32 @@
-import { atom } from "jotai";
 import { atomWithRefresh } from "./atomWithRefresh";
-import { getTasks } from "../api/FetchClient";
+import { getPayrolls, getTasks, getTenant, getUser } from "../api/FetchClient";
+import { buildParams } from "./routeParamAtoms";
+import getAuthUser from '../auth/getUser';
 
+function atomWithTenant(derive, defaultValue = null) {
+  return atomWithRefresh(get => {
+    const params = buildParams(get);
+    if (params.tenantId === null)
+      return defaultValue;
+    return derive({get, params});
+  })
+}
 
-export const tenantAtom = atom({id: 35});
-export const payrollAtom = atom({id: 61});
-export const userAtom = atom({id: 446});
+export const tenantAtom = atomWithTenant(params => getTenant(params));
 
+export const payrollsAtom = atomWithTenant(params => getPayrolls(params), []);
 
-export const openTasksAtom = atomWithRefresh((get) => {
-  const tenant = get(tenantAtom);
-  const payroll = get(payrollAtom);
+export const userAtom = atomWithTenant(params => {
+  const authUserEmail = getAuthUser()?.profile.email;
+  return getUser(params, authUserEmail);
+});
+
+export const openTasksAtom = atomWithTenant(({ get, params }) => {
   const user = get(userAtom);
-  const params = {tenantId: tenant.id, payrollId: payroll.id};
+  let orderBy = "completed, scheduled, created";
+  if (user !== null) {
+    orderBy = `assignedUserId eq ${user.id}, ${orderBy}`;
+  }
   const filter = "completed eq null";
-  const orderBy = `assignedUserId eq ${user.id}, completed, scheduled, created`;
   return getTasks(params, filter, orderBy);
-})
+}, {count: 0, items: []});
