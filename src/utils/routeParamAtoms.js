@@ -1,21 +1,6 @@
 import { atom } from 'jotai';
-import { browserRouter } from '../routes';
 
-const paramsAtom = atom({});
-paramsAtom.onMount = (set) => {
-  const callback = (state) => {
-    console.log(state);
-    if (Array.isArray(state.matches)) {
-      const match = [...state.matches].pop();
-      set(match.params);
-    } else {
-      set({});
-    }
-  };
-  const unsubscribe = browserRouter.subscribe(callback);
-  callback(browserRouter.state);
-  return unsubscribe;
-}
+export const paramsAtom = atom({tenantId: null, payrollId: null});
 
 export const tenantIdAtom = atom (get => {
   const params = get(paramsAtom);
