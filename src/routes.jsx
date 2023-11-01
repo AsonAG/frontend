@@ -1,7 +1,7 @@
 
 import * as React from "react";
 
-import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom";
+import { createBrowserRouter, defer, matchRoutes, Navigate, redirect } from "react-router-dom";
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
@@ -22,7 +22,6 @@ import {
   getEmployeeByIdentifier,
   getCompanyCases,
   getCompanyCaseValues,
-  tenantDataCache,
   getDocumentCaseFields,
   getTasks,
   getTask,
@@ -36,19 +35,19 @@ import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { DocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom } from "./utils/dataAtoms";
-
+import { openTasksAtom, payrollsAtom, tenantAtom, userAtom } from "./utils/dataAtoms";
+import { paramsAtom } from "./utils/routeParamAtoms";
 
 const store = getDefaultStore();
 
-function tenantDataAwareLoader(loader) {
-  return async (props) => {
-    if (!props.params.tenantId) {
-      throw new Error("No tenant found");
-    }
-    const tenantData = await tenantDataCache.getData(props.params.tenantId);
-    return loader({...tenantData, ...props});
-  }
+async function getTenantData() {
+  const [tenant, payrolls, user] = await Promise.all([
+    store.get(tenantAtom),
+    store.get(payrollsAtom),
+    store.get(userAtom)
+  ]);
+  console.log(tenant, payrolls, user);
+  return { tenant, payrolls, user };
 }
 
 const routeData = [
@@ -72,7 +71,9 @@ const routeData = [
   {
     path: "tenants/:tenantId/payrolls/:payrollId?",
     element: <App renderDrawer />,
-    loader: tenantDataAwareLoader(async ({params, tenant, user, payrolls}) => {
+    loader: async ({ params }) => {
+      console.log("payroll loader");
+      const { tenant, payrolls, user } = await getTenantData();
       if (!params.payrollId) {
         return redirect(payrolls[0].id + "");
       }
@@ -80,7 +81,7 @@ const routeData = [
       const authUserEmail = getAuthUser()?.profile.email;
       const employee = await getEmployeeByIdentifier(params, authUserEmail);
       return { tenant, user, payrolls, payroll, employee };
-    }),
+    },
     shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.payrollId !== nextParams.payrollId,
     id: "root",
     ErrorBoundary: ErrorView,
@@ -160,7 +161,8 @@ const routeData = [
       {
         path: "hr/tasks",
         Component: AsyncTaskTable,
-        loader: tenantDataAwareLoader(async ({params, request, user}) => {
+        loader: async ({params, request }) => {
+          const { user } = await getTenantData();
           const [_, queryString] = request.url.split("?");
           const searchParams = new URLSearchParams(queryString);
           let dataPromise = null;
@@ -175,7 +177,7 @@ const routeData = [
           return defer({
             data: dataPromise
           });
-        })
+        }
       },
       {
         path: "hr/tasks/:taskId",
@@ -187,8 +189,11 @@ const routeData = [
         },
         action: async ({params, request}) => {
           const data = await request.json();
-          console.log(data);
-          return await updateTask(params, data);
+          const response = await updateTask(params, data);
+          if (response.ok) {
+            return redirect("../hr/tasks");
+          }
+          return response;
         }
       },
       {
@@ -302,11 +307,27 @@ const routeData = [
   }
 ];
 
+const updateParamsAtom = (state) => {
+  let matches = [];
+  if (state.navigation.state === "loading") {
+    // navigating away, parse new route
+    matches = matchRoutes(routeData, state.navigation.location) || [];
+  } else if (Array.isArray(state.matches)) {
+    matches = [...state.matches];
+  }
+  const match = matches.pop();
+  store.set(paramsAtom, match?.params ?? {});
+};
+
+updateParamsAtom({navigation: {state: 'loading', location: window.location}});
+
 const browserRouter = createBrowserRouter(routeData,
 {
   future: {
     v7_normalizeFormMethod: true
   }
 });
+
+browserRouter.subscribe(updateParamsAtom);
 
 export { routeData, browserRouter };

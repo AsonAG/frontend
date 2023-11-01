@@ -12,11 +12,11 @@ function atomWithTenant(derive, defaultValue = null) {
   })
 }
 
-export const tenantAtom = atomWithTenant(params => getTenant(params));
+export const tenantAtom = atomWithTenant(({ params }) => getTenant(params));
 
-export const payrollsAtom = atomWithTenant(params => getPayrolls(params), []);
+export const payrollsAtom = atomWithTenant(({ params }) => getPayrolls(params), []);
 
-export const userAtom = atomWithTenant(params => {
+export const userAtom = atomWithTenant(({ params }) => {
   const authUserEmail = getAuthUser()?.profile.email;
   return getUser(params, authUserEmail);
 });

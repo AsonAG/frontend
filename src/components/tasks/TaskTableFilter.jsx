@@ -21,12 +21,12 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
 });
 
 
-export function TaskTableFilter() {
+export function TaskTableFilter({stackProps}) {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const completed = searchParams.has("completed");
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction="row" spacing={4} {...stackProps}>
       <FilterButton label={t("Open")} to="" active={!completed} icon={<Assignment />}/>
       <FilterButton label={t("Completed")} to="?completed=true" active={completed} icon={<Check />}/>
     </Stack>

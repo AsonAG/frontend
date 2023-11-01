@@ -1,5 +1,7 @@
 import { generatePath } from 'react-router-dom';
 import getAuthUser from '../auth/getUser';
+import { getDefaultStore } from 'jotai';
+import { userAtom } from '../utils/dataAtoms';
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const tenantsUrl          = "/tenants";
@@ -17,32 +19,7 @@ const companyDocumentUrl  = "/tenants/:tenantId/companycases/:caseValueId/docume
 const tasksUrl            = "/tenants/:tenantId/payrolls/:payrollId/tasks";
 const taskUrl             = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
 
-class TenantDataCache {
-    tenantDataCache = {};
-
-    async getData(tenantId) {
-        let data = this.tenantDataCache[tenantId];
-  
-        if (!data) {
-            data = this.tenantDataCache[tenantId] = this.loadTenantData(tenantId);
-        }
-
-        const [tenant, user, payrolls] = await data;
-
-        return {tenant, user, payrolls};
-    }
-
-    loadTenantData(tenantId) {
-        const authUserEmail = getAuthUser()?.profile.email;
-        return Promise.all([
-          getTenant({tenantId}),
-          getUser({tenantId}, authUserEmail),
-          getPayrolls({tenantId})
-        ]);
-    }
-}
-
-export const tenantDataCache = new TenantDataCache();
+const store = getDefaultStore();
 
 class FetchRequestBuilder {
     method = "GET";
@@ -109,15 +86,15 @@ class FetchRequestBuilder {
     }
 
     async fetch() {
-        if (this.routeParams.tenantId) {
-            if (this.localizeRequest) {
-                const data = await tenantDataCache.getData(this.routeParams.tenantId);
-                this.searchParams.append("language", data.user.language);
-            }
-            if (this.addUserQueryParam) {
-                const data = await tenantDataCache.getData(this.routeParams.tenantId);
-                this.searchParams.append("userId", data.user.id);
-            }
+        if (this.localizeRequest) {
+            const user = await store.get(userAtom);
+            if (user !== null)
+                this.searchParams.append("language", user.language);
+        }
+        if (this.addUserQueryParam) {
+            const user = await store.get(userAtom);
+            if (user !== null)
+                this.searchParams.append("userId", user.id);
         }
         let url = this.url;
         if ([...this.searchParams].length > 0) {

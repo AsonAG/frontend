@@ -41,13 +41,14 @@ function TaskTable() {
   const theme = useTheme();
   const mobileLayout = useMediaQuery(theme.breakpoints.down("md"));
   const rowVariant = mobileLayout ? "mobile" : "default";
+  const padding = mobileLayout ? 4 : 0;
 
   return (
     <Stack spacing={3}>
-      <TaskTableFilter />
+      <TaskTableFilter stackProps={{px: padding}}/>
       {
         tasks.count === 0 ?
-          <Typography>{t("No tasks found")}</Typography> :
+          <Typography px={padding}>{t("No tasks found")}</Typography> :
           <Paper>
             <Stack divider={<Divider />}>
               {tasks.items.map((task) => <TaskRow key={task.id} task={task} variant={rowVariant} taskFilter={search}/>)}
@@ -68,7 +69,8 @@ function TaskRow({ task, variant, taskFilter }) {
   let rowInfoSpacing = 0.5;
   if (variant === "mobile") {
     stackProps = {
-      spacing: 1
+      spacing: 1,
+      px: 4
     };
     rowInfoSpacing = 0.75;
   }
