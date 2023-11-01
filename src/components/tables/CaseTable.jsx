@@ -8,7 +8,7 @@ import { ContentLayout } from "../ContentLayout";
 
 export function AsyncCaseTable() {
   return (
-    <ContentLayout defaultTitle="New event">
+    <ContentLayout title="New event">
       <AsyncDataRoute>
         <CaseTable />
       </AsyncDataRoute>
@@ -56,7 +56,7 @@ function CaseTable() {
   }
 
   return (
-    <Stack spacing={3} direction="row" useFlexGap flexWrap="wrap">
+    <Stack spacing={3} direction="row" flexWrap="wrap">
       {sorted.map(c => <CaseCard key={c.id} _case={c} />)}
     </Stack>
   );

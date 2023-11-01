@@ -37,7 +37,23 @@ const translations = {
         "Showing all documents": "Es werden alle Dokumente angezeigt",
         "Load more": "Mehr laden",
         "Loading...": "Laden...",
-        "Without date": "Ohne Datum"
+        "Without date": "Ohne Datum",
+        "No tasks found": "Keine Aufgaben gefunden",
+        "Due on": "Fällig am",
+        "Assignee": "Zuständig",
+        "Open": "Offen",
+        "Completed": "Abgeschlossen",
+        "Complete": "Abschliessen",
+        "Save comment": "Kommentar speichern",
+        "Save comment & complete": "Kommentar speichern und abschliessen",
+        "Completed on": "Abgeschlossen am",
+        "Assigned to": "Zugewiesen an",
+        "not assigned": "nicht zugewiesen",
+        "Accept task": "Task akzeptieren",
+        "Instructions": "Anweisungen",
+        "Comment": "Kommentar",
+        "Back": "Zurück"
+        
     },
 };
 

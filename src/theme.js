@@ -36,6 +36,13 @@ function createThemeSettings(mode) {
 
   return {
     ...palette,
+    components: {
+      MuiStack: {
+        defaultProps: {
+          useFlexGap: true
+        }
+      }
+    },
     typography: {
       fontSize: 12,
       h1: {
@@ -50,6 +57,17 @@ function createThemeSettings(mode) {
       button: {
         textTransform: 'none'
       }
+    },
+    bgColorFromString: (str) => {
+      const hash = getHashCode(str);
+      const hue = Math.abs((hash % 90)) * 4;
+      const lightness = mode === "light" ? 30 : 90;
+      return {
+        bgcolor: `hsl(${hue}, 90%, ${lightness - 10}%)`,
+        "@supports (color:oklch(0% 0 0))": {
+          bgcolor: `oklch(${lightness}%, 0.25, ${hue})`
+        }
+      };
     }
   };
 }
@@ -74,4 +92,12 @@ export function useDarkMode() {
     isDarkMode,
     setDarkMode
   }
+}
+
+function getHashCode(s) {
+  let hash = 0;
+  for (let i = 0; i < s.length; i += 1) {
+      hash = s.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return hash;
 }

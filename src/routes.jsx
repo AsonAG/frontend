@@ -1,7 +1,7 @@
 
 import * as React from "react";
 
-import { createBrowserRouter, defer, Navigate, redirect } from "react-router-dom";
+import { createBrowserRouter, defer, matchRoutes, Navigate, redirect } from "react-router-dom";
 
 import Tenants from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
@@ -22,9 +22,10 @@ import {
   getEmployeeByIdentifier,
   getCompanyCases,
   getCompanyCaseValues,
-  tenantDataCache,
   getDocumentCaseFields,
-  getTasks
+  getTasks,
+  getTask,
+  updateTask
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -32,15 +33,21 @@ import { AsyncCaseDisplay } from "./scenes/global/CaseDisplay";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { DocumentDialog } from "./components/DocumentDialog";
+import { AsyncTaskView } from "./components/TaskView";
+import { getDefaultStore } from "jotai";
+import { openTasksAtom, payrollsAtom, tenantAtom, userAtom } from "./utils/dataAtoms";
+import { paramsAtom } from "./utils/routeParamAtoms";
 
-function tenantDataAwareLoader(loader) {
-  return async (props) => {
-    if (!props.params.tenantId) {
-      throw new Error("No tenant found");
-    }
-    const tenantData = await tenantDataCache.getData(props.params.tenantId);
-    return loader({...tenantData, ...props});
-  }
+const store = getDefaultStore();
+
+async function getTenantData() {
+  const [tenant, payrolls, user] = await Promise.all([
+    store.get(tenantAtom),
+    store.get(payrollsAtom),
+    store.get(userAtom)
+  ]);
+  console.log(tenant, payrolls, user);
+  return { tenant, payrolls, user };
 }
 
 const routeData = [
@@ -64,7 +71,9 @@ const routeData = [
   {
     path: "tenants/:tenantId/payrolls/:payrollId?",
     element: <App renderDrawer />,
-    loader: tenantDataAwareLoader(async ({params, tenant, user, payrolls}) => {
+    loader: async ({ params }) => {
+      console.log("payroll loader");
+      const { tenant, payrolls, user } = await getTenantData();
       if (!params.payrollId) {
         return redirect(payrolls[0].id + "");
       }
@@ -72,7 +81,7 @@ const routeData = [
       const authUserEmail = getAuthUser()?.profile.email;
       const employee = await getEmployeeByIdentifier(params, authUserEmail);
       return { tenant, user, payrolls, payroll, employee };
-    }),
+    },
     shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.payrollId !== nextParams.payrollId,
     id: "root",
     ErrorBoundary: ErrorView,
@@ -150,12 +159,49 @@ const routeData = [
         ]
       },
       {
+        path: "hr/tasks",
+        Component: AsyncTaskTable,
+        loader: async ({params, request }) => {
+          const { user } = await getTenantData();
+          const [_, queryString] = request.url.split("?");
+          const searchParams = new URLSearchParams(queryString);
+          let dataPromise = null;
+          if (searchParams.has("completed")) {
+            const filter = "completed ne null";
+            const orderBy = `assignedUserId eq ${user.id}, completed, scheduled, created`;
+            dataPromise = getTasks(params, filter, orderBy);
+          } else {
+            store.set(openTasksAtom);
+            dataPromise = store.get(openTasksAtom);
+          }
+          return defer({
+            data: dataPromise
+          });
+        }
+      },
+      {
+        path: "hr/tasks/:taskId",
+        Component: AsyncTaskView,
+        loader: ({params}) => {
+          return defer({
+            data: getTask(params)
+          });
+        },
+        action: async ({params, request}) => {
+          const data = await request.json();
+          const response = await updateTask(params, data);
+          if (response.ok) {
+            return redirect("../hr/tasks");
+          }
+          return response;
+        }
+      },
+      {
         path: "company",
         children: [
           {
             path: "data",
             Component: AsyncCaseDisplay,
-            // element: <AsyncCaseDisplay defaultTitle="Company data" />,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "CompanyData")
@@ -165,7 +211,6 @@ const routeData = [
           {
             path: "new",
             Component: AsyncCaseTable,
-            // element: <AsyncDataRoute defaultTitle="New Company event"><CaseTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "NotAvailable")
@@ -175,12 +220,10 @@ const routeData = [
           {
             path: "new/:caseName",
             lazy: () => import("./scenes/global/CaseForm")
-            // element: <CaseForm defaultTitle="New Company event" />
           },
           {
             path: "events",
             Component: AsyncEventTable,
-            // element: <AsyncDataRoute defaultTitle="Company events" disableXsPadding><EventTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCaseValues(params, null, "created desc")
@@ -190,7 +233,6 @@ const routeData = [
           {
             path: "documents",
             Component: AsyncDocumentTable,
-            // element: <AsyncDataRoute defaultTitle="Company documents"><DocumentTable /></AsyncDataRoute>,
             loader: ({params}) =>  {
               return defer({
                 data: getDocumentCaseFields(params)
@@ -202,15 +244,6 @@ const routeData = [
                 Component: DocumentDialog
               }
             ]
-          },
-          {
-            path: "tasks",
-            Component: AsyncTaskTable,
-            loader: ({params}) =>  {
-              return defer({
-                data: getTasks(params, null, "created desc")
-              });
-            }
           },
         ]
       },
@@ -274,11 +307,27 @@ const routeData = [
   }
 ];
 
+const updateParamsAtom = (state) => {
+  let matches = [];
+  if (state.navigation.state === "loading") {
+    // navigating away, parse new route
+    matches = matchRoutes(routeData, state.navigation.location) || [];
+  } else if (Array.isArray(state.matches)) {
+    matches = [...state.matches];
+  }
+  const match = matches.pop();
+  store.set(paramsAtom, match?.params ?? {});
+};
+
+updateParamsAtom({navigation: {state: 'loading', location: window.location}});
+
 const browserRouter = createBrowserRouter(routeData,
 {
   future: {
     v7_normalizeFormMethod: true
   }
 });
+
+browserRouter.subscribe(updateParamsAtom);
 
 export { routeData, browserRouter };

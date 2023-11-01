@@ -1,60 +1,115 @@
-import { React, useState } from "react";
-import { useAsyncValue } from "react-router-dom";
-import { Stack, Typography, Paper, Button, Chip, Divider, IconButton } from "@mui/material";
+import { React, forwardRef } from "react";
+import { Link as RouterLink, useAsyncValue, useLocation } from "react-router-dom";
+import { Stack, Typography, Paper, Divider, Tooltip, Avatar, useTheme, useMediaQuery } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { HtmlContent } from '../HtmlContent';
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
+import styled from "@emotion/styled";
+import { useTranslation } from "react-i18next";
+import { Person, Schedule } from "@mui/icons-material";
+import { CategoryLabel } from "../tasks/CategoryLabel";
+import { TaskTableFilter } from "../tasks/TaskTableFilter";
+
+const Link = styled(forwardRef(function Link(itemProps, ref) {
+  return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+}))(({theme}) => {
+  return {
+    textDecoration: "none",
+    color: theme.palette.text.primary,
+    "&:hover": {
+      "color": theme.palette.primary.main,
+      "backgroundColor": theme.palette.primary.hover
+    }
+  }
+});
 
 export function AsyncTaskTable() {
+  const { t } = useTranslation(); 
   return (
-    <ContentLayout defaultTitle="Tasks">
-      <AsyncDataRoute>
+    <ContentLayout title={t("Tasks")} disableXsPadding>
+      <AsyncDataRoute skipDataCheck>
         <TaskTable />
       </AsyncDataRoute>
     </ContentLayout>
   );
 }
 
-// testing
 function TaskTable() {
   const tasks = useAsyncValue();
+  const { t } = useTranslation();
+  const { search } = useLocation();
+  const theme = useTheme();
+  const mobileLayout = useMediaQuery(theme.breakpoints.down("md"));
+  const rowVariant = mobileLayout ? "mobile" : "default";
+  const padding = mobileLayout ? 4 : 0;
 
   return (
-    <Paper>
-      <Stack spacing={1} divider={<Divider />} py={1}>
-        {tasks.map((task, index) => <TaskRow key={index} task={task} />)}
-      </Stack>
-    </Paper>
+    <Stack spacing={3}>
+      <TaskTableFilter stackProps={{px: padding}}/>
+      {
+        tasks.count === 0 ?
+          <Typography px={padding}>{t("No tasks found")}</Typography> :
+          <Paper>
+            <Stack divider={<Divider />}>
+              {tasks.items.map((task) => <TaskRow key={task.id} task={task} variant={rowVariant} taskFilter={search}/>)}
+            </Stack>
+          </Paper>
+      }
+    </Stack>
   );
 };
 
-function TaskRow({ task }) {
+function TaskRow({ task, variant, taskFilter }) {
+  const { t } = useTranslation();
+  let stackProps = {
+    direction: "row",
+    alignItems: "center",
+    spacing: 2
+  };
+  let rowInfoSpacing = 0.5;
+  if (variant === "mobile") {
+    stackProps = {
+      spacing: 1,
+      px: 4
+    };
+    rowInfoSpacing = 0.75;
+  }
   return (
-    <Stack direction="row" alignItems="center" spacing={1} px={1}>
-      <TaskButton isCompleted={task.completed !== null} />
-      <Stack spacing={0.5} width={225}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography fontWeight="bold">{task.name}</Typography>
-          <Chip label={task.category} variant="outlined" size="small" sx={{height: 20}}/>
+    <Link to={task.id + ""} state={{task, taskFilter}}>
+      <Stack spacing={2} p={2} {...stackProps}>
+        <Stack spacing={0.5} flex={1}>
+          <CategoryLabel label={task.displayCategory} sx={{height: 20, alignSelf: "start"}}/>
+          <Typography fontWeight="bold" fontSize="1rem">{task.displayName}&nbsp;(#{task.id})</Typography>
         </Stack>
-        <Typography variant="body2">#{task.id} - Assigned on {formatDate(task.scheduled)}</Typography>
+        { task.employee && <RowInfo icon={<Person fontSize="small"/>} label={t("Employee")} spacing={rowInfoSpacing}><Typography>{task.employee.firstName} {task.employee.lastName}</Typography></RowInfo>}
+        { variant !== "mobile" && task.assignedUser && <AssignedUserAvatar user={task.assignedUser} />}
+        <RowInfo icon={<Schedule fontSize="small"/>} label={t("Due on")} spacing={rowInfoSpacing}><Typography>{formatDate(task.scheduled)}</Typography></RowInfo>
       </Stack>
-      <Typography><HtmlContent content={task.instruction} /></Typography>
-    </Stack>
+    </Link>
   );
 }
 
-function TaskButton({isCompleted, onClick}) {
-  const [hover, setHover] = useState(false);
-  const icon = isCompleted ? <CheckCircleIcon /> : 
-    hover ? <CheckCircleOutlinedIcon /> : <CircleOutlinedIcon />;
-  const onMouseEnter = () => setHover(true);
-  const onMouseLeave = () => setHover(false);
+function RowInfo({icon, label, spacing, children}) {
   return (
-     <IconButton color="primary" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>{icon}</IconButton>
-  ); 
+    <Tooltip title={label} placement="top">
+      <Stack direction="row" alignItems="center" spacing={spacing}>
+        {icon}
+        {children}
+      </Stack>
+    </Tooltip>
+  )
 }
+
+function AssignedUserAvatar({user}) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const name = `${user.firstName} ${user.lastName}`;
+  return (
+    <Tooltip title={t("Assignee")} placement="top" >
+      <Avatar sx={{width: 28, height: 28, ...theme.bgColorFromString(name)}}>
+        <Typography variant="body2" lineHeight={1}>{user.firstName[0]}{user.lastName[0]}</Typography>
+      </Avatar>
+    </Tooltip>
+  )
+}
+

@@ -3,8 +3,9 @@ import {
   Divider,
   Toolbar,
   Drawer as MuiDrawer,
-  Typography} from "@mui/material";
-import { forwardRef, useEffect } from "react";
+  Typography,
+  Badge} from "@mui/material";
+import { Suspense, forwardRef, useEffect } from "react";
 import { NavLink as RouterLink, useLoaderData, useLocation } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -21,6 +22,8 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import UserAccountComponent from "./UserAccountComponent";
 import { useTranslation } from "react-i18next";
+import { useAtomValue } from "jotai";
+import { openTasksAtom } from "../../utils/dataAtoms";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -58,6 +61,15 @@ function NavigationItem(props) {
   );
 }
 
+function OpenTasksBadgeIcon() {
+  const icon = <FormatListBulletedIcon />;
+  return (
+    <Suspense fallback={icon}>
+      <BadgeIcon dataAtom={openTasksAtom} icon={icon} />
+    </Suspense>
+  );
+}
+
 function NavigationMenu({children}) {
   return (
     <Box component="nav" sx={{flexGrow: 1, p: 1, overflowY: 'auto'}}>
@@ -77,6 +89,18 @@ function NavigationGroup({ name, children, hidden = false}) {
     </Box>
   );
 }
+
+const badgeSx = {badge: {sx: {height: 16, minWidth: 16, letterSpacing: 0, pl: 0.625, pr: 0.5}}};
+
+function BadgeIcon({dataAtom, icon}) {
+  const data = useAtomValue(dataAtom);
+  return (
+    <Badge badgeContent={data.count} color="primary" slotProps={badgeSx}>
+      {icon}
+    </Badge>
+  )
+}
+
 const drawerWidth = 265;
 function Drawer({ temporary, open, onClose }) {
   const { tenant, user, employee } = useLoaderData();
@@ -118,13 +142,13 @@ function Drawer({ temporary, open, onClose }) {
           </NavigationGroup>
           <NavigationGroup name={t("HR")} hidden={!isHrUser}>
             <NavigationItem label={t("Employees")} to="hr/employees" icon={<PeopleOutlinedIcon />} />
+            <NavigationItem label={t("Tasks")} to="hr/tasks" icon={<OpenTasksBadgeIcon />} />
           </NavigationGroup>
           <NavigationGroup name={t("Company")} hidden={!isHrUser}>
             <NavigationItem label={t("New event")} to="company/new" icon={<AddOutlinedIcon />} />
             <NavigationItem label={t("Data")} to="company/data" icon={<CasesOutlinedIcon />} end />
             <NavigationItem label={t("Events")} to="company/events" icon={<WorkHistoryOutlinedIcon />} end />
             <NavigationItem label={t("Documents")} to="company/documents" icon={<DescriptionOutlinedIcon />} />
-            <NavigationItem label={t("Tasks")} to="company/tasks" icon={<FormatListBulletedIcon />} end />
           </NavigationGroup>
           <NavigationGroup name={t("Employee")} hidden={employee === null}>
             <NavigationItem label={t("New event")} to={`employees/${employee?.id}/new`} icon={<AddOutlinedIcon />} />

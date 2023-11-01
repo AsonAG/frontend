@@ -18,7 +18,7 @@ function Tenants() {
   useDocumentTitle("Ason - Tenants");
   return (
     <Container maxWidth="lg">
-      <ContentLayout defaultTitle={t("Select a company")}>
+      <ContentLayout title={t("Select a company")}>
         <Paper>
           <List>
             {tenants.map(tenant => (
