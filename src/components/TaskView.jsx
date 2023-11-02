@@ -1,6 +1,6 @@
 
 import { React, useRef, useState } from "react";
-import { useAsyncValue, useLocation, Link, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { useAsyncValue, useLocation, Link, useSubmit } from "react-router-dom";
 import { Stack, Typography, Button,  TextField } from "@mui/material";
 import { HtmlContent } from './HtmlContent';
 import { ContentLayout } from "./ContentLayout";
@@ -8,7 +8,6 @@ import { Loading } from "./Loading";
 import { useTranslation } from "react-i18next";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { formatDate } from "../utils/DateUtils";
-import dayjs from "dayjs";
 import { CategoryLabel } from "./tasks/CategoryLabel";
 
 const getTaskTitle = (task) => `${task.displayName} (#${task.id})`;
@@ -37,7 +36,6 @@ function useBacklink() {
 function TaskView() {
   const task = useAsyncValue();
   const { t } = useTranslation();
-  const { user } = useRouteLoaderData("root");
   const submit = useSubmit();
   const title = getTaskTitle(task);
   const taskCompleted = task.completed !== null;
@@ -51,17 +49,14 @@ function TaskView() {
   if (!taskCompleted && comment !== taskComment) {
     buttonText = t("Save comment & complete");
   }
-  const acceptTask = () => submit({...task, assignedUserId: user.id}, { method: "post", encType: "application/json" });
+  const submitPost = (payload) => submit(payload, { method: "post", encType: "application/json", state: {taskCompleted: true} });
+  const acceptTask = () => submitPost({task, action: "accept"});
   const saveTask = (markCompleted) => {
-    let newTask = null;
     if (markCompleted) {
-      newTask = {...task, comment, completedUserId: user.id, completed: dayjs.utc().toISOString()};
+      submitPost({task, comment, action: "complete"});
+    } else {
+      submitPost({task, comment, action: "saveComment"});
     }
-    else {
-      newTask = {...task, comment}
-    }
-    
-    submit(newTask, { method: "post", encType: "application/json" });
   }
 
   return (
