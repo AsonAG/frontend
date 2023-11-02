@@ -1,35 +1,42 @@
 import { atomWithRefresh } from "./atomWithRefresh";
 import { getPayrolls, getTasks, getTenant, getUser } from "../api/FetchClient";
-import { buildParams } from "./routeParamAtoms";
+import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
 import getAuthUser from '../auth/getUser';
 import { atom } from "jotai";
 
-function atomWithTenant(derive, defaultValue = null) {
-  return atomWithRefresh(get => {
-    const params = buildParams(get);
-    if (params.tenantId === null)
-      return defaultValue;
-    return derive({get, params});
-  })
-}
+export const tenantAtom = atom(get => {
+  const tenantId = get(tenantIdAtom);
+  console.log("deriving tenant atom", tenantId);
+  if (tenantId == null) return null;
+  return getTenant({tenantId});
+})
 
-export const tenantAtom = atomWithTenant(({ params }) => getTenant(params));
+export const payrollsAtom = atom(get => {
+  const tenantId = get(tenantIdAtom);
+  if (tenantId == null) return [];
+  return getPayrolls({tenantId});
+})
 
-export const payrollsAtom = atomWithTenant(({ params }) => getPayrolls(params), []);
-
-export const userAtom = atomWithTenant(({ params }) => {
+export const userAtom = atom(get => {
+  const tenantId = get(tenantIdAtom);
+  if (tenantId == null) return null;
   const authUserEmail = getAuthUser()?.profile.email;
-  return getUser(params, authUserEmail);
+  return getUser({tenantId}, authUserEmail);
 });
 
-export const openTasksAtom = atomWithTenant(({ get, params }) => {
+export const openTasksAtom = atomWithRefresh(get => {
+  const tenantId = get(tenantIdAtom);
+  const payrollId = get(payrollIdAtom);
+  if (tenantId === null || payrollId === null)
+    return {count: 0, items: []};
+  
   const user = get(userAtom);
   let orderBy = "completed, scheduled, created";
   if (user !== null) {
     orderBy = `assignedUserId eq ${user.id}, ${orderBy}`;
   }
   const filter = "completed eq null";
-  return getTasks(params, filter, orderBy);
-}, {count: 0, items: []});
+  return getTasks({tenantId, payrollId}, filter, orderBy);
+});
 
 export const showTaskCompletedAlertAtom = atom(false);

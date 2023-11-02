@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 
 export const paramsAtom = atom({tenantId: null, payrollId: null});
 
-export const tenantIdAtom = atom (get => {
+export const tenantIdAtom = atom(get => {
   const params = get(paramsAtom);
   if (!params.tenantId)
     return null;
@@ -15,7 +15,3 @@ export const payrollIdAtom = atom(get => {
     return null;
   return Number(params.payrollId);
 })
-
-export function buildParams(get) {
-  return {tenantId: get(tenantIdAtom), payrollId: get(payrollIdAtom)};
-}

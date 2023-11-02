@@ -52,8 +52,8 @@ const translations = {
         "Accept task": "Task akzeptieren",
         "Instructions": "Anweisungen",
         "Comment": "Kommentar",
-        "Back": "Zurück"
-        
+        "Back": "Zurück",
+        "Task completed!": "Task abgeschlossen!"
     },
 };
 

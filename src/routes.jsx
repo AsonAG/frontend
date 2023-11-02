@@ -47,7 +47,6 @@ async function getTenantData() {
     store.get(payrollsAtom),
     store.get(userAtom)
   ]);
-  console.log(tenant, payrolls, user);
   return { tenant, payrolls, user };
 }
 
@@ -65,7 +64,10 @@ const routeData = [
       {
         path: "tenants",
         element: <Tenants />,
-        loader: getTenants,
+        loader: async () => {
+          await getTenantData(); // reset cache
+          return getTenants();
+        }
       }
     ]
   },
