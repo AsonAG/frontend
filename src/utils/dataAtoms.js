@@ -2,6 +2,7 @@ import { atomWithRefresh } from "./atomWithRefresh";
 import { getPayrolls, getTasks, getTenant, getUser } from "../api/FetchClient";
 import { buildParams } from "./routeParamAtoms";
 import getAuthUser from '../auth/getUser';
+import { atom } from "jotai";
 
 function atomWithTenant(derive, defaultValue = null) {
   return atomWithRefresh(get => {
@@ -30,3 +31,5 @@ export const openTasksAtom = atomWithTenant(({ get, params }) => {
   const filter = "completed eq null";
   return getTasks(params, filter, orderBy);
 }, {count: 0, items: []});
+
+export const showTaskCompletedAlertAtom = atom(false);

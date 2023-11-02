@@ -9,6 +9,7 @@ import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
 import { AsyncEventTable } from "./components/tables/EventTable";
 import getAuthUser from "./auth/getUser";
+import dayjs from "dayjs";
 
 import { App } from "./App";
 
@@ -35,7 +36,7 @@ import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { DocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom, payrollsAtom, tenantAtom, userAtom } from "./utils/dataAtoms";
+import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 
 const store = getDefaultStore();
@@ -162,6 +163,7 @@ const routeData = [
         path: "hr/tasks",
         Component: AsyncTaskTable,
         loader: async ({params, request }) => {
+          console.log("loader request", request);
           const { user } = await getTenantData();
           const [_, queryString] = request.url.split("?");
           const searchParams = new URLSearchParams(queryString);
@@ -189,8 +191,24 @@ const routeData = [
         },
         action: async ({params, request}) => {
           const data = await request.json();
-          const response = await updateTask(params, data);
-          if (response.ok) {
+          const user = await store.get(userAtom);
+          let task = data.task;
+          switch(data.action) {
+            case "accept":
+              task = {...task, assignedUserId: user.id};
+              break;
+            case "complete":
+              task = {...task, comment: data.comment, completedUserId: user.id, completed: dayjs.utc().toISOString()};
+              break;
+            case "saveComment":
+              task = {...task, comment: data.comment};
+              break;
+            default:
+              throw new Error("no action specified");
+          }
+          const response = await updateTask(params, task);
+          if (response.ok && data.action === "complete") {
+            store.set(showTaskCompletedAlertAtom, true);
             return redirect("../hr/tasks");
           }
           return response;
