@@ -7,7 +7,6 @@ import {
   Badge} from "@mui/material";
 import { Suspense, forwardRef, useEffect } from "react";
 import { NavLink as RouterLink, useLoaderData, useLocation } from "react-router-dom";
-import HomeIcon from "@mui/icons-material/Home";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PayrollSelector from "../../components/selectors/PayrollSelector";
@@ -20,7 +19,7 @@ import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
-import UserAccountComponent from "./UserAccountComponent";
+import { UserAccountComponent } from "./UserAccountComponent";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
 import { openTasksAtom } from "../../utils/dataAtoms";
@@ -137,9 +136,6 @@ function Drawer({ temporary, open, onClose }) {
       <Divider />
       <Stack sx={{flexGrow: 1, border: 0, borderRight: 1, borderStyle: 'solid', borderColor: 'divider', overflowY: 'auto'}}>
         <NavigationMenu>
-          <NavigationGroup>
-            <NavigationItem label={t("Dashboard")} to="" icon={<HomeIcon />} end />
-          </NavigationGroup>
           <NavigationGroup name={t("HR")} hidden={!isHrUser}>
             <NavigationItem label={t("Employees")} to="hr/employees" icon={<PeopleOutlinedIcon />} />
             <NavigationItem label={t("Tasks")} to="hr/tasks" icon={<OpenTasksBadgeIcon />} />
@@ -179,7 +175,7 @@ function Drawer({ temporary, open, onClose }) {
           </Stack>
         </Stack>
         <Divider />
-        <UserAccountComponent user={user} sx={{p: 2}} />
+        <UserAccountComponent />
       </Stack>
     </MuiDrawer>
   )

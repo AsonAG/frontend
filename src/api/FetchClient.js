@@ -1,7 +1,8 @@
 import { generatePath } from 'react-router-dom';
-import getAuthUser from '../auth/getUser';
+import { authUserAtom } from '../auth/getUser';
 import { getDefaultStore } from 'jotai';
 import { userAtom } from '../utils/dataAtoms';
+import { useOidc } from '../auth/authConfig';
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const tenantsUrl          = "/tenants";
@@ -39,8 +40,9 @@ class FetchRequestBuilder {
         this.url = baseUrl + generatePath(url, routeParams);
         this.routeParams = routeParams || {};
 
-        if (import.meta.env.PROD) {
-            this.headers.set('Authorization', `Bearer ${getAuthUser()?.access_token}`);
+        if (useOidc) {
+            const authUser = store.get(authUserAtom);
+            this.headers.set('Authorization', `Bearer ${authUser?.access_token}`);
         }
         this.headers.set('Accept', 'application/json');
         this.headers.set('Content-Type', 'application/json');

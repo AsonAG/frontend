@@ -8,7 +8,6 @@ import Dashboard from "./scenes/dashboard";
 import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
 import { AsyncEventTable } from "./components/tables/EventTable";
-import getAuthUser from "./auth/getUser";
 import dayjs from "dayjs";
 
 import { App } from "./App";
@@ -20,7 +19,6 @@ import {
   getEmployee,
   getEmployeeCases,
   getEmployeeCaseValues,
-  getEmployeeByIdentifier,
   getCompanyCases,
   getCompanyCaseValues,
   getDocumentCaseFields,
@@ -36,7 +34,7 @@ import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { DocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom } from "./utils/dataAtoms";
+import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 
 const store = getDefaultStore();
@@ -75,14 +73,12 @@ const routeData = [
     path: "tenants/:tenantId/payrolls/:payrollId?",
     element: <App renderDrawer />,
     loader: async ({ params }) => {
-      console.log("payroll loader");
       const { tenant, payrolls, user } = await getTenantData();
       if (!params.payrollId) {
         return redirect(payrolls[0].id + "");
       }
       const payroll = payrolls.find(p => p.id === Number(params.payrollId));
-      const authUserEmail = getAuthUser()?.profile.email;
-      const employee = await getEmployeeByIdentifier(params, authUserEmail);
+      const employee = await store.get(employeeAtom);
       return { tenant, user, payrolls, payroll, employee };
     },
     shouldRevalidate: ({currentParams, nextParams}) => currentParams.tenantId !== nextParams.tenantId || currentParams.payrollId !== nextParams.payrollId,
@@ -92,6 +88,18 @@ const routeData = [
       {
         index: true,
         Component: Dashboard,
+        loader: async () => {
+          const { user } = await getTenantData();
+          const isHrUser = user?.attributes.roles?.includes("hr");
+          if (isHrUser) {
+            return redirect("hr/tasks");
+          }
+          const employee = await store.get(employeeAtom);
+          if (employee !== null) {
+            return redirect(`employees/${employee.id}/new`);
+          }
+          return null;
+        }
       },
       {
         path: "hr/employees",

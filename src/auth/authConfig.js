@@ -1,6 +1,8 @@
 import { WebStorageStateStore } from "oidc-client-ts"
 
-const authConfig = {
+export const useOidc = import.meta.env.PROD;
+
+export const authConfig = {
   client_id: "210272222781178113@ason",
   response_type: "code",
   response_mode: "query",
@@ -26,6 +28,3 @@ const authConfig = {
     );
   }
 };
-
-
-export default authConfig;
