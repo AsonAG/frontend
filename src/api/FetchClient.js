@@ -1,5 +1,5 @@
 import { generatePath } from 'react-router-dom';
-import { authUserAtom } from '../auth/getUser';
+import { getAuthUser } from '../auth/getUser';
 import { getDefaultStore } from 'jotai';
 import { userAtom } from '../utils/dataAtoms';
 import { useOidc } from '../auth/authConfig';
@@ -41,7 +41,7 @@ class FetchRequestBuilder {
         this.routeParams = routeParams || {};
 
         if (useOidc) {
-            const authUser = store.get(authUserAtom);
+            const authUser = getAuthUser();
             this.headers.set('Authorization', `Bearer ${authUser?.access_token}`);
         }
         this.headers.set('Accept', 'application/json');
