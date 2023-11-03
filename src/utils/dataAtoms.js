@@ -1,10 +1,8 @@
 import { atomWithRefresh } from "./atomWithRefresh";
 import { getPayrolls, getTasks, getTenant, getUser, getEmployeeByIdentifier } from "../api/FetchClient";
 import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
-import { authUserEmailAtom } from '../auth/getUser';
-import { atom, getDefaultStore } from "jotai";
-
-const store = getDefaultStore();
+import { getAuthUser } from '../auth/getUser';
+import { atom } from "jotai";
 
 export const tenantAtom = atom(get => {
   const tenantId = get(tenantIdAtom);
@@ -21,7 +19,7 @@ export const payrollsAtom = atom(get => {
 export const userAtom = atom(get => {
   const tenantId = get(tenantIdAtom);
   if (tenantId == null) return null;
-  const authUserEmail = store.get(authUserEmailAtom);
+  const authUserEmail = getAuthUser()?.profile.email;
   return getUser({tenantId}, authUserEmail);
 });
 
@@ -29,7 +27,7 @@ export const employeeAtom = atom(get => {
   const tenantId = get(tenantIdAtom);
   const payrollId = get(payrollIdAtom);
   if (tenantId === null || payrollId === null);
-  const authUserEmail = store.get(authUserEmailAtom);
+  const authUserEmail = getAuthUser()?.profile.email;
   return getEmployeeByIdentifier({tenantId, payrollId}, authUserEmail);
 });
 

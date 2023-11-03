@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";
-import { authUserEmailAtom } from "../../auth/getUser";
+import { localUserEmailAtom } from "../../auth/getUser";
 import { userAtom } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
 
@@ -49,7 +49,7 @@ function AuthenticatedUserAccountComponent() {
 }
 
 function LocalUserAccountComponent() {
-  const [storedUserEmail, setStoredUserEmail] = useAtom(authUserEmailAtom);
+  const [storedUserEmail, setStoredUserEmail] = useAtom(localUserEmailAtom);
   const theme = useTheme();
   const updateUser = email => {
     setStoredUserEmail(email);
