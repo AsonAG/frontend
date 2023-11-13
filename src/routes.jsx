@@ -24,7 +24,9 @@ import {
   getDocumentCaseFields,
   getTasks,
   getTask,
-  updateTask
+  updateTask,
+  getCompliance,
+  getComplianceDocuments
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -36,6 +38,8 @@ import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
 import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
+import { AsyncComplianceView } from "./components/compliance/ComplianceView";
+import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceSettingsView";
 
 const store = getDefaultStore();
 
@@ -225,6 +229,30 @@ const routeData = [
         }
       },
       {
+        path: "hr/compliance",
+        Component: AsyncComplianceView,
+        loader: ({params}) => {
+          return defer({
+            data: getCompliance(params)
+          });
+        }
+      },
+      {
+        path: "hr/compliance/settings",
+        Component: AsyncComplianceSettingsView,
+        loader: ({params}) => {
+          return defer({
+            data: getCompliance(params)
+          });
+        }
+      },
+      {
+        path: "hr/compliance/documents",
+        loader: ({params}) => {
+          return getComplianceDocuments(params);
+        }
+      },
+      {
         path: "company",
         children: [
           {
@@ -306,6 +334,7 @@ const routeData = [
             Component: AsyncCaseTable,
             loader: ({params}) =>  {
               return defer({
+                title: "Tasks",
                 data: getEmployeeCases(params, "ECT")
               });
             }

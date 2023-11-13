@@ -19,6 +19,10 @@ const employeeDocumentUrl = "/tenants/:tenantId/employees/:employeeId/cases/:cas
 const companyDocumentUrl  = "/tenants/:tenantId/companycases/:caseValueId/documents/:documentId";
 const tasksUrl            = "/tenants/:tenantId/payrolls/:payrollId/tasks";
 const taskUrl             = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
+const complianceUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance";
+const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents";
+const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
+const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
 
 const store = getDefaultStore();
 
@@ -285,4 +289,26 @@ export function getDocument(routeParams) {
         companyDocumentUrl;
 
     return new FetchRequestBuilder(url, routeParams).fetchJson();
+}
+
+export function getCompliance(routeParams) {
+    return new FetchRequestBuilder(complianceUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function getComplianceDocuments(routeParams) {
+    return new FetchRequestBuilder(complianceDocumentsUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function pingCompliance(routeParams) {
+    return new FetchRequestBuilder(compliancePingUrl, routeParams).fetchJson();
+}
+
+export function checkInteroperabilityCompliance(routeParams, secondOperand) {
+    return new FetchRequestBuilder(complianceCheckInteroperabilityUrl, routeParams)
+        .withQueryParam("secondOperand", secondOperand)
+        .fetchJson();
 }

@@ -1,5 +1,5 @@
 import { React } from "react";
-import { useAsyncValue, Link } from "react-router-dom";
+import { useAsyncValue, useLoaderData, Link } from "react-router-dom";
 import { Stack, Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Centered } from "../Centered";
@@ -7,8 +7,11 @@ import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
 
 export function AsyncCaseTable() {
+  const routeData = useLoaderData();
+  const { t } = useTranslation();
+  const title = t(routeData.title || "New event");
   return (
-    <ContentLayout title="New event">
+    <ContentLayout title={title}>
       <AsyncDataRoute>
         <CaseTable />
       </AsyncDataRoute>
