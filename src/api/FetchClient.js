@@ -21,6 +21,7 @@ const tasksUrl            = "/tenants/:tenantId/payrolls/:payrollId/tasks";
 const taskUrl             = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
 const complianceUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance";
 const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents";
+const complianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
 const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
 const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
 
@@ -300,6 +301,19 @@ export function getCompliance(routeParams) {
 export function getComplianceDocuments(routeParams) {
     return new FetchRequestBuilder(complianceDocumentsUrl, routeParams)
         .withLocalization()
+        .fetchJson();
+}
+
+export function getComplianceDocument(routeParams) {
+    return new FetchRequestBuilder(complianceDocumentUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function uploadComplianceDocument(routeParams, document) {
+    return new FetchRequestBuilder(complianceDocumentsUrl, routeParams)
+        .withMethod("POST")
+        .withBody(document)
         .fetchJson();
 }
 

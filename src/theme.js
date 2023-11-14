@@ -56,6 +56,9 @@ function createThemeSettings(mode) {
       },
       button: {
         textTransform: 'none'
+      },
+      code: {
+        fontFamily: '"Source Code Pro"'
       }
     },
     bgColorFromString: (str) => {

@@ -26,7 +26,9 @@ import {
   getTask,
   updateTask,
   getCompliance,
-  getComplianceDocuments
+  getComplianceDocuments,
+  getComplianceDocument,
+  uploadComplianceDocument
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -40,6 +42,8 @@ import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, us
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncComplianceView } from "./components/compliance/ComplianceView";
 import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceSettingsView";
+import { CreateComplianceDocumentView } from "./components/compliance/CreateComplianceDocumentView";
+import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceDocumentView";
 
 const store = getDefaultStore();
 
@@ -250,6 +254,24 @@ const routeData = [
         path: "hr/compliance/documents",
         loader: ({params}) => {
           return getComplianceDocuments(params);
+        }
+      },
+      {
+        path: "hr/compliance/documents/:documentId",
+        Component: AsyncComplianceDocumentView,
+        loader: ({params}) => {
+          return defer({
+            data: getComplianceDocument(params)
+          });
+        }
+      },
+      {
+        path: "hr/compliance/documents/new",
+        Component: CreateComplianceDocumentView,
+        action: async ({params, request}) => {
+          const data = await request.json();
+          const response = await uploadComplianceDocument(params, data);
+          return redirect(`../hr/compliance/documents/${response.id}`)
         }
       },
       {
