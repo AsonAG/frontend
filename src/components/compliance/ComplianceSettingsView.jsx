@@ -26,15 +26,11 @@ function ComplianceSettingsView() {
 
   const ping = async () => {
     const response = await pingCompliance(params);
-    response.request = prettifyXml(response.request);
-    response.response = prettifyXml(response.response);
     setResponse(response);
   }
 
   const check = async () => {
     const response = await checkInteroperabilityCompliance(params, secondOperand);
-    response.request = prettifyXml(response.request);
-    response.response = prettifyXml(response.response);
     setResponse(response);
   }
   

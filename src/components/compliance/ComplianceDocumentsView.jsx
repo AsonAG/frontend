@@ -48,7 +48,7 @@ function ComplianceDocumentCard({ doc }) {
         <Box flex={1} alignContent="center">
           <TextSnippet fontSize="large"/>
         </Box>
-        <Typography whiteSpace="nowrap" textOverflow="ellipsis" overflow="hidden">{doc.name}</Typography>
+        <Typography noWrap>{doc.name}</Typography>
       </Stack>
     </Link>
   );

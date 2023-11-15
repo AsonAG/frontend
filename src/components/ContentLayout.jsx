@@ -9,8 +9,8 @@ export function ContentLayout({ title, disableXsPadding, children, buttons, ...s
 
   return (
     <Stack px={stackSpacingProps} py={4} spacing={2} sx={{ minHeight: "100%", width: "100%", boxSizing: "border-box", ...sxProps }}>
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Typography variant="h2" fontWeight="bold" pb={2} px={headerSpacingProps} flex={1}>{t(title)}</Typography>
+      <Stack direction="row" spacing={2} alignItems="start">
+        <Typography variant="h2" fontWeight="bold" pb={2} px={headerSpacingProps} flex={1} noWrap>{t(title)}</Typography>
         { buttons }
       </Stack>
       {children}

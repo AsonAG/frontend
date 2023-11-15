@@ -1,11 +1,17 @@
 import { Typography } from "@mui/material";
 import { useMemo } from "react";
 
+const codeTypographySx = {
+  whiteSpace: "pre-wrap",
+  wordBreak: "break-word",
+  overflow: "auto"
+};
+
 export function XmlView({ title, xml }) {
   const prettyXml = useMemo(() => prettifyXml(xml), [xml]);
   return <>
     <Typography variant="h6">{title}</Typography>
-    <Typography whiteSpace="pre-wrap" overflow="auto" variant="code">{prettyXml}</Typography>
+    <Typography variant="code" sx={codeTypographySx}>{prettyXml}</Typography>
   </>;
 }
 

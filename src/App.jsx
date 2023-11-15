@@ -52,7 +52,7 @@ export function App({renderDrawer = false}) {
 			<CssBaseline />
 			<Stack className="app" direction="row">
 				{renderDrawer && <Drawer temporary={useTemporaryDrawer} open={drawerOpen} onClose={() => setDrawerOpen(false)} /> }
-				<Stack sx={{flexGrow: 1}} divider={<Divider />}>
+				<Stack sx={{flexGrow: 1, minWidth: 0}} divider={<Divider />}>
 					<Topbar>
 						{drawerButton}
 						{topbarLogo}

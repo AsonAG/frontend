@@ -6,6 +6,7 @@ import { getDocument } from "../api/FetchClient";
 import { ArrowBack, Download } from "@mui/icons-material";
 import { Loading } from "./Loading";
 import { Centered } from "./Centered";
+import { getDataUrl } from "../utils/DocumentUtils";
 
 export function DocumentDialog() {
   const navigate = useNavigate();
@@ -94,8 +95,4 @@ function DownloadButton({url, name, sx}) {
         <Typography>Download</Typography>
     </Fab>
   );
-}
-
-function getDataUrl(document) {
-  return `data:${document.contentType};base64,${document.content}`
 }
