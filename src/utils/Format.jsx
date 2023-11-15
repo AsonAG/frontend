@@ -13,7 +13,7 @@ export function formatCaseValue(caseValue, t) {
 		case "DateTime":
       return formatDate(caseValue.value, true);
 		case "Boolean":
-      return t(caseValue.value ? "Yes" : "No");
+      return t(caseValue.value === "true" ? "Yes" : "No");
 		case "WebResource":
       return <Link href={caseValue.value} target="_blank" rel="noopener">{caseValue.value}</Link>
 		case "Integer":
