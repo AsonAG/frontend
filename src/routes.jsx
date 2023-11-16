@@ -28,7 +28,8 @@ import {
   getCompliance,
   getComplianceDocuments,
   getComplianceDocument,
-  uploadComplianceDocument
+  uploadComplianceDocument,
+  createSubmission
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -40,7 +41,7 @@ import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
 import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
-import { AsyncComplianceView } from "./components/compliance/ComplianceView";
+import { ComplianceView } from "./components/compliance/ComplianceView";
 import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceSettingsView";
 import { CreateComplianceDocumentView } from "./components/compliance/CreateComplianceDocumentView";
 import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceDocumentView";
@@ -234,12 +235,7 @@ const routeData = [
       },
       {
         path: "hr/compliance",
-        Component: AsyncComplianceView,
-        loader: ({params}) => {
-          return defer({
-            data: getCompliance(params)
-          });
-        }
+        Component: ComplianceView,
       },
       {
         path: "hr/compliance/settings",
@@ -263,6 +259,11 @@ const routeData = [
           return defer({
             data: getComplianceDocument(params)
           });
+        },
+        action: async ({request, params}) => {
+          const { isTestCase } = await request.json();
+          const submission = await createSubmission(params, isTestCase);
+          return redirect(`../hr/compliance/submissions/${submission.id}`);
         }
       },
       {

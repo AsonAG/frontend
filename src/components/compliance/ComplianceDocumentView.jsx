@@ -1,12 +1,12 @@
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../ContentLayout";
-import { Button, IconButton, Stack, Menu, MenuItem, ListItemIcon, Link } from "@mui/material";
-import { useAsyncValue, useLocation } from 'react-router-dom';
+import { Button, IconButton, ButtonGroup, Stack, Menu, MenuItem, ListItemIcon, Link, Popper, Paper, ClickAwayListener, Grow, MenuList } from "@mui/material";
+import { useAsyncValue, useLocation, useSubmit } from 'react-router-dom';
 import { XmlView } from "./XmlView";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { base64Decode } from "../../services/converters/BinaryConverter";
-import { DeleteForever, Download, MoreVert } from "@mui/icons-material";
+import { DeleteForever, Download, MoreVert, ArrowDropDown } from "@mui/icons-material";
 import { getDataUrl } from "../../utils/DocumentUtils";
 
 
@@ -48,10 +48,7 @@ function ComplianceDocumentView() {
     <ContentLayout title={doc.name} height="100%" buttons={buttons}>
       <Stack spacing={3} minHeight={0}>
         <XmlView title={t("Content")} xml={docXml} />
-        <Stack direction="row" spacing={2} alignSelf="end">
-          <Button color="primary">{t("Submit as test")}</Button>
-          <Button color="primary" variant="contained">{t("Submit")}</Button>
-        </Stack>
+        <SubmitButton />
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -71,4 +68,75 @@ function ComplianceDocumentView() {
       </Stack>
     </ContentLayout>
   )
+}
+
+
+function SubmitButton() {
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+  const [isTestCase, setIsTestCase] = useState(false);
+  const { t } = useTranslation();
+  const submit = useSubmit();
+
+  const handleClick = () => {
+    submit({isTestCase}, { method: "post", encType: "application/json" });
+  };
+
+  const handleMenuItemClick = (isTestCase) => {
+    setIsTestCase(isTestCase);
+    setOpen(false);
+  };
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+
+    setOpen(false);
+  };
+  const submitLabel = t("Submit");
+  const testCaseSubmitLabel = t("Submit as test case");
+  return (
+    <>
+      <ButtonGroup variant="contained" color="primary" ref={anchorRef} sx={{alignSelf: "end"}}>
+        <Button onClick={handleClick}>{isTestCase ? testCaseSubmitLabel : submitLabel}</Button>
+        <Button size="small" onClick={handleToggle}>
+          <ArrowDropDown />
+        </Button>
+      </ButtonGroup>
+      <Popper
+        sx={{
+          zIndex: 1,
+        }}
+        open={open}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        transition
+        disablePortal
+      >
+        {({ TransitionProps, placement }) => (
+          <Grow
+            {...TransitionProps}
+            style={{
+              transformOrigin:
+                placement === 'bottom' ? 'center top' : 'center bottom',
+            }}
+          >
+            <Paper>
+              <ClickAwayListener onClickAway={handleClose}>
+                <MenuList id="split-button-menu" autoFocusItem>
+                  <MenuItem selected={!isTestCase} onClick={() => handleMenuItemClick(false)}>{submitLabel}</MenuItem>
+                  <MenuItem selected={isTestCase} onClick={() => handleMenuItemClick(true)}>{testCaseSubmitLabel}</MenuItem>
+                </MenuList>
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
+    </>
+  );
 }

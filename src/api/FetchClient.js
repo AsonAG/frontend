@@ -22,6 +22,8 @@ const taskUrl             = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskI
 const complianceUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance";
 const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents";
 const complianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
+const complianceSubmissionsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions";
+const complianceSubmissionUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions/:submissionId";
 const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
 const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
 
@@ -324,5 +326,25 @@ export function pingCompliance(routeParams) {
 export function checkInteroperabilityCompliance(routeParams, secondOperand) {
     return new FetchRequestBuilder(complianceCheckInteroperabilityUrl, routeParams)
         .withQueryParam("secondOperand", secondOperand)
+        .fetchJson();
+}
+
+export function getSubmissions(routeParams) {
+    return new FetchRequestBuilder(complianceSubmissionsUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function getSubmission(routeParams) {
+    return new FetchRequestBuilder(complianceSubmissionUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function createSubmission(routeParams, isTestCase) {
+    return new FetchRequestBuilder(complianceSubmissionsUrl, routeParams)
+        .withMethod("POST")
+        .withQueryParam("isTestCase", isTestCase)
+        .withQueryParam("documentId", routeParams.documentId)
         .fetchJson();
 }
