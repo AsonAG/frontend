@@ -1,24 +1,32 @@
-import { useEffect, forwardRef } from 'react';
-import { Box, Stack, Typography } from "@mui/material";
-import { Link as RouterLink, useFetcher } from 'react-router-dom';
+import { forwardRef, Suspense } from 'react';
+import { Box, Skeleton, Stack, Typography } from "@mui/material";
+import { Link as RouterLink, Await } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { LibraryAdd, TextSnippet } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+import { TextSnippet } from '@mui/icons-material';
 
-export function ComplianceDocumentsView() {
-  const fetcher = useFetcher({key: "compliance-documents"});
+const cardHeight = 100;
+const cardWidth = 200;
 
-  useEffect(() => {
-    if (fetcher.state === "idle" && !fetcher.data)
-      fetcher.load("documents");
-  }, [fetcher]);
+function ItemSkeletion() {
+  return <>
+    <Skeleton width={cardWidth} height={cardHeight} variant="rounded" />
+    <Skeleton width={cardWidth} height={cardHeight} variant="rounded" />
+    <Skeleton width={cardWidth} height={cardHeight} variant="rounded" />
+  </>
+}
 
+function ItemStack(data, path) {
+  return data.map(item => <ComplianceItemCard key={item.id} to={`${path}/${item.id}`} title={item.name} />);
+}
+
+export function ComplianceItemView({dataPromise, path}) {
   return (
-    <Stack direction="row" spacing={2}>
-      {
-        fetcher.data && fetcher.data.map(doc => <ComplianceDocumentCard key={doc.id} doc={doc} />)
-      }
-      <NewCard />
+    <Stack direction="row" spacing={2} flexWrap="wrap">
+      <Suspense fallback={<ItemSkeletion />}>
+        <Await resolve={dataPromise}>
+          {(data) => ItemStack(data, path)}
+        </Await>
+      </Suspense>
     </Stack>
   )
 }
@@ -41,28 +49,14 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
   }
 }));
 
-function ComplianceDocumentCard({ doc }) {
+function ComplianceItemCard({ to, title }) {
   return (
-    <Link to={`documents/${doc.id}`}>
+    <Link to={to}>
       <Stack width="100%">
         <Box flex={1} alignContent="center">
           <TextSnippet fontSize="large"/>
         </Box>
-        <Typography noWrap>{doc.name}</Typography>
-      </Stack>
-    </Link>
-  );
-}
-
-function NewCard() {
-  const { t } = useTranslation();
-  return (
-    <Link to="documents/new" variant="small">
-      <Stack>
-        <Box flex={1} alignContent="center">
-          <LibraryAdd fontSize="large"/>
-        </Box>
-        <Typography>{t("New")}</Typography>
+        <Typography noWrap>{title}</Typography>
       </Stack>
     </Link>
   );

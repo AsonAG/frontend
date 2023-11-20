@@ -24,6 +24,7 @@ const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/complianc
 const complianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
 const complianceSubmissionsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions";
 const complianceSubmissionUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions/:submissionId";
+const complianceSubmissionMessagesUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions/:submissionId/messages";
 const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
 const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
 
@@ -346,5 +347,11 @@ export function createSubmission(routeParams, isTestCase) {
         .withMethod("POST")
         .withQueryParam("isTestCase", isTestCase)
         .withQueryParam("documentId", routeParams.documentId)
+        .fetchJson();
+}
+
+export function getSubmissionMessages(routeParams) {
+    return new FetchRequestBuilder(complianceSubmissionMessagesUrl, routeParams)
+        .withLocalization()
         .fetchJson();
 }

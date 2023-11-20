@@ -1,7 +1,7 @@
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../ContentLayout";
-import { Button, IconButton, ButtonGroup, Stack, Menu, MenuItem, ListItemIcon, Link, Popper, Paper, ClickAwayListener, Grow, MenuList } from "@mui/material";
+import { Button, IconButton, ButtonGroup, Stack, Menu, MenuItem, ListItemIcon, Link, Popper, Paper, ClickAwayListener, Grow, MenuList, Typography } from "@mui/material";
 import { useAsyncValue, useLocation, useSubmit } from 'react-router-dom';
 import { XmlView } from "./XmlView";
 import { useMemo, useState, useRef } from "react";
@@ -48,6 +48,7 @@ function ComplianceDocumentView() {
     <ContentLayout title={doc.name} height="100%" buttons={buttons}>
       <Stack spacing={3} minHeight={0}>
         <XmlView title={t("Content")} xml={docXml} />
+        <Typography sx={{alignSelf: "end"}}>TODO: Substitution</Typography>
         <SubmitButton />
         <Menu
           anchorEl={anchorEl}

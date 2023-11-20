@@ -29,7 +29,10 @@ import {
   getComplianceDocuments,
   getComplianceDocument,
   uploadComplianceDocument,
-  createSubmission
+  createSubmission,
+  getSubmissions,
+  getSubmission,
+  getSubmissionMessages
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -45,6 +48,7 @@ import { ComplianceView } from "./components/compliance/ComplianceView";
 import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceSettingsView";
 import { CreateComplianceDocumentView } from "./components/compliance/CreateComplianceDocumentView";
 import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceDocumentView";
+import { AsyncComplianceSubmissionView } from "./components/compliance/ComplianceSubmissionView";
 
 const store = getDefaultStore();
 
@@ -236,6 +240,12 @@ const routeData = [
       {
         path: "hr/compliance",
         Component: ComplianceView,
+        loader: ({params}) => {
+          return defer({
+            documents: getComplianceDocuments(params),
+            submissions: getSubmissions(params)
+          });
+        }
       },
       {
         path: "hr/compliance/settings",
@@ -273,6 +283,22 @@ const routeData = [
           const data = await request.json();
           const response = await uploadComplianceDocument(params, data);
           return redirect(`../hr/compliance/documents/${response.id}`)
+        }
+      },
+      {
+        path: "hr/compliance/submissions",
+        loader: ({params}) => {
+          return getSubmissions(params);
+        }
+      },
+      {
+        path: "hr/compliance/submissions/:submissionId",
+        Component: AsyncComplianceSubmissionView,
+        loader: ({params}) => {
+          return defer({
+            submission: getSubmission(params),
+            messages: getSubmissionMessages(params)
+          });
         }
       },
       {
