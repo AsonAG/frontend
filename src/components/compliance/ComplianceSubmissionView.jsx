@@ -23,7 +23,6 @@ export function AsyncComplianceSubmissionView() {
       
       <ContentStack>
         <Typography variant="h6">{t("Messages")}</Typography>
-        <LoadingComplianceSubmissionMessages />
         <Suspense fallback={<LoadingComplianceSubmissionMessages />}>
           <Await resolve={loaderData.messages}>
             <ComplianceSubmissionMessages />
