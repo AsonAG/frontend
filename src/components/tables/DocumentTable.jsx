@@ -6,18 +6,17 @@ import {
   Button,
   Paper,
   Collapse,
-  Link,
   CircularProgress
 } from "@mui/material";
 import { React, useState } from "react";
-import { useAsyncValue, Outlet, Link as RouterLink } from "react-router-dom";
+import { useAsyncValue, Outlet } from "react-router-dom";
 import { useDocuments } from "../../hooks/useDocuments";
 import { useTranslation } from "react-i18next";
-import { Attachment, ExpandLess, ExpandMore } from "@mui/icons-material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import dayjs from "dayjs";
 import { ContentLayout } from "../ContentLayout";
-
+import { DocumentLink } from "../DocumentLink";
 
 export function AsyncDocumentTable() {
   return (
@@ -43,22 +42,12 @@ function DocumentTable() {
   );
 };
 
-const documentLinkSx = {
-  textDecoration: 'none',
-  color: (theme) => theme.palette.primary.main,
-}
 function CaseValueRow({ caseValue }) {
   return (
     <Stack pl={0.5}>
       {
         caseValue.documents.map(document => 
-          <Link component={RouterLink} key={document.id} to={`${caseValue.id}/i/${document.id}`} sx={documentLinkSx}>
-            <Stack direction="row" alignItems="center" spacing={0.75}>
-              <Attachment fontSize="small"/>
-              <Typography>{document.name}</Typography>
-            </Stack>
-          </Link>
-        )
+          <DocumentLink key={document.id} name={document.name} to={`${caseValue.id}/i/${document.id}`} />)
       }
     </Stack>
   )

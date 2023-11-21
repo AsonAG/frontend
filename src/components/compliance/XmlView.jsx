@@ -10,7 +10,7 @@ const codeTypographySx = {
 export function XmlView({ title, xml }) {
   const prettyXml = useMemo(() => prettifyXml(xml), [xml]);
   return <>
-    <Typography variant="h6">{title}</Typography>
+    { title && <Typography variant="h6">{title}</Typography> }
     <Typography variant="code" sx={codeTypographySx}>{prettyXml}</Typography>
   </>;
 }

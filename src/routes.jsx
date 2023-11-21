@@ -32,14 +32,15 @@ import {
   createSubmission,
   getSubmissions,
   getSubmission,
-  getSubmissionMessages
+  getSubmissionMessages,
+  getDocument
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncCaseDisplay } from "./scenes/global/CaseDisplay";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
-import { DocumentDialog } from "./components/DocumentDialog";
+import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
 import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom } from "./utils/dataAtoms";
@@ -176,7 +177,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           }
@@ -186,7 +192,6 @@ const routeData = [
         path: "hr/tasks",
         Component: AsyncTaskTable,
         loader: async ({params, request }) => {
-          console.log("loader request", request);
           const { user } = await getTenantData();
           const [_, queryString] = request.url.split("?");
           const searchParams = new URLSearchParams(queryString);
@@ -346,7 +351,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           },
@@ -403,7 +413,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           }
