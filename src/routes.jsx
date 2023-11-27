@@ -33,7 +33,9 @@ import {
   getSubmissions,
   getSubmission,
   getSubmissionMessages,
-  getDocument
+  getDocument,
+  getComplianceSettings,
+  setComplianceSettings
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -257,8 +259,12 @@ const routeData = [
         Component: AsyncComplianceSettingsView,
         loader: ({params}) => {
           return defer({
-            data: getCompliance(params)
+            data: getComplianceSettings(params)
           });
+        },
+        action: async ({request, params}) => {
+          const settings = await request.json();
+          return setComplianceSettings(params, settings);
         }
       },
       {

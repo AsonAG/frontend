@@ -28,7 +28,7 @@ export function DocumentDialog({ documentPromise, onClose }) {
         </Await>
       </Suspense>
       <Divider />
-      <Box sx={{display: "grid", justifyItems: "stretch", alignItems: "stretch", flex: 1 }}>
+      <Box sx={{display: "grid", justifyItems: "stretch", alignItems: "stretch", flex: 1, minHeight: 0 }}>
         <Suspense fallback={<Loading />}>
           <Await resolve={documentPromise}>
             <DocumentView />

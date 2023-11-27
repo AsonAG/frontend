@@ -20,6 +20,7 @@ const companyDocumentUrl  = "/tenants/:tenantId/companycases/:caseValueId/docume
 const tasksUrl            = "/tenants/:tenantId/payrolls/:payrollId/tasks";
 const taskUrl             = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
 const complianceUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance";
+const complianceSettingsUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance/settings";
 const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents";
 const complianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
 const complianceSubmissionsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions";
@@ -298,6 +299,19 @@ export function getDocument(routeParams) {
 export function getCompliance(routeParams) {
     return new FetchRequestBuilder(complianceUrl, routeParams)
         .withLocalization()
+        .fetchJson();
+}
+
+export function getComplianceSettings(routeParams) {
+    return new FetchRequestBuilder(complianceSettingsUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function setComplianceSettings(routeParams, settings) {
+    return new FetchRequestBuilder(complianceSettingsUrl, routeParams)
+        .withMethod("POST")
+        .withBody(settings)
         .fetchJson();
 }
 

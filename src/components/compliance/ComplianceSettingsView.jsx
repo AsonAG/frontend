@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { useReducer, useState, useMemo, useCallback } from 'react';
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../ContentLayout";
 import { Alert, Button, Divider, Stack, TextField, Typography } from "@mui/material";
 import { checkInteroperabilityCompliance, pingCompliance } from "../../api/FetchClient";
-import { useParams } from 'react-router-dom';
+import { Form, useAsyncValue, useParams, useSubmit } from 'react-router-dom';
 import { XmlView } from './XmlView';
+import { ComplianceCertificatePicker } from './ComplianceCertificatePicker';
 
 
 export function AsyncComplianceSettingsView() {
   const { t } = useTranslation();
   return (
-    <ContentLayout title={t("Compliance")} height="100%">
+    <ContentLayout title={t("Settings")} height="100%">
       <AsyncDataRoute skipDataCheck>
         <ComplianceSettingsView />
       </AsyncDataRoute>
@@ -19,7 +20,55 @@ export function AsyncComplianceSettingsView() {
   );
 }
 
+function useSettingsReducer() {
+  const settings = useAsyncValue();
+
+  function reducer(state, action) {
+    if (action.type === "set_monitoring_id") {
+      return {
+        ...state,
+        monitoringId: action.value
+      };
+    }
+    if (action.type === "set_transmitter_certificate_id") {
+      return {
+        ...state,
+        transmitterCertificateId: action.value
+      };
+    }
+    if (action.type === "set_enterprise_certififcate_id") { 
+      return {
+        ...state,
+        uidCertificateId: action.value
+      };
+    }
+
+    throw new Error("invalid action");
+  }
+  
+  return useReducer(reducer, settings);
+}
+
 function ComplianceSettingsView() {
+  const { t } = useTranslation();
+  const [settings, dispatch] = useSettingsReducer();
+  const submit = useSubmit();
+
+  const onSave = () => submit(settings, { method: "post", encType: "application/json" });
+
+  return (
+    <Stack spacing={2}>
+      <Stack spacing={2} direction="row">
+        <TextField label={t("MonitoringId")} value={settings.monitoringId} onChange={e => dispatch({value: e.target.value, type: "set_monitoring_id"})} sx={{flex:1}} />
+        <ComplianceCertificatePicker type="Transmitter" value={settings.transmitterCertificateId} />
+        <ComplianceCertificatePicker type="Enterprise" value={settings.uidCertificateId} />
+      </Stack>
+      <Button variant="contained" sx={{alignSelf: "end"}} onClick={onSave}>{t("Save")}</Button>
+    </Stack>
+  );
+}
+
+function ComplianceTestingView() {
   const params = useParams();
   const [response, setResponse] = useState({});
   const [secondOperand, setSecondOperand] = useState(0.0);
