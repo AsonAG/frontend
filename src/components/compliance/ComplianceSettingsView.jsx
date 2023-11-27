@@ -1,10 +1,10 @@
-import { useReducer, useState, useMemo, useCallback } from 'react';
+import { useReducer, useState } from 'react';
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../ContentLayout";
 import { Alert, Button, Divider, Stack, TextField, Typography } from "@mui/material";
 import { checkInteroperabilityCompliance, pingCompliance } from "../../api/FetchClient";
-import { Form, useAsyncValue, useParams, useSubmit } from 'react-router-dom';
+import { useAsyncValue, useParams, useSubmit } from 'react-router-dom';
 import { XmlView } from './XmlView';
 import { ComplianceCertificatePicker } from './ComplianceCertificatePicker';
 
@@ -20,47 +20,49 @@ export function AsyncComplianceSettingsView() {
   );
 }
 
-function useSettingsReducer() {
-  const settings = useAsyncValue();
-
-  function reducer(state, action) {
-    if (action.type === "set_monitoring_id") {
-      return {
-        ...state,
-        monitoringId: action.value
-      };
-    }
-    if (action.type === "set_transmitter_certificate_id") {
-      return {
-        ...state,
-        transmitterCertificateId: action.value
-      };
-    }
-    if (action.type === "set_enterprise_certififcate_id") { 
-      return {
-        ...state,
-        uidCertificateId: action.value
-      };
-    }
-
-    throw new Error("invalid action");
+function reducer(state, action) {
+  if (action.type === "set_monitoring_id") {
+    return {
+      ...state,
+      monitoringId: action.value
+    };
   }
-  
-  return useReducer(reducer, settings);
+  if (action.type === "set_transmitter_certificate_id") {
+    return {
+      ...state,
+      transmitterCertificateId: action.value
+    };
+  }
+  if (action.type === "set_enterprise_certififcate_id") { 
+    return {
+      ...state,
+      uidCertificateId: action.value
+    };
+  }
+
+  throw new Error("invalid action");
 }
 
 function ComplianceSettingsView() {
   const { t } = useTranslation();
-  const [settings, dispatch] = useSettingsReducer();
+  const loadedSettings = useAsyncValue();
+  const [settings, dispatch] = useReducer(reducer, loadedSettings);
   const submit = useSubmit();
 
   const onSave = () => submit(settings, { method: "post", encType: "application/json" });
 
   return (
     <Stack spacing={2}>
-      <Stack spacing={2} direction="row">
-        <TextField label={t("MonitoringId")} value={settings.monitoringId} onChange={e => dispatch({value: e.target.value, type: "set_monitoring_id"})} sx={{flex:1}} />
+      <Stack spacing={2} direction="row" alignItems="center">
+        <Typography width={170}>{t("Custom MonitoringId")}</Typography>
+        <TextField value={settings.monitoringId} onChange={e => dispatch({value: e.target.value, type: "set_monitoring_id"})} sx={{flex:1}} />
+      </Stack>
+      <Stack spacing={2} direction="row" alignItems="center">
+        <Typography width={170}>{t("Transmitter Certificate")}</Typography>
         <ComplianceCertificatePicker type="Transmitter" value={settings.transmitterCertificateId} />
+      </Stack>
+      <Stack spacing={2} direction="row" alignItems="center">
+        <Typography width={170}>{t("Enterprise Certificate")}</Typography>
         <ComplianceCertificatePicker type="Enterprise" value={settings.uidCertificateId} />
       </Stack>
       <Button variant="contained" sx={{alignSelf: "end"}} onClick={onSave}>{t("Save")}</Button>
