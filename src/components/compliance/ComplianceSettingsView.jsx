@@ -6,7 +6,7 @@ import { Alert, Button, Divider, Stack, TextField, Typography } from "@mui/mater
 import { checkInteroperabilityCompliance, pingCompliance } from "../../api/FetchClient";
 import { useAsyncValue, useParams, useSubmit } from 'react-router-dom';
 import { XmlView } from './XmlView';
-import { ComplianceCertificatePicker } from './ComplianceCertificatePicker';
+import { EnterpriseCertificatePicker, TransmitterCertificatePicker } from './ComplianceCertificatePicker';
 
 
 export function AsyncComplianceSettingsView() {
@@ -27,21 +27,33 @@ function reducer(state, action) {
       monitoringId: action.value
     };
   }
-  if (action.type === "set_transmitter_certificate_id") {
+  if (action.type === "set_transmitter_certificate") {
     return {
       ...state,
-      transmitterCertificateId: action.value
+      transmitterCertificate: action.value
     };
   }
-  if (action.type === "set_enterprise_certififcate_id") { 
+  if (action.type === "set_enterprise_certificate") { 
     return {
       ...state,
-      uidCertificateId: action.value
+      uidCertificate: action.value
     };
   }
 
   throw new Error("invalid action");
 }
+
+// TODO AJO remove this
+const fakeCertificates = [
+  {
+    id: 1,
+    name: "MyCompany.pptx12"
+  },
+  {
+    id: 2,
+    name: "another cert "
+  }
+];
 
 function ComplianceSettingsView() {
   const { t } = useTranslation();
@@ -55,15 +67,15 @@ function ComplianceSettingsView() {
     <Stack spacing={2}>
       <Stack spacing={2} direction="row" alignItems="center">
         <Typography width={170}>{t("Custom MonitoringId")}</Typography>
-        <TextField value={settings.monitoringId} onChange={e => dispatch({value: e.target.value, type: "set_monitoring_id"})} sx={{flex:1}} />
+        <TextField value={settings.monitoringId} placeholder={t("Default MonitoringId")} onChange={e => dispatch({value: e.target.value, type: "set_monitoring_id"})} sx={{flex:1}} />
       </Stack>
       <Stack spacing={2} direction="row" alignItems="center">
         <Typography width={170}>{t("Transmitter Certificate")}</Typography>
-        <ComplianceCertificatePicker type="Transmitter" value={settings.transmitterCertificateId} />
+        <TransmitterCertificatePicker certificates={fakeCertificates} value={settings.transmitterCertificate} setValue={value => dispatch({value, type: "set_transmitter_certificate"})} />
       </Stack>
       <Stack spacing={2} direction="row" alignItems="center">
         <Typography width={170}>{t("Enterprise Certificate")}</Typography>
-        <ComplianceCertificatePicker type="Enterprise" value={settings.uidCertificateId} />
+        <EnterpriseCertificatePicker certificates={fakeCertificates} value={settings.uidCertificate} setValue={value => dispatch({value, type: "set_enterprise_certificate"})} />
       </Stack>
       <Button variant="contained" sx={{alignSelf: "end"}} onClick={onSave}>{t("Save")}</Button>
     </Stack>
