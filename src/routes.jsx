@@ -1,4 +1,3 @@
-
 import * as React from "react";
 
 import { createBrowserRouter, defer, matchRoutes, Navigate, redirect } from "react-router-dom";
@@ -25,7 +24,6 @@ import {
   getTasks,
   getTask,
   updateTask,
-  getCompliance,
   getComplianceDocuments,
   getComplianceDocument,
   uploadComplianceDocument,
@@ -35,7 +33,8 @@ import {
   getSubmissionMessages,
   getDocument,
   getComplianceSettings,
-  setComplianceSettings
+  setComplianceSettings,
+  getComplianceCertificates
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -265,7 +264,21 @@ const routeData = [
         action: async ({request, params}) => {
           const settings = await request.json();
           return setComplianceSettings(params, settings);
-        }
+        },
+        children: [
+          {
+            path: "transmittercertificates",
+            loader: ({params}) => {
+              return getComplianceCertificates(params, "Transmitter");
+            }
+          },
+          {
+            path: "enterprisecertificates",
+            loader: ({params}) => {
+              return getComplianceCertificates(params, "Enterprise");
+            }
+          }
+        ]
       },
       {
         path: "hr/compliance/documents",

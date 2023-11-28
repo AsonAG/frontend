@@ -1,16 +1,17 @@
 import styled from "@emotion/styled";
 import { VpnKey } from "@mui/icons-material";
-import { Button, Typography, Stack, Dialog, DialogTitle, DialogContent, List, ListItemButton as MuiListItemButton, DialogActions, useTheme, useMediaQuery, Divider } from "@mui/material";
-import { useState } from "react";
+import { Button, Typography, Stack, Dialog, DialogTitle, DialogContent, List, ListItemButton as MuiListItemButton, DialogActions, useTheme, useMediaQuery, Divider, Skeleton } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toBase64 } from "../../services/converters/BinaryConverter";
+import { useFetcher } from "react-router-dom";
 
 export function TransmitterCertificatePicker(props) {
-  return <ComplianceCertificatePicker nullValueText={"Default certificate"} {...props} />
+  return <ComplianceCertificatePicker nullValueText={"Default certificate"} certificateType="Transmitter" {...props} />
 }
 
 export function EnterpriseCertificatePicker(props) {
-  return <ComplianceCertificatePicker nullValueText="No certificate" {...props} />
+  return <ComplianceCertificatePicker nullValueText="No certificate" certificateType="Enterprise" {...props} />
 }
 
 const ListItemButton = styled(MuiListItemButton)(({theme}) => ({
@@ -18,6 +19,8 @@ const ListItemButton = styled(MuiListItemButton)(({theme}) => ({
   marginTop: theme.spacing(0.5),
   marginBottom: theme.spacing(0.5)
 }));
+
+function isNew(value) {return value !== null && !value.id}
 
 function ComplianceCertificatePicker(props) {
   const { t } = useTranslation();
@@ -29,8 +32,7 @@ function ComplianceCertificatePicker(props) {
     onClose();
     setValueParent(value);
   }
-  const isNew = value?.id === -1;
-  const titlePrefix = isNew ? t("(New)") : null;
+  const titlePrefix = isNew(value) ? t("(New)") : null;
   return <>
     <Button variant="outlined" sx={{flex: 1, justifyContent: "start"}} startIcon={<VpnKey fontSize="small"/>} onClick={() => setOpen(true)}>
       <Stack alignItems="start">
@@ -48,12 +50,23 @@ const dialogSx = {
   }
 };
 
-function CertificateDialog({certificates, value, setValue, nullValueText, open, onClose}) {
+function CertificateDialog({value, setValue, nullValueText, open, onClose, certificateType}) {
   const { t } = useTranslation();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const uploadedCertificate = value?.id === -1 ?
+  const fetcher = useFetcher();
+  const uploadedCertificate = isNew(value) ?
     <ListItemButton selected>{t("(New)")} {value.name}</ListItemButton> : null;
+
+  useEffect(() => {
+    if (!open) {
+      fetcher.data = null;
+    } else if (open && fetcher.state === "idle" && !fetcher.data) {
+      const url = certificateType === "Transmitter" ? "transmittercertificates" : "enterprisecertificates";
+      fetcher.load(url);
+    }
+  }, [open, fetcher]);
+  
   return (
     <Dialog open={open}
       sx={dialogSx}
@@ -69,11 +82,14 @@ function CertificateDialog({certificates, value, setValue, nullValueText, open, 
         <List sx={{px: 1}}>
           <ListItemButton selected={!value} onClick={() => setValue(null)}>{nullValueText}</ListItemButton>
           {
-            certificates.map(cert => 
-              <ListItemButton key={cert.id} selected={cert.id === value?.id} onClick={() => setValue(cert)}>
-                {cert.name}
-              </ListItemButton>
-          )
+            fetcher.data ? 
+              fetcher.data.map(cert => 
+                <ListItemButton key={cert.id} selected={cert.id === value?.id} onClick={() => setValue(cert)}>
+                  {cert.name}
+                </ListItemButton>
+              )
+              :
+              Array(3).fill(<Skeleton width="100%"><ListItemButton>Test</ListItemButton></Skeleton>)
           }
         </List>
       </DialogContent>
@@ -106,7 +122,6 @@ function UploadCertificateButton({setValue}) {
     const data = await toBase64(file);
     console.log("setting new certificate ");
     setValue({
-      id: -1,
       name: file.name,
       content: data
     });

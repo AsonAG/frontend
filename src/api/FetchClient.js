@@ -21,6 +21,7 @@ const tasksUrl            = "/tenants/:tenantId/payrolls/:payrollId/tasks";
 const taskUrl             = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
 const complianceUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance";
 const complianceSettingsUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance/settings";
+const complianceCertificatesUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance/certificates";
 const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents";
 const complianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
 const complianceSubmissionsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions";
@@ -304,7 +305,6 @@ export function getCompliance(routeParams) {
 
 export function getComplianceSettings(routeParams) {
     return new FetchRequestBuilder(complianceSettingsUrl, routeParams)
-        .withLocalization()
         .fetchJson();
 }
 
@@ -315,15 +315,19 @@ export function setComplianceSettings(routeParams, settings) {
         .fetchJson();
 }
 
+export function getComplianceCertificates(routeParams, type) {
+    return new FetchRequestBuilder(complianceCertificatesUrl, routeParams)
+        .withQueryParam("filter", `certificateType eq '${type}'`)
+        .fetchJson();
+}
+
 export function getComplianceDocuments(routeParams) {
     return new FetchRequestBuilder(complianceDocumentsUrl, routeParams)
-        .withLocalization()
         .fetchJson();
 }
 
 export function getComplianceDocument(routeParams) {
     return new FetchRequestBuilder(complianceDocumentUrl, routeParams)
-        .withLocalization()
         .fetchJson();
 }
 
