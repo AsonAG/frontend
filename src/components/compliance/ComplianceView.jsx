@@ -3,7 +3,7 @@ import { ContentLayout } from "../ContentLayout";
 import { IconButton, Stack, Typography } from "@mui/material";
 import { Link, useLoaderData } from 'react-router-dom';
 import { Settings } from '@mui/icons-material';
-import { ComplianceItemView } from "./ComplianceDocumentsView";
+import { ComplianceItemCard, ComplianceItemView } from "./ComplianceDocumentsView";
 
 
 export function ComplianceView() {
@@ -14,7 +14,9 @@ export function ComplianceView() {
     <ContentLayout title={t("Compliance")} height="100%" buttons={button}>
       <Stack spacing={3}>
         <Typography variant="h6">{t("Documents")}</Typography>
-        <ComplianceItemView dataPromise={routeData.documents} path="documents"/>
+        <ComplianceItemView dataPromise={routeData.documents} path="documents">
+          <ComplianceItemCard to="documents/new" title={t("New document")} />
+        </ComplianceItemView>
         <Typography variant="h6">{t("Submissions")}</Typography>
         <ComplianceItemView dataPromise={routeData.submissions} path="submissions"/>
       </Stack>

@@ -7,24 +7,28 @@ import { TextSnippet } from '@mui/icons-material';
 const cardHeight = 100;
 const cardWidth = 200;
 
-function ItemSkeletion() {
+function ItemSkeletion({children}) {
   return <>
+    {children}
     <Skeleton width={cardWidth} height={cardHeight} variant="rounded" />
     <Skeleton width={cardWidth} height={cardHeight} variant="rounded" />
     <Skeleton width={cardWidth} height={cardHeight} variant="rounded" />
   </>
 }
 
-function ItemStack(data, path) {
-  return data.map(item => <ComplianceItemCard key={item.id} to={`${path}/${item.id}`} title={item.name} />);
+function ItemStack({data, path, children}) {
+  return <>
+    {children}
+    {data.map(item => <ComplianceItemCard key={item.id} to={`${path}/${item.id}`} title={item.name} />)}
+  </>;
 }
 
-export function ComplianceItemView({dataPromise, path}) {
+export function ComplianceItemView({dataPromise, path, children}) {
   return (
     <Stack direction="row" spacing={2} flexWrap="wrap">
-      <Suspense fallback={<ItemSkeletion />}>
+      <Suspense fallback={<ItemSkeletion>{children}</ItemSkeletion>}>
         <Await resolve={dataPromise}>
-          {(data) => ItemStack(data, path)}
+          {(data) => <ItemStack data={data} path={path} children={children} />}
         </Await>
       </Suspense>
     </Stack>
@@ -49,7 +53,7 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
   }
 }));
 
-function ComplianceItemCard({ to, title }) {
+export function ComplianceItemCard({ to, title }) {
   return (
     <Link to={to}>
       <Stack width="100%">

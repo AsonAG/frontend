@@ -30,7 +30,7 @@ import {
   createSubmission,
   getSubmissions,
   getSubmission,
-  getSubmissionMessages,
+  getComplianceMessages,
   getDocument,
   getComplianceSettings,
   setComplianceSettings,
@@ -321,7 +321,7 @@ const routeData = [
         loader: ({params}) => {
           return defer({
             submission: getSubmission(params),
-            messages: getSubmissionMessages(params)
+            messages: getComplianceMessages(params)
           });
         }
       },

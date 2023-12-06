@@ -26,7 +26,7 @@ const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/complianc
 const complianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
 const complianceSubmissionsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions";
 const complianceSubmissionUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions/:submissionId";
-const complianceSubmissionMessagesUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions/:submissionId/messages";
+const complianceMessagesUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/messages";
 const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
 const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
 
@@ -350,6 +350,7 @@ export function checkInteroperabilityCompliance(routeParams, secondOperand) {
 
 export function getSubmissions(routeParams) {
     return new FetchRequestBuilder(complianceSubmissionsUrl, routeParams)
+        .withQueryParam("orderBy", "created desc")
         .withLocalization()
         .fetchJson();
 }
@@ -368,8 +369,10 @@ export function createSubmission(routeParams, isTestCase) {
         .fetchJson();
 }
 
-export function getSubmissionMessages(routeParams) {
-    return new FetchRequestBuilder(complianceSubmissionMessagesUrl, routeParams)
+export function getComplianceMessages(routeParams) {
+    return new FetchRequestBuilder(complianceMessagesUrl, routeParams)
+        .withQueryParam("filter", `submissionId eq '${routeParams.submissionId}'`)
+        .withQueryParam("orderBy", "created desc")
         .withLocalization()
         .fetchJson();
 }

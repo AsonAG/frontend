@@ -1,11 +1,9 @@
 import { ContentLayout, ContentStack } from "../ContentLayout";
 import { useTranslation } from "react-i18next";
 import { useLocation, Await, useLoaderData, useAsyncValue } from "react-router-dom";
-import { Skeleton, Typography, Stack, Paper } from "@mui/material";
-import { Suspense, useState } from "react";
-import { formatDate } from "../../utils/DateUtils";
-import { DocumentLink } from "../DocumentLink";
-import { DocumentDialog } from "../DocumentDialog";
+import { Skeleton, Typography, Stack } from "@mui/material";
+import { Suspense } from "react";
+import { ComplianceMessage } from "./ComplianceMessage";
 
 
 export function AsyncComplianceSubmissionView() {
@@ -23,9 +21,9 @@ export function AsyncComplianceSubmissionView() {
       
       <ContentStack>
         <Typography variant="h6">{t("Messages")}</Typography>
-        <Suspense fallback={<LoadingComplianceSubmissionMessages />}>
+        <Suspense fallback={<LoadingComplianceMessages />}>
           <Await resolve={loaderData.messages}>
-            <ComplianceSubmissionMessages />
+            <ComplianceMessages />
           </Await>
         </Suspense>
       </ContentStack>
@@ -45,32 +43,12 @@ function ComplianceSubmissionDetails(submission) {
   )
 }
 
-function SubmissionMessage({message}) {
-  const { t } = useTranslation();
-  const [document, setDocument] = useState(null);
-  const toXmlDoc = name => ({name, content: message[name], contentType: "text/xml" });
-  return (
-    <Stack component={Paper} spacing={1} p={2}>
-      <Typography fontWeight="bold" noWrap flex={1}>{message.messageKind}</Typography>
-      <Typography>{formatDate(message.created, true)}</Typography>
-      <Stack direction="row" spacing={3} flexWrap="wrap">
-        <DocumentLink name={t("Signed request")} component="button" onClick={() => setDocument(toXmlDoc("signedRequest"))} />
-        <DocumentLink name={t("Signed response")} state={message} onClick={() => setDocument(toXmlDoc("signedResponse"))}/>
-        <DocumentLink name={t("Encrypted request")} state={message} onClick={() => setDocument(toXmlDoc("encryptedRequest"))}/>
-        <DocumentLink name={t("Encrypted response")} state={message} onClick={() => setDocument(toXmlDoc("encryptedResponse"))}/>
-      </Stack>
-      { document && <DocumentDialog documentPromise={Promise.resolve(document)} onClose={() => setDocument(null)} /> }
-    </Stack>
-  );
-}
-
-
-function ComplianceSubmissionMessages() {
+function ComplianceMessages() {
   const messages = useAsyncValue();
-  return messages.map(msg => <SubmissionMessage key={msg.id} message={msg} />);
+  return messages.map(msg => <ComplianceMessage key={msg.id} message={msg} />);
 }
 
-function LoadingComplianceSubmissionMessages() {
+function LoadingComplianceMessages() {
   return <>
     <Skeleton variant="rectangular" height="110px" />
     <Skeleton variant="rectangular" height="110px" />

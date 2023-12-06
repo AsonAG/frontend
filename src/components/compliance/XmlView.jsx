@@ -7,11 +7,11 @@ const codeTypographySx = {
   overflow: "auto"
 };
 
-export function XmlView({ title, xml }) {
+export function XmlView({ title, xml, codeProps }) {
   const prettyXml = useMemo(() => prettifyXml(xml), [xml]);
   return <>
     { title && <Typography variant="h6">{title}</Typography> }
-    <Typography variant="code" sx={codeTypographySx}>{prettyXml}</Typography>
+    <Typography variant="code" sx={{...codeProps, ...codeTypographySx}}>{prettyXml}</Typography>
   </>;
 }
 
@@ -28,6 +28,9 @@ const xlstTemplate = `
 
 function prettifyXml(sourceXml)
 {
+  if (!sourceXml) {
+    return "";
+  }
   var xmlDoc = new DOMParser().parseFromString(sourceXml, 'application/xml');
   var xsltDoc = new DOMParser().parseFromString(xlstTemplate, 'application/xml');
 

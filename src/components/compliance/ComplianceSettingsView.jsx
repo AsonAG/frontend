@@ -21,7 +21,14 @@ export function AsyncComplianceSettingsView() {
     <ContentLayout title={t("Settings")} height="100%">
       <Suspense fallback={<Loading />}>
         <Await resolve={routeData.data} errorElement={<ErrorView />}>
-          {(data) => <ComplianceSettingsView key={getSettingsKey(data)} loadedSettings={data} />}
+          {
+            (data) => 
+              <Stack spacing={4}>
+                <ComplianceSettingsView key={getSettingsKey(data)} loadedSettings={data} />
+                <Divider />
+                <ComplianceTestingView />
+              </Stack>
+          }
         </Await>
       </Suspense>
     </ContentLayout>
@@ -29,6 +36,12 @@ export function AsyncComplianceSettingsView() {
 }
 
 function reducer(state, action) {
+  if (action.type === "set_submission_url") {
+    return {
+      ...state,
+      submissionUrl: action.value
+    };
+  }
   if (action.type === "set_monitoring_id") {
     return {
       ...state,
@@ -55,12 +68,15 @@ function ComplianceSettingsView({loadedSettings}) {
   const { t } = useTranslation();
   const [settings, dispatch] = useReducer(reducer, loadedSettings);
   const submit = useSubmit();
-  console.log("rendering settings VIew");
 
   const onSave = () => submit(settings, { method: "post", encType: "application/json" });
 
   return (
     <Stack spacing={2}>
+      <Stack spacing={2} direction="row" alignItems="center">
+        <Typography width={170}>{t("Custom Submission Url")}</Typography>
+        <TextField value={settings.submissionUrl|| ""} placeholder={t("Default Submission Url")} onChange={e => dispatch({value: e.target.value, type: "set_submission_url"})} sx={{flex:1}} />
+      </Stack>
       <Stack spacing={2} direction="row" alignItems="center">
         <Typography width={170}>{t("Custom MonitoringId")}</Typography>
         <TextField value={settings.monitoringId || ""} placeholder={t("Default MonitoringId")} onChange={e => dispatch({value: e.target.value, type: "set_monitoring_id"})} sx={{flex:1}} />
@@ -94,7 +110,7 @@ function ComplianceTestingView() {
   }
   
   return (
-    <Stack spacing={2} height="90%">
+    <Stack spacing={2}>
       <Stack direction="row" spacing={2} divider={<Divider orientation="vertical" />}>
         <Button variant="contained" onClick={ping}>Ping</Button>
         <Stack direction="row" spacing={2}>
@@ -102,9 +118,9 @@ function ComplianceTestingView() {
           <Button variant="contained" onClick={check}>CheckInteroperability</Button>
         </Stack>
       </Stack>
-      { response.error && <Alert severity="error" variant="filled"><Typography>{response.error}</Typography></Alert>}
-      <XmlView title="Request" xml={response.request} />
-      <XmlView title="Response" xml={response.response} />
+      { response.errors && <Alert severity="error" variant="filled"><Typography>{response.errors}</Typography></Alert>}
+      <XmlView title="Request" xml={response.request} codeProps={{flexBasis: "200px"}} />
+      <XmlView title="Response" xml={response.response} codeProps={{flexBasis: "200px"}} />
     </Stack>
   )
 }
