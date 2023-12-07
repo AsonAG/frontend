@@ -326,8 +326,9 @@ export function getComplianceDocuments(routeParams) {
         .fetchJson();
 }
 
-export function getComplianceDocument(routeParams) {
+export function getComplianceDocument(routeParams, asPdf) {
     return new FetchRequestBuilder(complianceDocumentUrl, routeParams)
+        .withQueryParam("asPdf", asPdf)
         .fetchJson();
 }
 
@@ -370,8 +371,9 @@ export function createSubmission(routeParams, isTestCase) {
 }
 
 export function getComplianceMessages(routeParams) {
+    const submissionFilter = routeParams.submissionId ? `submissionId eq '${routeParams.submissionId}'` : null;
     return new FetchRequestBuilder(complianceMessagesUrl, routeParams)
-        .withQueryParam("filter", `submissionId eq '${routeParams.submissionId}'`)
+        .withQueryParam("filter", submissionFilter)
         .withQueryParam("orderBy", "created desc")
         .withLocalization()
         .fetchJson();

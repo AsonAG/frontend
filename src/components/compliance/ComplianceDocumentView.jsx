@@ -6,7 +6,7 @@ import { useAsyncValue, useLocation, useSubmit } from 'react-router-dom';
 import { XmlView } from "./XmlView";
 import { useMemo, useState, useRef } from "react";
 import { base64Decode } from "../../services/converters/BinaryConverter";
-import { DeleteForever, Download, MoreVert, ArrowDropDown } from "@mui/icons-material";
+import { DeleteForever, Download, MoreVert, ArrowDropDown, PictureAsPdf } from "@mui/icons-material";
 import { getDataUrl } from "../../utils/DocumentUtils";
 
 
@@ -31,12 +31,17 @@ function ComplianceDocumentView() {
   const doc = useAsyncValue();
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const [showPdf, setShowPdf] = useState(false);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleShowPdf = () => {
+    handleClose();
+    setShowPdf(true);
+  }
  
   const docXml = useMemo(() => base64Decode(doc.content), [doc.content]);
 
@@ -61,11 +66,16 @@ function ComplianceDocumentView() {
               Download
             </MenuItem>
           </Link>
+          <MenuItem onClick={handleShowPdf}>
+            <ListItemIcon><PictureAsPdf fontSize="small"/></ListItemIcon>
+            Display PDF
+          </MenuItem>
           <MenuItem onClick={handleClose} sx={destructiveMenuItem}>
             <ListItemIcon sx={destructiveMenuItem}><DeleteForever fontSize="small"/></ListItemIcon>
             Delete
           </MenuItem>
         </Menu>
+        { showPdf && <DocumentDialog documentPromise={pdfPromise} onClose={() => setShowPdf(false)} />}
       </Stack>
     </ContentLayout>
   )

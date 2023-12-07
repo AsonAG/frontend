@@ -249,7 +249,8 @@ const routeData = [
         loader: ({params}) => {
           return defer({
             documents: getComplianceDocuments(params),
-            submissions: getSubmissions(params)
+            submissions: getSubmissions(params),
+            messages: getComplianceMessages(params)
           });
         }
       },
@@ -291,7 +292,9 @@ const routeData = [
         Component: AsyncComplianceDocumentView,
         loader: ({params}) => {
           return defer({
-            data: getComplianceDocument(params)
+            data: getComplianceDocument(params),
+            // TODO AJO fix pdf 
+            pdfPromise: getComplianceDocument(params)
           });
         },
         action: async ({request, params}) => {

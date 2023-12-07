@@ -4,6 +4,7 @@ import { IconButton, Stack, Typography } from "@mui/material";
 import { Link, useLoaderData } from 'react-router-dom';
 import { Settings } from '@mui/icons-material';
 import { ComplianceItemCard, ComplianceItemView } from "./ComplianceDocumentsView";
+import { ComplianceMessagesView } from "./ComplianceSubmissionView";
 
 
 export function ComplianceView() {
@@ -19,6 +20,7 @@ export function ComplianceView() {
         </ComplianceItemView>
         <Typography variant="h6">{t("Submissions")}</Typography>
         <ComplianceItemView dataPromise={routeData.submissions} path="submissions"/>
+        <ComplianceMessagesView messagesPromise={routeData.messages} />
       </Stack>
     </ContentLayout>
   );

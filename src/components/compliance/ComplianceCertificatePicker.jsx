@@ -89,7 +89,11 @@ function CertificateDialog({value, setValue, nullValueText, open, onClose, certi
                 </ListItemButton>
               )
               :
-              Array(3).fill(<Skeleton width="100%"><ListItemButton>Test</ListItemButton></Skeleton>)
+              <>
+                <Skeleton width="100%"><ListItemButton>Test</ListItemButton></Skeleton>
+                <Skeleton width="100%"><ListItemButton>Test</ListItemButton></Skeleton>
+                <Skeleton width="100%"><ListItemButton>Test</ListItemButton></Skeleton>
+              </>
           }
         </List>
       </DialogContent>

@@ -9,7 +9,6 @@ import { ComplianceMessage } from "./ComplianceMessage";
 export function AsyncComplianceSubmissionView() {
   const { state } = useLocation();
   const loaderData = useLoaderData();
-  const { t } = useTranslation();
   const detailLoading = ComplianceSubmissionDetails(state?.submission);
   return (
     <Stack>
@@ -20,12 +19,7 @@ export function AsyncComplianceSubmissionView() {
       </Suspense>
       
       <ContentStack>
-        <Typography variant="h6">{t("Messages")}</Typography>
-        <Suspense fallback={<LoadingComplianceMessages />}>
-          <Await resolve={loaderData.messages}>
-            <ComplianceMessages />
-          </Await>
-        </Suspense>
+        <ComplianceMessagesView messagesPromise={loaderData.messages} />
       </ContentStack>
     </Stack>
   );
@@ -36,9 +30,9 @@ function ComplianceSubmissionDetails(submission) {
   return (
     <ContentLayout title={submission ? submission.name : <Skeleton />}>
       <Typography variant="h6">{t("Status")}</Typography>
-      <Typography>{t("In Progress")}</Typography>
+      <Typography>{submission ? t(submission.submissionStatus) : <Skeleton />}</Typography>
       <Typography variant="h6">{t("DeclarationId")}</Typography>
-      <Typography>{submission ? submission.declarationId : <Skeleton />}</Typography>
+      <Typography>{submission ? submission.declarationId ?? "No declaration id" : <Skeleton />}</Typography>
     </ContentLayout>
   )
 }
@@ -46,6 +40,18 @@ function ComplianceSubmissionDetails(submission) {
 function ComplianceMessages() {
   const messages = useAsyncValue();
   return messages.map(msg => <ComplianceMessage key={msg.id} message={msg} />);
+}
+
+export function ComplianceMessagesView({messagesPromise}) {
+  const { t } = useTranslation();
+  return <>
+    <Typography variant="h6">{t("Messages")}</Typography>
+    <Suspense fallback={<LoadingComplianceMessages />}>
+      <Await resolve={messagesPromise}>
+        <ComplianceMessages />
+      </Await>
+    </Suspense>
+  </>
 }
 
 function LoadingComplianceMessages() {
