@@ -293,8 +293,7 @@ const routeData = [
         loader: ({params}) => {
           return defer({
             data: getComplianceDocument(params),
-            // TODO AJO fix pdf 
-            pdfPromise: getComplianceDocument(params)
+            pdfPromise: getComplianceDocument(params, true)
           });
         },
         action: async ({request, params}) => {

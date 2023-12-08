@@ -2,12 +2,13 @@ import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../ContentLayout";
 import { Button, IconButton, ButtonGroup, Stack, Menu, MenuItem, ListItemIcon, Link, Popper, Paper, ClickAwayListener, Grow, MenuList, Typography } from "@mui/material";
-import { useAsyncValue, useLocation, useSubmit } from 'react-router-dom';
+import { useAsyncValue, useLoaderData, useLocation, useSubmit } from 'react-router-dom';
 import { XmlView } from "./XmlView";
 import { useMemo, useState, useRef } from "react";
 import { base64Decode } from "../../services/converters/BinaryConverter";
 import { DeleteForever, Download, MoreVert, ArrowDropDown, PictureAsPdf } from "@mui/icons-material";
 import { getDataUrl } from "../../utils/DocumentUtils";
+import { DocumentDialog } from "../DocumentDialog";
 
 
 export function AsyncComplianceDocumentView() {
@@ -29,6 +30,7 @@ const destructiveMenuItem = {
 function ComplianceDocumentView() {
   const { t } = useTranslation();
   const doc = useAsyncValue();
+  const { pdfPromise } = useLoaderData();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [showPdf, setShowPdf] = useState(false);
