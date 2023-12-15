@@ -19,6 +19,7 @@ export function AsyncDataRoute({ children, loadingElement, skipDataCheck }) {
 }
 
 function hasData(value) {
+  console.log(value);
   if (Array.isArray(value)) {
     return value.length > 0;
   }

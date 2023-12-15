@@ -22,9 +22,15 @@ import {
   getCompanyCases,
   getCompanyCaseValues,
   getDocumentCaseFields,
+  getPayruns,
+  getPayrunJobs,
+  getDraftPayrunJobs,
   getTasks,
   getTask,
-  updateTask
+  updateTask,
+  getPayrun,
+  getPayrunParameters,
+  startPayrunJob
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -36,6 +42,10 @@ import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
 import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
+import { AsyncPayrunsView } from "./components/PayrunsView";
+import { AsyncPayrunJobsView } from "./components/PayrunJobsView";
+import { AsyncPayrunView } from "./components/PayrunView";
+import { AsyncNewPayrunView } from "./components/NewPayrunView";
 
 const store = getDefaultStore();
 
@@ -222,6 +232,57 @@ const routeData = [
             return redirect("../hr/tasks");
           }
           return response;
+        }
+      },
+      {
+        path: "hr/payruns",
+        Component: AsyncPayrunsView,
+        loader: ({params}) => {
+          return defer({
+            data: getPayruns(params)
+          });
+        },
+        children: [
+          {
+            path: ":payrunId",
+            Component: AsyncPayrunView,
+            loader: ({params}) => {
+              return defer({
+                data: getDraftPayrunJobs(params),
+                // TODO AJO parameters & employees
+              });
+            },
+            children: [
+              {
+                path: "jobs",
+                Component: AsyncPayrunJobsView,
+                loader: ({params}) => {
+                  return defer({
+                    data: getPayrunJobs(params)
+                  });
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        path: "hr/payruns/:payrunId/new",
+        Component: AsyncNewPayrunView,
+        loader: async ({params}) => {
+          return defer({
+            payrun: await getPayrun(params),
+            data: Promise.all([getPayrunParameters(params), getEmployees(params)])
+          });
+        },
+        action: async ({params, request}) => {
+          var invocation = await request.json();
+          var response = await startPayrunJob(params, invocation);
+          if (response.status === 201) {
+            var payrunJob = await response.json();
+            return redirect(`hr/payruns/${payrunJob.payrunId}`);
+          }
+          /// TODO AJO do something here
         }
       },
       {
