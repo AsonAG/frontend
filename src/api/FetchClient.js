@@ -23,6 +23,7 @@ const payrunsUrl          = "/tenants/:tenantId/payruns";
 const payrunUrl           = "/tenants/:tenantId/payruns/:payrunId";
 const payrunParametersUrl = "/tenants/:tenantId/payruns/:payrunId/parameters";
 const payrunJobsUrl       = "/tenants/:tenantId/payruns/jobs";
+const payrunJobStatusUrl  = "/tenants/:tenantId/payruns/jobs/:payrunJobId/status";
 
 const store = getDefaultStore();
 
@@ -256,6 +257,15 @@ export function startPayrunJob(routeParams, jobInvocation) {
     return new FetchRequestBuilder(payrunJobsUrl, routeParams)
         .withMethod("POST")
         .withBody(jobInvocation)
+        .withTimout(10 * 60 * 1000)
+        .fetch();
+}
+
+export function changePayrunJobStatus(routeParams, newStatus) {
+    console.log(routeParams);
+    return new FetchRequestBuilder(payrunJobStatusUrl, routeParams)
+        .withMethod("POST")
+        .withBody(newStatus)
         .fetch();
 }
 

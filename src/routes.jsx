@@ -30,7 +30,8 @@ import {
   updateTask,
   getPayrun,
   getPayrunParameters,
-  startPayrunJob
+  startPayrunJob,
+  changePayrunJobStatus
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -252,6 +253,14 @@ const routeData = [
                 // TODO AJO parameters & employees
               });
             },
+            action: async ({params, request}) => {
+              const action = await request.json();
+              if (action.type === "change_status") {
+                // TODO AJO what to do
+                await changePayrunJobStatus({...params, payrunJobId: action.jobId}, action.status);
+              }
+              return null;
+            },
             children: [
               {
                 path: "jobs",
@@ -280,7 +289,7 @@ const routeData = [
           var response = await startPayrunJob(params, invocation);
           if (response.status === 201) {
             var payrunJob = await response.json();
-            return redirect(`hr/payruns/${payrunJob.payrunId}`);
+            return redirect(`../hr/payruns/${payrunJob.payrunId}`);
           }
           /// TODO AJO do something here
         }

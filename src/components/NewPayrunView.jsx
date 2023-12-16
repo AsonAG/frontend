@@ -1,12 +1,13 @@
 import { React, useMemo, useReducer } from "react";
 import { useAsyncValue, useLoaderData, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Button, Checkbox, FormControl, FormControlLabel, Stack, TextField, Typography } from "@mui/material";
+import { Button, Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { ContentLayout } from "./ContentLayout";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getDateLocale } from "../services/converters/DateLocaleExtractor";
+import { NavigateBefore, NavigateNext } from "@mui/icons-material";
 
 export function AsyncNewPayrunView() {
   const { payrun } = useLoaderData();
@@ -46,19 +47,27 @@ function NewPayrunView({payrun}) {
 
   return (
     <Stack spacing={2}>
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
-        <DatePicker
-          label="Period"
-          value={state.period}
-          onChange={newDate => dispatch({type: "set_period", value: newDate})}
-          timezone="UTC"
-          openTo="month"
-          views={['year', 'month']}
-          slotProps={{
-            textField: { required: true}
-          }}
-        />
-      </LocalizationProvider>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
+          <DatePicker
+            label="Period"
+            value={state.period}
+            onChange={newDate => dispatch({type: "set_period", value: newDate})}
+            timezone="UTC"
+            openTo="month"
+            views={['year', 'month']}
+            slotProps={{
+              textField: { required: true, sx: {flex: 1} }
+            }}
+          />
+        </LocalizationProvider>
+        <IconButton onClick={() => dispatch({type: "dec_period"})}>
+          <NavigateBefore />
+        </IconButton>
+        <IconButton onClick={() => dispatch({type: "inc_period"})}>
+          <NavigateNext />
+        </IconButton>
+      </Stack>
       <TextField label="JobName" value={state.jobName} onChange={updateTextValue("set_job_name")} onBlur={() => dispatch({type: "blur_job_name"})}/>
       <TextField label="JobReason" value={state.jobReason} onChange={updateTextValue("set_job_reason")} />
       <TextField label="Employees" disabled value="All Employees" />
@@ -99,14 +108,21 @@ function usePayrunFormReducer(payrun, parameters, employees) {
 }
 
 function reducer(state, action) {
+  const updatePeriod = period => {
+    const jobName = state.jobNameDirty ? state.jobName : getJobName(period);
+    return {
+      ...state,
+      jobName,
+      period
+    };
+  }
   switch(action.type) {
     case "set_period":
-      const jobName = state.jobNameDirty ? state.jobName : getJobName(action.value);
-      return {
-        ...state,
-        jobName,
-        period: action.value
-      };
+      return updatePeriod(action.value);
+    case "inc_period":
+      return updatePeriod(state.period.add(1, "month"));
+    case "dec_period":
+      return updatePeriod(state.period.subtract(1, "month"));
     case "set_job_name":
       return {
         ...state,
