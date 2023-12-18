@@ -94,11 +94,12 @@ function NewPayrunView({payrun}) {
         />
       </FormControl>
       <Typography>Parameters</Typography>
-      <Button 
+      <Button
         disabled={isProcessing}
         variant="contained"
         onClick={onSubmit}
         endIcon={icon}
+        sx={{alignSelf: "end"}}
       >
         {t("Start")}
       </Button>
