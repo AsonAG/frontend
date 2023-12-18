@@ -1,5 +1,5 @@
 import { React, useReducer } from "react";
-import { useAsyncValue, useLoaderData, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { useAsyncValue, useLoaderData, useRouteLoaderData, useSubmit, useNavigation } from "react-router-dom";
 import { Button, Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { ContentLayout } from "./ContentLayout";
@@ -9,6 +9,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getDateLocale } from "../services/converters/DateLocaleExtractor";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
 import { EmployeeSelector } from "./EmployeeSelector";
+import { useTranslation } from "react-i18next";
+import { CircularProgress } from "@mui/material";
 
 export function AsyncNewPayrunView() {
   const { payrun } = useLoaderData();
@@ -27,6 +29,12 @@ function NewPayrunView({payrun}) {
   const submit = useSubmit();
   const [parameters, employees] = useAsyncValue();
   const [state, dispatch] = useReducer(reducer, {payrun, parameters, employees}, createInitialState);
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting" && !!navigation.json;
+  const isRedirecting = navigation.state === "loading" && navigation.json && navigation.formAction !== navigation.location.pathname;
+  const isProcessing = isSubmitting || isRedirecting;
+  const icon = isProcessing ? <CircularProgress {...iconProps} /> : null;
+  const { t } = useTranslation();
 
   const updateTextValue = type => event => dispatch({type, value: event.target.value});
   const onSubmit = () => {
@@ -86,7 +94,14 @@ function NewPayrunView({payrun}) {
         />
       </FormControl>
       <Typography>Parameters</Typography>
-      <Button variant="contained" onClick={onSubmit}>Start</Button>
+      <Button 
+        disabled={isProcessing}
+        variant="contained"
+        onClick={onSubmit}
+        endIcon={icon}
+      >
+        {t("Start")}
+      </Button>
     </Stack>
   )
 }
@@ -160,3 +175,9 @@ function reducer(state, action) {
 }
 
 const getJobName = period => `Payrun ${period.format('MMMM')} ${period.year()}`;
+const iconProps = {
+  size: "1em",
+  sx: {
+    color: "common.white"
+  }
+};
