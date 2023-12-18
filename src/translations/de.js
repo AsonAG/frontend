@@ -53,7 +53,12 @@ const translations = {
         "Instructions": "Anweisungen",
         "Comment": "Kommentar",
         "Back": "Zurück",
-        "Task completed!": "Task abgeschlossen!"
+        "Task completed!": "Task abgeschlossen!",
+        "selected": "ausgewählt",
+        "no_employees_selected": "Keine Mitarbeiter $t(selected)",
+        "all_employees_selected": "Alle Mitarbeiter $t(selected)",
+        "employee_name_selected": "{{employee.firstName}} {{employee.lastName}} $t(selected)",
+        "n_employees_selected": "{{count}} Mitarbeiter $t(selected)"
     },
 };
 

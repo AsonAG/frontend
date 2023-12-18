@@ -1,4 +1,4 @@
-import { React, useMemo, useReducer } from "react";
+import { React, useReducer } from "react";
 import { useAsyncValue, useLoaderData, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { Button, Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
@@ -8,6 +8,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { getDateLocale } from "../services/converters/DateLocaleExtractor";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
+import { EmployeeSelector } from "./EmployeeSelector";
 
 export function AsyncNewPayrunView() {
   const { payrun } = useLoaderData();
@@ -25,7 +26,7 @@ function NewPayrunView({payrun}) {
   const { user, payroll } = useRouteLoaderData('root');
   const submit = useSubmit();
   const [parameters, employees] = useAsyncValue();
-  const [state, dispatch] = usePayrunFormReducer(payrun, parameters, employees);
+  const [state, dispatch] = useReducer(reducer, {payrun, parameters, employees}, createInitialState);
 
   const updateTextValue = type => event => dispatch({type, value: event.target.value});
   const onSubmit = () => {
@@ -36,7 +37,7 @@ function NewPayrunView({payrun}) {
       name: state.jobName,
       forecast: state.forecast,
       periodStart: state.period,
-      employeeIdentifiers: employees.map(e => e.identifier),
+      employeeIdentifiers: state.employees.map(e => e.identifier),
       reason: state.jobReason,
       retroPayMode: state.retroPayMode ? "ValueChange" : "None",
       // TODO AJO
@@ -70,7 +71,7 @@ function NewPayrunView({payrun}) {
       </Stack>
       <TextField label="JobName" value={state.jobName} onChange={updateTextValue("set_job_name")} onBlur={() => dispatch({type: "blur_job_name"})}/>
       <TextField label="JobReason" value={state.jobReason} onChange={updateTextValue("set_job_reason")} />
-      <TextField label="Employees" disabled value="All Employees" />
+      <EmployeeSelector allEmployees={employees} selectedEmployees={state.employees} updateEmployees={e => dispatch({type: "set_employees", value: e})} />
       <TextField label="Forecast" value={state.forecast} onChange={updateTextValue("set_forecast")}/>
       <FormControl>
         <FormControlLabel
@@ -90,7 +91,7 @@ function NewPayrunView({payrun}) {
   )
 }
 
-function createInitialState(payrun, parameters, employees) {
+function createInitialState({payrun, parameters, employees}) {
   const period = dayjs().utc().startOf("month").add(1, "month");
   return {
     period,
@@ -100,11 +101,6 @@ function createInitialState(payrun, parameters, employees) {
     forecast: "",
     employees
   }
-}
-
-function usePayrunFormReducer(payrun, parameters, employees) {
-  const initialState = useMemo(() => createInitialState(payrun, parameters, employees));
-  return useReducer(reducer, initialState);
 }
 
 function reducer(state, action) {
@@ -142,6 +138,11 @@ function reducer(state, action) {
       return {
         ...state,
         jobReason: action.value
+      };
+    case "set_employees":
+      return {
+        ...state,
+        employees: action.value
       };
     case "set_forecast":
       return {
