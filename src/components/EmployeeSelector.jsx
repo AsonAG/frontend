@@ -52,8 +52,8 @@ function EmployeeDialog({onClose, allEmployees, selectedEmployees, setSelectedEm
     >
       <DialogTitle>{t("Select Employees")}</DialogTitle>
       <DialogContent dividers sx={{p: 0}}>
-        <List>
-          <ListItem disablePadding sx={{bgcolor: theme => theme.palette.background.default}}>
+        <List disablePadding sx={{position: "sticky", zIndex: 100, top: 0, bgcolor: theme => theme.palette.background.default}}>
+          <ListItem divider disablePadding >
             <ListItemButton sx={{px: 3}} onClick={() => dispatch({type: "toggle_global"})}>
               <ListItemIcon>
                 <Checkbox
@@ -67,7 +67,8 @@ function EmployeeDialog({onClose, allEmployees, selectedEmployees, setSelectedEm
               <ListItemText primary={getEmployeeSelectionText(allEmployees.length, localSelectedEmployees, t)} />
             </ListItemButton>
           </ListItem>
-          <Divider sx={{pb: 1, mb: 1}}/>
+        </List>
+        <List>
           {
             allEmployees.map(employee => {
               return (
