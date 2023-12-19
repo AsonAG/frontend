@@ -77,7 +77,7 @@ function NewPayrunView({payrun}) {
           <NavigateNext />
         </IconButton>
       </Stack>
-      <TextField label="JobName" value={state.jobName} onChange={updateTextValue("set_job_name")} onBlur={() => dispatch({type: "blur_job_name"})}/>
+      <TextField label="JobName" value={state.jobName} onChange={updateTextValue("set_job_name")} onBlur={() => dispatch({type: "ensure_job_name"})}/>
       <TextField label="JobReason" value={state.jobReason} onChange={updateTextValue("set_job_reason")} />
       <EmployeeSelector allEmployees={employees} selectedEmployees={state.employees} updateEmployees={e => dispatch({type: "set_employees", value: e})} />
       <TextField label="Forecast" value={state.forecast} onChange={updateTextValue("set_forecast")}/>
@@ -141,7 +141,7 @@ function reducer(state, action) {
         jobName: action.value,
         jobNameDirty: true
       };
-    case "blur_job_name":
+    case "ensure_job_name":
       if (!state.jobName) {
         return {
           ...state,
