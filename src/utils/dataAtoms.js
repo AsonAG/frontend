@@ -1,5 +1,5 @@
 import { atomWithRefresh } from "./atomWithRefresh";
-import { getPayrolls, getTasks, getTenant, getUser, getEmployeeByIdentifier } from "../api/FetchClient";
+import { getPayrolls, getTasks, getTenant, getUser, getEmployeeByIdentifier, getPayruns } from "../api/FetchClient";
 import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
 import { getAuthUser } from '../auth/getUser';
 import { atom } from "jotai";
@@ -26,9 +26,17 @@ export const userAtom = atom(get => {
 export const employeeAtom = atom(get => {
   const tenantId = get(tenantIdAtom);
   const payrollId = get(payrollIdAtom);
-  if (tenantId === null || payrollId === null);
+  if (tenantId === null || payrollId === null) return null;
   const authUserEmail = getAuthUser()?.profile.email;
   return getEmployeeByIdentifier({tenantId, payrollId}, authUserEmail);
+});
+
+export const payrunAtom = atom(async get => {
+  const tenantId = get(tenantIdAtom);
+  const payrollId = get(payrollIdAtom);
+  if (tenantId === null || payrollId === null) return [];
+  const payruns = await getPayruns({tenantId, payrollId});
+  return payruns[0] || null;
 });
 
 export const openTasksAtom = atomWithRefresh(get => {

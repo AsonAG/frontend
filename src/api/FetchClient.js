@@ -20,7 +20,6 @@ const companyDocumentUrl  = "/tenants/:tenantId/companycases/:caseValueId/docume
 const tasksUrl            = "/tenants/:tenantId/payrolls/:payrollId/tasks";
 const taskUrl             = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
 const payrunsUrl          = "/tenants/:tenantId/payruns";
-const payrunUrl           = "/tenants/:tenantId/payruns/:payrunId";
 const payrunParametersUrl = "/tenants/:tenantId/payruns/:payrunId/parameters";
 const payrunJobsUrl       = "/tenants/:tenantId/payruns/jobs";
 const payrunJobStatusUrl  = "/tenants/:tenantId/payruns/jobs/:payrunJobId/status";
@@ -235,21 +234,17 @@ export function getDraftPayrunJobs(routeParams) {
         .fetchJson();
 }
 
-export function getPayrun(routeParams) {
-    return new FetchRequestBuilder(payrunUrl, routeParams)
+export function getPayrunJobs(routeParams) {
+    return new FetchRequestBuilder(payrunJobsUrl, routeParams)
+        .withQueryParam("filter", `payrollId eq '${routeParams.payrollId}' and payrunId eq '${routeParams.payrunId}' and jobStatus ne 'Draft'`)
+        .withQueryParam("orderBy", "periodStart desc")
+        .withQueryParam("result", "ItemsWithCount")
+        .withQueryParam("top", 15)
         .fetchJson();
 }
 
 export function getPayrunParameters(routeParams) {
     return new FetchRequestBuilder(payrunParametersUrl, routeParams)
-        .fetchJson();
-}
-
-export function getPayrunJobs(routeParams) {
-    return new FetchRequestBuilder(payrunJobsUrl, routeParams)
-        .withQueryParam("filter", `payrollId eq '${routeParams.payrollId}' and payrunId eq '${routeParams.payrunId}'`)
-        .withQueryParam("result", "ItemsWithCount")
-        .withQueryParam("top", 15)
         .fetchJson();
 }
 
@@ -262,7 +257,6 @@ export function startPayrunJob(routeParams, jobInvocation) {
 }
 
 export function changePayrunJobStatus(routeParams, newStatus) {
-    console.log(routeParams);
     return new FetchRequestBuilder(payrunJobStatusUrl, routeParams)
         .withMethod("POST")
         .withBody(newStatus)

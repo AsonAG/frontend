@@ -1,34 +1,30 @@
 import { React, useReducer } from "react";
-import { useAsyncValue, useLoaderData, useRouteLoaderData, useSubmit, useNavigation } from "react-router-dom";
+import { useAsyncValue, useRouteLoaderData, useSubmit, useNavigation, useLoaderData } from "react-router-dom";
 import { Button, Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
-import { AsyncDataRoute } from "../routes/AsyncDataRoute";
-import { ContentLayout } from "./ContentLayout";
+import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { getDateLocale } from "../services/converters/DateLocaleExtractor";
+import { getDateLocale } from "../../services/converters/DateLocaleExtractor";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
 import { EmployeeSelector } from "./EmployeeSelector";
 import { useTranslation } from "react-i18next";
 import { CircularProgress } from "@mui/material";
 
 export function AsyncNewPayrunView() {
-  const { payrun } = useLoaderData();
-  
   return (
-    <ContentLayout title={payrun.name}>
-      <AsyncDataRoute skipDataCheck>
-        <NewPayrunView payrun={payrun}/>
-      </AsyncDataRoute>
-    </ContentLayout>
+    <AsyncDataRoute skipDataCheck>
+      <NewPayrunView />
+    </AsyncDataRoute>
   );
 }
 
-function NewPayrunView({payrun}) {
+function NewPayrunView() {
   const { user, payroll } = useRouteLoaderData('root');
   const submit = useSubmit();
-  const [parameters, employees] = useAsyncValue();
-  const [state, dispatch] = useReducer(reducer, {payrun, parameters, employees}, createInitialState);
+  const employees = useAsyncValue();
+  const { payrun } = useLoaderData();
+  const [state, dispatch] = useReducer(reducer, {payrun, employees, parameters: null}, createInitialState);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting" && !!navigation.json;
   const isRedirecting = navigation.state === "loading" && navigation.json && navigation.formAction !== navigation.location.pathname;
@@ -48,8 +44,6 @@ function NewPayrunView({payrun}) {
       employeeIdentifiers: state.employees.map(e => e.identifier),
       reason: state.jobReason,
       retroPayMode: state.retroPayMode ? "ValueChange" : "None",
-      // TODO AJO
-      // attributes: parameters
     }
     submit(jobInvocation, { method: "post", encType: "application/json" });
   };
@@ -93,7 +87,6 @@ function NewPayrunView({payrun}) {
           }
         />
       </FormControl>
-      <Typography>Parameters</Typography>
       <Button
         disabled={isProcessing}
         variant="contained"

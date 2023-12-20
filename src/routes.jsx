@@ -22,13 +22,11 @@ import {
   getCompanyCases,
   getCompanyCaseValues,
   getDocumentCaseFields,
-  getPayruns,
   getPayrunJobs,
   getDraftPayrunJobs,
   getTasks,
   getTask,
   updateTask,
-  getPayrun,
   getPayrunParameters,
   startPayrunJob,
   changePayrunJobStatus
@@ -41,12 +39,11 @@ import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { DocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom } from "./utils/dataAtoms";
+import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom, payrunAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
-import { AsyncPayrunsView } from "./components/PayrunsView";
-import { AsyncPayrunJobsView } from "./components/PayrunJobsView";
-import { AsyncPayrunView } from "./components/PayrunView";
-import { AsyncNewPayrunView } from "./components/NewPayrunView";
+import { AsyncPayrunView } from "./components/payrun/PayrunView";
+import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
+import { NoPayrunView } from "./components/payrun/NoPayrunView";
 
 const store = getDefaultStore();
 
@@ -237,63 +234,46 @@ const routeData = [
       },
       {
         path: "hr/payruns",
-        Component: AsyncPayrunsView,
-        loader: ({params}) => {
-          return defer({
-            data: getPayruns(params)
-          });
-        },
-        children: [
-          {
-            path: ":payrunId",
-            Component: AsyncPayrunView,
-            loader: ({params}) => {
-              return defer({
-                data: getDraftPayrunJobs(params),
-                // TODO AJO parameters & employees
-              });
-            },
-            action: async ({params, request}) => {
-              const action = await request.json();
-              if (action.type === "change_status") {
-                // TODO AJO what to do
-                await changePayrunJobStatus({...params, payrunJobId: action.jobId}, action.status);
-              }
-              return null;
-            },
-            children: [
-              {
-                path: "jobs",
-                Component: AsyncPayrunJobsView,
-                loader: ({params}) => {
-                  return defer({
-                    data: getPayrunJobs(params)
-                  });
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        path: "hr/payruns/:payrunId/new",
-        Component: AsyncNewPayrunView,
+        Component: AsyncPayrunView,
         loader: async ({params}) => {
+          const payrun = await store.get(payrunAtom);
           return defer({
-            payrun: await getPayrun(params),
-            data: Promise.all([getPayrunParameters(params), getEmployees(params)])
+            draftPayrunJobs: getDraftPayrunJobs(params),
+            payrunJobs: getPayrunJobs({...params, payrunId: payrun.id})
           });
         },
         action: async ({params, request}) => {
-          var invocation = await request.json();
-          var response = await startPayrunJob(params, invocation);
-          if (response.status === 201) {
-            var payrunJob = await response.json();
-            return redirect(`../hr/payruns/${payrunJob.payrunId}`);
+          const action = await request.json();
+          const payrun = await store.get(payrunAtom);
+          if (action.type === "change_status") {
+            // TODO AJO what to do
+            await changePayrunJobStatus({...params, payrunId: payrun.id, payrunJobId: action.jobId}, action.status);
           }
-          /// TODO AJO do something here
-        }
+          return null;
+        },
+        children: [
+          {
+            path: "new",
+            Component: AsyncNewPayrunView,
+            loader: async ({params}) => {
+              const payrun = await store.get(payrunAtom);
+              return defer({
+                payrun,
+                data: getEmployees(params)
+              });
+            },
+            action: async ({params, request}) => {
+              var invocation = await request.json();
+              var response = await startPayrunJob(params, invocation);
+              if (response.status === 201) {
+                return redirect(`..`);
+              }
+              /// TODO AJO do something here
+            }
+          }
+        ]
       },
+      ,
       {
         path: "company",
         children: [
