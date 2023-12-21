@@ -16,7 +16,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import CasesOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
-
+import NotStartedOutlinedIcon from '@mui/icons-material/NotStartedOutlined';
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { UserAccountComponent } from "./UserAccountComponent";
@@ -139,7 +139,7 @@ function Drawer({ temporary, open, onClose }) {
           <NavigationGroup name={t("HR")} hidden={!isHrUser}>
             <NavigationItem label={t("Employees")} to="hr/employees" icon={<PeopleOutlinedIcon />} />
             <NavigationItem label={t("Tasks")} to="hr/tasks" icon={<OpenTasksBadgeIcon />} />
-            <NavigationItem label={t("Payruns")} to="hr/payruns" icon={<PeopleOutlinedIcon />} />
+            <NavigationItem label={t("Payruns")} to="hr/payruns" icon={<NotStartedOutlinedIcon />} />
           </NavigationGroup>
           <NavigationGroup name={t("Company")} hidden={!isHrUser}>
             <NavigationItem label={t("New event")} to="company/new" icon={<AddOutlinedIcon />} />

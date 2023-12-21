@@ -1,7 +1,7 @@
 import { React, Suspense } from "react";
-import { Link, useSubmit, useLoaderData, Await, Outlet, useOutlet, useAsyncValue } from "react-router-dom";
-import { Stack, Button, Typography, Skeleton, Divider, IconButton, Tooltip, Paper } from "@mui/material";
-import { Cancel, ChevronRight, Clear, DangerousRounded, DoneAll, InsightsRounded, Mode, Outbox, Stop, SyncAlt } from "@mui/icons-material";
+import { Link, useSubmit, useLoaderData, Await, useOutlet, useAsyncValue } from "react-router-dom";
+import { Stack, Typography, Skeleton, Divider, IconButton, Tooltip, Paper, Button } from "@mui/material";
+import { Add, Cancel, Clear, DangerousRounded, DoneAll, InsightsRounded, Mode, Outbox, SyncAlt } from "@mui/icons-material";
 import { ContentLayout } from "../ContentLayout";
 import { ErrorView } from "../ErrorView";
 import { useTranslation } from "react-i18next";
@@ -14,7 +14,7 @@ export function AsyncPayrunView() {
       {
         outlet ??
         <Stack spacing={2}>
-          <DraftPayrun />
+          <AwaitDraftPayrun />
           <AwaitPayrunJobs />
         </Stack>
       }
@@ -27,39 +27,37 @@ function AwaitPayrunJobs() {
   return (
     <Suspense fallback={<Skeleton />}>
       <Await resolve={payrunJobs} errorElement={<ErrorView />}>
-        <JobTable>
+        <Paper variant="outlined">
           <PayrunJobs />
-        </JobTable>
+        </Paper>
       </Await>
     </Suspense>
   );
-}
-
-
-function JobTable({children}) {
-  return (
-    <Paper variant="outlined">
-      <Stack divider={<Divider />}>
-        {children}
-      </Stack>
-    </Paper>
-  )
 }
 
 function PayrunJobs() {
   const jobs = useAsyncValue();
-  return jobs.items.map(job => <PayrunJobRow key={job.id} payrunJob={job} />);
+  return (
+    <Stack divider={<Divider flexItem />}>
+      {jobs.items.map(job => <PayrunJobRow key={job.id} payrunJob={job} />)}
+    </Stack>
+  )
 }
 
-function DraftPayrun() {
+function AwaitDraftPayrun() {
   const { draftPayrunJobs } = useLoaderData();
   return (
     <Suspense fallback={<Skeleton />}>
       <Await resolve={draftPayrunJobs} errorElement={<ErrorView />}>
-        {(drafts) => drafts.length > 0 ? <DraftPayrunJobRow payrunJob={drafts[0]} /> : <NewPayrunJobRow />}
+        <DraftPayrun />
       </Await>
     </Suspense>
   );
+}
+
+function DraftPayrun() {
+  const drafts = useAsyncValue();
+  return drafts.length > 0 ? <DraftPayrunJobRow payrunJob={drafts[0]} /> : <NewPayrunJobRow />;
 }
 
 function DraftPayrunJobRow({payrunJob}) {
@@ -68,7 +66,7 @@ function DraftPayrunJobRow({payrunJob}) {
   const buttons = (
     <Stack direction="row">
       <Tooltip title={t("Abort")}>
-        <IconButton color="error" size="small" onClick={abort}><Clear /></IconButton>
+        <IconButton sx={{"&:hover": {color: theme => theme.palette.error.light}}} size="small" onClick={abort}><Clear /></IconButton>
       </Tooltip>
       <Tooltip title={t("Release")}>
         <IconButton color="primary" size="small" onClick={complete}><DoneAll /></IconButton>
@@ -76,7 +74,11 @@ function DraftPayrunJobRow({payrunJob}) {
     </Stack>
   );
   const icon = <JobIcon payrunJob={payrunJob} />;
-  return <Row icon={icon} title={payrunJob.name} subtitle={payrunJob.reason} buttons={buttons} />
+  return (
+    <Paper variant="outlined">
+      <Row icon={icon} title={payrunJob.name} subtitle={payrunJob.reason} buttons={buttons} bgcolor="rgba(255, 221, 0, 0.2)"/>
+    </Paper>
+  );
 }
 
 function PayrunJobRow({payrunJob}) {
@@ -86,16 +88,15 @@ function PayrunJobRow({payrunJob}) {
 
 function NewPayrunJobRow() {
   const { t } = useTranslation();
-  const button = <IconButton size="small" component={Link} to="new"><ChevronRight fontSize="small"/></IconButton>;
-  
-  return <Row title={t("New payrun")} buttons={button} />
+  const row = <Row icon={<Add fontSize="small"/>} title={t("New payrun")} />;
+  return <Button component={Link} to="new" variant="outlined" sx={{p: 0, justifyContent: "start"}} >{row}</Button>
 }
 
-function Row({title, subtitle, buttons, icon}) {
+function Row({title, subtitle, buttons, icon, bgcolor}) {
   return (
-    <Stack direction="row" spacing={1.5} alignItems="center" minHeight={32} px={1}>
+    <Stack direction="row" spacing={1.5} alignItems="center" minHeight={50} px={2} py={1} bgcolor={bgcolor}>
       {icon}
-      <Stack direction="row" flex={1} spacing={1} alignItems="center">
+      <Stack direction={{sm: "row"}} flex={1} spacing={1} alignItems={{sm: "center"}} >
         <Typography>{title}</Typography>
         <Typography variant="caption">{subtitle}</Typography>
       </Stack>
@@ -113,29 +114,36 @@ function useChangeStatus(payrunJobId) {
 function JobIcon({payrunJob}) {
   const { t } = useTranslation();
   let Icon = null;
+  let color = "action";
   switch(payrunJob.jobStatus) {
     case "Draft":
       Icon = Mode;
       break;
     case "Release":
       Icon = Outbox;
+      color = "success";
       break;
     case "Process":
       Icon = SyncAlt;
+      color = "success";
       break;
     case "Complete":
       Icon = DoneAll;
+      color = "success";
       break;
     case "Forecast":
       Icon = InsightsRounded;
+      color = "secondary";
       break;
     case "Abort":
       Icon = Cancel;
+      color = "error";
       break;
     case "Cancel":
       Icon = DangerousRounded;
+      color = "error";
       break;
   }
   if (Icon === null) return null;
-  return <Tooltip title={t(payrunJob.jobStatus)}><Icon fontSize="small" color="action" /></Tooltip>
+  return <Tooltip title={t(payrunJob.jobStatus)}><Icon fontSize="small" color={color} /></Tooltip>
 }

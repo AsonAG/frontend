@@ -181,7 +181,6 @@ const routeData = [
         path: "hr/tasks",
         Component: AsyncTaskTable,
         loader: async ({params, request }) => {
-          console.log("loader request", request);
           const { user } = await getTenantData();
           const [_, queryString] = request.url.split("?");
           const searchParams = new URLSearchParams(queryString);

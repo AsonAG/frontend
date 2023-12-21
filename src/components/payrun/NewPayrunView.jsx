@@ -1,5 +1,5 @@
 import { React, useReducer } from "react";
-import { useAsyncValue, useRouteLoaderData, useSubmit, useNavigation, useLoaderData } from "react-router-dom";
+import { useAsyncValue, useRouteLoaderData, useSubmit, useNavigation, useLoaderData, Link } from "react-router-dom";
 import { Button, Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import dayjs from "dayjs";
@@ -87,15 +87,23 @@ function NewPayrunView() {
           }
         />
       </FormControl>
-      <Button
-        disabled={isProcessing}
-        variant="contained"
-        onClick={onSubmit}
-        endIcon={icon}
-        sx={{alignSelf: "end"}}
-      >
-        {t("Start")}
-      </Button>
+      <Stack direction="row" alignSelf="end" spacing={2}>
+        <Button
+          component={Link}
+          to=".."
+          disabled={isProcessing}
+        >
+          {t("Back")}
+        </Button>
+        <Button
+          disabled={isProcessing}
+          variant="contained"
+          onClick={onSubmit}
+          endIcon={icon}
+        >
+          {t("Start")}
+        </Button>
+      </Stack>
     </Stack>
   )
 }
