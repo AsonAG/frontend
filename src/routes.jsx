@@ -1,4 +1,3 @@
-
 import * as React from "react";
 
 import { createBrowserRouter, defer, matchRoutes, Navigate, redirect } from "react-router-dom";
@@ -28,20 +27,38 @@ import {
   getTask,
   updateTask,
   startPayrunJob,
-  changePayrunJobStatus
+  changePayrunJobStatus,
+  getComplianceDocuments,
+  getComplianceDocument,
+  uploadComplianceDocument,
+  createSubmission,
+  getSubmissions,
+  getSubmission,
+  getComplianceMessages,
+  getDocument,
+  getComplianceSettings,
+  setComplianceSettings,
+  getComplianceCertificates,
+  getReport
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncCaseDisplay } from "./scenes/global/CaseDisplay";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
-import { DocumentDialog } from "./components/DocumentDialog";
+import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
 import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom, payrunAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
 import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
+import { ComplianceView } from "./components/compliance/ComplianceView";
+import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceSettingsView";
+import { CreateComplianceDocumentView } from "./components/compliance/CreateComplianceDocumentView";
+import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceDocumentView";
+import { AsyncComplianceSubmissionView } from "./components/compliance/ComplianceSubmissionView";
+import { ReportsView } from "./components/ReportsView";
 
 const store = getDefaultStore();
 
@@ -169,7 +186,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           }
@@ -272,6 +294,120 @@ const routeData = [
       },
       ,
       {
+        path: "hr/compliance",
+        Component: ComplianceView,
+        loader: ({params}) => {
+          return defer({
+            documents: getComplianceDocuments(params),
+            submissions: getSubmissions(params),
+            messages: getComplianceMessages(params)
+          });
+        }
+      },
+      {
+        path: "hr/compliance/settings",
+        Component: AsyncComplianceSettingsView,
+        loader: ({params}) => {
+          return defer({
+            data: getComplianceSettings(params)
+          });
+        },
+        action: async ({request, params}) => {
+          const settings = await request.json();
+          return setComplianceSettings(params, settings);
+        },
+        children: [
+          {
+            path: "transmittercertificates",
+            loader: ({params}) => {
+              return getComplianceCertificates(params, "Transmitter");
+            }
+          },
+          {
+            path: "enterprisecertificates",
+            loader: ({params}) => {
+              return getComplianceCertificates(params, "Enterprise");
+            }
+          }
+        ]
+      },
+      {
+        path: "hr/compliance/documents",
+        loader: ({params}) => {
+          return getComplianceDocuments(params);
+        }
+      },
+      {
+        path: "hr/compliance/documents/:documentId",
+        Component: AsyncComplianceDocumentView,
+        loader: ({params}) => {
+          return defer({
+            data: getComplianceDocument(params),
+            pdfPromise: getComplianceDocument(params, true)
+          });
+        },
+        action: async ({request, params}) => {
+          const { isTestCase } = await request.json();
+          const submission = await createSubmission(params, isTestCase);
+          return redirect(`../hr/compliance/submissions/${submission.id}`);
+        }
+      },
+      {
+        path: "hr/compliance/documents/new",
+        Component: CreateComplianceDocumentView,
+        action: async ({params, request}) => {
+          const data = await request.json();
+          const response = await uploadComplianceDocument(params, data);
+          return redirect(`../hr/compliance/documents/${response.id}`)
+        }
+      },
+      {
+        path: "hr/compliance/submissions",
+        loader: ({params}) => {
+          return getSubmissions(params);
+        }
+      },
+      {
+        path: "hr/compliance/submissions/:submissionId",
+        Component: AsyncComplianceSubmissionView,
+        loader: ({params}) => {
+          return defer({
+            submission: getSubmission(params),
+            messages: getComplianceMessages(params)
+          });
+        }
+      },
+      {
+        path: "reports",
+        Component: ReportsView,
+        children: [
+          {
+            path: "test",
+            Component: CaseValueDocumentDialog,
+            loader: ({params}) => {
+              const routeParams = {...params, regulationId: 224, reportId: 50 };
+              const reportRequest = {
+                  "language": "English",
+                  "userId": 805,
+                  "payrollId": 132,
+                  "parameters": {
+                      "EmployeeIdentifier": "TF01 Herz Monica",
+                      "ValuesUntilDate": "10/1/2022",
+                      "AllEmployees": "false",
+                      "EmployeeLanguage": "false",
+                      "Language": "German",
+                      "SeparatedRetroDifferences": "true",
+                      "RegulationId": "224"
+                  }
+              };
+              return defer({
+                document: getReport(routeParams, reportRequest)
+              });
+            }
+          }
+        ]
+      },
+      {
         path: "company",
         children: [
           {
@@ -316,7 +452,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           },
@@ -353,6 +494,7 @@ const routeData = [
             Component: AsyncCaseTable,
             loader: ({params}) =>  {
               return defer({
+                title: "Tasks",
                 data: getEmployeeCases(params, "ECT")
               });
             }
@@ -372,7 +514,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           }

@@ -23,6 +23,17 @@ const payrunsUrl          = "/tenants/:tenantId/payruns";
 const payrunParametersUrl = "/tenants/:tenantId/payruns/:payrunId/parameters";
 const payrunJobsUrl       = "/tenants/:tenantId/payruns/jobs";
 const payrunJobStatusUrl  = "/tenants/:tenantId/payruns/jobs/:payrunJobId/status";
+const complianceUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance";
+const complianceSettingsUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance/settings";
+const complianceCertificatesUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance/certificates";
+const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents";
+const complianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
+const complianceSubmissionsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions";
+const complianceSubmissionUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions/:submissionId";
+const complianceMessagesUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/messages";
+const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
+const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
+const generateReportUrl = "/tenants/:tenantId/regulations/:regulationId/reports/:reportId/generate";
 
 const store = getDefaultStore();
 
@@ -263,6 +274,14 @@ export function changePayrunJobStatus(routeParams, newStatus) {
         .fetch();
 }
 
+export function getReport(routeParams, reportRequest) {
+    return new FetchRequestBuilder(generateReportUrl, routeParams)
+        .withMethod("POST")
+        .withBody(reportRequest)
+        .withQueryParam("format", "pdf")
+        .fetchJson();
+}
+
 export function buildCase(routeParams, caseChangeSetup) {
     // manually construct path, generatePath does not handle encoding properly
     const url = caseSetsUrl + "/" + encodeURIComponent(routeParams.caseName);
@@ -330,4 +349,86 @@ export function getDocument(routeParams) {
         companyDocumentUrl;
 
     return new FetchRequestBuilder(url, routeParams).fetchJson();
+}
+
+export function getCompliance(routeParams) {
+    return new FetchRequestBuilder(complianceUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function getComplianceSettings(routeParams) {
+    return new FetchRequestBuilder(complianceSettingsUrl, routeParams)
+        .fetchJson();
+}
+
+export function setComplianceSettings(routeParams, settings) {
+    return new FetchRequestBuilder(complianceSettingsUrl, routeParams)
+        .withMethod("POST")
+        .withBody(settings)
+        .fetchJson();
+}
+
+export function getComplianceCertificates(routeParams, type) {
+    return new FetchRequestBuilder(complianceCertificatesUrl, routeParams)
+        .withQueryParam("filter", `certificateType eq '${type}'`)
+        .fetchJson();
+}
+
+export function getComplianceDocuments(routeParams) {
+    return new FetchRequestBuilder(complianceDocumentsUrl, routeParams)
+        .fetchJson();
+}
+
+export function getComplianceDocument(routeParams, asPdf) {
+    return new FetchRequestBuilder(complianceDocumentUrl, routeParams)
+        .withQueryParam("asPdf", asPdf)
+        .fetchJson();
+}
+
+export function uploadComplianceDocument(routeParams, document) {
+    return new FetchRequestBuilder(complianceDocumentsUrl, routeParams)
+        .withMethod("POST")
+        .withBody(document)
+        .fetchJson();
+}
+
+export function pingCompliance(routeParams) {
+    return new FetchRequestBuilder(compliancePingUrl, routeParams).fetchJson();
+}
+
+export function checkInteroperabilityCompliance(routeParams, secondOperand) {
+    return new FetchRequestBuilder(complianceCheckInteroperabilityUrl, routeParams)
+        .withQueryParam("secondOperand", secondOperand)
+        .fetchJson();
+}
+
+export function getSubmissions(routeParams) {
+    return new FetchRequestBuilder(complianceSubmissionsUrl, routeParams)
+        .withQueryParam("orderBy", "created desc")
+        .withLocalization()
+        .fetchJson();
+}
+
+export function getSubmission(routeParams) {
+    return new FetchRequestBuilder(complianceSubmissionUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function createSubmission(routeParams, isTestCase) {
+    return new FetchRequestBuilder(complianceSubmissionsUrl, routeParams)
+        .withMethod("POST")
+        .withQueryParam("isTestCase", isTestCase)
+        .withQueryParam("documentId", routeParams.documentId)
+        .fetchJson();
+}
+
+export function getComplianceMessages(routeParams) {
+    const submissionFilter = routeParams.submissionId ? `submissionId eq '${routeParams.submissionId}'` : null;
+    return new FetchRequestBuilder(complianceMessagesUrl, routeParams)
+        .withQueryParam("filter", submissionFilter)
+        .withQueryParam("orderBy", "created desc")
+        .withLocalization()
+        .fetchJson();
 }

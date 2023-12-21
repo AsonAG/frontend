@@ -41,6 +41,33 @@ function createThemeSettings(mode) {
         defaultProps: {
           useFlexGap: true
         }
+      },
+      MuiSkeleton: {
+        styleOverrides: {
+          root: {
+            "@keyframes fade-in": {
+              "0%": {
+                opacity: 0
+              },
+              "100%": {
+                opacity: 1
+              }
+            },
+            "@keyframes pulse": {
+              "0%": {
+                opacity: 1
+              },
+              "50%": {
+                opacity: 0.4
+              },
+              "100%": {
+                opacity: 1
+              }
+            },
+            animation: "fade-in 1s ease-in 0.5s, pulse 2s ease-in-out 1.5s infinite",
+            opacity: 0
+          }
+        }
       }
     },
     typography: {
@@ -56,6 +83,9 @@ function createThemeSettings(mode) {
       },
       button: {
         textTransform: 'none'
+      },
+      code: {
+        fontFamily: '"Source Code Pro"'
       }
     },
     bgColorFromString: (str) => {
