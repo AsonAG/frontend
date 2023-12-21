@@ -29,6 +29,7 @@ const complianceSubmissionUrl = "/tenants/:tenantId/payrolls/:payrollId/complian
 const complianceMessagesUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/messages";
 const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
 const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
+const generateReportUrl = "/tenants/:tenantId/regulations/:regulationId/reports/:reportId/generate";
 
 const store = getDefaultStore();
 
@@ -226,6 +227,14 @@ export function updateTask(routeParams, task) {
         .withMethod("PUT")
         .withBody(task)
         .fetch();
+}
+
+export function getReport(routeParams, reportRequest) {
+    return new FetchRequestBuilder(generateReportUrl, routeParams)
+        .withMethod("POST")
+        .withBody(reportRequest)
+        .withQueryParam("format", "pdf")
+        .fetchJson();
 }
 
 export function buildCase(routeParams, caseChangeSetup) {

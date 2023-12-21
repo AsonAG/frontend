@@ -34,7 +34,8 @@ import {
   getDocument,
   getComplianceSettings,
   setComplianceSettings,
-  getComplianceCertificates
+  getComplianceCertificates,
+  getReport
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -51,6 +52,7 @@ import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceS
 import { CreateComplianceDocumentView } from "./components/compliance/CreateComplianceDocumentView";
 import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceDocumentView";
 import { AsyncComplianceSubmissionView } from "./components/compliance/ComplianceSubmissionView";
+import { ReportsView } from "./components/ReportsView";
 
 const store = getDefaultStore();
 
@@ -326,6 +328,36 @@ const routeData = [
             messages: getComplianceMessages(params)
           });
         }
+      },
+      {
+        path: "reports",
+        Component: ReportsView,
+        children: [
+          {
+            path: "test",
+            Component: CaseValueDocumentDialog,
+            loader: ({params}) => {
+              const routeParams = {...params, regulationId: 224, reportId: 50 };
+              const reportRequest = {
+                  "language": "English",
+                  "userId": 805,
+                  "payrollId": 132,
+                  "parameters": {
+                      "EmployeeIdentifier": "TF01 Herz Monica",
+                      "ValuesUntilDate": "10/1/2022",
+                      "AllEmployees": "false",
+                      "EmployeeLanguage": "false",
+                      "Language": "German",
+                      "SeparatedRetroDifferences": "true",
+                      "RegulationId": "224"
+                  }
+              };
+              return defer({
+                document: getReport(routeParams, reportRequest)
+              });
+            }
+          }
+        ]
       },
       {
         path: "company",
