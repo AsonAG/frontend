@@ -27,7 +27,6 @@ import {
   getTasks,
   getTask,
   updateTask,
-  getPayrunParameters,
   startPayrunJob,
   changePayrunJobStatus
 } from "./api/FetchClient";
@@ -43,7 +42,6 @@ import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, us
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
 import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
-import { NoPayrunView } from "./components/payrun/NoPayrunView";
 
 const store = getDefaultStore();
 

@@ -53,7 +53,7 @@ function NewPayrunView() {
       <Stack direction="row" spacing={1} alignItems="center">
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
           <DatePicker
-            label="Period"
+            label={t("Period")}
             value={state.period}
             onChange={newDate => dispatch({type: "set_period", value: newDate})}
             timezone="UTC"
@@ -71,22 +71,10 @@ function NewPayrunView() {
           <NavigateNext />
         </IconButton>
       </Stack>
-      <TextField label="JobName" value={state.jobName} onChange={updateTextValue("set_job_name")} onBlur={() => dispatch({type: "ensure_job_name"})}/>
-      <TextField label="JobReason" value={state.jobReason} onChange={updateTextValue("set_job_reason")} />
+      <TextField label={t("Name")} value={state.jobName} onChange={updateTextValue("set_job_name")} onBlur={() => dispatch({type: "ensure_job_name"})}/>
+      <TextField label={t("Reason")} value={state.jobReason} onChange={updateTextValue("set_job_reason")} />
       <EmployeeSelector allEmployees={employees} selectedEmployees={state.employees} updateEmployees={e => dispatch({type: "set_employees", value: e})} />
-      <TextField label="Forecast" value={state.forecast} onChange={updateTextValue("set_forecast")}/>
-      <FormControl>
-        <FormControlLabel
-          label="Retro Pay Mode"
-          labelPlacement="end"
-          control={
-            <Checkbox
-              checked={state.retroPayMode}
-              onChange={event => dispatch({type: "set_retro", value: event.target.checked})}
-            />
-          }
-        />
-      </FormControl>
+      <TextField label={t("Forecast")} value={state.forecast} onChange={updateTextValue("set_forecast")}/>
       <Stack direction="row" alignSelf="end" spacing={2}>
         <Button
           component={Link}

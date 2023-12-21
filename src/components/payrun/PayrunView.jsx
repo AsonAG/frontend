@@ -145,5 +145,5 @@ function JobIcon({payrunJob}) {
       break;
   }
   if (Icon === null) return null;
-  return <Tooltip title={t(payrunJob.jobStatus)}><Icon fontSize="small" color={color} /></Tooltip>
+  return <Tooltip title={t("PayrunJobStatus." + payrunJob.jobStatus)}><Icon fontSize="small" color={color} /></Tooltip>
 }

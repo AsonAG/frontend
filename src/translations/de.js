@@ -58,7 +58,22 @@ const translations = {
         "no_employees_selected": "Keine Mitarbeiter $t(selected)",
         "all_employees_selected": "Alle Mitarbeiter $t(selected)",
         "employee_name_selected": "{{employee.firstName}} {{employee.lastName}} $t(selected)",
-        "n_employees_selected": "{{count}} Mitarbeiter $t(selected)"
+        "n_employees_selected": "{{count}} Mitarbeiter $t(selected)",
+        "Payruns": "Lohnläufe",
+        "Abort": "Abbrechen",
+        "Release": "Freigeben",
+        "New payrun": "Neuer Lohnlauf",
+        "PayrunJobStatus.Draft": "Entwurf",
+        "PayrunJobStatus.Release": "Freigegeben",
+        "PayrunJobStatus.Process": "In Verarbeitung",
+        "PayrunJobStatus.Complete": "Abgeschlossen",
+        "PayrunJobStatus.Forecast": "Szenario",
+        "PayrunJobStatus.Abort": "Abgebrochen",
+        "PayrunJobStatus.Cancel": "Fehlgeschlagen",
+        "Period": "Periode",
+        "Forecast": "Szenario",
+        "Reason": "Grund",
+        "Select employees": "Mitarbeiter auswählen"
     },
 };
 

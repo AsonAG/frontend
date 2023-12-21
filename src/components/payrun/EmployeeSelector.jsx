@@ -50,7 +50,7 @@ function EmployeeDialog({onClose, allEmployees, selectedEmployees, setSelectedEm
       fullScreen={fullScreen}
       onClose={onClose}
     >
-      <DialogTitle>{t("Select Employees")}</DialogTitle>
+      <DialogTitle>{t("Select employees")}</DialogTitle>
       <DialogContent dividers sx={{p: 0}}>
         <List disablePadding sx={{position: "sticky", zIndex: 100, top: 0, bgcolor: theme => theme.palette.background.default}}>
           <ListItem divider disablePadding >
