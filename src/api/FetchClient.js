@@ -270,6 +270,7 @@ export function startPayrunJob(routeParams, jobInvocation) {
 export function changePayrunJobStatus(routeParams, newStatus) {
     return new FetchRequestBuilder(payrunJobStatusUrl, routeParams)
         .withMethod("POST")
+        .withQueryParam("patchMode", "true")
         .withBody(newStatus)
         .fetch();
 }
