@@ -1,6 +1,6 @@
 import { React, useReducer } from "react";
-import { useAsyncValue, useRouteLoaderData, useSubmit, useNavigation, useLoaderData, Link } from "react-router-dom";
-import { Button, Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { useAsyncValue, useRouteLoaderData, useSubmit, useNavigation, useLoaderData, Link, useActionData } from "react-router-dom";
+import { Alert, Button, Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -20,6 +20,7 @@ export function AsyncNewPayrunView() {
 }
 
 function NewPayrunView() {
+  const createdJob = useActionData();
   const { user, payroll } = useRouteLoaderData('root');
   const submit = useSubmit();
   const employees = useAsyncValue();
@@ -75,6 +76,7 @@ function NewPayrunView() {
       <TextField label={t("Reason")} value={state.jobReason} onChange={updateTextValue("set_job_reason")} />
       <EmployeeSelector allEmployees={employees} selectedEmployees={state.employees} updateEmployees={e => dispatch({type: "set_employees", value: e})} />
       <TextField label={t("Forecast")} value={state.forecast} onChange={updateTextValue("set_forecast")}/>
+      { createdJob && <Alert severity="error" variant="filled"><Typography>{createdJob.message}</Typography></Alert> }
       <Stack direction="row" alignSelf="end" spacing={2}>
         <Button
           component={Link}
