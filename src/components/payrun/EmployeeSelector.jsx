@@ -28,7 +28,7 @@ export function EmployeeSelector({allEmployees, selectedEmployees, updateEmploye
 
 const dialogSx = {
   '& .MuiDialog-paper': {
-    sm: { width: '80%', maxHeight: 835 }
+    sm: { width: '80%', maxHeight: 835, height: "80%" }
   }
 };
 
