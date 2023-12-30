@@ -33,6 +33,10 @@ const complianceSubmissionUrl = "/tenants/:tenantId/payrolls/:payrollId/complian
 const complianceMessagesUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/messages";
 const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
 const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
+const reportsUrl = "/tenants/:tenantId/payrolls/:payrollId/reports";
+const buildReportUrl = "/tenants/:tenantId/regulations/:regulationId/reports/sets/:reportId/build";
+const reportSetUrl = "/tenants/:tenantId/regulations/:regulationId/reports/sets/:reportId";
+const reportParametersUrl = "/tenants/:tenantId/regulations/:regulationId/reports/:reportId/parameters";
 const generateReportUrl = "/tenants/:tenantId/regulations/:regulationId/reports/:reportId/generate";
 
 const store = getDefaultStore();
@@ -99,6 +103,13 @@ class FetchRequestBuilder {
 
     withUser() {
         this.addUserQueryParam = true;
+        return this;
+    }
+    
+    withSignal(signal/*: AbortSignal*/) {
+        if (signal) {
+            this.signal = AbortSignal.any([signal, this.signal]);
+        }
         return this;
     }
 
@@ -275,11 +286,32 @@ export function changePayrunJobStatus(routeParams, newStatus) {
         .fetch();
 }
 
-export function getReport(routeParams, reportRequest) {
+export function getReports(routeParams) {
+    return new FetchRequestBuilder(reportsUrl, routeParams)
+        .withLocalization()
+        .fetchJson();
+}
+
+export function getReport(routeParams, reportRequest, signal) {
+    return new FetchRequestBuilder(buildReportUrl, routeParams)
+        .withMethod("POST")
+        .withBody(reportRequest)
+        .withLocalization()
+        .withSignal(signal)
+        .fetch();
+}
+
+export function generateReport(routeParams, reportRequest) {
     return new FetchRequestBuilder(generateReportUrl, routeParams)
         .withMethod("POST")
         .withBody(reportRequest)
         .withQueryParam("format", "pdf")
+        .fetch();
+}
+
+export function getReportParameters(routeParams, regulationId) {
+    return new FetchRequestBuilder(reportParametersUrl, {...routeParams, regulationId})
+        .withLocalization()
         .fetchJson();
 }
 

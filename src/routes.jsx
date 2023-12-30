@@ -39,6 +39,8 @@ import {
   getComplianceSettings,
   setComplianceSettings,
   getComplianceCertificates,
+  generateReport,
+  getReports,
   getReport
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
@@ -58,7 +60,8 @@ import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceS
 import { CreateComplianceDocumentView } from "./components/compliance/CreateComplianceDocumentView";
 import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceDocumentView";
 import { AsyncComplianceSubmissionView } from "./components/compliance/ComplianceSubmissionView";
-import { ReportsView } from "./components/ReportsView";
+import { AsyncReportsView } from "./components/ReportsView";
+import { AsyncReportView } from "./components/ReportView";
 
 const store = getDefaultStore();
 
@@ -282,12 +285,16 @@ const routeData = [
               });
             },
             action: async ({params, request}) => {
-              var invocation = await request.json();
-              var response = await startPayrunJob(params, invocation);
+              const invocation = await request.json();
+              const response = await startPayrunJob(params, invocation);
               if (response.status === 201) {
+                const job = await response.json();
+                if (job.jobStatus === "Abort") {
+                  return job;
+                }
                 return redirect(`..`);
               }
-              /// TODO AJO do something here
+              return null;
             }
           }
         ]
@@ -378,34 +385,35 @@ const routeData = [
         }
       },
       {
-        path: "reports",
-        Component: ReportsView,
-        children: [
-          {
-            path: "test",
-            Component: CaseValueDocumentDialog,
-            loader: ({params}) => {
-              const routeParams = {...params, regulationId: 224, reportId: 50 };
-              const reportRequest = {
-                  "language": "English",
-                  "userId": 805,
-                  "payrollId": 132,
-                  "parameters": {
-                      "EmployeeIdentifier": "TF01 Herz Monica",
-                      "ValuesUntilDate": "10/1/2022",
-                      "AllEmployees": "false",
-                      "EmployeeLanguage": "false",
-                      "Language": "German",
-                      "SeparatedRetroDifferences": "true",
-                      "RegulationId": "224"
-                  }
-              };
-              return defer({
-                document: getReport(routeParams, reportRequest)
-              });
-            }
-          }
-        ]
+        path: "hr/reports",
+        Component: AsyncReportsView,
+        loader: ({params}) => {
+          return defer({
+            data: getReports(params)
+          });
+        }
+      },
+      {
+        path: "hr/reports/:regulationId/:reportId",
+        Component: AsyncReportView,
+        action: async ({params}) => {
+          const reportRequest = {
+              "language": "English",
+              "userId": 805,
+              "payrollId": params.payrollId,
+              "parameters": {
+                  "EmployeeIdentifier": "TF01 Herz Monica",
+                  "ValuesUntilDate": "10/1/2022",
+                  "AllEmployees": "false",
+                  "EmployeeLanguage": "false",
+                  "Language": "German",
+                  "SeparatedRetroDifferences": "true",
+                  "RegulationId": params.regulationId
+              }
+          };
+          const document = await generateReport(params, reportRequest);
+          return document;
+        }
       },
       {
         path: "company",

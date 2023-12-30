@@ -73,7 +73,8 @@ const translations = {
         "Period": "Periode",
         "Forecast": "Szenario",
         "Reason": "Grund",
-        "Select employees": "Mitarbeiter auswählen"
+        "Select employees": "Mitarbeiter auswählen",
+        "Create": "Erstellen"
     },
 };
 

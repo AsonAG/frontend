@@ -22,6 +22,7 @@ function FieldValueDropdownComponent({useDataHook}) {
       {...data}
       disabled={isReadonly}
       fullWidth
+      disableClearable={field.attributes["input.disableClear"]}
       renderInput={(params) => (
         <TextField
           {...params}

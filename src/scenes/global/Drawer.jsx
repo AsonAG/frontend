@@ -24,6 +24,7 @@ import { UserAccountComponent } from "./UserAccountComponent";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
 import { openTasksAtom } from "../../utils/dataAtoms";
+import { Description } from "@mui/icons-material";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -141,6 +142,7 @@ function Drawer({ temporary, open, onClose }) {
             <NavigationItem label={t("Employees")} to="hr/employees" icon={<PeopleOutlinedIcon />} />
             <NavigationItem label={t("Tasks")} to="hr/tasks" icon={<OpenTasksBadgeIcon />} />
             <NavigationItem label={t("Payruns")} to="hr/payruns" icon={<NotStartedOutlinedIcon />} />
+            <NavigationItem label={t("Reports")} to="hr/reports" icon={<Description />} />
             { 
               !import.meta.env.PROD && 
                 <NavigationItem label={t("Compliance")} to="hr/compliance" icon={<AssuredWorkloadIcon />} />

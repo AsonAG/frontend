@@ -15,6 +15,8 @@ import { FieldContext } from "../EditFieldComponent";
 
 export function EditFieldValueComponent({ excludeNoneValue = false }) {
 	const { field } = useContext(FieldContext);
+	if (field.attributes["input.hidden"])
+		return null;
 	if (field.lookupSettings && "lookupName" in field.lookupSettings) {
 		return <FieldValueLookupComponent />;
 	}
