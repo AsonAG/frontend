@@ -51,7 +51,7 @@ export function AsyncReportView() {
         </CaseFormContext.Provider>
       </Stack>
       <Stack direction="row" spacing={2} justifyContent="end">
-        <Button component={Link} to="..">{t("Back")}</Button>
+        <Button component={Link} to=".." relative="path">{t("Back")}</Button>
         <GenerateButton generate={generateReport} isGenerating={isGenerating}/>
       </Stack>
       {reportFile && <DocumentDialog documentPromise={reportFile} onClose={() => setReportFile(null)}/> }
