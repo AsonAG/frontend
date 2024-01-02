@@ -34,10 +34,8 @@ const complianceMessagesUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance
 const compliancePingUrl   = "/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
 const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
 const reportsUrl = "/tenants/:tenantId/payrolls/:payrollId/reports";
-const buildReportUrl = "/tenants/:tenantId/regulations/:regulationId/reports/sets/:reportId/build";
-const reportSetUrl = "/tenants/:tenantId/regulations/:regulationId/reports/sets/:reportId";
-const reportParametersUrl = "/tenants/:tenantId/regulations/:regulationId/reports/:reportId/parameters";
-const generateReportUrl = "/tenants/:tenantId/regulations/:regulationId/reports/:reportId/generate";
+const buildReportUrl = "/tenants/:tenantId/payrolls/:payrollId/reports/:reportId/build";
+const generateReportUrl = "/tenants/:tenantId/payrolls/:payrollId/reports/:reportId/generate";
 
 const store = getDefaultStore();
 
@@ -301,18 +299,12 @@ export function getReport(routeParams, reportRequest, signal) {
         .fetch();
 }
 
-export function generateReport(routeParams, reportRequest) {
+export function generateReport(routeParams, reportRequest, format) {
     return new FetchRequestBuilder(generateReportUrl, routeParams)
         .withMethod("POST")
         .withBody(reportRequest)
-        .withQueryParam("format", "pdf")
+        .withQueryParam("format", format)
         .fetch();
-}
-
-export function getReportParameters(routeParams, regulationId) {
-    return new FetchRequestBuilder(reportParametersUrl, {...routeParams, regulationId})
-        .withLocalization()
-        .fetchJson();
 }
 
 export function buildCase(routeParams, caseChangeSetup) {

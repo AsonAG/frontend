@@ -40,8 +40,7 @@ import {
   setComplianceSettings,
   getComplianceCertificates,
   generateReport,
-  getReports,
-  getReport
+  getReports
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -394,26 +393,8 @@ const routeData = [
         }
       },
       {
-        path: "hr/reports/:regulationId/:reportId",
+        path: "hr/reports/:reportId",
         Component: AsyncReportView,
-        action: async ({params}) => {
-          const reportRequest = {
-              "language": "English",
-              "userId": 805,
-              "payrollId": params.payrollId,
-              "parameters": {
-                  "EmployeeIdentifier": "TF01 Herz Monica",
-                  "ValuesUntilDate": "10/1/2022",
-                  "AllEmployees": "false",
-                  "EmployeeLanguage": "false",
-                  "Language": "German",
-                  "SeparatedRetroDifferences": "true",
-                  "RegulationId": params.regulationId
-              }
-          };
-          const document = await generateReport(params, reportRequest);
-          return document;
-        }
       },
       {
         path: "company",

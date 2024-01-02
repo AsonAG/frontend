@@ -30,15 +30,15 @@ const styling = {
 function ReportCard({report}) {
   return (
     <Card sx={styling}>
-      <CardActionArea component={Link} to={`${report.regulationId}/${report.id}`} sx={{height: "100%"}} state={{reportName: report.name}}>
+      <CardActionArea component={Link} to={`${report.id}`} sx={{height: "100%"}} state={{reportName: report.displayName}}>
         <CardContent>
           <Typography gutterBottom variant="h3" fontWeight="bold" component="div">
-            {report.name}
+            {report.displayName}
           </Typography>
           {
             report.description && 
               <Typography variant="body2" color="text.secondary">
-                {report.description}
+                {report.displayDescription}
               </Typography>
           }
         </CardContent>

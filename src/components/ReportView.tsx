@@ -1,4 +1,4 @@
-import { Stack, Button, CircularProgress } from "@mui/material";
+import { Stack, Button, CircularProgress, ButtonGroup, Paper, ClickAwayListener, MenuList, MenuItem, Grow, Popper } from "@mui/material";
 import { ContentLayout } from "./ContentLayout";
 import { Loading } from "./Loading";
 import { useTranslation } from "react-i18next";
@@ -10,9 +10,13 @@ import React, { useEffect, useState } from "react";
 import { generateReport, getReport } from "../api/FetchClient";
 import dayjs from "dayjs";
 import { DocumentDialog } from "./DocumentDialog";
+import { useAtomValue } from "jotai";
+import { userAtom } from "../utils/dataAtoms";
+import { ArrowDropDown } from "@mui/icons-material";
 
 
 export function AsyncReportView() {
+  const user = useAtomValue(userAtom);
   const params = useParams();
   const { state } = useLocation();
   const [reportFile, setReportFile] = useState<Promise<ReportFile> | null>(null);
@@ -20,9 +24,8 @@ export function AsyncReportView() {
     {
       tenantId: params.tenantId!,
       payrollId: params.payrollId!,
-      regulationId: params.regulationId!,
       reportId: params.reportId!,
-      userId: "805",
+      user: user,
       onReportGenerated: file => setReportFile(Promise.resolve(file))
     }
   );
@@ -34,7 +37,6 @@ export function AsyncReportView() {
     const reportName = state?.reportName ? state.reportName : t("Loading...");
     return <ContentLayout title={reportName}><Loading /></ContentLayout>;
   }
-  const icon = isGenerating ? <CircularProgress size="1em" sx={{color: "common.white"}} /> : null;
   return (
     <ContentLayout title={reportData.displayName}>
       <Stack spacing={2}>
@@ -42,7 +44,7 @@ export function AsyncReportView() {
           {
             reportData.parameters.map(p => (
               <FieldContext.Provider value={{field: p, displayName: p.displayName, required: p.mandatory, buildCase: buildReport}}>
-                <EditFieldValueComponent />
+                <EditFieldValueComponent key={p.id} />
               </FieldContext.Provider>
             ))
           }
@@ -50,7 +52,7 @@ export function AsyncReportView() {
       </Stack>
       <Stack direction="row" spacing={2} justifyContent="end">
         <Button component={Link} to="..">{t("Back")}</Button>
-        <Button variant="contained" disabled={isGenerating} onClick={generateReport} startIcon={icon}>{t("Create")}</Button>
+        <GenerateButton generate={generateReport} isGenerating={isGenerating}/>
       </Stack>
       {reportFile && <DocumentDialog documentPromise={reportFile} onClose={() => setReportFile(null)}/> }
     </ContentLayout>
@@ -66,13 +68,14 @@ type ReportFile = {
 interface ReportBuilderParams {
   tenantId: string,
   payrollId: string
-  regulationId: string,
   reportId: string,
-  userId: string,
+  user: {id: number, language: string},
   onReportGenerated: (file: ReportFile) => void
 }
 
-function useReportBuilder({tenantId, payrollId, regulationId, reportId, userId, onReportGenerated}: ReportBuilderParams) {
+type DocumentFormat = "pdf" | "word" | "excel" | "xml" | "xmlraw";
+
+function useReportBuilder({tenantId, payrollId, reportId, user, onReportGenerated}: ReportBuilderParams) {
 
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -80,13 +83,9 @@ function useReportBuilder({tenantId, payrollId, regulationId, reportId, userId, 
 
   function getReportRequest() {
     const reportRequest = {
-      "language": "English",
-      "userId": userId,
-      "payrollId": payrollId,
-      "parameters": {
-        "RegulationId": regulationId,
-        "Language": "German"
-      }
+      "language": user.language,
+      "userId": user.id,
+      "parameters": {}
     };
 
     if (reportData?.parameters) {
@@ -116,11 +115,11 @@ function useReportBuilder({tenantId, payrollId, regulationId, reportId, userId, 
 
     return () => controller.abort();
 
-  }, [tenantId, payrollId, regulationId, reportId, userId]);
+  }, [tenantId, payrollId, reportId, user.id]);
 
 
   async function _buildReport(signal?: AbortSignal) {
-    const reportResponse = await getReport({tenantId, payrollId, regulationId, reportId}, getReportRequest(), signal);
+    const reportResponse = await getReport({tenantId, payrollId, reportId}, getReportRequest(), signal);
     if (reportResponse.ok && !signal?.aborted) {
       const report = await reportResponse.json();
       processReportParameters(report.parameters);
@@ -128,10 +127,10 @@ function useReportBuilder({tenantId, payrollId, regulationId, reportId, userId, 
     }
   }
 
-  async function _generateReport() {
+  async function _generateReport(format: DocumentFormat) {
     try {
       setGenerating(true);
-      const reportResponse = await generateReport({tenantId, payrollId, regulationId, reportId}, getReportRequest());
+      const reportResponse = await generateReport({tenantId, payrollId, reportId}, getReportRequest(), format);
       if (reportResponse.ok) {
         const report = await reportResponse.json();
         onReportGenerated(report);
@@ -174,4 +173,74 @@ function processReportParameters(parameters) {
       parameter.lookupSettings = parameter.attributes["lookupSettings"];
     }
   }
+}
+
+function GenerateButton({generate, isGenerating}: {generate: (format: DocumentFormat) => void, isGenerating: boolean}) {
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef(null);
+  const { t } = useTranslation();
+
+  const handleMenuItemClick = (format: DocumentFormat) => {
+    generate(format);
+    setOpen(false);
+  };
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const icon = isGenerating ? <CircularProgress size="1em" sx={{color: "common.white"}} /> : null;
+
+  return (
+    <React.Fragment>
+      <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button" disabled={isGenerating}>
+        <Button onClick={() => generate('pdf')} startIcon={icon}>{t("Create PDF")}</Button>
+        <Button
+          size="small"
+          onClick={handleToggle}
+        >
+          <ArrowDropDown />
+        </Button>
+      </ButtonGroup>
+      <Popper
+        sx={{
+          zIndex: 1,
+        }}
+        open={open}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        transition
+        disablePortal
+      >
+        {({ TransitionProps, placement }) => (
+          <Grow
+            {...TransitionProps}
+            style={{
+              transformOrigin:
+                placement === 'bottom' ? 'center top' : 'center bottom',
+            }}
+          >
+            <Paper>
+              <ClickAwayListener onClickAway={handleClose}>
+                <MenuList autoFocusItem>
+                  <MenuItem onClick={() => handleMenuItemClick("word")}>{t("Create Word")}</MenuItem>
+                  <MenuItem onClick={() => handleMenuItemClick("excel")}>{t("Create Excel")}</MenuItem>
+                  <MenuItem onClick={() => handleMenuItemClick("xml")}>{t("Create XML")}</MenuItem>
+                  <MenuItem onClick={() => handleMenuItemClick("xmlraw")}>{t("Create XML Raw")}</MenuItem>
+                </MenuList>
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
+    </React.Fragment>
+  );
 }
