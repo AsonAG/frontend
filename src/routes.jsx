@@ -61,6 +61,7 @@ import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceD
 import { AsyncComplianceSubmissionView } from "./components/compliance/ComplianceSubmissionView";
 import { AsyncReportsView } from "./components/ReportsView";
 import { AsyncReportView } from "./components/ReportView";
+import { CompletionView } from "./components/compliance/CompletionView";
 
 const store = getDefaultStore();
 
@@ -321,7 +322,7 @@ const routeData = [
         action: async ({request, params}) => {
           const settings = await request.json();
           return setComplianceSettings(params, settings);
-        },
+                  },
         children: [
           {
             path: "transmittercertificates",
@@ -376,6 +377,16 @@ const routeData = [
       {
         path: "hr/compliance/submissions/:submissionId",
         Component: AsyncComplianceSubmissionView,
+        loader: ({params}) => {
+          return defer({
+            submission: getSubmission(params),
+            messages: getComplianceMessages(params)
+          });
+        }
+      },
+      {
+        path: "hr/compliance/submissions/:submissionId/tasks/:taskId",
+        Component: CompletionView,
         loader: ({params}) => {
           return defer({
             submission: getSubmission(params),

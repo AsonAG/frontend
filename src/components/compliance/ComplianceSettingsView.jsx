@@ -1,36 +1,53 @@
 import { useReducer, useState, Suspense } from 'react';
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../ContentLayout";
-import { Alert, Button, Divider, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Divider, ListSubheader, MenuItem, Select, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { checkInteroperabilityCompliance, pingCompliance } from "../../api/FetchClient";
-import { useLoaderData, useParams, useSubmit, Await } from 'react-router-dom';
+import { useLoaderData, useParams, useSubmit, Await, useAsyncValue } from 'react-router-dom';
 import { XmlView } from './XmlView';
 import { EnterpriseCertificatePicker, TransmitterCertificatePicker } from './ComplianceCertificatePicker';
 import { Loading } from '../Loading';
 import { ErrorView } from '../ErrorView';
-
-function getSettingsKey(settings) {
-  return `${settings.id},${settings.monitoringId},${settings.transmitterCertificate?.id},${settings.uidCertificate?.id}`
-}
+import { useUpdateEffect } from 'usehooks-ts';
 
 
 export function AsyncComplianceSettingsView() {
   const { t } = useTranslation();
   const routeData = useLoaderData();
+  const [value, setValue] = useState(0);
+
+  const handleChange = (_, newValue) => {
+    setValue(newValue);
+  }
+  
   return (
     <ContentLayout title={t("Settings")} height="100%">
-      <Suspense fallback={<Loading />}>
-        <Await resolve={routeData.data} errorElement={<ErrorView />}>
-          {
-            (data) => 
-              <Stack spacing={4}>
-                <ComplianceSettingsView key={getSettingsKey(data)} loadedSettings={data} />
-                <Divider />
-                <ComplianceTestingView />
-              </Stack>
-          }
-        </Await>
-      </Suspense>
+      <Stack direction="row" flex={1}>
+        <Tabs
+          orientation="vertical"
+          value={value}
+          onChange={handleChange}
+          sx={{minWidth: 140}}
+        >
+          <Tab label={t("Transmitter")} sx={{alignItems: "start", pl: 0}} disableRipple/>
+          <Tab label={t("Ping")} sx={{alignItems: "start", pl: 0}} disableRipple/>
+          <Tab label={t("CheckInteroperability")} sx={{alignItems: "start", pl: 0}} disableRipple/>
+        </Tabs>
+        <Divider flexItem orientation="vertical" />
+        <TabPanel value={value} index={0}>
+          <Suspense fallback={<Loading />}>
+            <Await resolve={routeData.data} errorElement={<ErrorView />}>
+              <ComplianceSettingsView />
+            </Await>
+          </Suspense>
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <Ping />
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <CheckInteroperability />
+        </TabPanel>
+      </Stack>
     </ContentLayout>
   );
 }
@@ -60,22 +77,50 @@ function reducer(state, action) {
       uidCertificate: action.value
     };
   }
+  if (action.type === "set_settings") {
+    return action.settings;
+  }
 
   throw new Error("invalid action");
 }
 
-function ComplianceSettingsView({loadedSettings}) {
+const defaultProductionUrl = "https://distributor.swissdec.ch/services/elm/SalaryDeclaration/20200220";
+
+const productionUrls = [
+  defaultProductionUrl
+]
+
+const testingUrls = [
+  "https://tst.itserve.ch/swissdec/refapps/stable/receiver/services/SalaryDeclarationService20200220",
+  "https://tst.itserve.ch/swissdec/refapps/next/receiver/services/SalaryDeclarationService20200220",
+  "https://tst.itserve.ch/swissdec/qualitytool/stable/services/SalaryDeclarationService20200220",
+  "https://tst.itserve.ch/swissdec/qualitytool/next/services/SalaryDeclarationService20200220"
+]
+
+function ComplianceSettingsView() {
   const { t } = useTranslation();
+  const loadedSettings = useAsyncValue();
   const [settings, dispatch] = useReducer(reducer, loadedSettings);
   const submit = useSubmit();
+
+  useUpdateEffect(() => dispatch({settings: loadedSettings, type: "set_settings"}), [loadedSettings]);
 
   const onSave = () => submit(settings, { method: "post", encType: "application/json" });
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} flex={1}>
       <Stack spacing={2} direction="row" alignItems="center">
-        <Typography width={170}>{t("Custom Submission Url")}</Typography>
-        <TextField value={settings.submissionUrl|| ""} placeholder={t("Default Submission Url")} onChange={e => dispatch({value: e.target.value, type: "set_submission_url"})} sx={{flex:1}} />
+        <Typography width={170}>{t("Submission url")}</Typography>
+        <Select value={settings.submissionUrl} sx={{flex: 1}} onChange={e => dispatch({value: e.target.value, type: "set_submission_url"})}  displayEmpty>
+          <ListSubheader>{t("Production")}</ListSubheader>
+          {
+            productionUrls.map(url => <MenuItem key={url} value={url === defaultProductionUrl ? "" : url}>{url}</MenuItem>)
+          }
+          <ListSubheader>{t("Testing")}</ListSubheader>
+          {
+            testingUrls.map(url => <MenuItem key={url} value={url}>{url}</MenuItem>)
+          }
+        </Select>
       </Stack>
       <Stack spacing={2} direction="row" alignItems="center">
         <Typography width={170}>{t("Custom MonitoringId")}</Typography>
@@ -94,34 +139,73 @@ function ComplianceSettingsView({loadedSettings}) {
   );
 }
 
-function ComplianceTestingView() {
+function ComplianceResponse({response, successMessage}) {
+  const { t } = useTranslation();
+
+  if (!response.request) {
+    return null
+  }
+
+  const message = response.errors ?
+    <Alert severity="error" variant="filled"><Typography>{response.errors}</Typography></Alert> :
+    <Alert severity="success" variant="filled"><Typography>{successMessage}</Typography></Alert>;
+  
+  return (
+    <Stack spacing={2} flex={1}>
+      {message}
+      <XmlView title={t("Request")} xml={response.request} codeProps={{flex: "1 1 200px"}} />
+      <XmlView title={t("Response")} xml={response.response} codeProps={{flex: "1 1 200px"}} />
+    </Stack>
+  )
+}
+
+function Ping() {
+  const { t } = useTranslation();
   const params = useParams();
   const [response, setResponse] = useState({});
-  const [secondOperand, setSecondOperand] = useState(0.0);
-
-  const ping = async () => {
+  
+  const execute = async () => {
     const response = await pingCompliance(params);
     setResponse(response);
   }
 
-  const check = async () => {
+  return (
+    <Stack spacing={2} flex={1}>
+      <Button variant="contained" onClick={execute} sx={{alignSelf: "start"}}>{t("Ping")}</Button>
+      <Divider flexItem />
+      <ComplianceResponse response={response} successMessage={t("Ping successful!")}/>
+    </Stack>
+  );
+}
+
+function CheckInteroperability() {
+  const { t } = useTranslation();
+  const params = useParams();
+  const [secondOperand, setSecondOperand] = useState(0.0);
+  const [response, setResponse] = useState({});
+  
+  const execute = async () => {
     const response = await checkInteroperabilityCompliance(params, secondOperand);
     setResponse(response);
   }
   
   return (
     <Stack spacing={2}>
-      <Stack direction="row" spacing={2} divider={<Divider orientation="vertical" />}>
-        <Button variant="contained" onClick={ping}>Ping</Button>
-        <Stack direction="row" spacing={2}>
-          <TextField variant="standard" label="Second Operand" value={secondOperand} onChange={e => setSecondOperand(e.target.value)} />
-          <Button variant="contained" onClick={check}>CheckInteroperability</Button>
-        </Stack>
+      <Stack direction="row" alignContent="start" spacing={2}>
+        <TextField variant="standard" label={t("Second Operand")} value={secondOperand} onChange={e => setSecondOperand(e.target.value)} />
+        <Button variant="contained" onClick={execute} sx={{alignSelf: "stretch", alignItems: "center"}}>{t("Check interoperability")}</Button>
       </Stack>
-      { response.errors && <Alert severity="error" variant="filled"><Typography>{response.errors}</Typography></Alert>}
-      <XmlView title="Request" xml={response.request} codeProps={{flexBasis: "200px"}} />
-      <XmlView title="Response" xml={response.response} codeProps={{flexBasis: "200px"}} />
+      <Divider flexItem />
+      <ComplianceResponse response={response} successMessage={t("CheckInteroperability successful!")}/>
     </Stack>
-  )
+  );
 }
 
+function TabPanel(props) {
+  const { value, index, children } = props;
+
+  if (value !== index)
+    return null;
+
+  return <Box sx={{px: 4}} flex={1} display="flex">{children}</Box>;
+}
