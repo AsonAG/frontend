@@ -1,7 +1,7 @@
 import { ContentLayout, ContentStack } from "../ContentLayout";
 import { useTranslation } from "react-i18next";
 import { useLocation, Await, useLoaderData, useAsyncValue, Link } from "react-router-dom";
-import { Skeleton, Typography, Stack, IconButton, Tooltip, Paper, Divider } from "@mui/material";
+import { Skeleton, Typography, Stack, IconButton, Tooltip, Paper, Divider, Alert } from "@mui/material";
 import { Suspense, useState } from "react";
 import { ComplianceMessage } from "./ComplianceMessage";
 import { Science } from "@mui/icons-material";
@@ -56,7 +56,8 @@ function ComplianceSubmissionDetails({expertMode, buttons}) {
   return (
     <ContentLayout title={submission ? submission.name : <Skeleton />} buttons={buttons}>
       <Typography variant="h6">{t("Status")}</Typography>
-      <Typography>{submission ? t(/*submission.submissionStatus*/"In Bearbeitung") : <Skeleton />}</Typography>
+      <Typography>{submission ? t(submission.submissionStatus) : <Skeleton />}</Typography>
+      { submission?.errors && <Alert severity="error" variant="filled"><Typography>{submission.errors}</Typography></Alert> }
       {
         expertMode && <>
           <Typography variant="h6">{t("DeclarationId")}</Typography>

@@ -8,6 +8,7 @@ import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
 import { AsyncEventTable } from "./components/tables/EventTable";
 import dayjs from "dayjs";
+import i18next from "i18next";
 
 import { App } from "./App";
 
@@ -39,7 +40,7 @@ import {
   getComplianceSettings,
   setComplianceSettings,
   getComplianceCertificates,
-  generateReport,
+  generateComplianceDocument,
   getReports
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
@@ -50,7 +51,7 @@ import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom, payrunAtom } from "./utils/dataAtoms";
+import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom, payrunAtom, toast } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
 import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
@@ -321,8 +322,14 @@ const routeData = [
         },
         action: async ({request, params}) => {
           const settings = await request.json();
-          return setComplianceSettings(params, settings);
-                  },
+          const response = await setComplianceSettings(params, settings);
+          if (response.ok) {
+            toast("success", i18next.t("Settings saved!"));
+          } else {
+            toast("error", i18next.t("Error while saving settings!"));
+          }
+          return response;
+        },
         children: [
           {
             path: "transmittercertificates",
@@ -356,6 +363,11 @@ const routeData = [
         action: async ({request, params}) => {
           const { isTestCase } = await request.json();
           const submission = await createSubmission(params, isTestCase);
+          if (submission.errors) {
+            toast("error", i18next.t("Submission was unsuccessful!"));
+          } else {
+            toast("success", i18next.t("Submission was successful!"));
+          }
           return redirect(`../hr/compliance/submissions/${submission.id}`);
         }
       },
@@ -364,8 +376,25 @@ const routeData = [
         Component: CreateComplianceDocumentView,
         action: async ({params, request}) => {
           const data = await request.json();
-          const response = await uploadComplianceDocument(params, data);
-          return redirect(`../hr/compliance/documents/${response.id}`)
+          let response = null;
+          switch (data.type) {
+            case "upload":
+              response = await uploadComplianceDocument(params, data.document);
+              break;
+            case "generate":
+              response = await generateComplianceDocument(params, data.reportRequest);
+              break;
+            default:
+              throw new Error("invalid action");
+          }
+          if (response.ok) {
+            toast("success", i18next.t("Document ready!"))
+            const document = await response.json();
+            return redirect(`../hr/compliance/documents/${document.id}`)
+          } else {
+            toast("error", i18next.t("Unable to save document!"))
+            return null;
+          }
         }
       },
       {

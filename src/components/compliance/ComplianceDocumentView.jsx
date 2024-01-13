@@ -65,16 +65,16 @@ function ComplianceDocumentView() {
           <Link href={getDataUrl(doc)} download={doc.name} underline="none" color="inherit">
             <MenuItem onClick={handleClose}>
               <ListItemIcon><Download fontSize="small"/></ListItemIcon>
-              Download
+              {t("Download")}
             </MenuItem>
           </Link>
           <MenuItem onClick={handleShowPdf}>
             <ListItemIcon><PictureAsPdf fontSize="small"/></ListItemIcon>
-            Display PDF
+            {t("Display PDF")}
           </MenuItem>
           <MenuItem onClick={handleClose} sx={destructiveMenuItem}>
             <ListItemIcon sx={destructiveMenuItem}><DeleteForever fontSize="small"/></ListItemIcon>
-            Delete
+            {t("Delete")}
           </MenuItem>
         </Menu>
         { showPdf && <DocumentDialog documentPromise={pdfPromise} onClose={() => setShowPdf(false)} />}

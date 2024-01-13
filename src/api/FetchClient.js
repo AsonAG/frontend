@@ -27,6 +27,7 @@ const complianceUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance";
 const complianceSettingsUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance/settings";
 const complianceCertificatesUrl       = "/tenants/:tenantId/payrolls/:payrollId/compliance/certificates";
 const complianceDocumentsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents";
+const generateComplianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/generate";
 const complianceDocumentUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
 const complianceSubmissionsUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions";
 const complianceSubmissionUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance/submissions/:submissionId";
@@ -299,11 +300,10 @@ export function getReport(routeParams, reportRequest, signal) {
         .fetch();
 }
 
-export function generateReport(routeParams, reportRequest, format) {
+export function generateReport(routeParams, reportRequest) {
     return new FetchRequestBuilder(generateReportUrl, routeParams)
         .withMethod("POST")
         .withBody(reportRequest)
-        .withQueryParam("format", format)
         .fetch();
 }
 
@@ -391,7 +391,7 @@ export function setComplianceSettings(routeParams, settings) {
     return new FetchRequestBuilder(complianceSettingsUrl, routeParams)
         .withMethod("POST")
         .withBody(settings)
-        .fetchJson();
+        .fetch();
 }
 
 export function getComplianceCertificates(routeParams, type) {
@@ -415,7 +415,14 @@ export function uploadComplianceDocument(routeParams, document) {
     return new FetchRequestBuilder(complianceDocumentsUrl, routeParams)
         .withMethod("POST")
         .withBody(document)
-        .fetchJson();
+        .fetch();
+}
+
+export function generateComplianceDocument(routeParams, reportRequest) {
+    return new FetchRequestBuilder(generateComplianceDocumentUrl, routeParams)
+        .withMethod("POST")
+        .withBody(reportRequest)
+        .fetch();
 }
 
 export function pingCompliance(routeParams) {
@@ -454,6 +461,7 @@ export function getComplianceMessages(routeParams) {
     return new FetchRequestBuilder(complianceMessagesUrl, routeParams)
         .withQueryParam("filter", submissionFilter)
         .withQueryParam("orderBy", "created desc")
+        .withQueryParam("top", "7")
         .withLocalization()
         .fetchJson();
 }

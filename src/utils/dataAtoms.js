@@ -2,7 +2,7 @@ import { atomWithRefresh } from "./atomWithRefresh";
 import { getPayrolls, getTasks, getTenant, getUser, getEmployeeByIdentifier, getPayruns } from "../api/FetchClient";
 import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
 import { getAuthUser } from '../auth/getUser';
-import { atom } from "jotai";
+import { atom, getDefaultStore } from "jotai";
 
 export const tenantAtom = atom(get => {
   const tenantId = get(tenantIdAtom);
@@ -55,3 +55,9 @@ export const openTasksAtom = atomWithRefresh(get => {
 });
 
 export const showTaskCompletedAlertAtom = atom(false);
+
+export const toastNotificationAtom = atom(null);
+
+export function toast(severity, message) {
+  getDefaultStore().set(toastNotificationAtom, {severity, message})
+}

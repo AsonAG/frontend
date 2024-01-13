@@ -9,6 +9,7 @@ import { EnterpriseCertificatePicker, TransmitterCertificatePicker } from './Com
 import { Loading } from '../Loading';
 import { ErrorView } from '../ErrorView';
 import { useUpdateEffect } from 'usehooks-ts';
+import { ComplianceMessage } from './ComplianceMessage';
 
 
 export function AsyncComplianceSettingsView() {
@@ -114,7 +115,7 @@ function ComplianceSettingsView() {
         <Select value={settings.submissionUrl} sx={{flex: 1}} onChange={e => dispatch({value: e.target.value, type: "set_submission_url"})}  displayEmpty>
           <ListSubheader>{t("Production")}</ListSubheader>
           {
-            productionUrls.map(url => <MenuItem key={url} value={url === defaultProductionUrl ? "" : url}>{url}</MenuItem>)
+            productionUrls.map(url => <MenuItem key={url} value={url === defaultProductionUrl ? null : url}>{url}</MenuItem>)
           }
           <ListSubheader>{t("Testing")}</ListSubheader>
           {
@@ -123,8 +124,11 @@ function ComplianceSettingsView() {
         </Select>
       </Stack>
       <Stack spacing={2} direction="row" alignItems="center">
-        <Typography width={170}>{t("Custom MonitoringId")}</Typography>
-        <TextField value={settings.monitoringId || ""} placeholder={t("Default MonitoringId")} onChange={e => dispatch({value: e.target.value, type: "set_monitoring_id"})} sx={{flex:1}} />
+        <Typography width={170}>{t("MonitoringId")}</Typography>
+        <Select value={settings.monitoringId} sx={{flex: 1}} onChange={e => dispatch({value: e.target.value, type: "set_monitoring_id"})}  displayEmpty>
+          <MenuItem value={null}>ason</MenuItem>
+          <MenuItem value="asoncert">asoncert</MenuItem>
+        </Select>
       </Stack>
       <Stack spacing={2} direction="row" alignItems="center">
         <Typography width={170}>{t("Transmitter Certificate")}</Typography>
@@ -140,8 +144,6 @@ function ComplianceSettingsView() {
 }
 
 function ComplianceResponse({response, successMessage}) {
-  const { t } = useTranslation();
-
   if (!response.request) {
     return null
   }
@@ -153,8 +155,7 @@ function ComplianceResponse({response, successMessage}) {
   return (
     <Stack spacing={2} flex={1}>
       {message}
-      <XmlView title={t("Request")} xml={response.request} codeProps={{flex: "1 1 200px"}} />
-      <XmlView title={t("Response")} xml={response.response} codeProps={{flex: "1 1 200px"}} />
+      <ComplianceMessage message={response} />
     </Stack>
   )
 }
@@ -178,21 +179,28 @@ function Ping() {
   );
 }
 
+
 function CheckInteroperability() {
   const { t } = useTranslation();
   const params = useParams();
-  const [secondOperand, setSecondOperand] = useState(0.0);
+  const [secondOperand, setSecondOperand] = useState("1.00");
   const [response, setResponse] = useState({});
   
   const execute = async () => {
     const response = await checkInteroperabilityCompliance(params, secondOperand);
     setResponse(response);
   }
+
+  const onBlur = e => {
+    let value = parseFloat(e.target.value);
+    value = isNaN(value) ? 1 : value;
+    setSecondOperand((Math.trunc(value * 100) / 100).toFixed(2));
+  }
   
   return (
     <Stack spacing={2}>
       <Stack direction="row" alignContent="start" spacing={2}>
-        <TextField variant="standard" label={t("Second Operand")} value={secondOperand} onChange={e => setSecondOperand(e.target.value)} />
+        <TextField variant="standard" label={t("Second Operand")} value={secondOperand} onChange={e => setSecondOperand(e.target.value)} onBlur={onBlur}/>
         <Button variant="contained" onClick={execute} sx={{alignSelf: "stretch", alignItems: "center"}}>{t("Check interoperability")}</Button>
       </Stack>
       <Divider flexItem />

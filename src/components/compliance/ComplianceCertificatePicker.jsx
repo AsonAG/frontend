@@ -7,11 +7,13 @@ import { toBase64 } from "../../services/converters/BinaryConverter";
 import { useFetcher } from "react-router-dom";
 
 export function TransmitterCertificatePicker(props) {
-  return <ComplianceCertificatePicker nullValueText={"Default certificate"} certificateType="Transmitter" {...props} />
+  const { t } = useTranslation();
+  return <ComplianceCertificatePicker nullValueText={t("Default certificate")} certificateType="Transmitter" {...props} />
 }
 
 export function EnterpriseCertificatePicker(props) {
-  return <ComplianceCertificatePicker nullValueText="No certificate" certificateType="Enterprise" {...props} />
+  const { t } = useTranslation();
+  return <ComplianceCertificatePicker nullValueText={t("No certificate")} certificateType="Enterprise" {...props} />
 }
 
 const ListItemButton = styled(MuiListItemButton)(({theme}) => ({
