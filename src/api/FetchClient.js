@@ -1,5 +1,5 @@
 import { generatePath } from 'react-router-dom';
-import { getAuthUser } from '../auth/getUser';
+import { getAuthUser, localUserEmailAtom } from '../auth/getUser';
 import { getDefaultStore } from 'jotai';
 import { userAtom } from '../utils/dataAtoms';
 import { useOidc } from '../auth/authConfig';
@@ -61,9 +61,12 @@ class FetchRequestBuilder {
         if (useOidc) {
             const authUser = getAuthUser();
             this.headers.set('Authorization', `Bearer ${authUser?.access_token}`);
+        } else {
+            this.headers.set('X_ASON_USER_IDENTIFIER', store.get(localUserEmailAtom));
         }
         this.headers.set('Accept', 'application/json');
         this.headers.set('Content-Type', 'application/json');
+        
     }
 
     withRouteParams(routeParams) {
@@ -304,6 +307,7 @@ export function generateReport(routeParams, reportRequest) {
     return new FetchRequestBuilder(generateReportUrl, routeParams)
         .withMethod("POST")
         .withBody(reportRequest)
+        .withTimout(10 * 60 * 1000)
         .fetch();
 }
 

@@ -4,7 +4,6 @@ import { ContentLayout } from "../ContentLayout";
 import { Alert, Box, Button, Divider, ListSubheader, MenuItem, Select, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { checkInteroperabilityCompliance, pingCompliance } from "../../api/FetchClient";
 import { useLoaderData, useParams, useSubmit, Await, useAsyncValue } from 'react-router-dom';
-import { XmlView } from './XmlView';
 import { EnterpriseCertificatePicker, TransmitterCertificatePicker } from './ComplianceCertificatePicker';
 import { Loading } from '../Loading';
 import { ErrorView } from '../ErrorView';

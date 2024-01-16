@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { VpnKey } from "@mui/icons-material";
-import { Button, Typography, Stack, Dialog, DialogTitle, DialogContent, List, ListItemButton as MuiListItemButton, DialogActions, useTheme, useMediaQuery, Divider, Skeleton } from "@mui/material";
+import { Button, Typography, Stack, Dialog, DialogTitle, DialogContent, List, ListItemButton as MuiListItemButton, DialogActions, useTheme, useMediaQuery, Divider, Skeleton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toBase64 } from "../../services/converters/BinaryConverter";
@@ -27,12 +27,20 @@ function isNew(value) {return value !== null && !value.id}
 function ComplianceCertificatePicker(props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [passwordDialogForCertificate, setPasswordDialogForCertificate] = useState(null);
   const onClose = () => setOpen(false);
   const { value, nullValueText, setValue: setValueParent } = props;
   const titleText = !value ? t(nullValueText) : value.name;
   const setValue = value => {
     onClose();
     setValueParent(value);
+    if (isNew(value)) {
+      setPasswordDialogForCertificate(value);
+    }
+  }
+  const setPassword = pw => {
+    passwordDialogForCertificate.password = pw;
+    setPasswordDialogForCertificate(null);
   }
   const titlePrefix = isNew(value) ? t("(New)") : null;
   return <>
@@ -43,6 +51,7 @@ function ComplianceCertificatePicker(props) {
       </Stack>
     </Button>
     <CertificateDialog {...props} open={open} onClose={onClose} setValue={setValue} />
+    { passwordDialogForCertificate && <PasswordDialog setCertificatePassword={setPassword} />}
   </>;
 }
 
@@ -51,6 +60,23 @@ const dialogSx = {
     sm: { width: '80%', maxHeight: 435 }
   }
 };
+
+
+function PasswordDialog({setCertificatePassword}) {
+  const { t } = useTranslation();
+  const [password, setPassword] = useState("");
+  return (
+    <Dialog open>
+      <DialogTitle>{t("Certificate password")}</DialogTitle>
+      <DialogContent dividers>
+        <TextField type="password" label={t("Password")} value={password} onChange={e => setPassword(e.target.value)} />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setCertificatePassword(password)}>{t("Bestätigen")}</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
 
 function CertificateDialog({value, setValue, nullValueText, open, onClose, certificateType}) {
   const { t } = useTranslation();
@@ -126,7 +152,6 @@ function UploadCertificateButton({setValue}) {
       return;
     const file = files[0];
     const data = await toBase64(file);
-    console.log("setting new certificate ");
     setValue({
       name: file.name,
       content: data

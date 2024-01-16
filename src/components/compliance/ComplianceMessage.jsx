@@ -11,10 +11,12 @@ export function ComplianceMessage({ message }) {
     const [documentPromise, setDocumentPromise] = useState(null);
     return (
         <Stack component={Paper} spacing={1} p={2}>
-            <Typography fontWeight="bold" noWrap flex={1}>{message.messageType}</Typography>
+            <Stack direction="row" spacing={1} flex={1}>
+                <Typography fontWeight="bold" noWrap>{message.messageType}</Typography>
+                <MessageError message={message} />
+            </Stack>
             <Typography>{formatDate(message.created, true)}</Typography>
             <Stack direction="row" spacing={3} flexWrap="wrap">
-                <MessageError message={message} />
                 <MessageLink name={t("Request")} content={message.request} setDocumentPromise={setDocumentPromise} />
                 <MessageLink name={t("Response")} content={message.response} setDocumentPromise={setDocumentPromise}  />
                 { message.encryptedRequest && <MessageLink name={t("Encrypted request")} content={message.encryptedRequest} setDocumentPromise={setDocumentPromise}  /> }

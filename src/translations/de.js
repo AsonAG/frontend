@@ -88,7 +88,7 @@ const translations = {
         "Transmitter Certificate": "Transmitterzertifikat",
         "Enterprise Certificate": "Unternehmenszertifikat",
         "Default certificate": "Standard Zertifikat",
-        "No certificate": "Kein Zerifikat",
+        "No certificate": "Kein Zertifikat",
         "Click to select certificate": "Zum Auswählen von Zertifikat klicken",
         "Select certificate": "Zertifikat auswählen",
         "Upload new certificate": "Neues Zertifikat hochladen",
