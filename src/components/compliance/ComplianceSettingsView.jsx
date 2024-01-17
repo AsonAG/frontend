@@ -197,7 +197,7 @@ function CheckInteroperability() {
   }
   
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} flex={1}>
       <Stack direction="row" alignContent="start" spacing={2}>
         <TextField variant="standard" label={t("Second Operand")} value={secondOperand} onChange={e => setSecondOperand(e.target.value)} onBlur={onBlur}/>
         <Button variant="contained" onClick={execute} sx={{alignSelf: "stretch", alignItems: "center"}}>{t("Check interoperability")}</Button>

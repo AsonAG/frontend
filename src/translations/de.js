@@ -99,6 +99,7 @@ const translations = {
         "Submission was successful!": "Übermittlung war erfolgreich!",
         "CheckInteroperability successful!": "CheckInteroperability erfolgreich!",
         "Ping successful!": "Ping erfolgreich!",
+        "Contact your IT administrator to resolve this problem.": "Kontaktieren Sie Ihren IT Administrator, um dieses Problem zu lösen.",
         "Submissions": "Übermittlungen",
         "Messages": "Nachrichten",
         "Request": "Anfrage",

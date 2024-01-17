@@ -303,11 +303,12 @@ export function getReport(routeParams, reportRequest, signal) {
         .fetch();
 }
 
-export function generateReport(routeParams, reportRequest) {
+export function generateReport(routeParams, reportRequest, format) {
     return new FetchRequestBuilder(generateReportUrl, routeParams)
         .withMethod("POST")
         .withBody(reportRequest)
         .withTimout(10 * 60 * 1000)
+        .withQueryParam("format", format)
         .fetch();
 }
 

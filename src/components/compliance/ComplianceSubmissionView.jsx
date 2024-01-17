@@ -1,7 +1,7 @@
 import { ContentLayout, ContentStack } from "../ContentLayout";
 import { useTranslation } from "react-i18next";
 import { useLocation, Await, useLoaderData, useAsyncValue, Link } from "react-router-dom";
-import { Skeleton, Typography, Stack, IconButton, Tooltip, Paper, Divider, Alert } from "@mui/material";
+import { Skeleton, Typography, Stack, IconButton, Tooltip, Paper, Divider, Alert, AlertTitle } from "@mui/material";
 import { Suspense, useState } from "react";
 import { ComplianceMessage } from "./ComplianceMessage";
 import { Science } from "@mui/icons-material";
@@ -11,8 +11,8 @@ export function AsyncComplianceSubmissionView() {
   const [expertMode, setExpertMode] = useState(false);
   const loaderData = useLoaderData();
   const { t } = useTranslation();
-  const toggleExportModeButton = <ToggleExpertModeButton expertMode={expertMode} setExpertMode={setExpertMode} />
-  const details = <ComplianceSubmissionDetails expertMode={expertMode} buttons={toggleExportModeButton} />
+  const toggleExpertModeButton = <ToggleExpertModeButton expertMode={expertMode} setExpertMode={setExpertMode} />
+  const details = <ComplianceSubmissionDetails expertMode={expertMode} buttons={toggleExpertModeButton} />
   return (
     <Stack spacing={3}>
       <Suspense fallback={details}>
@@ -24,21 +24,21 @@ export function AsyncComplianceSubmissionView() {
       <ContentStack>
         <Typography variant="h6">{t("Offene Aufgaben")}</Typography>
         <Stack component={Paper} variant="outlined" divider={<Divider flexItem />}>
-          <ComplianceTaskRow title="DialogResult Aufgabe"/>
-          <ComplianceTaskRow title="CompletionAndResult Aufgabe"/>
-          <ComplianceTaskRow title="Result (? wahrscheinlich nicht)"/>
-          <ComplianceTaskRow title="CompletionAndResult Aufgabe"/>
+        <ComplianceTaskRow title="DialogResult Aufgabe"/>
+        <ComplianceTaskRow title="CompletionAndResult Aufgabe"/>
+        <ComplianceTaskRow title="Result (? wahrscheinlich nicht)"/>
+        <ComplianceTaskRow title="CompletionAndResult Aufgabe"/>
         </Stack>
-      </ContentStack>
+        </ContentStack>
 
-      <ContentStack>
+        <ContentStack>
         <Typography variant="h6">{t("Erledigte Aufgaben")}</Typography>
         <Stack component={Paper} variant="outlined" divider={<Divider flexItem />}>
-          <ComplianceTaskRow title="CompletionAndResult" completed/>
-          <ComplianceTaskRow title="DialogResult" completed/>
+        <ComplianceTaskRow title="CompletionAndResult" completed/>
+        <ComplianceTaskRow title="DialogResult" completed/>
         </Stack>
-      </ContentStack>
-      
+        </ContentStack>
+            
       {
         expertMode && 
           <ContentStack>
@@ -57,13 +57,9 @@ function ComplianceSubmissionDetails({expertMode, buttons}) {
     <ContentLayout title={submission ? submission.name : <Skeleton />} buttons={buttons}>
       <Typography variant="h6">{t("Status")}</Typography>
       <Typography>{submission ? t(submission.submissionStatus) : <Skeleton />}</Typography>
-      { submission?.errors && <Alert severity="error" variant="filled"><Typography>{submission.errors}</Typography></Alert> }
-      {
-        expertMode && <>
-          <Typography variant="h6">{t("DeclarationId")}</Typography>
-          <Typography>{submission ? submission.declarationId ?? "No declaration id" : <Skeleton />}</Typography>
-        </>
-      }
+      { submission?.errors && <Alert severity="error" variant="filled"><AlertTitle>{submission.errors}</AlertTitle>{t("Contact your IT administrator to resolve this problem.")}</Alert> }
+      <Typography variant="h6">{t("DeclarationId")}</Typography>
+      <Typography>{submission ? submission.declarationId ?? "No declaration id" : <Skeleton />}</Typography>
     </ContentLayout>
   )
 }
