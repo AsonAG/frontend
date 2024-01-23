@@ -1,72 +1,83 @@
 import { Dialog, Divider, Box, Stack, IconButton, Typography, Fab, useTheme } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { Await, useAsyncValue, useLoaderData, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-import { getDocument } from "../api/FetchClient";
+import { useMemo, Suspense } from "react";
 import { ArrowBack, Download } from "@mui/icons-material";
-import { Loading } from "./Loading";
 import { Centered } from "./Centered";
+import { getDataUrl } from "../utils/DocumentUtils";
+import { XmlView } from "./compliance/XmlView";
+import { Loading } from "./Loading";
 
-export function DocumentDialog() {
+export function CaseValueDocumentDialog() {
+  const loaderData = useLoaderData();
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const onClose = () => navigate("..");
+  return <DocumentDialog documentPromise={loaderData.document} onClose={onClose} />;
+}
+
+export function DocumentDialog({ documentPromise, onClose }) {
+  const { t } = useTranslation();
+  const { state } = useLocation();
+  const title = state?.name ?? t("Loading");
+
   return (
     <Dialog open fullScreen onClose={onClose}>
-      <DialogHeader title={t("Document")} onClose={onClose}  />
+      <Suspense fallback={<DialogHeader title={title} onClose={onClose} />}>
+        <Await resolve={documentPromise}>
+          {(doc) => <DialogHeader title={doc.name} onClose={onClose} />}
+        </Await>
+      </Suspense>
       <Divider />
-      <DocumentPreview flex={1} />
+      <Box sx={{display: "grid", justifyItems: "stretch", alignItems: "stretch", flex: 1, minHeight: 0 }}>
+        <Suspense fallback={<Loading />}>
+          <Await resolve={documentPromise}>
+            <DocumentView />
+          </Await>
+        </Suspense>
+      </Box>
     </Dialog>
   );
 }
+const layoutSx = {
+  maxWidth: "100%",
+  gridArea: "1 / 1", 
+  p: 5,
+  minHeight: 0,
+  overflowY: "auto" 
+};
 
-function DocumentPreview(boxProps) {
-  const params = useParams();
-  const [doc, setDoc] = useState(null);
-  const [isLoading, setLoading] = useState(true);
-  const { t } = useTranslation();
+function DocumentView() {
+  const doc = useAsyncValue();
+  const url = useMemo(() => getDataUrl(doc), [doc]);
+  return <>
+    <DocumentDisplay doc={doc} url={url} />
+    <DownloadButton url={url} name={doc?.name} sx={{
+      gridArea: "1 / 1", 
+      justifySelf: "end", 
+      alignSelf: "end", 
+      m: 2,
+      pointerEvents: "auto"
+    }} />
+  </>;
+}
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const d = await getDocument(params);
-        setDoc({ url: getDataUrl(d), name: d.name });
-      }
-      catch { }
-      finally {
-        setLoading(false);
-      }
-      
-    }
-    loadData();
-  }, [params]);
-
-
-  if (isLoading) {
-    return <Loading />;
+function DocumentDisplay({doc, url}) {
+  switch (doc?.contentType) {
+    case "text/xml": return <Box sx={layoutSx}><XmlView xml={doc.content} /></Box>;
+    default: return <GeneralPreview url={url} />;
   }
+}
 
+function GeneralPreview({ url }) {
+  const { t } = useTranslation();
   return (
-    <Box sx={{display: "grid", justifyItems: "stretch", alignItems: "stretch", pointerEvents:"none"}} {...boxProps}>
-      <Box sx={{
-        border: "none",
-        objectFit: "contain",
-        maxWidth: "100%",
-        gridArea: "1 / 1", 
-        m: 5, 
-        pointerEvents: "auto"}} component="object" data={doc.url}>
-        <Centered><Typography>{t("Preview not available.")}</Typography></Centered>
-      </Box>
-      <DownloadButton url={doc.url} name={doc.name} sx={{
-        gridArea: "1 / 1", 
-        justifySelf: "end", 
-        alignSelf: "end", 
-        m: 2,
-        pointerEvents: "auto"
-      }} />
+    <Box component="object" data={url} sx={{
+      border: "none",
+      objectFit: "contain",
+      ...layoutSx
+      }}>
+      <Centered><Typography>{t("Preview not available.")}</Typography></Centered>
     </Box>
-    
   );
 }
 
@@ -94,8 +105,4 @@ function DownloadButton({url, name, sx}) {
         <Typography>Download</Typography>
     </Fab>
   );
-}
-
-function getDataUrl(document) {
-  return `data:${document.contentType};base64,${document.content}`
 }

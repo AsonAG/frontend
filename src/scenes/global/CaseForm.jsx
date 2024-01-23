@@ -21,7 +21,6 @@ export function Component() {
   const params = useParams();
   const { caseData, caseErrors, fatalError, attachments, loading, buildCase, addCase } = useCaseData(params, user, payroll);
   const formRef = useRef();
-  
 
   const theme = useTheme();
   // this breakpoint was chosen because at this point the datefields + input field

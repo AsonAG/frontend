@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useCreateTheme } from "./theme";
-import { CssBaseline, Divider, ThemeProvider, Stack, useMediaQuery, IconButton } from "@mui/material";
+import { CssBaseline, Divider, ThemeProvider, Stack, useMediaQuery, IconButton, Snackbar as MuiSnackbar, Alert, Typography } from "@mui/material";
 import Topbar from "./scenes/global/Topbar";
 import Drawer from "./scenes/global/Drawer";
 
@@ -22,6 +22,8 @@ dayjs.extend(localizedFormat);
 // dynamically load these when we support more locales
 import "dayjs/locale/de";
 import "dayjs/locale/en";
+import { useAtom } from "jotai";
+import { toastNotificationAtom } from "./utils/dataAtoms";
 
 
 export function App({renderDrawer = false}) {
@@ -52,7 +54,7 @@ export function App({renderDrawer = false}) {
 			<CssBaseline />
 			<Stack className="app" direction="row">
 				{renderDrawer && <Drawer temporary={useTemporaryDrawer} open={drawerOpen} onClose={() => setDrawerOpen(false)} /> }
-				<Stack sx={{flexGrow: 1}} divider={<Divider />}>
+				<Stack sx={{flexGrow: 1, minWidth: 0}} divider={<Divider />}>
 					<Topbar>
 						{drawerButton}
 						{topbarLogo}
@@ -63,7 +65,26 @@ export function App({renderDrawer = false}) {
 						</Container>
 					</div>
 				</Stack>
+				<Snackbar />
 			</Stack>
 		</ThemeProvider>
 	);
+}
+
+
+function Snackbar() {
+	const [toastNotification, setToastNotification] = useAtom(toastNotificationAtom);
+	const handleClose = () => setToastNotification(null);
+
+	if (toastNotification === null)
+		return null;
+	
+  return <MuiSnackbar
+	  open
+	  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+	  onClose={handleClose}
+		autoHideDuration={5000}
+	>
+		<Alert severity={toastNotification.severity} variant="filled"><Typography>{toastNotification.message}</Typography></Alert>
+	</MuiSnackbar>
 }

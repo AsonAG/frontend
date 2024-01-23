@@ -1,4 +1,3 @@
-
 import * as React from "react";
 
 import { createBrowserRouter, defer, matchRoutes, Navigate, redirect } from "react-router-dom";
@@ -9,6 +8,7 @@ import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
 import { AsyncEventTable } from "./components/tables/EventTable";
 import dayjs from "dayjs";
+import i18next from "i18next";
 
 import { App } from "./App";
 
@@ -22,20 +22,47 @@ import {
   getCompanyCases,
   getCompanyCaseValues,
   getDocumentCaseFields,
+  getPayrunJobs,
+  getDraftPayrunJobs,
   getTasks,
   getTask,
-  updateTask
+  updateTask,
+  startPayrunJob,
+  changePayrunJobStatus,
+  getComplianceDocuments,
+  getComplianceDocument,
+  uploadComplianceDocument,
+  createSubmission,
+  getSubmissions,
+  getSubmission,
+  getComplianceMessages,
+  getDocument,
+  getComplianceSettings,
+  setComplianceSettings,
+  getComplianceCertificates,
+  generateComplianceDocument,
+  getReports
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncCaseDisplay } from "./scenes/global/CaseDisplay";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
-import { DocumentDialog } from "./components/DocumentDialog";
+import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom } from "./utils/dataAtoms";
+import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom, payrunAtom, toast } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
+import { AsyncPayrunView } from "./components/payrun/PayrunView";
+import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
+import { ComplianceView } from "./components/compliance/ComplianceView";
+import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceSettingsView";
+import { CreateComplianceDocumentView } from "./components/compliance/CreateComplianceDocumentView";
+import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceDocumentView";
+import { AsyncComplianceSubmissionView } from "./components/compliance/ComplianceSubmissionView";
+import { AsyncReportsView } from "./components/ReportsView";
+import { AsyncReportView } from "./components/ReportView";
+import { CompletionView } from "./components/compliance/CompletionView";
 
 const store = getDefaultStore();
 
@@ -163,7 +190,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           }
@@ -173,7 +205,6 @@ const routeData = [
         path: "hr/tasks",
         Component: AsyncTaskTable,
         loader: async ({params, request }) => {
-          console.log("loader request", request);
           const { user } = await getTenantData();
           const [_, queryString] = request.url.split("?");
           const searchParams = new URLSearchParams(queryString);
@@ -225,6 +256,187 @@ const routeData = [
         }
       },
       {
+        path: "hr/payruns",
+        Component: AsyncPayrunView,
+        loader: async ({params}) => {
+          const payrun = await store.get(payrunAtom);
+          return defer({
+            draftPayrunJobs: getDraftPayrunJobs(params),
+            payrunJobs: getPayrunJobs({...params, payrunId: payrun.id})
+          });
+        },
+        action: async ({params, request}) => {
+          const action = await request.json();
+          const payrun = await store.get(payrunAtom);
+          if (action.type === "change_status") {
+            // TODO AJO what to do
+            await changePayrunJobStatus({...params, payrunId: payrun.id, payrunJobId: action.jobId}, action.status);
+          }
+          return null;
+        },
+        children: [
+          {
+            path: "new",
+            Component: AsyncNewPayrunView,
+            loader: async ({params}) => {
+              const payrun = await store.get(payrunAtom);
+              return defer({
+                payrun,
+                data: getEmployees(params)
+              });
+            },
+            action: async ({params, request}) => {
+              const invocation = await request.json();
+              const response = await startPayrunJob(params, invocation);
+              if (response.status === 201) {
+                const job = await response.json();
+                if (job.jobStatus === "Abort") {
+                  return job;
+                }
+                return redirect(`..`);
+              }
+              return null;
+            }
+          }
+        ]
+      },
+      ,
+      {
+        path: "hr/compliance",
+        Component: ComplianceView,
+        loader: ({params}) => {
+          return defer({
+            documents: getComplianceDocuments(params),
+            submissions: getSubmissions(params),
+            messages: getComplianceMessages(params)
+          });
+        }
+      },
+      {
+        path: "hr/compliance/settings",
+        Component: AsyncComplianceSettingsView,
+        loader: ({params}) => {
+          return defer({
+            data: getComplianceSettings(params)
+          });
+        },
+        action: async ({request, params}) => {
+          const settings = await request.json();
+          const response = await setComplianceSettings(params, settings);
+          if (response.ok) {
+            toast("success", i18next.t("Settings saved!"));
+          } else {
+            toast("error", i18next.t("Error while saving settings!"));
+          }
+          return response;
+        },
+        children: [
+          {
+            path: "transmittercertificates",
+            loader: ({params}) => {
+              return getComplianceCertificates(params, "Transmitter");
+            }
+          },
+          {
+            path: "enterprisecertificates",
+            loader: ({params}) => {
+              return getComplianceCertificates(params, "Enterprise");
+            }
+          }
+        ]
+      },
+      {
+        path: "hr/compliance/documents",
+        loader: ({params}) => {
+          return getComplianceDocuments(params);
+        }
+      },
+      {
+        path: "hr/compliance/documents/:documentId",
+        Component: AsyncComplianceDocumentView,
+        loader: ({params}) => {
+          return defer({
+            data: getComplianceDocument(params),
+            pdfPromise: getComplianceDocument(params, true)
+          });
+        },
+        action: async ({request, params}) => {
+          const { isTestCase } = await request.json();
+          const submission = await createSubmission(params, isTestCase);
+          if (submission.errors) {
+            toast("error", i18next.t("Submission was unsuccessful!"));
+          } else {
+            toast("success", i18next.t("Submission was successful!"));
+          }
+          return redirect(`../hr/compliance/submissions/${submission.id}`);
+        }
+      },
+      {
+        path: "hr/compliance/documents/new",
+        Component: CreateComplianceDocumentView,
+        action: async ({params, request}) => {
+          const data = await request.json();
+          let response = null;
+          switch (data.type) {
+            case "upload":
+              response = await uploadComplianceDocument(params, data.document);
+              break;
+            case "generate":
+              response = await generateComplianceDocument(params, data.reportRequest);
+              break;
+            default:
+              throw new Error("invalid action");
+          }
+          if (response.ok) {
+            toast("success", i18next.t("Document ready!"))
+            const document = await response.json();
+            return redirect(`../hr/compliance/documents/${document.id}`)
+          } else {
+            toast("error", i18next.t("Unable to save document!"))
+            return null;
+          }
+        }
+      },
+      {
+        path: "hr/compliance/submissions",
+        loader: ({params}) => {
+          return getSubmissions(params);
+        }
+      },
+      {
+        path: "hr/compliance/submissions/:submissionId",
+        Component: AsyncComplianceSubmissionView,
+        loader: ({params}) => {
+          return defer({
+            submission: getSubmission(params),
+            messages: getComplianceMessages(params)
+          });
+        }
+      },
+      {
+        path: "hr/compliance/submissions/:submissionId/tasks/:taskId",
+        Component: CompletionView,
+        loader: ({params}) => {
+          return defer({
+            submission: getSubmission(params),
+            messages: getComplianceMessages(params)
+          });
+        }
+      },
+      {
+        path: "hr/reports",
+        Component: AsyncReportsView,
+        loader: ({params}) => {
+          return defer({
+            data: getReports(params)
+          });
+        }
+      },
+      {
+        path: "hr/reports/:reportId",
+        Component: AsyncReportView,
+      },
+      {
         path: "company",
         children: [
           {
@@ -269,7 +481,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           },
@@ -306,6 +523,7 @@ const routeData = [
             Component: AsyncCaseTable,
             loader: ({params}) =>  {
               return defer({
+                title: "Tasks",
                 data: getEmployeeCases(params, "ECT")
               });
             }
@@ -325,7 +543,12 @@ const routeData = [
             children: [
               {
                 path: ":caseValueId/i/:documentId",
-                Component: DocumentDialog
+                Component: CaseValueDocumentDialog,
+                loader: ({params}) => {
+                  return defer({
+                    document: getDocument(params)
+                  });
+                }
               }
             ]
           }
