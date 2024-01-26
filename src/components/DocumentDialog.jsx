@@ -63,7 +63,9 @@ function DocumentView() {
 
 function DocumentDisplay({doc, url}) {
   switch (doc?.contentType) {
-    case "text/xml": return <Box sx={layoutSx}><XmlView xml={doc.content} /></Box>;
+    case "text/xml":
+    case "application/xml":
+       return <Box sx={layoutSx}><XmlView xml={doc.content} /></Box>;
     default: return <GeneralPreview url={url} />;
   }
 }
