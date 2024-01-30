@@ -31,7 +31,7 @@ function DefaultLayout({field}) {
 	return (
 		<Box
 			display="grid"
-			gridTemplateColumns="3fr 22px minmax(135px, 1fr) minmax(135px, 1fr)"
+			gridTemplateColumns="1fr 22px 135px 135px"
 			alignItems="center"
 			columnGap="8px"
 		>
