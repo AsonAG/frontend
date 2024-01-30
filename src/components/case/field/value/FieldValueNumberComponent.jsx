@@ -4,8 +4,14 @@ import { useState, useContext } from "react";
 import { FieldContext } from "../EditFieldComponent";
 import { useUpdateEffect } from "usehooks-ts";
 
-function getDecimalParams(valueType) {
+function getDecimalParams({valueType, attributes}) {
   switch(valueType) {
+    case "Percent":
+    case "Decimal":
+      const decimalPlaces = attributes["decimalPlaces"];
+      if (decimalPlaces && typeof decimalPlaces === "number") {
+        return { decimalScale: decimalPlaces, fixedDecimalScale: true}
+      }
     case "Integer":
     case "NumericBoolean":
       return { decimalScale: 0, fixedDecimalScale: true };
@@ -79,7 +85,7 @@ export function FieldValueNumberComponent() {
       thousandSeparator={
         field.attributes?.["input.thousandSeparator"] ?? " "
       }
-      {...getDecimalParams(field.valueType)}
+      {...getDecimalParams(field)}
       customInput={TextField}
       label={displayName}
       type="numeric"
