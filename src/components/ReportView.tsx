@@ -43,8 +43,8 @@ export function AsyncReportView() {
         <CaseFormContext.Provider value={{buildCase: buildReport}}>
           {
             reportData.parameters.map(p => (
-              <FieldContext.Provider value={{field: p, displayName: p.displayName, required: p.mandatory, buildCase: buildReport}}>
-                <EditFieldValueComponent key={p.id} />
+              <FieldContext.Provider key={p.id} value={{field: p, displayName: p.displayName, required: p.mandatory, buildCase: buildReport}}>
+                <EditFieldValueComponent />
               </FieldContext.Provider>
             ))
           }

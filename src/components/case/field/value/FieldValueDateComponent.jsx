@@ -1,13 +1,9 @@
-import { DatePicker, DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
 import { useContext, useRef } from "react";
 import { FieldContext } from "../EditFieldComponent";
-import { useRouteLoaderData } from "react-router-dom";
-import { getDateLocale } from "../../../../services/converters/DateLocaleExtractor";
+import { DatePicker } from "../../../DatePicker";
 
-function _InternalDateComponent({Picker, propertyName = "value", displayName, sx, size = "medium", required}) {
-	const { user } = useRouteLoaderData('root');
+export function FieldValueDateComponent({variant = "standard", propertyName = "value", displayName, sx, size = "medium", required}) {
 	const { field, isReadonly, required: fieldRequired, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const inputRef = useRef();
 	const fieldValue = field[propertyName];
@@ -23,29 +19,27 @@ function _InternalDateComponent({Picker, propertyName = "value", displayName, sx
 			buildCase();
 		}
 	};
+
+	if (field.attributes["input.datePicker"] === "Month") {
+		variant = "month";
+	}
+
 	return (
-		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
-			<Picker
-				label={displayName}
-				value={value}
-				onChange={handleDateChange}
-				name={field.name}
-				timezone="UTC"
-				disabled={isReadonly}
-				inputRef={inputRef}
-				slotProps={{
-					textField: { required, size },
-					openPickerButton: { tabIndex: -1 }
-				}}
-				sx={sx}
-			/>
-		</LocalizationProvider>
+		<DatePicker
+			variant={variant}
+			label={displayName}
+			value={value}
+			onChange={handleDateChange}
+			name={field.name}
+			disabled={isReadonly}
+			inputRef={inputRef}
+			slotProps={{
+				field: {
+					required, size
+				},
+				openPickerButton: { tabIndex: -1 },
+			}}
+			sx={sx}
+		/>
 	);
 };
-
-function FieldValueDateComponent(props) { return _InternalDateComponent({Picker: DatePicker, ...props}); }
-function FieldValueDateTimeComponent(props) { return _InternalDateComponent({Picker: DateTimePicker, ...props}); }
-
-
-
-export { FieldValueDateComponent, FieldValueDateTimeComponent };

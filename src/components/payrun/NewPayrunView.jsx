@@ -1,15 +1,12 @@
 import { React, useReducer } from "react";
 import { useAsyncValue, useRouteLoaderData, useSubmit, useNavigation, useLoaderData, Link, useActionData } from "react-router-dom";
-import { Alert, Button, Checkbox, FormControl, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import dayjs from "dayjs";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { getDateLocale } from "../../services/converters/DateLocaleExtractor";
-import { NavigateBefore, NavigateNext } from "@mui/icons-material";
 import { EmployeeSelector } from "./EmployeeSelector";
 import { useTranslation } from "react-i18next";
 import { CircularProgress } from "@mui/material";
+import { DatePicker } from "../DatePicker";
 
 export function AsyncNewPayrunView() {
   return (
@@ -51,27 +48,12 @@ function NewPayrunView() {
 
   return (
     <Stack spacing={2}>
-      <Stack direction="row" spacing={1} alignItems="center">
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
-          <DatePicker
-            label={t("Period")}
-            value={state.period}
-            onChange={newDate => dispatch({type: "set_period", value: newDate})}
-            timezone="UTC"
-            openTo="month"
-            views={['year', 'month']}
-            slotProps={{
-              textField: { required: true, sx: {flex: 1} }
-            }}
-          />
-        </LocalizationProvider>
-        <IconButton onClick={() => dispatch({type: "dec_period"})}>
-          <NavigateBefore />
-        </IconButton>
-        <IconButton onClick={() => dispatch({type: "inc_period"})}>
-          <NavigateNext />
-        </IconButton>
-      </Stack>
+      <DatePicker
+        variant="month"
+        label={t("Period")}
+        value={state.period}
+        onChange={newDate => dispatch({type: "set_period", value: newDate})}
+      />
       <TextField label={t("Name")} value={state.jobName} onChange={updateTextValue("set_job_name")} onBlur={() => dispatch({type: "ensure_job_name"})}/>
       <TextField label={t("Reason")} value={state.jobReason} onChange={updateTextValue("set_job_reason")} />
       <EmployeeSelector allEmployees={employees} selectedEmployees={state.employees} updateEmployees={e => dispatch({type: "set_employees", value: e})} />
@@ -122,10 +104,6 @@ function reducer(state, action) {
   switch(action.type) {
     case "set_period":
       return updatePeriod(action.value);
-    case "inc_period":
-      return updatePeriod(state.period.add(1, "month"));
-    case "dec_period":
-      return updatePeriod(state.period.subtract(1, "month"));
     case "set_job_name":
       return {
         ...state,
