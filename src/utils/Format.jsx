@@ -26,13 +26,14 @@ export function formatCaseValue(caseValue, t) {
 		case "Month":
 			return caseValue.value;
 		case "Decimal":
-      let decimalValue = caseValue.value;
+      let decimalValue = caseValue.numericValue.toFixed(getDecimalPlaces(caseValue.attributes, 2));
       if (caseValue.attributes?.["input.units"]) {
         decimalValue += caseValue.attributes["input.units"];
       }
 			return decimalValue;
 		case "Percent":
-      return `${caseValue.value * 100}%`
+			let decimalPlaces = getDecimalPlaces(caseValue.attributes, 2);
+      return `${(caseValue.numericValue * 100).toFixed(decimalPlaces)}%`
 		case "Money":
       let moneyValue = caseValue.value;
       if (caseValue.attributes?.["input.currency"]) {
@@ -42,4 +43,12 @@ export function formatCaseValue(caseValue, t) {
 		default:
 			return caseValue.value;
 	}
+}
+
+export function getDecimalPlaces(attributes, fallback) {
+	let decimalPlaces = attributes?.["input.decimalPlaces"]
+	if (decimalPlaces && typeof decimalPlaces === "number") {
+		return decimalPlaces;
+	}
+	return fallback;
 }
