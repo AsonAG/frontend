@@ -9,7 +9,7 @@ const translations = {
         "Documents": "Dokumente",
         "Document": "Dokument",
         "Employee": "Mitarbeiter",
-        "My Profile": "Mein Profil",
+        "Missing data": "Fehlende Daten",
         "Tasks": "Aufgaben",
         "Select...": "Auswählen...",
         "Settings": "Einstellungen",

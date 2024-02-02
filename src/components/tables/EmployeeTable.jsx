@@ -2,7 +2,6 @@ import { React } from "react";
 import { useAsyncValue } from "react-router-dom";
 import { Divider, Stack, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from "@emotion/react";
-import { Link } from "../Link";
 import { TableButton } from "../buttons/TableButton";
 import { useTranslation } from "react-i18next";
 
@@ -48,12 +47,10 @@ const sx = {
 function EmployeeRow({ employee, variant }) {
   return (
     <Stack direction="row" alignItems="center" gap={2} marginX={-2} sx={sx}>
-      <Link to={employee.id + "/data"} flex={1} disableBgHover>
-        <Stack>
-          <Typography gutterBottom>{employee.firstName} {employee.lastName}</Typography>
-          <Typography variant="body2" sx={{textOverflow: 'ellipsis', overflow: 'hidden'}}>{employee.identifier}</Typography>
-        </Stack>
-      </Link>
+      <Stack flex={1} p={1}>
+        <Typography gutterBottom>{employee.firstName} {employee.lastName}</Typography>
+        <Typography variant="body2" sx={{textOverflow: 'ellipsis', overflow: 'hidden'}}>{employee.identifier}</Typography>
+      </Stack>
       <EmployeeButtons employeeId={employee.id} variant={variant} />
     </Stack>
   );

@@ -45,7 +45,6 @@ import {
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
-import { AsyncCaseDisplay } from "./scenes/global/CaseDisplay";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { CaseValueDocumentDialog } from "./components/DocumentDialog";
@@ -149,15 +148,6 @@ const routeData = [
         ErrorBoundary: ErrorView,
         children: [
           {
-            path: "data",
-            Component: AsyncCaseDisplay,
-            loader: ({params}) =>  {
-              return defer({
-                data: getEmployeeCases(params, "EmployeeData")
-              });
-            }
-          },
-          {
             path: "new",
             Component: AsyncCaseTable,
             loader: ({params}) =>  {
@@ -253,6 +243,16 @@ const routeData = [
             return redirect("../hr/tasks");
           }
           return response;
+        }
+      },
+      {
+        path: "hr/missingdata",
+        Component: AsyncCaseTable,
+        loader: ({params}) =>  {
+          return defer({
+            data: getCompanyCases(params, "HRCT"),
+            title: "Missing data"
+          });
         }
       },
       {
@@ -440,11 +440,12 @@ const routeData = [
         path: "company",
         children: [
           {
-            path: "data",
-            Component: AsyncCaseDisplay,
+            path: "missingdata",
+            Component: AsyncCaseTable,
             loader: ({params}) =>  {
               return defer({
-                data: getCompanyCases(params, "CompanyData")
+                data: getCompanyCases(params, "CCT"),
+                title: "Missing data"
               });
             }
           },
@@ -496,15 +497,6 @@ const routeData = [
         path: "employees/:employeeId",
         element: <EmployeeView routeLoaderDataName="root" />,
         children: [
-          {
-            path: "data",
-            Component: AsyncCaseDisplay,
-            loader: ({params}) =>  {
-              return defer({
-                data: getEmployeeCases(params, "EmployeeData")
-              });
-            }
-          },
           {
             path: "new",
             Component: AsyncCaseTable,
