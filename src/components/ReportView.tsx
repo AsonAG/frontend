@@ -175,13 +175,24 @@ function processReportParameters(parameters) {
   }
 }
 
+const formatButtonText : Record<DocumentFormat, string> = {
+  "pdf": "Create PDF",
+  "word": "Create Word",
+  "excel": "Create Excel",
+  "xml": "Create XML",
+  "xmlraw" : "Create raw XML"
+};
+
+const documentFormats : DocumentFormat[] = ["pdf", "word", "excel", "xml", "xmlraw"];
+
 function GenerateButton({generate, isGenerating}: {generate: (format: DocumentFormat) => void, isGenerating: boolean}) {
   const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
+  const anchorRef = React.useRef<HTMLDivElement>(null);
+  const [selectedFormat, setSelectedFormat] = useState<DocumentFormat>("pdf");
   const { t } = useTranslation();
 
   const handleMenuItemClick = (format: DocumentFormat) => {
-    generate(format);
+    setSelectedFormat(format);
     setOpen(false);
   };
 
@@ -189,8 +200,8 @@ function GenerateButton({generate, isGenerating}: {generate: (format: DocumentFo
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const handleClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+  const handleClose = (event: Event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
       return;
     }
 
@@ -202,7 +213,7 @@ function GenerateButton({generate, isGenerating}: {generate: (format: DocumentFo
   return (
     <React.Fragment>
       <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button" disabled={isGenerating}>
-        <Button onClick={() => generate('pdf')} startIcon={icon}>{t("Create PDF")}</Button>
+        <Button onClick={() => generate(selectedFormat)} startIcon={icon}>{t(formatButtonText[selectedFormat])}</Button>
         <Button
           size="small"
           onClick={handleToggle}
@@ -231,10 +242,11 @@ function GenerateButton({generate, isGenerating}: {generate: (format: DocumentFo
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList autoFocusItem>
-                  <MenuItem onClick={() => handleMenuItemClick("word")}>{t("Create Word")}</MenuItem>
-                  <MenuItem onClick={() => handleMenuItemClick("excel")}>{t("Create Excel")}</MenuItem>
-                  <MenuItem onClick={() => handleMenuItemClick("xml")}>{t("Create XML")}</MenuItem>
-                  <MenuItem onClick={() => handleMenuItemClick("xmlraw")}>{t("Create XML Raw")}</MenuItem>
+                  {
+                    documentFormats.map(format => 
+                      <MenuItem key={format} selected={format === selectedFormat} onClick={() => handleMenuItemClick(format)}>{t(formatButtonText[format])}</MenuItem>
+                    )
+                  }
                 </MenuList>
               </ClickAwayListener>
             </Paper>
