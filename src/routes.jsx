@@ -62,6 +62,7 @@ import { AsyncComplianceSubmissionView } from "./components/compliance/Complianc
 import { AsyncReportsView } from "./components/ReportsView";
 import { AsyncReportView } from "./components/ReportView";
 import { CompletionView } from "./components/compliance/CompletionView";
+import { MissingDataView } from "./components/MissingDataView";
 
 const store = getDefaultStore();
 
@@ -247,13 +248,32 @@ const routeData = [
       },
       {
         path: "hr/missingdata",
-        Component: AsyncCaseTable,
-        loader: ({params}) =>  {
+        Component: MissingDataView,
+        loader: ({params}) => {
           return defer({
-            data: getCompanyCases(params, "HRCT"),
+            data: getEmployees(params, 5),
             title: "Missing data"
           });
-        }
+        },
+        children: [
+          {
+            path: ":employeeId",
+            loader: async ({params}) => {
+              const [ect, hrct] = await Promise.all([
+                getEmployeeCases(params, "ECT"),
+                getEmployeeCases(params, "HRCT")
+              ]);
+              return {
+                ect: Array.isArray(ect) ? ect: [],
+                hrct: Array.isArray(hrct) ? hrct: []
+              };
+            }
+          }
+        ]
+      },
+      {
+        path: "hr/missingdata/:employeeId/:caseName",
+        lazy: () => import("./scenes/global/CaseForm")
       },
       {
         path: "hr/payruns",

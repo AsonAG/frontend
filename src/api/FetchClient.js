@@ -161,9 +161,10 @@ export function getPayroll(routeParams) {
     return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
 }
 
-export async function getEmployees(routeParams) {
+export async function getEmployees(routeParams, count) {
     return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
         .withQueryParam("orderBy", `firstName asc`)
+        .withQueryParam("top", count)
         .fetchJson();
 }
 

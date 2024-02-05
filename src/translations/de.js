@@ -78,6 +78,7 @@ const translations = {
         "Close": "Schliessen",
         "Content": "Inhalt",
         "Delete": "Löschen",
+        "Data complete.": "Daten vollständig.",
 
         
         // compliance
