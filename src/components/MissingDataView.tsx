@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { ContentLayout } from "./ContentLayout";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { CategoryLabel } from "./tasks/CategoryLabel";
-import { Link as RouterLink, useAsyncValue, useFetcher } from "react-router-dom";
+import { Link as RouterLink, LinkProps as RouterLinkProps, useAsyncValue, useFetcher } from "react-router-dom";
 import { Paper, Skeleton, Stack, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 
-const Link = styled(forwardRef(function Link(itemProps, ref) {
+const Link = styled(forwardRef<any, RouterLinkProps>((itemProps, ref) => {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 }))(({theme}) => {
   return {
@@ -83,11 +83,10 @@ function EmployeeSection({employee}) {
 }
 
 function CaseTask({employee, type, _case}) {
-  const { t } = useTranslation();
   return (
     <Link to={`${employee.id}/${encodeURIComponent(_case.name)}`}>
       <Stack spacing={1} flex={1} direction="row" p={1}>
-        <CategoryLabel label={type} sx={{height: 21, alignSelf: "center"}}/>
+        <CategoryLabel label={type} sx={{height: 21, alignSelf: "center", flex: "0 0 60px"}}/>
         <Typography fontWeight="bold" fontSize="1rem">{_case.displayName}</Typography>
       </Stack>
     </Link>

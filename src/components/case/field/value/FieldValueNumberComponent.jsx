@@ -54,6 +54,11 @@ export function FieldValueNumberComponent() {
   const [isValid, setIsValid] = useState(true);
 
   const handleBlur = () => {
+    if (!value) {
+      field.value = null;
+      buildCase();
+      return;
+    }
     const floatValue = parseFloat(value);
     let val = transformValue(field, floatValue);
     if (field.value == val) {
