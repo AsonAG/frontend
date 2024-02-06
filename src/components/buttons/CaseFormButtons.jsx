@@ -12,7 +12,7 @@ const iconProps = {
   }
 };
 
-function CaseFormButtons({ onSubmit }) {
+function CaseFormButtons({ backPath, onSubmit }) {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting" && navigation.json?.intent === "addCase";
   const isRedirecting = navigation.state === "loading" && navigation.json && navigation.formAction !== navigation.location.pathname;
@@ -25,7 +25,7 @@ function CaseFormButtons({ onSubmit }) {
       <Button
         disableRipple
         LinkComponent={Link}
-        to=".."
+        to={backPath}
         relative="path"
       >
         <Typography>

@@ -1,4 +1,4 @@
-import { Form, useParams, useRouteLoaderData, useOutletContext, useNavigate } from "react-router-dom";
+import { Form, useParams, useLoaderData, useRouteLoaderData, useOutletContext, useNavigate } from "react-router-dom";
 import { CaseComponent } from "../../components/case/CaseComponent";
 import { createContext, useRef } from "react";
 import CaseIndexView from "../../components/cases/CaseIndexView";
@@ -11,6 +11,7 @@ import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
 import { ErrorView } from "../../components/ErrorView";
 import { EditFieldComponent } from "../../components/case/field/EditFieldComponent";
 import { ContentLayout } from "../../components/ContentLayout";
+import { toast } from "../../utils/dataAtoms";
 
 export const CaseFormContext = createContext();
 
@@ -18,6 +19,7 @@ export function Component() {
   const title = useOutletContext() || "New event";
   const navigate = useNavigate();
   const { user, payroll } = useRouteLoaderData("root");
+  const redirectPath = useLoaderData() || "..";
   const params = useParams();
   const { caseData, caseErrors, fatalError, attachments, loading, buildCase, addCase } = useCaseData(params, user, payroll);
   const formRef = useRef();
@@ -29,7 +31,10 @@ export function Component() {
   
   const handleSubmit = () => {
     if (formRef?.current?.reportValidity()) {
-      addCase(() => navigate("../events"));
+      addCase(() => {
+        toast("success", "Saved!");
+        navigate(redirectPath, { relative: "path" });
+      });
     }
   }
 
@@ -44,7 +49,7 @@ export function Component() {
       <Stack alignItems="stretch" spacing={4}>
         {caseData && <CaseComponent _case={caseData} FieldRenderComponent={EditFieldComponent} />}
         <CaseErrorComponent errors={caseErrors} />
-        <CaseFormButtons onSubmit={handleSubmit} />
+        <CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath}/>
       </Stack>    
       </Form>
     </CaseFormContext.Provider>

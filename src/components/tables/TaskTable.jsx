@@ -9,8 +9,6 @@ import { useTranslation } from "react-i18next";
 import { Person, Schedule } from "@mui/icons-material";
 import { CategoryLabel } from "../tasks/CategoryLabel";
 import { TaskTableFilter } from "../tasks/TaskTableFilter";
-import { useAtom } from "jotai";
-import { showTaskCompletedAlertAtom } from "../../utils/dataAtoms";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -40,13 +38,10 @@ function TaskTable() {
   const tasks = useAsyncValue();
   const { t } = useTranslation();
   const { search } = useLocation();
-  const [showCompletedNotification, setShowCompletedNotification] = useAtom(showTaskCompletedAlertAtom);
   const theme = useTheme();
   const mobileLayout = useMediaQuery(theme.breakpoints.down("md"));
   const rowVariant = mobileLayout ? "mobile" : "default";
   const padding = mobileLayout ? 4 : 0;
-
-  const closeNotification = () => setShowCompletedNotification(false);
 
   return (
     <Stack spacing={3}>
@@ -60,11 +55,6 @@ function TaskTable() {
             </Stack>
           </Paper>
       }
-      <Snackbar open={showCompletedNotification} autoHideDuration={4000} onClose={closeNotification} anchorOrigin={{vertical: "bottom", horizontal: "center"}}>
-        <Alert onClose={closeNotification} severity="success" variant="filled" elevation={6} sx={{ width: '100%' }}>
-          <Typography>{t("Task completed!")}</Typography>
-        </Alert>
-      </Snackbar>
     </Stack>
   );
 };

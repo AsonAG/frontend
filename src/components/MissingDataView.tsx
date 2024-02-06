@@ -52,7 +52,6 @@ function EmployeeSection({employee}) {
 
   useEffect(() => {
     if (fetcher.state === "idle" && !fetcher.data) {
-      console.log("fetching cases", employee);
       fetcher.load(employee.id.toString());
     }
   }, [fetcher]);

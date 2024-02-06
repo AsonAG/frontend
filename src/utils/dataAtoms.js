@@ -54,8 +54,6 @@ export const openTasksAtom = atomWithRefresh(get => {
   return getTasks({tenantId, payrollId}, filter, orderBy);
 });
 
-export const showTaskCompletedAlertAtom = atom(false);
-
 export const toastNotificationAtom = atom(null);
 
 export function toast(severity, message) {

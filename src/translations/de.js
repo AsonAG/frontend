@@ -79,8 +79,8 @@ const translations = {
         "Content": "Inhalt",
         "Delete": "Löschen",
         "Data complete.": "Daten vollständig.",
+        "Saved!": "Gespeichert!",
 
-        
         // compliance
         "Submit": "Übermitteln",
         "Submit as test case": "Als Testcase übermitteln",

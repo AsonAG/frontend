@@ -50,7 +50,7 @@ import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom, payrollsAtom, showTaskCompletedAlertAtom, tenantAtom, userAtom, employeeAtom, payrunAtom, toast } from "./utils/dataAtoms";
+import { openTasksAtom, payrollsAtom, tenantAtom, userAtom, employeeAtom, payrunAtom, toast } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
 import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
@@ -240,7 +240,7 @@ const routeData = [
           }
           const response = await updateTask(params, task);
           if (response.ok && data.action === "complete") {
-            store.set(showTaskCompletedAlertAtom, true);
+            toast("success", "Task completed!");
             return redirect("../hr/tasks");
           }
           return response;
@@ -273,7 +273,10 @@ const routeData = [
       },
       {
         path: "hr/missingdata/:employeeId/:caseName",
-        lazy: () => import("./scenes/global/CaseForm")
+        lazy: () => import("./scenes/global/CaseForm"),
+        loader: () => {
+          return "../.."
+        }
       },
       {
         path: "hr/payruns",
@@ -344,9 +347,9 @@ const routeData = [
           const settings = await request.json();
           const response = await setComplianceSettings(params, settings);
           if (response.ok) {
-            toast("success", i18next.t("Settings saved!"));
+            toast("success", "Settings saved!");
           } else {
-            toast("error", i18next.t("Error while saving settings!"));
+            toast("error", "Error while saving settings!");
           }
           return response;
         },
@@ -384,9 +387,9 @@ const routeData = [
           const { isTestCase } = await request.json();
           const submission = await createSubmission(params, isTestCase);
           if (submission.errors) {
-            toast("error", i18next.t("Submission was unsuccessful!"));
+            toast("error", "Submission was unsuccessful!");
           } else {
-            toast("success", i18next.t("Submission was successful!"));
+            toast("success", "Submission was successful!");
           }
           return redirect(`../hr/compliance/submissions/${submission.id}`);
         }
@@ -408,11 +411,11 @@ const routeData = [
               throw new Error("invalid action");
           }
           if (response.ok) {
-            toast("success", i18next.t("Document ready!"))
+            toast("success", "Document ready!")
             const document = await response.json();
             return redirect(`../hr/compliance/documents/${document.id}`)
           } else {
-            toast("error", i18next.t("Unable to save document!"))
+            toast("error", "Unable to save document!")
             return null;
           }
         }

@@ -73,6 +73,7 @@ export function App({renderDrawer = false}) {
 
 
 function Snackbar() {
+	const { t } = useTranslation();
 	const [toastNotification, setToastNotification] = useAtom(toastNotificationAtom);
 	const handleClose = () => setToastNotification(null);
 
@@ -85,6 +86,6 @@ function Snackbar() {
 	  onClose={handleClose}
 		autoHideDuration={5000}
 	>
-		<Alert severity={toastNotification.severity} variant="filled"><Typography>{toastNotification.message}</Typography></Alert>
+		<Alert severity={toastNotification.severity} variant="filled"><Typography>{t(toastNotification.message)}</Typography></Alert>
 	</MuiSnackbar>
 }
