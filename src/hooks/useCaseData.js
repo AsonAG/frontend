@@ -11,7 +11,9 @@ function mapCase(_case, attachments) {
       value: f.value,
       start: f.start,
       end: f.end,
-      documents: attachments[f.id]
+      documents: attachments[f.id],
+      tags: f.valueTags,
+      attributes: f.valueAttributes
     })),
     relatedCases: _case.relatedCases.map(c => mapCase(c, attachments))
   };
