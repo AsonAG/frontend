@@ -470,6 +470,10 @@ const routeData = [
             }
           },
           {
+            path: "missingdata/:caseName",
+            lazy: () => import("./scenes/global/CaseForm")
+          },
+          {
             path: "new",
             Component: AsyncCaseTable,
             loader: ({params}) =>  {
