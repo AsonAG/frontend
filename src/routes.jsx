@@ -8,7 +8,6 @@ import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
 import { AsyncEventTable } from "./components/tables/EventTable";
 import dayjs from "dayjs";
-import i18next from "i18next";
 
 import { App } from "./App";
 
@@ -18,9 +17,9 @@ import {
   getEmployees,
   getEmployee,
   getEmployeeCases,
-  getEmployeeCaseValues,
+  getEmployeeCaseChanges,
   getCompanyCases,
-  getCompanyCaseValues,
+  getCompanyCaseChanges,
   getDocumentCaseFields,
   getPayrunJobs,
   getDraftPayrunJobs,
@@ -166,7 +165,7 @@ const routeData = [
             Component: AsyncEventTable,
             loader: ({params}) =>  {
               return defer({
-                data: getEmployeeCaseValues(params, null, "created desc")
+                data: getEmployeeCaseChanges(params, null, "created desc")
               });
             }
           },
@@ -494,7 +493,7 @@ const routeData = [
             Component: AsyncEventTable,
             loader: ({params}) =>  {
               return defer({
-                data: getCompanyCaseValues(params, null, "created desc")
+                data: getCompanyCaseChanges(params, null, "created desc")
               });
             }
           },
@@ -522,7 +521,6 @@ const routeData = [
       },
       {
         path: "employees/:employeeId",
-        element: <EmployeeView routeLoaderDataName="root" />,
         children: [
           {
             path: "new",

@@ -190,8 +190,8 @@ export function getEmployeeCases(routeParams, clusterSetName) {
         .fetchJson();
 }
 
-export function getEmployeeCaseValues(routeParams, filter, orderBy) {
-    const url = payrollUrl + "/changes/values";
+export function getEmployeeCaseChanges(routeParams, filter, orderBy) {
+    const url = payrollUrl + "/changes";
     return new FetchRequestBuilder(url, routeParams)
         .withQueryParam("employeeId", routeParams.employeeId)
         .withQueryParam("caseType", "Employee")
@@ -212,8 +212,8 @@ export function getCompanyCases(routeParams, clusterSetName) {
         .fetchJson();
 }
 
-export function getCompanyCaseValues(routeParams, filter, orderBy) {
-    const url = payrollUrl + "/changes/values";
+export function getCompanyCaseChanges(routeParams, filter, orderBy) {
+    const url = payrollUrl + "/changes";
     return new FetchRequestBuilder(url, routeParams)
         .withQueryParam("caseType", "Company")
         .withQueryParam("filter", filter)

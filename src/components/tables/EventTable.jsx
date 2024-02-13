@@ -1,11 +1,12 @@
 import { React } from "react";
 import { useAsyncValue } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Card, CardContent, CardHeader, IconButton, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
 import { formatCaseValue } from "../../utils/Format";
+import { MoreVert } from "@mui/icons-material";
 
 export function AsyncEventTable() {
   return (
@@ -18,95 +19,82 @@ export function AsyncEventTable() {
 }
 
 function EventTable() {
+  const events = useAsyncValue();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  return isMobile ? <MobileEventTable /> : <DesktopEventTable />;
-}
-
-function DesktopEventTable() {
-  const events = useAsyncValue();
-  const { t } = useTranslation();
-  const sx = { wordBreak: "break-word" };
-
+  const variant = isMobile ? "mobile" : "standard";
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>{t("Case")}</TableCell>
-            <TableCell>{t("Field")}</TableCell>
-            <TableCell>{t("Value")}</TableCell>
-            <TableCell>{t("Start")}</TableCell>
-            <TableCell>{t("End")}</TableCell>
-            <TableCell>{t("Created")}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {events.map((event) => {
-            return <TableRow 
-              key={event.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 }}}
-            >
-              <TableCell component="th" scope="row" sx={sx}>
-                {event.caseName}
-              </TableCell>
-              <TableCell sx={sx}>{event.caseFieldName}</TableCell>
-              <TableCell>{formatCaseValue(event, t)}</TableCell>
-              <TableCell>{formatDate(event.start)}</TableCell>
-              <TableCell>{formatDate(event.end)}</TableCell>
-              <TableCell>{formatDate(event.created, true)}</TableCell>
-            </TableRow>
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Stack spacing={3}>
+      {events.map(caseChange => <CaseChange key={caseChange.id} caseChange={caseChange} variant={variant} />)}
+    </Stack>
   );
 }
 
-function MobileEventTable() {
-  const events = useAsyncValue();
-  const { t } = useTranslation();
+const tooltipProps = {
+  placement: "bottom-start",
+  slotProps: {
+    popper: {
+      modifiers: [
+        {
+          name: "offset",
+          options: {
+            offset: [0, -14]
+          }
+        }
+      ]
+    }
+  }
+}
 
+function CaseChange({caseChange, variant}) {
+  const { t } = useTranslation();
+  const valueAndDateStackDirection = variant === "mobile" ? "column" : "row";
   return (
-    <TableContainer>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>{t("Field")}</TableCell>
-            <TableCell>{t("Created")}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {events.map(event => {
-            return (
-              <TableRow 
+    <Stack>
+      <Card>
+        <CardHeader 
+          action={
+            <IconButton>
+              <MoreVert />
+            </IconButton>
+          }
+          title={caseChange.caseName}
+          titleTypographyProps={{variant: "h6"}}
+          subheader={
+            <Tooltip title={t("Created")} {...tooltipProps}>
+              <Typography>{formatDate(caseChange.created, true)}</Typography>
+            </Tooltip>
+          }
+        />
+        <CardContent>
+          <Stack spacing={1}>
+            {caseChange.values.map((event) => {
+              return <Stack
                 key={event.id}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                spacing={0.5}
               >
-                <TableCell component="th" scope="row">
-                  <Stack>
-                    <Typography gutterBottom>{event.caseFieldName}</Typography>
-                    <Typography fontWeight="500">{event.value}</Typography>
-                    {
-                      event.start && <>
-                        <Typography variant="body2">{t("valid from")}:</Typography>
-                        <Typography variant="body2">{formatDate(event.start)}</Typography>
-                        { 
-                          event.end && <>
-                            <Typography variant="body2">{t("until")}:</Typography>
-                            <Typography variant="body2">{formatDate(event.end)}</Typography>
-                          </>
-                        }
-                      </>
-                    }
+                <Typography fontWeight={500}>
+                  {event.caseFieldName}
+                </Typography>
+                <Stack direction={valueAndDateStackDirection} spacing={0.5}>
+                  <Typography flex={1}>{formatCaseValue(event, t)}</Typography>
+                  <Stack direction="row" spacing={0.5}>
+                    <Tooltip title={t("Start")} {...tooltipProps}>
+                      <Typography>{formatDate(event.start)}</Typography>
+                    </Tooltip>
+                    {event.end && <>
+                      -
+                      <Tooltip title={t("End")} {...tooltipProps}>
+                        <Typography>{formatDate(event.end)}</Typography>
+                      </Tooltip>
+                    </>}
                   </Stack>
-                </TableCell>
-                <TableCell>{formatDate(event.created, true)}</TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                </Stack>
+              </Stack>
+            })}
+          </Stack>
+        </CardContent>
+      </Card>
+    </Stack>
   )
 }

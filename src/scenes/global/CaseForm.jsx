@@ -16,7 +16,6 @@ import { toast } from "../../utils/dataAtoms";
 export const CaseFormContext = createContext();
 
 export function Component() {
-  const title = useOutletContext() || "New event";
   const navigate = useNavigate();
   const { user, payroll } = useRouteLoaderData("root");
   const redirectPath = useLoaderData() || "..";
@@ -57,7 +56,7 @@ export function Component() {
 
   return (
     <Stack direction="row" minHeight="100%">
-      <ContentLayout title={title} sx={{flex: 1}}>
+      <ContentLayout title="New event" sx={{flex: 1}}>
         {content}
       </ContentLayout>
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }

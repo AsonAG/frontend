@@ -12,6 +12,7 @@ main {
   overflow-y: auto;
   position: relative;
   height: 100%;
+  scrollbar-gutter: stable both-edges;
 }
 
 .app {

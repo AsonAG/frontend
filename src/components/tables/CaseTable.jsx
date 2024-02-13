@@ -1,5 +1,5 @@
 import { React } from "react";
-import { useAsyncValue, useLoaderData, Link } from "react-router-dom";
+import { useAsyncValue, Link } from "react-router-dom";
 import { Stack, Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Centered } from "../Centered";
@@ -7,11 +7,8 @@ import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
 
 export function AsyncCaseTable() {
-  const routeData = useLoaderData();
-  const { t } = useTranslation();
-  const title = t(routeData.title || "New event");
   return (
-    <ContentLayout title={title}>
+    <ContentLayout title="New event">
       <AsyncDataRoute>
         <CaseTable />
       </AsyncDataRoute>
@@ -21,7 +18,7 @@ export function AsyncCaseTable() {
 
 const styling = {
   flex: "1 1 300px",
-  borderRadius: (theme) => theme.spacing(1),
+  borderRadius: (theme) => theme.spacing(0.5),
   color: (theme) => theme.palette.text.primary,
   "&:hover": {
     "color": (theme) => theme.palette.primary.main,
