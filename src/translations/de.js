@@ -81,7 +81,7 @@ const translations = {
         "Data complete.": "Daten vollständig.",
         "Saved!": "Gespeichert!",
         "New employee": "Neuer Eintritt",
-        "Edit": "Bearbeiten",
+        "Change name": "Namensänderung",
         "New employee created": "Neueintritt erfasst",
         "Saving failed!": "Speichern fehlgeschlagen!",
         "Identifier": "Identifikator",

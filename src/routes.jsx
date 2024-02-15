@@ -203,6 +203,7 @@ const routeData = [
 
               if (response.ok) {
                 toast("success", "Saved!");
+                return redirect("../../hr/employees");
               } else {
                 let errorMessage = await response.json();
                 if(!errorMessage || typeof errorMessage !== "string") {

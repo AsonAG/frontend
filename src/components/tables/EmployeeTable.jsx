@@ -65,7 +65,7 @@ function EmployeeButtons ({ employeeId, variant }) {
   const stackSpacing = variant === "dense" ? 1 : 2;
   return (
     <Stack direction="row" spacing={stackSpacing}>
-      <TableButton title={t("Edit")} to={employeeId + "/edit"} variant={variant} icon={<Edit />} />
+      <TableButton title={t("Change name")} to={employeeId + "/edit"} variant={variant} icon={<Edit />} />
       <TableButton title={t("New event")} to={employeeId + "/new"} variant={variant} icon={<AddOutlinedIcon />} />
       <TableButton title={t("Events")} to={employeeId + "/events"} variant={variant} icon={<WorkHistoryOutlinedIcon />} />
       <TableButton title={t("Documents")} to={employeeId + "/documents"} variant={variant} icon={<DescriptionOutlinedIcon />} />
