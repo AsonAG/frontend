@@ -40,7 +40,10 @@ import {
   setComplianceSettings,
   getComplianceCertificates,
   generateComplianceDocument,
-  getReports
+  getReports,
+  createEmployee,
+  updateEmployee,
+  getDivision
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -49,7 +52,7 @@ import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom, payrollsAtom, tenantAtom, userAtom, employeeAtom, payrunAtom, toast } from "./utils/dataAtoms";
+import { openTasksAtom, payrollsAtom, tenantAtom, userAtom, employeeAtom, payrunAtom, toast, payrollAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
 import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
@@ -62,6 +65,7 @@ import { AsyncReportsView } from "./components/ReportsView";
 import { AsyncReportView } from "./components/ReportView";
 import { CompletionView } from "./components/compliance/CompletionView";
 import { MissingDataView } from "./components/MissingDataView";
+import { EmployeeForm } from "./components/EmployeeForm";
 
 const store = getDefaultStore();
 
@@ -137,13 +141,41 @@ const routeData = [
         }
       },
       {
+        path: "hr/employees/new",
+        Component: EmployeeForm,
+        action: async ({params, request}) => {
+          const payroll = await store.get(payrollAtom);
+          if (!payroll)
+            return null;
+          const division = await getDivision(params, payroll.divisionId);
+          const formData = await request.formData();
+          const response = await createEmployee(params, {
+            identifier: formData.get("identifier"),
+            firstName: formData.get("firstName"),
+            lastName: formData.get("lastName"),
+            divisions: [division.name]
+          });
+
+          if (response.status === 201) {
+            const employee = await response.json();
+            toast("success", "New employee created");
+            return redirect(`../hr/employees/${employee.id}/new`);
+          }
+          let errorMessage = await response.json();
+          if(!errorMessage || typeof errorMessage !== "string") {
+            errorMessage = "Saving failed!";
+          }
+          toast("error", errorMessage);
+          return response;
+        }
+      },
+      {
         path: "hr/employees/:employeeId",
         element: <EmployeeView routeLoaderDataName="employee"/>,
         loader: async ({params}) => {
           const employee = await getEmployee(params);
           return { employee };
         },
-        shouldRevalidate: ({currentParams, nextParams}) => currentParams.payrollId !== nextParams.payrollId || currentParams.employeeId !== nextParams.employeeId,
         id: "employee",
         ErrorBoundary: ErrorView,
         children: [
@@ -156,6 +188,32 @@ const routeData = [
               });
             }
           },
+          {
+            path: "edit",
+            Component: EmployeeForm,
+            action: async ({params, request}) =>  {
+              const formData = await request.formData();
+              console.log(formData.get("divisions"));
+              const response = await updateEmployee(params, {
+                identifier: formData.get("identifier"),
+                firstName: formData.get("firstName"),
+                lastName: formData.get("lastName"),
+                divisions: JSON.parse(formData.get("divisions"))
+              });
+
+              if (response.ok) {
+                toast("success", "Saved!");
+              } else {
+                let errorMessage = await response.json();
+                if(!errorMessage || typeof errorMessage !== "string") {
+                  errorMessage = "Saving failed!";
+                }
+                toast("error", errorMessage);
+              }
+              return response;
+            }
+          },
+          
           {
             path: "new/:caseName",
             lazy: () => import("./scenes/global/CaseForm")

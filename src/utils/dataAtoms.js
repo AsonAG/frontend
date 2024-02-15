@@ -16,6 +16,15 @@ export const payrollsAtom = atom(get => {
   return getPayrolls({tenantId});
 })
 
+export const payrollAtom = atom(async get => {
+  const payrolls = await get(payrollsAtom);
+  const payrollId = get(payrollIdAtom);
+  if (!Array.isArray(payrolls) || payrollId === null) {
+    return null;
+  }
+  return payrolls.find(p => p.id === payrollId);
+})
+
 export const userAtom = atom(get => {
   const tenantId = get(tenantIdAtom);
   if (tenantId == null) return null;

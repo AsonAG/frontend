@@ -9,10 +9,12 @@ const tenantsUrl          = "/tenants";
 const tenantUrl           = "/tenants/:tenantId";
 const payrollsUrl         = "/tenants/:tenantId/payrolls";
 const payrollUrl          = "/tenants/:tenantId/payrolls/:payrollId";
+const divisionsUrl        = "/tenants/:tenantId/divisions";
 const caseSetsUrl         = "/tenants/:tenantId/payrolls/:payrollId/cases/sets";
 const lookupValuesUrl     = "/tenants/:tenantId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
 const caseFieldsUrl       = "/tenants/:tenantId/payrolls/:payrollId/casefields";
+const employeesUrl        = "/tenants/:tenantId/employees";
 const employeeUrl         = "/tenants/:tenantId/employees/:employeeId";
 const usersUrl            = "/tenants/:tenantId/users";
 const employeeDocumentUrl = "/tenants/:tenantId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
@@ -161,15 +163,43 @@ export function getPayroll(routeParams) {
     return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
 }
 
-export async function getEmployees(routeParams, count) {
+export async function getDivision(routeParams, divisionId) {
+    const builder = new FetchRequestBuilder(divisionsUrl, routeParams)
+        .withQueryParam("filter", `id eq '${divisionId}'`);
+    const divisions = await builder.fetchJson();
+    if (divisions.length !== 1) {
+        return null;
+    }
+    return divisions[0];
+}
+
+export async function getEmployees(routeParams, count, skip) {
     return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
         .withQueryParam("orderBy", `firstName asc`)
+        //.withQueryParam("result", "ItemsWithCount")
         .withQueryParam("top", count)
+        .withQueryParam("skip", skip)
         .fetchJson();
 }
 
 export async function getEmployee(routeParams) {
     return new FetchRequestBuilder(employeeUrl, routeParams).fetchJson();
+}
+
+export async function createEmployee(routeParams, employee) {
+    return new FetchRequestBuilder(employeesUrl, routeParams)
+        .withMethod("POST")
+        .withBody(employee)
+        .withLocalization()
+        .fetch();
+}
+
+export async function updateEmployee(routeParams, employee) {
+    return new FetchRequestBuilder(employeeUrl, routeParams)
+        .withMethod("PUT")
+        .withBody(employee)
+        .withLocalization()
+        .fetch();
 }
 
 export async function getEmployeeByIdentifier(routeParams, identifier) {

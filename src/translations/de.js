@@ -80,6 +80,11 @@ const translations = {
         "Delete": "Löschen",
         "Data complete.": "Daten vollständig.",
         "Saved!": "Gespeichert!",
+        "New employee": "Neuer Eintritt",
+        "Edit": "Bearbeiten",
+        "New employee created": "Neueintritt erfasst",
+        "Saving failed!": "Speichern fehlgeschlagen!",
+        "Identifier": "Identifikator",
 
         // compliance
         "Submit": "Übermitteln",

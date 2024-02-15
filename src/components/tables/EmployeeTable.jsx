@@ -10,24 +10,28 @@ import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
+import { Edit } from "@mui/icons-material";
+
 
 export function AsyncEmployeeTable() {
+  const theme = useTheme();
+  const variant = useMediaQuery(theme.breakpoints.down("md")) ? "dense" : "default";
+  const { t } = useTranslation();
+  const newEmployeeButton = <TableButton title={t("New employee")} to="new" icon={<AddOutlinedIcon />} variant={variant} />
+  
   return (
-    <ContentLayout title="Employees">
+    <ContentLayout title="Employees" buttons={newEmployeeButton}>
       <AsyncDataRoute>
-        <EmployeeTable />
+        <EmployeeTable variant={variant}/>
       </AsyncDataRoute>
     </ContentLayout>
   );
 }
 
-function EmployeeTable() {
+function EmployeeTable({variant}) {
   const employees = useAsyncValue();
-  const theme = useTheme();
-  const variant = useMediaQuery(theme.breakpoints.down("md")) ? "dense" : "default";
-
   return (
-    <Stack gap={1.5} divider={<Divider />}>
+    <Stack spacing={1.5} divider={<Divider />}>
       {employees.map((employee, index) => <EmployeeRow key={index} employee={employee} variant={variant} />)}
     </Stack>
   );
@@ -46,7 +50,7 @@ const sx = {
 
 function EmployeeRow({ employee, variant }) {
   return (
-    <Stack direction="row" alignItems="center" gap={2} marginX={-2} sx={sx}>
+    <Stack direction="row" alignItems="center" spacing={2} ml={-2} mr={-1} sx={sx}>
       <Stack flex={1} p={1}>
         <Typography gutterBottom>{employee.firstName} {employee.lastName}</Typography>
         <Typography variant="body2" sx={{textOverflow: 'ellipsis', overflow: 'hidden'}}>{employee.identifier}</Typography>
@@ -61,6 +65,7 @@ function EmployeeButtons ({ employeeId, variant }) {
   const stackSpacing = variant === "dense" ? 1 : 2;
   return (
     <Stack direction="row" spacing={stackSpacing}>
+      <TableButton title={t("Edit")} to={employeeId + "/edit"} variant={variant} icon={<Edit />} />
       <TableButton title={t("New event")} to={employeeId + "/new"} variant={variant} icon={<AddOutlinedIcon />} />
       <TableButton title={t("Events")} to={employeeId + "/events"} variant={variant} icon={<WorkHistoryOutlinedIcon />} />
       <TableButton title={t("Documents")} to={employeeId + "/documents"} variant={variant} icon={<DescriptionOutlinedIcon />} />
