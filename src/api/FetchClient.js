@@ -1,7 +1,7 @@
 import { generatePath } from 'react-router-dom';
 import { getAuthUser, localUserEmailAtom } from '../auth/getUser';
 import { getDefaultStore } from 'jotai';
-import { userAtom } from '../utils/dataAtoms';
+import { payrollAtom, userAtom } from '../utils/dataAtoms';
 import { useOidc } from '../auth/authConfig';
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
@@ -52,6 +52,7 @@ class FetchRequestBuilder {
     url = null;
     routeParams = {};
     addUserQueryParam = false;
+    addPayrollDivision = false;
 
     constructor(url, routeParams) {
         if (!url) {
@@ -95,7 +96,7 @@ class FetchRequestBuilder {
 
     withQueryParam(key, value) {
         if(value) {
-            this.searchParams.append(key, value);
+            this.searchParams.set(key, value);
         }
         return this;
     }
@@ -109,6 +110,11 @@ class FetchRequestBuilder {
         this.addUserQueryParam = true;
         return this;
     }
+
+    withPayrollDivision() {
+        this.addPayrollDivision = true;
+        return this;
+    }
     
     withSignal(signal/*: AbortSignal*/) {
         if (signal) {
@@ -117,16 +123,29 @@ class FetchRequestBuilder {
         return this;
     }
 
+    withPagination(page, pageCount) {
+        return this
+            .withQueryParam("top", pageCount)
+            .withQueryParam("skip", page * pageCount)
+            .withQueryParam("result", "ItemsWithCount");
+    }
+
     async fetch() {
         if (this.localizeRequest) {
             const user = await store.get(userAtom);
             if (user !== null)
-                this.searchParams.append("language", user.language);
+                this.searchParams.set("language", user.language);
         }
         if (this.addUserQueryParam) {
             const user = await store.get(userAtom);
             if (user !== null)
-                this.searchParams.append("userId", user.id);
+                this.searchParams.set("userId", user.id);
+        }
+        if (this.addPayrollDivision) {
+            const payroll = await store.get(payrollAtom);
+            if (payroll !== null) {
+                this.searchParams.set("divisionId", payroll.divisionId);
+            }
         }
         let url = this.url;
         if ([...this.searchParams].length > 0) {
@@ -143,6 +162,11 @@ class FetchRequestBuilder {
 
     async fetchJson() {
         return (await this.fetch()).json();
+    }
+
+    async fetchSingle() {
+        const response = await this.fetchJson();
+        return Array.isArray(response) && response.length === 1 ? response[0] : null;
     }
 
 }
@@ -163,23 +187,16 @@ export function getPayroll(routeParams) {
     return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
 }
 
-export async function getDivision(routeParams, divisionId) {
+export function getDivision(routeParams, divisionId) {
     const builder = new FetchRequestBuilder(divisionsUrl, routeParams)
         .withQueryParam("filter", `id eq '${divisionId}'`);
-    const divisions = await builder.fetchJson();
-    if (divisions.length !== 1) {
-        return null;
-    }
-    return divisions[0];
+    return builder.fetchSingle();
 }
 
-export async function getEmployees(routeParams, count, skip) {
-    return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
-        .withQueryParam("orderBy", `firstName asc`)
-        //.withQueryParam("result", "ItemsWithCount")
-        .withQueryParam("top", count)
-        .withQueryParam("skip", skip)
-        .fetchJson();
+export function getEmployees(routeParams) {
+    return new FetchRequestBuilder(employeesUrl, routeParams)
+        .withPayrollDivision()
+        .withQueryParam("orderBy", `firstName asc`);
 }
 
 export async function getEmployee(routeParams) {
@@ -194,7 +211,7 @@ export async function createEmployee(routeParams, employee) {
         .fetch();
 }
 
-export async function updateEmployee(routeParams, employee) {
+export function updateEmployee(routeParams, employee) {
     return new FetchRequestBuilder(employeeUrl, routeParams)
         .withMethod("PUT")
         .withBody(employee)
@@ -202,11 +219,10 @@ export async function updateEmployee(routeParams, employee) {
         .fetch();
 }
 
-export async function getEmployeeByIdentifier(routeParams, identifier) {
-    const employees = await new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
+export function getEmployeeByIdentifier(routeParams, identifier) {
+    return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
         .withQueryParam("filter", `Identifier eq '${identifier}'`)
-        .fetchJson();
-    return employees?.length ? employees[0] : null;
+        .fetchSingle();
 }
 
 export function getEmployeeCases(routeParams, clusterSetName) {

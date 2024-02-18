@@ -10,6 +10,7 @@ import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
+import { PaginatedContent } from "../PaginatedContent";
 import { Edit } from "@mui/icons-material";
 
 
@@ -22,17 +23,21 @@ export function AsyncEmployeeTable() {
   return (
     <ContentLayout title="Employees" buttons={newEmployeeButton}>
       <AsyncDataRoute>
-        <EmployeeTable variant={variant}/>
+        <PaginatedContent>
+          <EmployeeTable variant={variant}/>
+        </PaginatedContent>
       </AsyncDataRoute>
     </ContentLayout>
   );
 }
 
 function EmployeeTable({variant}) {
-  const employees = useAsyncValue();
+  const { items: employees }= useAsyncValue();
   return (
-    <Stack spacing={1.5} divider={<Divider />}>
-      {employees.map((employee, index) => <EmployeeRow key={index} employee={employee} variant={variant} />)}
+    <Stack spacing={3}>
+      <Stack spacing={1.5} divider={<Divider />}>
+        {employees.map((employee, index) => <EmployeeRow key={index} employee={employee} variant={variant} />)}
+      </Stack>
     </Stack>
   );
 };

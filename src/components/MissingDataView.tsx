@@ -6,6 +6,7 @@ import { CategoryLabel } from "./tasks/CategoryLabel";
 import { Link as RouterLink, LinkProps as RouterLinkProps, useAsyncValue, useFetcher } from "react-router-dom";
 import { Paper, Skeleton, Stack, Typography } from "@mui/material";
 import styled from "@emotion/styled";
+import { PaginatedContent } from "./PaginatedContent";
 
 const Link = styled(forwardRef<any, RouterLinkProps>((itemProps, ref) => {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -25,7 +26,9 @@ export function MissingDataView() {
   return (
     <ContentLayout title={t("Missing data")}>
       <AsyncDataRoute>
-        <EmployeeTable />
+        <PaginatedContent>
+          <EmployeeTable />
+        </PaginatedContent>
       </AsyncDataRoute>
     </ContentLayout>
   )
@@ -38,7 +41,7 @@ type Employee = {
 }
 
 function EmployeeTable() {
-  const employees = useAsyncValue() as Employee[];
+  const { items: employees }  = useAsyncValue() as { items: Employee[] };
   return (
     <Stack spacing={2}>
       { employees.map(e => <EmployeeSection key={e.id} employee={e} />)}

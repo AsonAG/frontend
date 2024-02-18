@@ -78,6 +78,20 @@ async function getTenantData() {
   return { tenant, payrolls, user };
 }
 
+function paginatedLoader({pageCount, getRequestBuilder, ...loaderData}) {
+  return ({params, request}) => {
+    let page = new URL(request.url).searchParams.get("page") || 1;
+    page = Number(page) - 1;
+    return defer({
+      ...loaderData,
+      pageCount,
+      data: getRequestBuilder({params, request})
+        .withPagination(page, pageCount)
+        .fetchJson(),
+    });
+  }
+}
+
 const routeData = [
   {
     path: "/",
@@ -134,11 +148,10 @@ const routeData = [
       {
         path: "hr/employees",
         Component: AsyncEmployeeTable,
-        loader: ({params}) =>  {
-          return defer({
-            data: getEmployees(params)
-          });
-        }
+        loader: paginatedLoader({
+          pageCount: 10,
+          getRequestBuilder: ({params}) => getEmployees(params)
+        })
       },
       {
         path: "hr/employees/new",
@@ -307,12 +320,11 @@ const routeData = [
       {
         path: "hr/missingdata",
         Component: MissingDataView,
-        loader: ({params}) => {
-          return defer({
-            data: getEmployees(params, 5),
-            title: "Missing data"
-          });
-        },
+        loader: paginatedLoader({
+          pageCount: 5,
+          title: "Missing data",
+          getRequestBuilder: ({params}) => getEmployees(params)
+        }),
         children: [
           {
             path: ":employeeId",

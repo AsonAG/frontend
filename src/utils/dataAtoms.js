@@ -48,13 +48,13 @@ export const payrunAtom = atom(async get => {
   return payruns[0] || null;
 });
 
-export const openTasksAtom = atomWithRefresh(get => {
+export const openTasksAtom = atomWithRefresh(async get => {
   const tenantId = get(tenantIdAtom);
   const payrollId = get(payrollIdAtom);
   if (tenantId === null || payrollId === null)
     return {count: 0, items: []};
   
-  const user = get(userAtom);
+  const user = await get(userAtom);
   let orderBy = "completed, scheduled, created";
   if (user !== null) {
     orderBy = `assignedUserId eq ${user.id}, ${orderBy}`;
