@@ -244,8 +244,7 @@ export function getEmployeeCaseChanges(routeParams, filter, orderBy) {
         .withQueryParam("filter", filter)
         .withQueryParam("orderBy", orderBy)
         .withLocalization()
-        .withUser()
-        .fetchJson();
+        .withUser();
 }
 
 export function getCompanyCases(routeParams, clusterSetName) {
@@ -264,11 +263,8 @@ export function getCompanyCaseChanges(routeParams, filter, orderBy) {
         .withQueryParam("caseType", "Company")
         .withQueryParam("filter", filter)
         .withQueryParam("orderBy", orderBy)
-        // .withQueryParam("result", "ItemsWithCount")
-        // .withQueryParam("top", 10)
         .withLocalization()
-        .withUser()
-        .fetchJson();
+        .withUser();
 }
 
 export function getTasks(routeParams, filter, orderBy) {

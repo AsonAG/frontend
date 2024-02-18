@@ -7,19 +7,22 @@ import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
 import { formatCaseValue } from "../../utils/Format";
 import { MoreVert } from "@mui/icons-material";
+import { PaginatedContent } from "../PaginatedContent";
 
 export function AsyncEventTable() {
   return (
     <ContentLayout title="Events" disableXsPadding>
       <AsyncDataRoute>
-        <EventTable />
+        <PaginatedContent>
+          <EventTable />
+        </PaginatedContent>
       </AsyncDataRoute>
     </ContentLayout>
   );
 }
 
 function EventTable() {
-  const events = useAsyncValue();
+  const {items: events} = useAsyncValue();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const variant = isMobile ? "mobile" : "standard";

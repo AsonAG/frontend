@@ -235,11 +235,10 @@ const routeData = [
           {
             path: "events",
             Component: AsyncEventTable,
-            loader: ({params}) =>  {
-              return defer({
-                data: getEmployeeCaseChanges(params, null, "created desc")
-              });
-            }
+            loader: paginatedLoader({
+              pageCount: 10,
+              getRequestBuilder: ({params}) => getEmployeeCaseChanges(params, null, "created desc")
+            })
           },
           {
             path: "documents",
@@ -562,11 +561,10 @@ const routeData = [
           {
             path: "events",
             Component: AsyncEventTable,
-            loader: ({params}) =>  {
-              return defer({
-                data: getCompanyCaseChanges(params, null, "created desc")
-              });
-            }
+            loader: paginatedLoader({
+              pageCount: 10,
+              getRequestBuilder: ({params}) => getCompanyCaseChanges(params, null, "created desc")
+            })
           },
           {
             path: "documents",
