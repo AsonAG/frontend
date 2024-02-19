@@ -82,7 +82,9 @@ function paginatedLoader({pageCount, name, getRequestBuilder, getLoaderData}) {
   return async (loaderParams) => {
     let page = new URL(loaderParams.request.url).searchParams.get("page") || 1;
     page = Number(page) - 1;
-    const loaderData = await Promise.resolve(getLoaderData(loaderParams));
+    const loaderData = getLoaderData ?
+      await Promise.resolve(getLoaderData(loaderParams)) :
+      {};
     const result = {
       ...loaderData,
       pageCount,
