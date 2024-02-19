@@ -5,6 +5,7 @@ import { Add, Cancel, Clear, DangerousRounded, DoneAll, InsightsRounded, Mode, O
 import { ContentLayout } from "../ContentLayout";
 import { ErrorView } from "../ErrorView";
 import { useTranslation } from "react-i18next";
+import { PaginatedContent } from "../PaginatedContent";
 
 export function AsyncPayrunView() {
   const { t } = useTranslation();
@@ -27,9 +28,7 @@ function AwaitPayrunJobs() {
   return (
     <Suspense fallback={<Skeleton />}>
       <Await resolve={payrunJobs} errorElement={<ErrorView />}>
-        <Paper variant="outlined">
-          <PayrunJobs />
-        </Paper>
+        <PayrunJobs />
       </Await>
     </Suspense>
   );
@@ -37,10 +36,17 @@ function AwaitPayrunJobs() {
 
 function PayrunJobs() {
   const jobs = useAsyncValue();
+  if (jobs.count === 0) {
+    return null;
+  }
   return (
-    <Stack divider={<Divider flexItem />}>
-      {jobs.items.map(job => <PayrunJobRow key={job.id} payrunJob={job} />)}
-    </Stack>
+    <PaginatedContent>
+      <Paper variant="outlined">
+        <Stack divider={<Divider flexItem />}>
+          {jobs.items.map(job => <PayrunJobRow key={job.id} payrunJob={job} />)}
+        </Stack>
+      </Paper>
+    </PaginatedContent>
   )
 }
 

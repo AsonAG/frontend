@@ -78,17 +78,20 @@ async function getTenantData() {
   return { tenant, payrolls, user };
 }
 
-function paginatedLoader({pageCount, getRequestBuilder, ...loaderData}) {
-  return ({params, request}) => {
-    let page = new URL(request.url).searchParams.get("page") || 1;
+function paginatedLoader({pageCount, name, getRequestBuilder, getLoaderData}) {
+  return async (loaderParams) => {
+    let page = new URL(loaderParams.request.url).searchParams.get("page") || 1;
     page = Number(page) - 1;
-    return defer({
+    const loaderData = await Promise.resolve(getLoaderData(loaderParams));
+    const result = {
       ...loaderData,
       pageCount,
-      data: getRequestBuilder({params, request})
-        .withPagination(page, pageCount)
-        .fetchJson(),
-    });
+    }
+    const requestBuilder = await Promise.resolve(getRequestBuilder(loaderParams));
+    result[name ?? "data"] = requestBuilder
+      .withPagination(page, pageCount)
+      .fetchJson();
+    return defer(result);
   }
 }
 
@@ -321,8 +324,10 @@ const routeData = [
         Component: MissingDataView,
         loader: paginatedLoader({
           pageCount: 5,
-          title: "Missing data",
-          getRequestBuilder: ({params}) => getEmployees(params)
+          getRequestBuilder: ({params}) => getEmployees(params),
+          getLoaderData: () => ({
+            title: "Missing data"
+          })
         }),
         children: [
           {
@@ -350,13 +355,17 @@ const routeData = [
       {
         path: "hr/payruns",
         Component: AsyncPayrunView,
-        loader: async ({params}) => {
-          const payrun = await store.get(payrunAtom);
-          return defer({
-            draftPayrunJobs: getDraftPayrunJobs(params),
-            payrunJobs: getPayrunJobs({...params, payrunId: payrun.id})
-          });
-        },
+        loader: paginatedLoader({
+          pageCount: 15,
+          name: "payrunJobs",
+          getRequestBuilder: async ({params}) => {
+            const payrun = await store.get(payrunAtom);
+            return getPayrunJobs({...params, payrunId: payrun.id});
+          },
+          getLoaderData: ({params}) => ({
+            draftPayrunJobs: getDraftPayrunJobs(params)
+          })
+        }),
         action: async ({params, request}) => {
           const action = await request.json();
           const payrun = await store.get(payrunAtom);

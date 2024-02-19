@@ -304,10 +304,7 @@ export function getDraftPayrunJobs(routeParams) {
 export function getPayrunJobs(routeParams) {
     return new FetchRequestBuilder(payrunJobsUrl, routeParams)
         .withQueryParam("filter", `payrollId eq '${routeParams.payrollId}' and payrunId eq '${routeParams.payrunId}' and jobStatus ne 'Draft'`)
-        .withQueryParam("orderBy", "periodStart desc")
-        .withQueryParam("result", "ItemsWithCount")
-        .withQueryParam("top", 15)
-        .fetchJson();
+        .withQueryParam("orderBy", "periodStart desc");
 }
 
 export function getPayrunParameters(routeParams) {
