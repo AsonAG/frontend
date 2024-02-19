@@ -242,7 +242,7 @@ const routeData = [
             Component: AsyncEventTable,
             loader: paginatedLoader({
               pageCount: 10,
-              getRequestBuilder: ({params}) => getEmployeeCaseChanges(params, null, "created desc")
+              getRequestBuilder: ({params}) => getEmployeeCaseChanges(params, null, "created desc, id")
             })
           },
           {
@@ -574,7 +574,7 @@ const routeData = [
             Component: AsyncEventTable,
             loader: paginatedLoader({
               pageCount: 10,
-              getRequestBuilder: ({params}) => getCompanyCaseChanges(params, null, "created desc")
+              getRequestBuilder: ({params}) => getCompanyCaseChanges(params, null, "created desc, id")
             })
           },
           {
