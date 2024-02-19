@@ -58,7 +58,7 @@ export function Component() {
   }
 
   return (
-    <Stack direction="row" minHeight="100%">
+    <Stack direction="row" minHeight="100%" spacing={4}>
       <PageComponent title="New event" sx={{flex: 1}} disableInset={!renderTitle} >
         {content}
       </PageComponent>
