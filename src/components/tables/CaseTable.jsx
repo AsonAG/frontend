@@ -4,15 +4,12 @@ import { Stack, Card, CardActionArea, CardContent, Typography } from "@mui/mater
 import { useTranslation } from "react-i18next";
 import { Centered } from "../Centered";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
-import { ContentLayout } from "../ContentLayout";
 
 export function AsyncCaseTable() {
   return (
-    <ContentLayout title="New event">
-      <AsyncDataRoute>
-        <CaseTable />
-      </AsyncDataRoute>
-    </ContentLayout>
+    <AsyncDataRoute>
+      <CaseTable />
+    </AsyncDataRoute>
   );
 }
 

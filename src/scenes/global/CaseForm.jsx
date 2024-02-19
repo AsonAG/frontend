@@ -1,4 +1,4 @@
-import { Form, useParams, useLoaderData, useRouteLoaderData, useOutletContext, useNavigate } from "react-router-dom";
+import { Form, useParams, useLoaderData, useRouteLoaderData, useNavigate } from "react-router-dom";
 import { CaseComponent } from "../../components/case/CaseComponent";
 import { createContext, useRef } from "react";
 import CaseIndexView from "../../components/cases/CaseIndexView";
@@ -10,7 +10,7 @@ import { Loading } from "../../components/Loading";
 import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
 import { ErrorView } from "../../components/ErrorView";
 import { EditFieldComponent } from "../../components/case/field/EditFieldComponent";
-import { ContentLayout } from "../../components/ContentLayout";
+import { ContentLayout, PageContent } from "../../components/ContentLayout";
 import { toast } from "../../utils/dataAtoms";
 
 export const CaseFormContext = createContext();
@@ -18,7 +18,10 @@ export const CaseFormContext = createContext();
 export function Component() {
   const navigate = useNavigate();
   const { user, payroll } = useRouteLoaderData("root");
-  const redirectPath = useLoaderData() || "..";
+  const loaderData = useLoaderData();
+  const redirectPath = loaderData?.redirect || "..";
+  const renderTitle = loaderData?.renderTitle ?? true;
+  const PageComponent = renderTitle ? ContentLayout : PageContent;
   const params = useParams();
   const { caseData, caseErrors, fatalError, attachments, loading, buildCase, addCase } = useCaseData(params, user, payroll);
   const formRef = useRef();
@@ -56,9 +59,9 @@ export function Component() {
 
   return (
     <Stack direction="row" minHeight="100%">
-      <ContentLayout title="New event" sx={{flex: 1}}>
+      <PageComponent title="New event" sx={{flex: 1}} disableInset={!renderTitle} >
         {content}
-      </ContentLayout>
+      </PageComponent>
       { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }
     </Stack>
   )

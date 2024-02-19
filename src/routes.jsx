@@ -66,6 +66,7 @@ import { AsyncReportView } from "./components/ReportView";
 import { CompletionView } from "./components/compliance/CompletionView";
 import { MissingDataView } from "./components/MissingDataView";
 import { EmployeeForm } from "./components/EmployeeForm";
+import { withPage } from "./components/ContentLayout";
 
 const store = getDefaultStore();
 
@@ -85,14 +86,12 @@ function paginatedLoader({pageCount, name, getRequestBuilder, getLoaderData}) {
     const loaderData = getLoaderData ?
       await Promise.resolve(getLoaderData(loaderParams)) :
       {};
+    const requestBuilder = await Promise.resolve(getRequestBuilder(loaderParams));
     const result = {
       ...loaderData,
       pageCount,
+      [name ?? "data"]: requestBuilder.withPagination(page, pageCount).fetchJson()
     }
-    const requestBuilder = await Promise.resolve(getRequestBuilder(loaderParams));
-    result[name ?? "data"] = requestBuilder
-      .withPagination(page, pageCount)
-      .fetchJson();
     return defer(result);
   }
 }
@@ -189,7 +188,7 @@ const routeData = [
       },
       {
         path: "hr/employees/:employeeId",
-        element: <EmployeeView routeLoaderDataName="employee"/>,
+        element: <EmployeeView />,
         loader: async ({params}) => {
           const employee = await getEmployee(params);
           return { employee };
@@ -235,7 +234,10 @@ const routeData = [
           
           {
             path: "new/:caseName",
-            lazy: () => import("./scenes/global/CaseForm")
+            lazy: () => import("./scenes/global/CaseForm"),
+            loader: () => ({
+              renderTitle: false
+            })
           },
           {
             path: "events",
@@ -350,9 +352,9 @@ const routeData = [
       {
         path: "hr/missingdata/:employeeId/:caseName",
         lazy: () => import("./scenes/global/CaseForm"),
-        loader: () => {
-          return "../.."
-        }
+        loader: () => ({
+          redirect: "../.."
+        })
       },
       {
         path: "hr/payruns",
@@ -544,11 +546,10 @@ const routeData = [
         children: [
           {
             path: "missingdata",
-            Component: AsyncCaseTable,
+            Component: withPage("Missing data", AsyncCaseTable),
             loader: ({params}) =>  {
               return defer({
-                data: getCompanyCases(params, "CCT"),
-                title: "Missing data"
+                data: getCompanyCases(params, "CCT")
               });
             }
           },
@@ -558,7 +559,7 @@ const routeData = [
           },
           {
             path: "new",
-            Component: AsyncCaseTable,
+            Component: withPage("New event", AsyncCaseTable),
             loader: ({params}) =>  {
               return defer({
                 data: getCompanyCases(params, "NotAvailable")
@@ -571,7 +572,7 @@ const routeData = [
           },
           {
             path: "events",
-            Component: AsyncEventTable,
+            Component: withPage("Events", AsyncEventTable),
             loader: paginatedLoader({
               pageCount: 10,
               getRequestBuilder: ({params}) => getCompanyCaseChanges(params, null, "created desc, id")
@@ -579,7 +580,7 @@ const routeData = [
           },
           {
             path: "documents",
-            Component: AsyncDocumentTable,
+            Component: withPage("Documents", AsyncDocumentTable),
             loader: ({params}) =>  {
               return defer({
                 data: getDocumentCaseFields(params)
@@ -604,7 +605,7 @@ const routeData = [
         children: [
           {
             path: "new",
-            Component: AsyncCaseTable,
+            Component: withPage("New event", AsyncCaseTable),
             loader: ({params}) =>  {
               return defer({
                 data: getEmployeeCases(params, "ESS")
@@ -617,10 +618,9 @@ const routeData = [
           },
           {
             path: "tasks",
-            Component: AsyncCaseTable,
+            Component: withPage("Tasks", AsyncCaseTable),
             loader: ({params}) =>  {
               return defer({
-                title: "Tasks",
                 data: getEmployeeCases(params, "ECT")
               });
             }
@@ -631,7 +631,7 @@ const routeData = [
           },
           {
             path: "documents",
-            Component: AsyncDocumentTable,
+            Component: withPage("Documents", AsyncDocumentTable),
             loader: ({params}) =>  {
               return defer({
                 data: getDocumentCaseFields(params)

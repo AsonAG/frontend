@@ -1,4 +1,4 @@
-import { ContentLayout, ContentStack } from "../ContentLayout";
+import { ContentLayout, PageContent } from "../ContentLayout";
 import { useTranslation } from "react-i18next";
 import { useLocation, Await, useLoaderData, useAsyncValue, Link } from "react-router-dom";
 import { Skeleton, Typography, Stack, IconButton, Tooltip, Paper, Divider, Alert, AlertTitle } from "@mui/material";
@@ -21,7 +21,7 @@ export function AsyncComplianceSubmissionView() {
         </Await>
       </Suspense>
 
-      <ContentStack>
+      <PageContent>
         <Typography variant="h6">{t("Offene Aufgaben")}</Typography>
         <Stack component={Paper} variant="outlined" divider={<Divider flexItem />}>
         <ComplianceTaskRow title="DialogResult Aufgabe"/>
@@ -29,21 +29,21 @@ export function AsyncComplianceSubmissionView() {
         <ComplianceTaskRow title="Result (? wahrscheinlich nicht)"/>
         <ComplianceTaskRow title="CompletionAndResult Aufgabe"/>
         </Stack>
-        </ContentStack>
+        </PageContent>
 
-        <ContentStack>
+        <PageContent>
         <Typography variant="h6">{t("Erledigte Aufgaben")}</Typography>
         <Stack component={Paper} variant="outlined" divider={<Divider flexItem />}>
         <ComplianceTaskRow title="CompletionAndResult" completed/>
         <ComplianceTaskRow title="DialogResult" completed/>
         </Stack>
-        </ContentStack>
+        </PageContent>
             
       {
         expertMode && 
-          <ContentStack>
+          <PageContent>
             <ComplianceMessagesView messagesPromise={loaderData.messages} />
-          </ContentStack>
+          </PageContent>
       }
     </Stack>
   );

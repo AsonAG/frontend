@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useCreateTheme } from "./theme";
-import { CssBaseline, Divider, ThemeProvider, Stack, useMediaQuery, IconButton, Snackbar as MuiSnackbar, Alert, Typography } from "@mui/material";
+import { CssBaseline, Box, Divider, ThemeProvider, Stack, useMediaQuery, IconButton, Snackbar as MuiSnackbar, Alert, Typography } from "@mui/material";
 import Topbar from "./scenes/global/Topbar";
 import Drawer from "./scenes/global/Drawer";
 
@@ -59,11 +59,11 @@ export function App({renderDrawer = false}) {
 						{drawerButton}
 						{topbarLogo}
 					</Topbar>
-					<div id="scroll-container">
+					<Box id="scroll-container" sx={{scrollbarGutter: {sm: "stable both-edges"}}}>
 						<Container component="main" maxWidth="lg" sx={containerProps}>
 							<Outlet />
 						</Container>
-					</div>
+					</Box>
 				</Stack>
 				<Snackbar />
 			</Stack>

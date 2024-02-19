@@ -26,7 +26,7 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
 export function AsyncTaskTable() {
   const { t } = useTranslation(); 
   return (
-    <ContentLayout title={t("Tasks")} disableXsPadding>
+    <ContentLayout title={t("Tasks")} disableInset>
       <AsyncDataRoute skipDataCheck>
         <TaskTable />
       </AsyncDataRoute>
@@ -41,7 +41,7 @@ function TaskTable() {
   const theme = useTheme();
   const mobileLayout = useMediaQuery(theme.breakpoints.down("md"));
   const rowVariant = mobileLayout ? "mobile" : "default";
-  const padding = mobileLayout ? 4 : 0;
+  const padding = "var(--content-inset)";
 
   return (
     <Stack spacing={3}>
@@ -49,7 +49,7 @@ function TaskTable() {
       {
         tasks.count === 0 ?
           <Typography px={padding}>{t("No tasks found")}</Typography> :
-          <Paper>
+          <Paper variant="outlined">
             <Stack divider={<Divider />}>
               {tasks.items.map((task) => <TaskRow key={task.id} task={task} variant={rowVariant} taskFilter={search}/>)}
             </Stack>
@@ -64,13 +64,12 @@ function TaskRow({ task, variant, taskFilter }) {
   let stackProps = {
     direction: "row",
     alignItems: "center",
-    spacing: 2
+    spacing: 2,
   };
   let rowInfoSpacing = 0.5;
   if (variant === "mobile") {
     stackProps = {
-      spacing: 1,
-      px: 4
+      spacing: 1
     };
     rowInfoSpacing = 0.75;
   }

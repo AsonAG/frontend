@@ -15,16 +15,13 @@ import { useTranslation } from "react-i18next";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import dayjs from "dayjs";
-import { ContentLayout } from "../ContentLayout";
 import { DocumentLink } from "../DocumentLink";
 
 export function AsyncDocumentTable() {
   return (
-    <ContentLayout title="Documents">
-      <AsyncDataRoute>
-        <DocumentTable />
-      </AsyncDataRoute>
-    </ContentLayout>
+    <AsyncDataRoute>
+      <DocumentTable />
+    </AsyncDataRoute>
   );
 }
 

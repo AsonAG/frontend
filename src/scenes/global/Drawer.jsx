@@ -117,7 +117,8 @@ function Drawer({ temporary, open, onClose }) {
       open={open}
       onClose={onClose}
       sx={{
-        width: drawerWidth, 
+        width: drawerWidth,
+        px: 0.5,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
           width: drawerWidth,

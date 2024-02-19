@@ -4,20 +4,17 @@ import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, IconButton, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
-import { ContentLayout } from "../ContentLayout";
 import { formatCaseValue } from "../../utils/Format";
 import { MoreVert } from "@mui/icons-material";
 import { PaginatedContent } from "../PaginatedContent";
 
 export function AsyncEventTable() {
   return (
-    <ContentLayout title="Events" disableXsPadding>
-      <AsyncDataRoute>
-        <PaginatedContent>
-          <EventTable />
-        </PaginatedContent>
-      </AsyncDataRoute>
-    </ContentLayout>
+    <AsyncDataRoute>
+      <PaginatedContent>
+        <EventTable />
+      </PaginatedContent>
+    </AsyncDataRoute>
   );
 }
 
