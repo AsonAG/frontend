@@ -17,21 +17,19 @@ function Tenants() {
   const { t } = useTranslation();
   useDocumentTitle("Ason - Tenants");
   return (
-    <Container maxWidth="lg">
-      <ContentLayout title={t("Select a company")}>
-        <Paper>
-          <List>
-            {tenants.map(tenant => (
-              <ListItem disablePadding key={tenant.id}>
-                <ListItemButton component={Link} to={`${tenant.id}/payrolls`} state={{tenant}}>
-                  <ListItemText primary={tenant.identifier} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
-      </ContentLayout>
-    </Container>
+    <ContentLayout title={t("Select a company")}>
+      <Paper>
+        <List>
+          {tenants.map(tenant => (
+            <ListItem disablePadding key={tenant.id}>
+              <ListItemButton component={Link} to={`${tenant.id}/payrolls`} state={{tenant}}>
+                <ListItemText primary={tenant.identifier} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+    </ContentLayout>
   );
 };
 

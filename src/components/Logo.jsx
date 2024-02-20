@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 import { useMatches } from "react-router-dom";
 
 
-export default function Logo() {
+export default function Logo({paddingLeft}) {
   const matches = useMatches();
 
   const location = matches ? matches[0].pathname : "/";
 
   return (
-    <Link to={location} style={{height: 32}} >
+    <Link to={location} style={{height: 32, paddingLeft}} >
       <img
           alt="logo"
           height={32}

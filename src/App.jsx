@@ -45,7 +45,7 @@ export function App({renderDrawer = false}) {
 		<IconButton size="large" onClick={() => setDrawerOpen(true)}>
 			<MenuIcon />
 		</IconButton>;
-	const topbarLogo = !(renderDrawer && !useTemporaryDrawer) && <Logo />;
+	const topbarLogo = !(renderDrawer && !useTemporaryDrawer) && <Logo paddingLeft={drawerButton ? 0 : 16}/>;
 
 	const containerProps = {px: 0, sm: {px: 0}}
 

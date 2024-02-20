@@ -13,7 +13,7 @@ function Topbar({ children }) {
 
   return (
     <AppBar elevation={0} sx={{ backgroundColor: "background.default", position: "static" }}>
-      <Toolbar disableGutters sx={{mx: {sm: 2}, gap: 2}} spacing={1} >
+      <Toolbar disableGutters sx={{mx: {sm: 2}, gap: {xs: 1, sm: 2}}} spacing={1} >
         {children}
         <Box sx={{flexGrow: 1}} />
 
