@@ -387,7 +387,7 @@ const routeData = [
               const payrun = await store.get(payrunAtom);
               return defer({
                 payrun,
-                data: getEmployees(params)
+                data: getEmployees(params).fetchJson()
               });
             },
             action: async ({params, request}) => {

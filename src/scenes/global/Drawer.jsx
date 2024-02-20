@@ -116,6 +116,9 @@ function Drawer({ temporary, open, onClose }) {
       variant={drawerVariant}
       open={open}
       onClose={onClose}
+      PaperProps={{
+        elevation: 0
+      }}
       sx={{
         width: drawerWidth,
         px: 0.5,
