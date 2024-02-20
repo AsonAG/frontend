@@ -9,10 +9,9 @@ export function EmployeeForm() {
   const employee= loaderData?.employee;
   const isNew = !employee;
   const divisions = JSON.stringify(employee?.divisions);
-  const title = isNew ? "New employee" : null;
+  const title = isNew ? "New employee" : "Change name";
   const backPath = isNew ? ".." : "../..";
   const { t } = useTranslation();
-  console.log("employee", employee);
   return (
     <Form method="post">
       <ContentLayout title={title}>
