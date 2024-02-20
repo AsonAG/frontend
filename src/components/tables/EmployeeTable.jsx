@@ -12,6 +12,7 @@ import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
 import { PaginatedContent } from "../PaginatedContent";
 import { Edit } from "@mui/icons-material";
+import { ScrollToTop } from "../ScrollToTop";
 
 
 export function AsyncEmployeeTable() {
@@ -33,13 +34,12 @@ export function AsyncEmployeeTable() {
 
 function EmployeeTable({variant}) {
   const { items: employees }= useAsyncValue();
-  return (
-    <Stack spacing={3}>
-      <Stack spacing={1.5} divider={<Divider />}>
-        {employees.map((employee, index) => <EmployeeRow key={index} employee={employee} variant={variant} />)}
-      </Stack>
+  return <>
+    <Stack spacing={1.5} divider={<Divider />}>
+      {employees.map((employee, index) => <EmployeeRow key={index} employee={employee} variant={variant} />)}
     </Stack>
-  );
+    <ScrollToTop />
+  </>;
 };
 
 const sx = {
