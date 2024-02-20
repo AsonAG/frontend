@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, IconButton, Stack, Tooltip, Typography, 
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { formatCaseValue } from "../../utils/Format";
+import { ScrollToTop } from "../ScrollToTop";
 import { MoreVert } from "@mui/icons-material";
 import { PaginatedContent } from "../PaginatedContent";
 
@@ -23,11 +24,12 @@ function EventTable() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const variant = isMobile ? "mobile" : "standard";
-  return (
+  return <>
     <Stack spacing={3}>
       {events.map(caseChange => <CaseChange key={caseChange.id} caseChange={caseChange} variant={variant} />)}
     </Stack>
-  );
+    <ScrollToTop />
+  </>;
 }
 
 const tooltipProps = {
