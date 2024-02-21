@@ -11,7 +11,7 @@ export function CaseComponent({ _case, FieldRenderComponent, pt = 0 }) {
           {_case.description}
         </Typography>
       </Stack>
-      <Stack spacing={3}>
+      <Stack spacing={1.5}>
         {
           _case.fields?.map((field) => <FieldRenderComponent key={field.id} field={field} />)
         }

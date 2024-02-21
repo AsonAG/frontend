@@ -42,6 +42,20 @@ function createThemeSettings(mode) {
           useFlexGap: true
         }
       },
+      MuiTextField: {
+        defaultProps: {
+          size: "small"
+        }
+      },
+      MuiCheckbox: {
+        styleOverrides: {
+          root: {
+            padding: "4px",
+            marginLeft: "5px",
+            marginRight: "5px"
+          }
+        }
+      },
       MuiSkeleton: {
         styleOverrides: {
           root: {

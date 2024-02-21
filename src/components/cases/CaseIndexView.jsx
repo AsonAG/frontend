@@ -6,7 +6,7 @@ import useActiveCase from "../../hooks/useActiveCase";
 function CaseIndexView({ _case }) {
   const { activeCase, scrollAndSetActive } = useActiveCase(_case);
   return (
-    <Stack sx={{overflowY: 'auto', position: 'sticky', top: 0, height: 'calc(100vh - 65px)', pb: 2, pt: 2, width: 225 }}>
+    <Stack sx={{overflowY: 'auto', position: 'sticky', alignSelf: "start", top: 0, pb: 2, pt: 2, width: 225 }}>
       <CaseIndexComponent _case={_case} indent={0} activeCase={activeCase} onSelect={scrollAndSetActive} />
     </Stack>
   );

@@ -43,8 +43,7 @@ function DefaultLayout({field}) {
 }
 
 const componentProps = {
-	sx: { flex: 1 },
-	size: "small"
+	sx: { flex: 1 }
 };
 
 function MobileLayout({field}) {

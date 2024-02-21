@@ -26,9 +26,12 @@ export function EditFieldValueComponent({ excludeNoneValue = false }) {
 	} 
 	switch (field.valueType) {
 		case "None":
-			return (!excludeNoneValue &&
+			if (excludeNoneValue) return;
+
+			const fontWeight = field.attributes?.["text.bold"] ? "bold" : undefined;
+			return (
 				<Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center'}}>
-					<Typography>{field.displayName}</Typography>
+					<Typography fontWeight={fontWeight}>{field.displayName}</Typography>
 				</Box>
 			);
 		case "Document":

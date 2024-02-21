@@ -3,7 +3,7 @@ import { useContext, useRef } from "react";
 import { FieldContext } from "../EditFieldComponent";
 import { DatePicker } from "../../../DatePicker";
 
-export function FieldValueDateComponent({variant = "standard", propertyName = "value", displayName, sx, size = "medium", required}) {
+export function FieldValueDateComponent({variant = "standard", propertyName = "value", displayName, sx, required}) {
 	const { field, isReadonly, required: fieldRequired, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const inputRef = useRef();
 	const fieldValue = field[propertyName];
@@ -35,7 +35,7 @@ export function FieldValueDateComponent({variant = "standard", propertyName = "v
 			inputRef={inputRef}
 			slotProps={{
 				field: {
-					required, size
+					required
 				},
 				openPickerButton: { tabIndex: -1 },
 			}}
