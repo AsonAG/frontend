@@ -27,13 +27,13 @@ function DatePickerInputAdornment({children, handleBack, handleForward, ...props
 }
 
 interface DatePickerProps extends MuiDatePickerProps<Dayjs> {
-  variant: "standard" |  "month"
+  variant: "standard" |  "month" | "year"
 }
 interface DateTimePickerProps extends MuiDateTimePickerProps<Dayjs> {
   variant: "datetime"
 }
 
-type DatePickerVariants = "standard" | "datetime" | "month";
+type DatePickerVariants = "standard" | "datetime" | "month" | "year";
 
 type Props<T> = T extends "datetime" ? DateTimePickerProps : DatePickerProps;
 
@@ -64,6 +64,11 @@ export function DatePicker<T extends DatePickerVariants>({ variant, slots, slotP
       views: ["year", "month"],
       openTo: "month"
     }
+	}
+	if (variant === "year") {
+		pickerProps = {
+			views: ["year"]
+		}
 	}
 	return (
 		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>

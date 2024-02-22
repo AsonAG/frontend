@@ -23,6 +23,9 @@ export function FieldValueDateComponent({variant = "standard", propertyName = "v
 	if (field.attributes["input.datePicker"] === "Month") {
 		variant = "month";
 	}
+	if (field.attributes["input.datePicker"] === "Year") {
+		variant = "year";
+	}
 
 	return (
 		<DatePicker
