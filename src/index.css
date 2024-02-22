@@ -19,6 +19,10 @@ main {
   position: relative;
 }
 
+main {
+  margin-top: var(--header-height);
+}
+
 ::-webkit-scrollbar{
   width: 10px;
 }
@@ -58,5 +62,23 @@ input[type="file"] {
 @media (max-width: 600px) {
   :root {
     --content-inset: 16px;
+  }
+}
+
+:root {
+  --header-height: 56px;
+}
+
+@media (min-width:0px) {
+  @media (orientation: landscape) {
+    :root {
+      --header-height: 48px;
+    }
+  }
+}
+
+@media (min-width: 600px) {
+  :root {
+    --header-height: 64px;
   }
 }

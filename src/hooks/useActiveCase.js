@@ -18,7 +18,7 @@ function scrollToAsync(element, offset) {
   })
 }
 
-export function getScrollContainer() {return document.querySelector("#scroll-container");}
+export function getScrollContainer() {return document.body;}
 
 export default function useActiveCase(caseData) {
   const [activeCase, setActiveCase] = useState(caseData.name);

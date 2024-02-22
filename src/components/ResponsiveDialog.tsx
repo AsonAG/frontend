@@ -4,7 +4,9 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Box, Stack, Typography, styled } from "@mui/material";
 import { useIsMobile } from "../hooks/useIsMobile";
 
-const DrawerContent = styled('div')(({theme}) =>
+const DrawerContent = styled('div', {
+  shouldForwardProp: () => true
+})(({theme}) =>
   theme.unstable_sx({
     position: "fixed",
     borderTopLeftRadius: theme.shape.borderRadius * 4,
@@ -13,9 +15,9 @@ const DrawerContent = styled('div')(({theme}) =>
     right: 0,
     bottom: 0,
     backgroundColor: theme.palette.background.default,
-    mt: 10,
+    mt: "var(--header-height)",
     padding: 2,
-    zIndex: 10000,
+    zIndex: theme.zIndex.modal,
     minHeight: "33vh",
     ":focus-visible": {
       outline: "none"
@@ -23,7 +25,9 @@ const DrawerContent = styled('div')(({theme}) =>
   })
 );
 
-const DialogContent = styled('div')(({theme}) =>
+const DialogContent = styled('div', {
+  shouldForwardProp: () => true
+})(({theme}) =>
   theme.unstable_sx({
     position: "fixed",
     borderRadius: 1,
@@ -35,7 +39,7 @@ const DialogContent = styled('div')(({theme}) =>
     maxWidth: 600,
     maxHeight: "85vh",
     padding: 3,
-    zIndex: 10000,
+    zIndex: theme.zIndex.modal,
     ":focus-visible": {
       outline: "none"
     },
@@ -48,12 +52,12 @@ export function ResponsiveDialog({title, trigger, children}) {
   const Component = isMobile ? Drawer : Dialog;
   const Content = isMobile ? DrawerContent : DialogContent;
   return (
-    <Component.Root preventScrollRestoration={false}>
+    <Component.Root>
       <Component.Trigger asChild>
         {trigger}
       </Component.Trigger>
       <Component.Portal>
-        <Component.Overlay style={{position: "fixed", inset: 0, backgroundColor: "rgb(0 0 0 / 0.4)", zIndex: 9999}} />
+        <Component.Overlay style={{position: "fixed", inset: 0, backgroundColor: "rgb(0 0 0 / 0.4)", zIndex: 1200}} />
         <Component.Content asChild>
           <Content>
             <Stack spacing={2}>

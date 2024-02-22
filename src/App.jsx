@@ -54,16 +54,14 @@ export function App({renderDrawer = false}) {
 			<CssBaseline />
 			<Stack className="app" direction="row">
 				{renderDrawer && <Drawer temporary={useTemporaryDrawer} open={drawerOpen} onClose={() => setDrawerOpen(false)} /> }
-				<Stack sx={{flexGrow: 1, minWidth: 0}} divider={<Divider />}>
+				<Stack sx={{flexGrow: 1, minWidth: 0}}>
 					<Topbar>
 						{drawerButton}
 						{topbarLogo}
 					</Topbar>
-					<Box id="scroll-container" sx={{scrollbarGutter: {sm: "stable both-edges"}}}>
-						<Container component="main" maxWidth="lg" sx={containerProps}>
-							<Outlet />
-						</Container>
-					</Box>
+					<Container component="main" maxWidth="lg" sx={containerProps}>
+						<Outlet />
+					</Container>
 				</Stack>
 				<Snackbar />
 			</Stack>

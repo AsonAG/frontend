@@ -13,7 +13,8 @@ const lightModeDesignTokens = {
     },
     text: {
       secondary: "rgba(0, 0, 0, 0.4)"
-    }
+    },
+    inputBorder: "rgba(0, 0, 0, 0.23)"
   }
 }
 
@@ -27,7 +28,8 @@ const darkModeDesignTokens = {
     },
     text: {
       secondary: "rgba(255, 255, 255, 0.4)"
-    }
+    },
+    inputBorder: "rgba(255, 255, 255, 0.23)"
   }
 }
 
@@ -62,7 +64,6 @@ function createThemeSettings(mode) {
         },
         styleOverrides: {
           root: {
-            height: "100%",
             "&>.MuiFormControl-root": {
               height: "100%"
             }
