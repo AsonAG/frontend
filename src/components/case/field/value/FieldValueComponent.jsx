@@ -11,9 +11,9 @@ import { FieldValueNumberComponent } from "./FieldValueNumberComponent";
 import { FieldValueTextComponent } from "./FieldValueTextComponent";
 import { FieldValueDateComponent } from "./FieldValueDateComponent";
 import { FieldValueBooleanComponent } from "./FieldValueBooleanComponent";
-import { FieldContext } from "../EditFieldComponent";
+import { FieldContext } from "../Field";
 
-export function EditFieldValueComponent() {
+export function FieldValueComponent() {
 	const { field } = useContext(FieldContext);
 	if (field.attributes["input.hidden"])
 		return null;
@@ -28,7 +28,7 @@ export function EditFieldValueComponent() {
 		case "None":
 			const fontWeight = field.attributes?.["text.bold"] ? "bold" : undefined;
 			return (
-				<Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center'}}>
+				<Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center', flex: 1}}>
 					<Typography fontWeight={fontWeight}>{field.displayName}</Typography>
 				</Box>
 			);
@@ -42,7 +42,7 @@ export function EditFieldValueComponent() {
 			return <FieldValueBooleanComponent />;
 		case "WebResource":
 			return (
-				<Stack>
+				<Stack flex={1}>
 					<FieldValueTextComponent />
 					{field.value && <Box m={0.75}>
 						<Link href={field.value} target="_blank" rel="noopener">

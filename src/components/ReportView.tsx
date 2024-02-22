@@ -3,9 +3,9 @@ import { ContentLayout } from "./ContentLayout";
 import { Loading } from "./Loading";
 import { useTranslation } from "react-i18next";
 import { useLocation, Link, useParams } from "react-router-dom";
-import { FieldContext } from "./case/field/EditFieldComponent";
+import { FieldContext } from "./case/field/Field";
 import { CaseFormContext } from "../scenes/global/CaseForm";
-import { EditFieldValueComponent } from "./case/field/value/EditFieldValueComponent";
+import { FieldValueComponent } from "./case/field/value/FieldValueComponent";
 import React, { useEffect, useState } from "react";
 import { generateReport, getReport } from "../api/FetchClient";
 import dayjs from "dayjs";
@@ -44,7 +44,7 @@ export function AsyncReportView() {
           {
             reportData.parameters.map(p => (
               <FieldContext.Provider key={p.id} value={{field: p, displayName: p.displayName, required: p.mandatory, buildCase: buildReport}}>
-                <EditFieldValueComponent />
+                <FieldValueComponent />
               </FieldContext.Provider>
             ))
           }

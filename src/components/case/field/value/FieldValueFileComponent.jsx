@@ -1,5 +1,5 @@
 import { TextField, Box } from "@mui/material";
-import { FieldContext } from "../EditFieldComponent";
+import { FieldContext } from "../Field";
 import { useContext, useState, useEffect } from "react";
 import { toBase64 } from "../../../../services/converters/BinaryConverter";
 import { CloudUpload } from "@mui/icons-material";
@@ -55,7 +55,9 @@ export function FieldValueFileComponent() {
           adornedStart: "file-upload-adorned-start"
         }
       }}
-      
+      sx={{
+        flex: 1
+      }}
     />
   );
 };

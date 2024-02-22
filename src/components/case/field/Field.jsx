@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
-import { EditFieldValueComponent } from "./value/EditFieldValueComponent";
-import { DescriptionComponent } from "../DescriptionComponent";
+import { FieldValueComponent } from "./value/FieldValueComponent";
+import { FieldDescription } from "./FieldDescription";
 import { createContext, useContext } from "react";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
 import { useTheme } from "@emotion/react";
@@ -8,7 +8,7 @@ import { FieldPeriodSelector } from "./FieldPeriodSelector";
 
 export const FieldContext = createContext();
 
-export function EditFieldComponent({ field }) {
+export function Field({ field }) {
 	const { buildCase, attachments } = useContext(CaseFormContext);
 	const isReadonly = field.attributes?.["input.readOnly"] ?? false;
 	const required = !field.optional;
@@ -31,31 +31,32 @@ function DefaultLayout({field}) {
 	return (
 		<Box
 			display="grid"
-			gridTemplateColumns="1fr 22px 135px 135px"
-			alignItems="center"
+			gridTemplateColumns="1fr 135px 135px"
 			columnGap="8px"
 		>
-			<EditFieldValueComponent />
-			<DescriptionComponent description={field.description} />
+			<EditWithDescription />
 			<FieldPeriodSelector field={field} />
 		</Box>
 	)
 }
 
-const componentProps = {
-	sx: { flex: 1 }
-};
+function EditWithDescription() {
+	return (
+		<Stack direction="row" spacing={1}>
+			<FieldValueComponent />
+			<FieldDescription />
+		</Stack>
+	);
+}
 
 function MobileLayout({field}) {
-	const renderPeriodPickerContainer = (children) => <Stack spacing={1} direction="row">{children}</Stack>;
 	return (
 		<Stack spacing={1}>
+			<Typography color="disabled" flex={1}>{field.displayName}&nbsp;*</Typography>
+			<EditWithDescription />
 			<Stack direction="row" spacing={1}>
-				<Typography color="disabled" flex={1}>{field.displayName}&nbsp;*</Typography>
-				<DescriptionComponent description={field.description} />
+				<FieldPeriodSelector field={field} />
 			</Stack>
-			<EditFieldValueComponent excludeNoneValue />
-			<FieldPeriodSelector field={field} renderIntoContainer={renderPeriodPickerContainer} componentProps={componentProps} />
 		</Stack>
 	);
 }

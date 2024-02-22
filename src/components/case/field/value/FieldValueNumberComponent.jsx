@@ -1,7 +1,7 @@
 import { NumericFormat } from "react-number-format";
 import { InputAdornment, TextField } from "@mui/material";
 import { useState, useContext } from "react";
-import { FieldContext } from "../EditFieldComponent";
+import { FieldContext } from "../Field";
 import { useUpdateEffect } from "usehooks-ts";
 import { getDecimalPlaces } from "../../../../utils/Format";
 
@@ -102,8 +102,13 @@ export function FieldValueNumberComponent() {
           field.attributes
         ),
         inputProps: {
-          style: { textAlign: "right" },
+          style: { 
+            textAlign: "right"
+          },
         },
+      }}
+      sx={{
+        flex: 1
       }}
     />
   );

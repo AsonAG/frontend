@@ -1,6 +1,6 @@
 import { FormControl, FormControlLabel, Checkbox } from "@mui/material";
 import { useContext } from "react";
-import { FieldContext } from "../EditFieldComponent";
+import { FieldContext } from "../Field";
 
 export function FieldValueBooleanComponent() {
     const { field, isReadonly, displayName, buildCase } = useContext(FieldContext);
@@ -13,7 +13,7 @@ export function FieldValueBooleanComponent() {
         buildCase();
     }
 
-    return <FormControl>
+    return <FormControl sx={{flex: 1}}>
         <FormControlLabel
             name={field.name}
             label={displayName}

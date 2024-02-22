@@ -1,9 +1,9 @@
 import dayjs from "dayjs";
 import { useContext, useRef } from "react";
-import { FieldContext } from "../EditFieldComponent";
+import { FieldContext } from "../Field";
 import { DatePicker } from "../../../DatePicker";
 
-export function FieldValueDateComponent({variant = "standard", propertyName = "value", displayName, sx, required}) {
+export function FieldValueDateComponent({variant = "standard", propertyName = "value", displayName, required}) {
 	const { field, isReadonly, required: fieldRequired, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const inputRef = useRef();
 	const fieldValue = field[propertyName];
@@ -39,7 +39,9 @@ export function FieldValueDateComponent({variant = "standard", propertyName = "v
 				},
 				openPickerButton: { tabIndex: -1 },
 			}}
-			sx={sx}
+			sx={{
+				flex: 1
+			}}
 		/>
 	);
 };

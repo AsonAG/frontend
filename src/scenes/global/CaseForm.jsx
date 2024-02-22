@@ -9,7 +9,6 @@ import { useCaseData } from "../../hooks/useCaseData.js";
 import { Loading } from "../../components/Loading";
 import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
 import { ErrorView } from "../../components/ErrorView";
-import { EditFieldComponent } from "../../components/case/field/EditFieldComponent";
 import { ContentLayout, PageContent } from "../../components/ContentLayout";
 import { toast } from "../../utils/dataAtoms";
 
@@ -49,7 +48,7 @@ export function Component() {
     content = <CaseFormContext.Provider value={{ buildCase, attachments }}>
       <Form method="post" ref={formRef} id="case_form">
       <Stack alignItems="stretch" spacing={4}>
-        {caseData && <CaseComponent _case={caseData} FieldRenderComponent={EditFieldComponent} />}
+        {caseData && <CaseComponent _case={caseData} />}
         <CaseErrorComponent errors={caseErrors} />
         <CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath}/>
       </Stack>    

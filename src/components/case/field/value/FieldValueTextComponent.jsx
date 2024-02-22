@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { TextField } from "@mui/material";
 import ReactInputMask from "react-input-mask";
 import { useUpdateEffect } from "usehooks-ts";
-import { FieldContext } from "../EditFieldComponent";
+import { FieldContext } from "../Field";
 
 export function FieldValueTextComponent() {
   const { field, isReadonly, required, displayName, buildCase } = useContext(FieldContext);
@@ -42,6 +42,9 @@ export function FieldValueTextComponent() {
       maxRows={6}
       disabled={isReadonly}
       error={!isValid}
+      sx={{
+        flex: 1
+      }}
     />;
   }
 
@@ -66,6 +69,9 @@ export function FieldValueTextComponent() {
           maxRows={6}
           error={!isValid}
           required={required}
+          sx={{
+            flex: 1
+          }}
         />
       )}
     </ReactInputMask>

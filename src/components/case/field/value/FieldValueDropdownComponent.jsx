@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
-import { FieldContext } from "../EditFieldComponent";
+import { FieldContext } from "../Field";
 import { useLookupData, useListData } from "../../../../hooks/useDropdownData";
 
 
@@ -42,6 +42,7 @@ function FieldValueDropdownComponent({useDataHook}) {
               </>
             ),
           }}
+          sx={{flex: 1}}
         />
       )}
     />
