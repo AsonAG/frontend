@@ -19,6 +19,7 @@ function FieldValueDropdownComponent({useDataHook}) {
 
   return (
     <Autocomplete
+      size="small"
       {...data}
       disabled={isReadonly}
       fullWidth

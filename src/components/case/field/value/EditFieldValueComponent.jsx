@@ -13,7 +13,7 @@ import { FieldValueDateComponent } from "./FieldValueDateComponent";
 import { FieldValueBooleanComponent } from "./FieldValueBooleanComponent";
 import { FieldContext } from "../EditFieldComponent";
 
-export function EditFieldValueComponent({ excludeNoneValue = false }) {
+export function EditFieldValueComponent() {
 	const { field } = useContext(FieldContext);
 	if (field.attributes["input.hidden"])
 		return null;
@@ -26,8 +26,6 @@ export function EditFieldValueComponent({ excludeNoneValue = false }) {
 	} 
 	switch (field.valueType) {
 		case "None":
-			if (excludeNoneValue) return;
-
 			const fontWeight = field.attributes?.["text.bold"] ? "bold" : undefined;
 			return (
 				<Box sx={{display: "flex", flexDirection: "column", justifyContent: 'center'}}>
