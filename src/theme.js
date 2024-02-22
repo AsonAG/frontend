@@ -49,6 +49,11 @@ function createThemeSettings(mode) {
           size: "small"
         }
       },
+      MuiInputBase: {
+        defaultProps: {
+          autoComplete: "one-time-code"
+        }
+      },
       MuiCheckbox: {
         styleOverrides: {
           root: {

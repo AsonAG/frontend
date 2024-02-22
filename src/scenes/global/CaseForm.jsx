@@ -46,7 +46,7 @@ export function Component() {
     content = <Loading />;
   } else {
     content = <CaseFormContext.Provider value={{ buildCase, attachments }}>
-      <Form method="post" ref={formRef} id="case_form">
+      <Form method="post" ref={formRef} id="case_form" autocomplete="off">
       <Stack alignItems="stretch" spacing={4}>
         {caseData && <CaseComponent _case={caseData} />}
         <CaseErrorComponent errors={caseErrors} />
