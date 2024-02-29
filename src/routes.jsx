@@ -201,7 +201,7 @@ const routeData = [
             Component: AsyncCaseTable,
             loader: ({params}) =>  {
               return defer({
-                data: getEmployeeCases(params, "NotAvailable")
+                data: getEmployeeCases(params, "NewEvent")
               });
             }
           },
@@ -337,14 +337,8 @@ const routeData = [
           {
             path: ":employeeId",
             loader: async ({params}) => {
-              const [ect, hrct] = await Promise.all([
-                getEmployeeCases(params, "ECT"),
-                getEmployeeCases(params, "HRCT")
-              ]);
-              return {
-                ect: Array.isArray(ect) ? ect: [],
-                hrct: Array.isArray(hrct) ? hrct: []
-              };
+              const caseTasks = await getEmployeeCases(params, "HRCT");
+              return Array.isArray(caseTasks) ? caseTasks : [];
             }
           }
         ]
@@ -562,7 +556,7 @@ const routeData = [
             Component: withPage("New event", AsyncCaseTable),
             loader: ({params}) =>  {
               return defer({
-                data: getCompanyCases(params, "NotAvailable")
+                data: getCompanyCases(params, "NewEvent")
               });
             }
           },

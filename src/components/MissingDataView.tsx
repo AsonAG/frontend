@@ -68,7 +68,9 @@ function EmployeeSection({employee}) {
     )
   }
 
-  const {ect, hrct} = fetcher.data;
+  const caseTasks = fetcher.data;
+  const ect = caseTasks.filter(ct => ct.clusters?.contains("ECT"));
+  const hrct = caseTasks.filter(ct => ct.clusters?.contains("HRCT"));
   
   return (
     <Stack spacing={1}>
