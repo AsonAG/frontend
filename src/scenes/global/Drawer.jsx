@@ -146,9 +146,11 @@ function Drawer({ temporary, open, onClose }) {
             <NavigationItem label={t("Missing data")} to="hr/missingdata" icon={<NotificationImportant />} />
             <NavigationItem label={t("Payruns")} to="hr/payruns" icon={<NotStartedOutlinedIcon />} />
             <NavigationItem label={t("Reports")} to="hr/reports" icon={<Description />} />
-            { 
+            {
+              /*
               !import.meta.env.PROD && 
                 <NavigationItem label={t("Compliance")} to="hr/compliance" icon={<AssuredWorkloadIcon />} />
+              */
             }
           </NavigationGroup>
           <NavigationGroup name={t("Company")} hidden={!isHrUser}>
