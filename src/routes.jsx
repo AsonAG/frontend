@@ -527,7 +527,7 @@ const routeData = [
         Component: AsyncReportsView,
         loader: ({params}) => {
           return defer({
-            data: getReports(params)
+            data: getReports(params, "AvailableReports")
           });
         }
       },
