@@ -328,8 +328,9 @@ export function changePayrunJobStatus(routeParams, newStatus) {
         .fetch();
 }
 
-export function getReports(routeParams) {
+export function getReports(routeParams, clusterSet) {
     return new FetchRequestBuilder(reportsUrl, routeParams)
+        .withQueryParam("clusterSetName", clusterSet)
         .withLocalization()
         .fetchJson();
 }
