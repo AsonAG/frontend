@@ -3,6 +3,7 @@ import { Drawer } from "vaul";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Box, Stack, Typography, styled } from "@mui/material";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { ReactNode } from "react";
 
 const DrawerContent = styled('div', {
   shouldForwardProp: () => true
@@ -47,30 +48,57 @@ const DialogContent = styled('div', {
   })
 );
 
-export function ResponsiveDialog({title, trigger, children}) {
-  const isMobile = useIsMobile();
-  const Component = isMobile ? Drawer : Dialog;
-  const Content = isMobile ? DrawerContent : DialogContent;
-  return (
-    <Component.Root>
-      <Component.Trigger asChild>
-        {trigger}
-      </Component.Trigger>
+interface Props {
+  children?: ReactNode;
+}
+
+export const ResponsiveDialogContent = React.forwardRef<HTMLDivElement, Props>(
+  ({children, ...props}, forwardedRef) => {
+    const isMobile = useIsMobile();
+    const Component = isMobile ? Drawer : Dialog;
+    const Content = isMobile ? DrawerContent : DialogContent;
+    return (
       <Component.Portal>
         <Component.Overlay style={{position: "fixed", inset: 0, backgroundColor: "rgb(0 0 0 / 0.4)", zIndex: 1200}} />
-        <Component.Content asChild>
+        <Component.Content asChild {...props} ref={forwardedRef}>
           <Content>
             <Stack spacing={2}>
               {isMobile && <Box sx={{bgcolor: "divider", borderRadius: 1, alignSelf: "center", height: 6, width: "3rem"}} />}
-              <Component.Title asChild>
-                <Typography variant="h6">{title}</Typography>
-              </Component.Title>
               {children}
             </Stack>
           </Content>
         </Component.Content>
       </Component.Portal>
-    </Component.Root>
-  );
-  
+    );
+  }
+);
+
+export const ResponsiveDialogTrigger = React.forwardRef<HTMLButtonElement, Props>(
+  ({children}, forwardedRef) => {
+    const isMobile = useIsMobile();
+    const Component = isMobile ? Drawer : Dialog;
+    return (
+      <Component.Trigger asChild ref={forwardedRef}>
+        {children}
+      </Component.Trigger>
+    )
+  }
+);
+
+export const ResponsiveDialogClose = React.forwardRef<HTMLButtonElement, Props>(
+  ({children}, forwardedRef) => {
+    const isMobile = useIsMobile();
+    const Component = isMobile ? Drawer : Dialog;
+    return (
+      <Component.Close asChild ref={forwardedRef}>
+        {children}
+      </Component.Close>
+    )
+  }
+);
+
+export function ResponsiveDialog(args: any, context: any) {
+  const isMobile = useIsMobile();
+  const Component = isMobile ? Drawer : Dialog;
+  return Component.Root(args, context);
 }

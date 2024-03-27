@@ -1,10 +1,8 @@
 import { Form, useParams, useLoaderData, useRouteLoaderData, useNavigate } from "react-router-dom";
 import { CaseComponent } from "../../components/case/CaseComponent";
 import { createContext, useRef } from "react";
-import CaseIndexView from "../../components/cases/CaseIndexView";
 import { CaseFormButtons } from "../../components/buttons/CaseFormButtons";
-import { Stack, useMediaQuery } from "@mui/material";
-import { useTheme } from "@emotion/react";
+import { Stack } from "@mui/material";
 import { useCaseData } from "../../hooks/useCaseData.js";
 import { Loading } from "../../components/Loading";
 import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
@@ -25,11 +23,6 @@ export function Component() {
   const { caseData, caseErrors, fatalError, attachments, loading, buildCase, addCase } = useCaseData(params, user, payroll);
   const formRef = useRef();
 
-  const theme = useTheme();
-  // this breakpoint was chosen because at this point the datefields + input field
-  // don't have enough space
-  const hideIndex = useMediaQuery(theme.breakpoints.down("md"));
-  
   const handleSubmit = () => {
     if (formRef?.current?.reportValidity()) {
       addCase(() => {
@@ -51,7 +44,7 @@ export function Component() {
         {caseData && <CaseComponent _case={caseData} />}
         <CaseErrorComponent errors={caseErrors} />
         <CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath}/>
-      </Stack>    
+      </Stack>
       </Form>
     </CaseFormContext.Provider>
   }
@@ -61,7 +54,6 @@ export function Component() {
       <PageComponent title="New event" sx={{flex: 1}} disableInset={!renderTitle} >
         {content}
       </PageComponent>
-      { !hideIndex && caseData && <CaseIndexView _case={caseData} /> }
     </Stack>
   )
  

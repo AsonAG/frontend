@@ -50,6 +50,9 @@ function EditWithDescription() {
 }
 
 function MobileLayout({field}) {
+	if (field.valueType === "None") {
+		return <EditWithDescription />
+	}
 	return (
 		<Stack spacing={1}>
 			<Typography color="disabled" flex={1}>{field.displayName}&nbsp;*</Typography>
