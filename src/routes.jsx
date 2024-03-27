@@ -152,10 +152,20 @@ const routeData = [
       {
         path: "hr/employees",
         Component: AsyncEmployeeTable,
-        loader: paginatedLoader({
-          pageCount: 10,
-          getRequestBuilder: ({params}) => getEmployees(params)
-        })
+        loader: ({params, request}) => {
+          const [_, queryString] = request.url.split("?");
+          const searchParams = new URLSearchParams(queryString);
+          const searchTerm = searchParams.get("search");
+          let filter;
+          if(searchTerm) {
+            filter = `startswith(firstName, '${searchTerm}') or startsWith(lastName, '${searchTerm}') or startsWith(identifier, '${searchTerm}')`;
+          }
+          return defer({
+            data: getEmployees(params)
+              .withQueryParam("filter", filter)
+              .fetchJson()
+          });
+        }
       },
       {
         path: "hr/employees/new",
@@ -210,7 +220,6 @@ const routeData = [
             Component: EmployeeForm,
             action: async ({params, request}) =>  {
               const formData = await request.formData();
-              console.log(formData.get("divisions"));
               const response = await updateEmployee(params, {
                 identifier: formData.get("identifier"),
                 firstName: formData.get("firstName"),

@@ -1,7 +1,7 @@
 import React from "react";
 import { Drawer } from "vaul";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Box, Stack, Typography, styled } from "@mui/material";
+import { Box, Stack, styled } from "@mui/material";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { ReactNode } from "react";
 
