@@ -158,7 +158,7 @@ const routeData = [
           const searchTerm = searchParams.get("search");
           let filter;
           if(searchTerm) {
-            filter = `startswith(firstName, '${searchTerm}') or startsWith(lastName, '${searchTerm}') or startsWith(identifier, '${searchTerm}')`;
+            filter = `startswith_ci(firstName, '${searchTerm}') or startswith_ci(lastName, '${searchTerm}') or startswith_ci(identifier, '${searchTerm}')`;
           }
           return defer({
             data: getEmployees(params)
