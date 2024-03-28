@@ -5,14 +5,14 @@ import { Await, useLoaderData } from "react-router-dom";
 import { Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-export function AsyncDataRoute({ children, loadingElement, skipDataCheck }) {
+export function AsyncDataRoute({ children, loadingElement, skipDataCheck, noDataAvailableText = "No data available" }) {
   const routeData = useLoaderData();
   const { t } = useTranslation();
   const loading = loadingElement || <Loading />;
   return (
     <Suspense fallback={loading}>
       <Await resolve={routeData.data} errorElement={<ErrorView />}>
-        {(data) => skipDataCheck || hasData(data) ? children : <Typography>{t("No data available")}</Typography>}
+        {(data) => skipDataCheck || hasData(data) ? children : <Typography>{t(noDataAvailableText)}</Typography>}
       </Await>
     </Suspense>
   );

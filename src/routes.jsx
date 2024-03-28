@@ -186,7 +186,7 @@ const routeData = [
           if (response.status === 201) {
             const employee = await response.json();
             toast("success", "New employee created");
-            return redirect(`../hr/employees/${employee.id}/new`);
+            return redirect(`../hr/employees/${employee.id}/missingdata`);
           }
           let errorMessage = await response.json();
           if(!errorMessage || typeof errorMessage !== "string") {
@@ -275,6 +275,23 @@ const routeData = [
                 }
               }
             ]
+          },
+          {
+            path: "missingdata/:caseName",
+            lazy: () => import("./scenes/global/CaseForm"),
+            loader: () => ({
+              renderTitle: false
+            })
+          },
+          {
+            path: "missingdata",
+            Component: AsyncCaseTable,
+            loader: ({params}) => {
+              return defer({
+                data: getEmployeeCases(params, "HRCT"),
+                noDataAvailableText: "Data complete."
+              });
+            }
           }
         ]
       },

@@ -1,13 +1,14 @@
 import { React } from "react";
-import { useAsyncValue, Link } from "react-router-dom";
+import { useAsyncValue, Link, useLoaderData } from "react-router-dom";
 import { Stack, Card, CardActionArea, CardContent, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Centered } from "../Centered";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 
 export function AsyncCaseTable() {
+  const loaderData = useLoaderData();
   return (
-    <AsyncDataRoute>
+    <AsyncDataRoute noDataAvailableText={loaderData?.noDataAvailableText}>
       <CaseTable />
     </AsyncDataRoute>
   );

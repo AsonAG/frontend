@@ -63,6 +63,7 @@ function EmployeeView() {
                 <TabLink title={t("New event")} to={"new"} />
                 <TabLink title={t("Events")} to={"events"} />
                 <TabLink title={t("Documents")} to={"documents"} />
+                <TabLink title={t("Missing data")} to={"missingdata"} />
             </Stack>
             {outlet}
         </ContentLayout>
