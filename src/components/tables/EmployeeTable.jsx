@@ -58,6 +58,19 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
   }
 });
 
+const SearchButton = styled(forwardRef(function SearchButton(itemProps, ref) {
+  return <IconButton ref={ref} {...itemProps} role={undefined}><Search /></IconButton>;
+}), {shouldForwardProp: (name) => name !== "isFiltering"})(({theme, ...props}) => {
+  if (props.isFiltering) {
+    return {
+      color: theme.palette.common.white,
+      backgroundColor: `${theme.palette.primary.main} !important`
+    };
+  }
+  return {
+    color: theme.palette.primary
+  };
+});
 
 function EmployeeTableButtons() {
   const { t } = useTranslation();
@@ -122,9 +135,7 @@ function EmployeeTableSearchDialog() {
   return (
     <ResponsiveDialog>
       <ResponsiveDialogTrigger>
-        <IconButton color="primary">
-          <Search />
-        </IconButton>
+        <SearchButton isFiltering={!!searchTerm} />
       </ResponsiveDialogTrigger>
       <ResponsiveDialogContent>
         <TextField
