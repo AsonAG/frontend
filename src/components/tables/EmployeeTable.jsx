@@ -68,7 +68,7 @@ const SearchButton = styled(forwardRef(function SearchButton(itemProps, ref) {
     };
   }
   return {
-    color: theme.palette.primary
+    color: theme.palette.primary.main
   };
 });
 
