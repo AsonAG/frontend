@@ -2,15 +2,13 @@ import React from "react";
 import { Button, Stack, TextField } from "@mui/material";
 import { ContentLayout } from "./ContentLayout";
 import { useTranslation } from "react-i18next";
-import { Form, Link as RouterLink, useRouteLoaderData } from "react-router-dom";
+import { Form, Link as RouterLink, useLoaderData } from "react-router-dom";
 
 export function EmployeeForm() {
-  const loaderData = useRouteLoaderData("employee") as any;
-  const employee= loaderData?.employee;
+  const employee = useLoaderData() as any;
   const isNew = !employee;
   const divisions = JSON.stringify(employee?.divisions);
   const title = isNew ? "New employee" : "Change name";
-  const backPath = isNew ? ".." : "../..";
   const { t } = useTranslation();
   return (
     <Form method="post">
@@ -21,7 +19,7 @@ export function EmployeeForm() {
         <TextField label={t("Identifier")} required name="identifier" defaultValue={employee?.identifier} disabled={!isNew}/>
         <input type="hidden" name="divisions" value={divisions} />
         <Stack direction="row" justifyContent="right" spacing={1}>
-          <Button component={RouterLink} to={backPath} relative="path">{t("Back")}</Button>
+          <Button component={RouterLink} to=".." relative="path">{t("Back")}</Button>
           <Button type="submit" variant="contained">{t("Save")}</Button>
         </Stack>
       </ContentLayout>

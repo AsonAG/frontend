@@ -13,16 +13,23 @@ export function ContentLayout({ title: defaultTitle, disableInset, children, but
   );
 }
 
-export function PageHeader({title: defaultTitle, buttons}) {
+export function PageHeader({title, buttons}) {
   const { t } = useTranslation();
   const loaderData = useLoaderData();
-  const title = t(loaderData?.title || defaultTitle);
+  let headerTitle = title;
+  if (typeof title === "string") {
+    headerTitle = <PageHeaderTitle title={t(loaderData?.title || title)} flex={1} />
+  }
   return (
     <Stack direction="row" spacing={2} alignItems="start" px="var(--content-inset)">
-      <Typography variant="h2" fontWeight={500} flex={1} noWrap>{title}</Typography>
+      { headerTitle }
       { buttons }
     </Stack>
   );
+}
+
+export function PageHeaderTitle({title, flex = undefined}) {
+  return <Typography variant="h2" fontWeight={500} flex={flex} noWrap>{title}</Typography>;
 }
 
 export function PageContent({children, disableInset, ...sxProps}) {

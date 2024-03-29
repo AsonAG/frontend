@@ -215,31 +215,6 @@ const routeData = [
               });
             }
           },
-          {
-            path: "edit",
-            Component: EmployeeForm,
-            action: async ({params, request}) =>  {
-              const formData = await request.formData();
-              const response = await updateEmployee(params, {
-                identifier: formData.get("identifier"),
-                firstName: formData.get("firstName"),
-                lastName: formData.get("lastName"),
-                divisions: JSON.parse(formData.get("divisions"))
-              });
-
-              if (response.ok) {
-                toast("success", "Saved!");
-                return redirect("../../hr/employees");
-              } else {
-                let errorMessage = await response.json();
-                if(!errorMessage || typeof errorMessage !== "string") {
-                  errorMessage = "Saving failed!";
-                }
-                toast("error", errorMessage);
-              }
-              return response;
-            }
-          },
           
           {
             path: "new/:caseName",
@@ -294,6 +269,32 @@ const routeData = [
             }
           }
         ]
+      },
+      {
+        path: "hr/employees/:employeeId/edit",
+        Component: EmployeeForm,
+        loader: async ({params}) => getEmployee(params),
+        action: async ({params, request}) =>  {
+          const formData = await request.formData();
+          const response = await updateEmployee(params, {
+            identifier: formData.get("identifier"),
+            firstName: formData.get("firstName"),
+            lastName: formData.get("lastName"),
+            divisions: JSON.parse(formData.get("divisions"))
+          });
+
+          if (response.ok) {
+            toast("success", "Saved!");
+            return redirect(`../hr/employees/${params.employeeId}`);
+          } else {
+            let errorMessage = await response.json();
+            if(!errorMessage || typeof errorMessage !== "string") {
+              errorMessage = "Saving failed!";
+            }
+            toast("error", errorMessage);
+          }
+          return response;
+        }
       },
       {
         path: "hr/tasks",
