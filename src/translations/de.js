@@ -41,6 +41,8 @@ const translations = {
         "Without date": "Ohne Datum",
         "Invalid date": "Ungültiges Datum",
         "Please enter a date": "Bitte geben Sie ein Datum ein",
+        "Please enter a value": "Bitte geben Sie einen Wert ein",
+        "Please enter a valid value": "Bitte geben Sie einen gültigen Wert ein",
         "No tasks found": "Keine Aufgaben gefunden",
         "Due on": "Fällig am",
         "Assignee": "Zuständig",

@@ -27,9 +27,13 @@ export function FieldValueDateComponent({variant = "standard", propertyName = "v
 	// populates the input field with a placeholder.
 	// The default HTML Form validation error message won't display because of that.
 	useEffect(() => {
+    if (!required) {
+      inputRef.current?.setCustomValidity("");
+      return;
+    }
 		const validationError = !value ? t("Please enter a date") : "";
 		inputRef.current?.setCustomValidity(validationError);
-	}, [value, inputRef.current]);
+	}, [value, inputRef.current, required]);
 
 	if (field.attributes["input.datePicker"] === "Month") {
 		variant = "month";
