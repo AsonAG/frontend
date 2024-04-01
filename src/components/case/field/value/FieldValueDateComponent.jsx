@@ -1,9 +1,11 @@
 import dayjs from "dayjs";
-import { useContext, useRef } from "react";
+import { useContext, useRef, useEffect } from "react";
 import { FieldContext } from "../Field";
 import { DatePicker } from "../../../DatePicker";
+import { useTranslation } from "react-i18next";
 
 export function FieldValueDateComponent({variant = "standard", propertyName = "value", displayName, required}) {
+	const { t } = useTranslation();
 	const { field, isReadonly, required: fieldRequired, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
 	const inputRef = useRef();
 	const fieldValue = field[propertyName];
@@ -12,13 +14,22 @@ export function FieldValueDateComponent({variant = "standard", propertyName = "v
 	displayName ??= fieldDisplayName;
 
 	const handleDateChange = (newDate, context) => {
-		const validationError = context.validationError ? "Invalid date" : "";
+		const validationError = context.validationError ? t("Invalid date") : "";
+		
 		inputRef.current?.setCustomValidity(validationError);
 		if(!validationError) {
 			field[propertyName] = newDate?.toISOString();
 			buildCase();
 		}
 	};
+
+	// We need to set the validity ourselves, because the MUI Datepicker
+	// populates the input field with a placeholder.
+	// The default HTML Form validation error message won't display because of that.
+	useEffect(() => {
+		const validationError = !value ? t("Please enter a date") : "";
+		inputRef.current?.setCustomValidity(validationError);
+	}, [value, inputRef.current]);
 
 	if (field.attributes["input.datePicker"] === "Month") {
 		variant = "month";

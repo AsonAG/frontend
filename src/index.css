@@ -6,12 +6,7 @@ main {
   height: 100%;
   width: 100%;
   margin: 0;
-}
-
-#scroll-container {
-  overflow-y: auto;
-  position: relative;
-  height: 100%;
+  scroll-padding-top: calc(var(--header-height) + 1em);
 }
 
 .app {

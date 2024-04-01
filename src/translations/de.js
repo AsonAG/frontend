@@ -39,6 +39,8 @@ const translations = {
         "Load more": "Mehr laden",
         "Loading...": "Laden...",
         "Without date": "Ohne Datum",
+        "Invalid date": "Ungültiges Datum",
+        "Please enter a date": "Bitte geben Sie ein Datum ein",
         "No tasks found": "Keine Aufgaben gefunden",
         "Due on": "Fällig am",
         "Assignee": "Zuständig",
