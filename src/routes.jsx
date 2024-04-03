@@ -43,7 +43,8 @@ import {
   getReports,
   createEmployee,
   updateEmployee,
-  getDivision
+  getDivision,
+  getMissingData
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -353,13 +354,12 @@ const routeData = [
       {
         path: "hr/missingdata",
         Component: MissingDataView,
-        loader: paginatedLoader({
-          pageCount: 5,
-          getRequestBuilder: ({params}) => getEmployees(params),
-          getLoaderData: () => ({
+        loader: ({params}) => {
+          return defer({
+            data: getMissingData(params),
             title: "Missing data"
           })
-        }),
+        },
         children: [
           {
             path: ":employeeId",
