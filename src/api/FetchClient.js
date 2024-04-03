@@ -243,6 +243,7 @@ export function getEmployeeCaseChanges(routeParams, filter, orderBy) {
         .withQueryParam("caseType", "Employee")
         .withQueryParam("filter", filter)
         .withQueryParam("orderBy", orderBy)
+        .withQueryParam("substituteLookupCodes", true)
         .withLocalization()
         .withUser();
 }
@@ -263,6 +264,7 @@ export function getCompanyCaseChanges(routeParams, filter, orderBy) {
         .withQueryParam("caseType", "Company")
         .withQueryParam("filter", filter)
         .withQueryParam("orderBy", orderBy)
+        .withQueryParam("substituteLookupCodes", true)
         .withLocalization()
         .withUser();
 }
