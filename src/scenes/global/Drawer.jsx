@@ -21,7 +21,7 @@ import styled from "@emotion/styled";
 import { UserAccountComponent } from "./UserAccountComponent";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { openTasksAtom } from "../../utils/dataAtoms";
+import { openMissingDataTasksAtom, openTasksAtom } from "../../utils/dataAtoms";
 import { Description, NotificationImportant  } from "@mui/icons-material";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
@@ -64,9 +64,35 @@ function OpenTasksBadgeIcon() {
   const icon = <FormatListBulletedIcon />;
   return (
     <Suspense fallback={icon}>
-      <BadgeIcon dataAtom={openTasksAtom} icon={icon} />
+      <AtomBadge atom={openTasksAtom}>
+        {icon}
+      </AtomBadge>
     </Suspense>
   );
+}
+
+function MissingDataBadgeIcon() {
+  const icon = <NotificationImportant />;
+  const count = (data) => data.map(x => x.cases.length).reduce((a, b) => a+b, 0);
+  return (
+    <Suspense fallback={icon}>
+      <AtomBadge atom={openMissingDataTasksAtom} countFunc={count}>
+        {icon}
+      </AtomBadge>
+    </Suspense>
+  )
+}
+
+
+function defaultCount(data) { return data.count };
+function AtomBadge({atom, countFunc = defaultCount, children}) {
+  const data = useAtomValue(atom);
+  const count = countFunc(data);
+  return (
+    <Badge badgeContent={count} color="primary" slotProps={badgeSx}>
+      {children}
+    </Badge>
+  )
 }
 
 function NavigationMenu({children}) {
@@ -91,14 +117,6 @@ function NavigationGroup({ name, children, hidden = false}) {
 
 const badgeSx = {badge: {sx: {height: 16, minWidth: 16, letterSpacing: 0, pl: 0.625, pr: 0.5}}};
 
-function BadgeIcon({dataAtom, icon}) {
-  const data = useAtomValue(dataAtom);
-  return (
-    <Badge badgeContent={data.count} color="primary" slotProps={badgeSx}>
-      {icon}
-    </Badge>
-  )
-}
 
 const drawerWidth = 265;
 function Drawer({ temporary, open, onClose }) {
@@ -143,7 +161,7 @@ function Drawer({ temporary, open, onClose }) {
           <NavigationGroup name={t("HR")} hidden={!isHrUser}>
             <NavigationItem label={t("Employees")} to="hr/employees" icon={<PeopleOutlinedIcon />} />
             <NavigationItem label={t("Tasks")} to="hr/tasks" icon={<OpenTasksBadgeIcon />} />
-            <NavigationItem label={t("Missing data")} to="hr/missingdata" icon={<NotificationImportant />} />
+            <NavigationItem label={t("Missing data")} to="hr/missingdata" icon={<MissingDataBadgeIcon />} />
             <NavigationItem label={t("Payruns")} to="hr/payruns" icon={<NotStartedOutlinedIcon />} />
             <NavigationItem label={t("Reports")} to="hr/reports" icon={<Description />} />
             {
