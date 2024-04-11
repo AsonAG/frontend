@@ -39,6 +39,7 @@ const complianceCheckInteroperabilityUrl = "/tenants/:tenantId/payrolls/:payroll
 const reportsUrl = "/tenants/:tenantId/payrolls/:payrollId/reports";
 const buildReportUrl = "/tenants/:tenantId/payrolls/:payrollId/reports/:reportId/build";
 const generateReportUrl = "/tenants/:tenantId/payrolls/:payrollId/reports/:reportId/generate";
+const exportUrl = "/tenants/:tenantId/export";
 
 const store = getDefaultStore();
 
@@ -512,4 +513,22 @@ export function getComplianceMessages(routeParams) {
         .withQueryParam("top", "7")
         .withLocalization()
         .fetchJson();
+}
+
+export async function requestExportDataDownload(routeParams, cutoffDate, name) {
+    const builder = new FetchRequestBuilder(exportUrl, routeParams).withQueryParam("createdDateCutoff", cutoffDate);
+    const response = await builder.fetch();
+    const blob = await response.blob();
+    let objectUrl = window.URL.createObjectURL(blob);
+    let anchor = document.createElement("a");
+    try {
+        anchor.href = objectUrl;
+        anchor.download = name;
+        anchor.click();
+    }
+    finally {
+        window.URL.revokeObjectURL(objectUrl);
+        anchor.remove();
+    }
+    
 }
