@@ -14,7 +14,7 @@ import { Stack } from "@mui/system";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
-import NotStartedOutlinedIcon from '@mui/icons-material/NotStartedOutlined';import AssuredWorkloadIcon from '@mui/icons-material/AssuredWorkload';
+import NotStartedOutlinedIcon from '@mui/icons-material/NotStartedOutlined';
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
@@ -89,7 +89,7 @@ function AtomBadge({atom, countFunc = defaultCount, children}) {
   const data = useAtomValue(atom);
   const count = countFunc(data);
   return (
-    <Badge badgeContent={count} color="primary" slotProps={badgeSx}>
+    <Badge badgeContent={count} color="primary">
       {children}
     </Badge>
   )
@@ -115,7 +115,6 @@ function NavigationGroup({ name, children, hidden = false}) {
   );
 }
 
-const badgeSx = {badge: {sx: {height: 16, minWidth: 16, letterSpacing: 0, pl: 0.625, pr: 0.5}}};
 
 
 const drawerWidth = 265;

@@ -18,6 +18,7 @@ import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, Respo
 import { useSearchParam } from "../../hooks/useSearchParam";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { StatusChip } from "../../scenes/employees/StatusChip";
+import { useMissingDataCount } from "../../utils/dataAtoms";
 
 const VariantContext = createContext("standard");
 
@@ -217,13 +218,14 @@ function EmployeeButtons ({ employee }) {
   const { t } = useTranslation();
   const variant = "dense";
   const isActive = employee.status === "Active"
+  const missingDataCount = useMissingDataCount(employee.id);
 
   return (
     <Stack direction="row" spacing={2} py={0.5}>
-      {isActive && <TableButton title={t("New event")} to={employee.id + "/new"} variant={variant} icon={<AddOutlinedIcon />} /> }
+      <TableButton title={t("New event")} to={employee.id + "/new"} variant={variant} icon={<AddOutlinedIcon />} disabled={!isActive}/>
       <TableButton title={t("Events")} to={employee.id + "/events"} variant={variant} icon={<WorkHistoryOutlinedIcon />} />
       <TableButton title={t("Documents")} to={employee.id + "/documents"} variant={variant} icon={<DescriptionOutlinedIcon />} />
-      {isActive && <TableButton title={t("Missing data")} to={employee.id + "/missingdata"} variant={variant} icon={<NotificationImportantIcon />} /> }
+      <TableButton title={t("Missing data")} to={employee.id + "/missingdata"} variant={variant} icon={<NotificationImportantIcon />} badgeCount={missingDataCount} disabled={!isActive || !missingDataCount} />
     </Stack>
   );
 };

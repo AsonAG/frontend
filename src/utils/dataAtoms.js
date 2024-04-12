@@ -2,7 +2,7 @@ import { atomWithRefresh } from "./atomWithRefresh";
 import { getPayrolls, getTasks, getTenant, getUser, getEmployeeByIdentifier, getPayruns, getMissingData } from "../api/FetchClient";
 import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
 import { getAuthUser } from '../auth/getUser';
-import { atom, getDefaultStore } from "jotai";
+import { atom, getDefaultStore, useAtomValue } from "jotai";
 
 export const tenantAtom = atom(get => {
   const tenantId = get(tenantIdAtom);
@@ -72,8 +72,24 @@ export const openMissingDataTasksAtom = atomWithRefresh(async get => {
   return getMissingData({tenantId, payrollId});
 });
 
+const missingDataMapAtom = atom(async get => {
+  const missingData = await get(openMissingDataTasksAtom);
+  if (!missingData)
+    return {};
+  const kvp = missingData.map(x => [x.id, x]);
+  return new Map(kvp);
+})
+
 export const toastNotificationAtom = atom(null);
 
 export function toast(severity, message) {
   getDefaultStore().set(toastNotificationAtom, {severity, message})
+}
+
+export function useMissingDataCount(employeeId) {
+  const allMissingData = useAtomValue(missingDataMapAtom);
+  const employeeMissingData =allMissingData.get(employeeId);
+  if (!employeeMissingData)
+    return null;
+  return employeeMissingData.cases.length;
 }

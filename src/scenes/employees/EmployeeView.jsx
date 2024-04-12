@@ -1,11 +1,12 @@
-import { Navigate, useOutlet, useLoaderData, NavLink as RouterLink } from "react-router-dom";
+import { Navigate, useOutlet, useLoaderData, NavLink as RouterLink, Outlet } from "react-router-dom";
 import { ContentLayout, PageHeaderTitle } from "../../components/ContentLayout";
-import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { Badge, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import styled from "@emotion/styled";
 import { forwardRef } from "react";
 import { Edit } from "@mui/icons-material";
 import { StatusChip } from "./StatusChip";
+import { useMissingDataCount } from "../../utils/dataAtoms";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -43,11 +44,13 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
   }
 });
 
-function TabLink({to, title}) {
+function TabLink({to, title, badgeCount}) {
     return (
+      <Badge badgeContent={badgeCount} color="primary" variant="oob">
         <Link to={to}>
-            <Typography>{title}</Typography>
+          <Typography>{title}</Typography>
         </Link>
+      </Badge>
     )
 }
 
@@ -55,6 +58,7 @@ function EmployeeView() {
     const outlet = useOutlet();
     const { employee } = useLoaderData();
     const { t } = useTranslation();
+    const missingDataCount = useMissingDataCount(employee.id);
     const isActive = employee.status === "Active";
     
     const header = employee.firstName + " " + employee.lastName;
@@ -80,7 +84,7 @@ function EmployeeView() {
                 {isActive && <TabLink title={t("New event")} to="new" /> }
                 <TabLink title={t("Events")} to="events" />
                 <TabLink title={t("Documents")} to="documents" />
-                {isActive && <TabLink title={t("Missing data")} to="missingdata" /> }
+                {isActive && missingDataCount && <TabLink title={t("Missing data")} to="missingdata" badgeCount={missingDataCount} /> }
             </Stack>
             {outlet}
         </ContentLayout>
@@ -88,3 +92,13 @@ function EmployeeView() {
 }
 
 export default EmployeeView;
+
+export function EmployeeTitle() {
+  const employee = useLoaderData();
+  const header = employee.firstName + " " + employee.lastName;
+  return (
+    <ContentLayout title={header}>
+      <Outlet />
+    </ContentLayout>
+  )
+}

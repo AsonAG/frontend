@@ -43,10 +43,9 @@ import {
   getReports,
   createEmployee,
   updateEmployee,
-  getDivision,
-  getMissingData
+  getDivision
 } from "./api/FetchClient";
-import EmployeeView from "./scenes/employees/EmployeeView";
+import EmployeeView, { EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
@@ -376,11 +375,19 @@ const routeData = [
         ]
       },
       {
-        path: "hr/missingdata/:employeeId/:caseName",
-        lazy: () => import("./scenes/global/CaseForm"),
-        loader: () => ({
-          redirect: "../.."
-        })
+        path: "hr/missingdata/:employeeId",
+        Component: EmployeeTitle,
+        loader: ({params}) => getEmployee(params),
+        children: [
+          {
+            path: ":caseName",
+            lazy: () => import("./scenes/global/CaseForm"),
+            loader: () => ({
+              redirect: "../..",
+              renderTitle: false
+            })
+          }
+        ]
       },
       {
         path: "hr/payruns",

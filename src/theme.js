@@ -80,6 +80,27 @@ function createThemeSettings(mode) {
           })
         }
       },
+      MuiBadge: {
+        variants: [
+          {
+            props: {variant: "oob"},
+            style: {
+              "& .MuiBadge-badge": {
+                right: "-10%"
+              }
+            }
+          }
+        ],
+        styleOverrides: {
+          badge: ({theme}) => ({
+            height: 16,
+            minWidth: 16,
+            letterSpacing: 0,
+            paddingLeft: theme.spacing(0.5),
+            paddingRight: theme.spacing(0.5)
+          })
+        }
+      },
       MuiSkeleton: {
         styleOverrides: {
           root: {
