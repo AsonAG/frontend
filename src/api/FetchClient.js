@@ -11,6 +11,7 @@ const payrollsUrl         = "/tenants/:tenantId/payrolls";
 const payrollUrl          = "/tenants/:tenantId/payrolls/:payrollId";
 const divisionsUrl        = "/tenants/:tenantId/divisions";
 const caseSetsUrl         = "/tenants/:tenantId/payrolls/:payrollId/cases/sets";
+const missingDataUrl      = "/tenants/:tenantId/payrolls/:payrollId/missingdata";
 const lookupValuesUrl     = "/tenants/:tenantId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
 const caseFieldsUrl       = "/tenants/:tenantId/payrolls/:payrollId/casefields";
@@ -268,6 +269,13 @@ export function getCompanyCaseChanges(routeParams, filter, orderBy) {
         .withQueryParam("substituteLookupCodes", true)
         .withLocalization()
         .withUser();
+}
+
+export function getMissingData(routeParams) {
+    return new FetchRequestBuilder(missingDataUrl, routeParams)
+        .withLocalization()
+        .withUser()
+        .fetchJson();
 }
 
 export function getTasks(routeParams, filter, orderBy) {

@@ -26,22 +26,28 @@ export function MissingDataView() {
   return (
     <ContentLayout title={t("Missing data")}>
       <AsyncDataRoute>
-        <PaginatedContent>
-          <EmployeeTable />
-        </PaginatedContent>
+        <EmployeeTable />
       </AsyncDataRoute>
     </ContentLayout>
   )
 }
 
+type Case = {
+  id: number,
+  caseName: string,
+  displayCaseName: string,
+  clusters: string[]
+}
+
 type Employee = {
   id: number,
   firstName: string,
-  lastName: string
+  lastName: string,
+  cases: Case[]
 }
 
 function EmployeeTable() {
-  const { items: employees }  = useAsyncValue() as { items: Employee[] };
+  const employees  = useAsyncValue() as Employee[];
   return (
     <Stack spacing={2}>
       { employees.map(e => <EmployeeSection key={e.id} employee={e} />)}
@@ -50,36 +56,18 @@ function EmployeeTable() {
 }
 
 function EmployeeSection({employee}) {
-  const fetcher = useFetcher();
-  const { t } = useTranslation();
+  const caseTasks = employee.cases;
 
-  useEffect(() => {
-    if (fetcher.state === "idle" && !fetcher.data) {
-      fetcher.load(employee.id.toString());
-    }
-  }, [fetcher]);
-
-  if (!fetcher.data) {
-    return (
-      <Stack>
-        <Typography variant="h6">{employee.firstName} {employee.lastName}</Typography>
-        <Skeleton height={60} />
-      </Stack>
-    )
-  }
-
-  const caseTasks = fetcher.data;
-  const ect = caseTasks.filter(ct => ct.clusters?.includes("ECT"));
-  const hrct = caseTasks.filter(ct => ct.clusters?.includes("HRCT"));
+  const ect = caseTasks.filter((ct: Case) => ct.clusters?.includes("ECT"));
+  const hrct = caseTasks.filter((ct: Case) => ct.clusters?.includes("HRCT"));
   
   return (
     <Stack spacing={1}>
       <Typography variant="h6">{employee.firstName} {employee.lastName}</Typography>
       <Paper variant="outlined">
         <Stack>
-          {ect.length == 0 && hrct.length == 0 && <Typography p={1}>{t("Data complete.")}</Typography>}
-          {ect.map(c => <CaseTask key={c.id} employee={employee} _case={c} type="ECT" />)}
-          {hrct.map(c => <CaseTask key={c.id} employee={employee} _case={c} type="HRCT"/>)}
+          {ect.map((c: Case) => <CaseTask key={c.id} employee={employee} _case={c} type="ECT" />)}
+          {hrct.map((c: Case) => <CaseTask key={c.id} employee={employee} _case={c} type="HRCT"/>)}
         </Stack>
       </Paper>
     </Stack>

@@ -43,7 +43,8 @@ import {
   getReports,
   createEmployee,
   updateEmployee,
-  getDivision
+  getDivision,
+  getMissingData
 } from "./api/FetchClient";
 import EmployeeView from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -52,7 +53,7 @@ import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
-import { openTasksAtom, payrollsAtom, tenantAtom, userAtom, employeeAtom, payrunAtom, toast, payrollAtom } from "./utils/dataAtoms";
+import { openTasksAtom, payrollsAtom, tenantAtom, userAtom, employeeAtom, payrunAtom, toast, payrollAtom, openMissingDataTasksAtom } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
 import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
@@ -353,13 +354,14 @@ const routeData = [
       {
         path: "hr/missingdata",
         Component: MissingDataView,
-        loader: paginatedLoader({
-          pageCount: 5,
-          getRequestBuilder: ({params}) => getEmployees(params),
-          getLoaderData: () => ({
+        loader: () => {
+          store.set(openMissingDataTasksAtom);
+          
+          return defer({
+            data: store.get(openMissingDataTasksAtom),
             title: "Missing data"
           })
-        }),
+        },
         children: [
           {
             path: ":employeeId",

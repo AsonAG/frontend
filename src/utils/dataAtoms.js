@@ -1,5 +1,5 @@
 import { atomWithRefresh } from "./atomWithRefresh";
-import { getPayrolls, getTasks, getTenant, getUser, getEmployeeByIdentifier, getPayruns } from "../api/FetchClient";
+import { getPayrolls, getTasks, getTenant, getUser, getEmployeeByIdentifier, getPayruns, getMissingData } from "../api/FetchClient";
 import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
 import { getAuthUser } from '../auth/getUser';
 import { atom, getDefaultStore } from "jotai";
@@ -61,6 +61,15 @@ export const openTasksAtom = atomWithRefresh(async get => {
   }
   const filter = "completed eq null";
   return getTasks({tenantId, payrollId}, filter, orderBy);
+});
+
+export const openMissingDataTasksAtom = atomWithRefresh(async get => {
+  const tenantId = get(tenantIdAtom);
+  const payrollId = get(payrollIdAtom);
+  if (tenantId === null || payrollId === null)
+    return [];
+
+  return getMissingData({tenantId, payrollId});
 });
 
 export const toastNotificationAtom = atom(null);
