@@ -157,6 +157,7 @@ const routeData = [
           const [_, queryString] = request.url.split("?");
           const searchParams = new URLSearchParams(queryString);
           const searchTerm = searchParams.get("search");
+          const showAll = !!searchParams.get("showAll");
           let filter;
           if(searchTerm) {
             filter = `startswith_ci(firstName, '${searchTerm}') or startswith_ci(lastName, '${searchTerm}') or startswith_ci(identifier, '${searchTerm}')`;
@@ -164,6 +165,7 @@ const routeData = [
           return defer({
             data: getEmployees(params)
               .withQueryParam("filter", filter)
+              .withQueryParam("status", showAll ? null : "Active")
               .fetchJson()
           });
         }
@@ -279,6 +281,7 @@ const routeData = [
           const formData = await request.formData();
           const response = await updateEmployee(params, {
             identifier: formData.get("identifier"),
+            status: formData.get("status"),
             firstName: formData.get("firstName"),
             lastName: formData.get("lastName"),
             divisions: JSON.parse(formData.get("divisions"))

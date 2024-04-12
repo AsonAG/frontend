@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import styled from "@emotion/styled";
 import { forwardRef } from "react";
 import { Edit } from "@mui/icons-material";
+import { StatusChip } from "./StatusChip";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -54,27 +55,32 @@ function EmployeeView() {
     const outlet = useOutlet();
     const { employee } = useLoaderData();
     const { t } = useTranslation();
+    const isActive = employee.status === "Active";
+    
     const header = employee.firstName + " " + employee.lastName;
+    
     if (!outlet) {
-        return <Navigate to="new" />
+      const to = isActive ? "new" : "events";
+      return <Navigate to={to} replace />
     }
     const title = (
-      <Stack direction="row" spacing={1} flex={1}>
+      <Stack direction="row" spacing={1} flex={1} alignItems="center">
         <PageHeaderTitle title={header} />
-        <Tooltip title={t("Change name")} placement="top" arrow size="sm">
+        <Tooltip title={t("Edit employee")} placement="top" arrow size="sm">
           <IconButton component={RouterLink} to="edit" color="primary" size="small">
             <Edit />
           </IconButton>
         </Tooltip>
+        <StatusChip status={employee.status} />
       </Stack>
     );
     return (
         <ContentLayout title={title}>
             <Stack direction="row" spacing={2}>
-                <TabLink title={t("New event")} to="new" />
+                {isActive && <TabLink title={t("New event")} to="new" /> }
                 <TabLink title={t("Events")} to="events" />
                 <TabLink title={t("Documents")} to="documents" />
-                <TabLink title={t("Missing data")} to="missingdata" />
+                {isActive && <TabLink title={t("Missing data")} to="missingdata" /> }
             </Stack>
             {outlet}
         </ContentLayout>

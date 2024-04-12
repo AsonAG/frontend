@@ -1,6 +1,6 @@
 import { React, createContext, useContext, useState, forwardRef } from "react";
 import { useAsyncValue, Link as RouterLink } from "react-router-dom";
-import { Divider, Stack, Typography, TextField, useMediaQuery, InputAdornment, IconButton, Button } from "@mui/material";
+import { Divider, Stack, Typography, TextField, useMediaQuery, InputAdornment, IconButton, Button, Switch, FormGroup, FormControlLabel} from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { TableButton } from "../buttons/TableButton";
 import { useTranslation } from "react-i18next";
@@ -16,6 +16,8 @@ import { ContentLayout } from "../ContentLayout";
 import { Search } from "@mui/icons-material";
 import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, ResponsiveDialogTrigger } from "../ResponsiveDialog";
 import { useSearchParam } from "../../hooks/useSearchParam";
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { StatusChip } from "../../scenes/employees/StatusChip";
 
 const VariantContext = createContext("standard");
 
@@ -77,9 +79,26 @@ function EmployeeTableButtons() {
   const variant = useContext(VariantContext);
   return (
     <Stack direction="row" spacing={2}>
+      <EmployeeStatusSwitch />
       <EmployeeTableSearch />
       <TableButton title={t("New employee")} to="new" icon={<AddOutlinedIcon />} variant={variant} />
     </Stack>
+  )
+}
+
+function EmployeeStatusSwitch() {
+  const { t } = useTranslation();
+  const [showAll, setShowAll] = useSearchParam("showAll", {replace: true});
+  const isMobile = useIsMobile();
+  if (isMobile)
+    return;
+
+  const label = t("Only active");
+  const handleChange = (event) => setShowAll(event.target.checked ? null : "true");
+  return (
+    <FormGroup>
+      <FormControlLabel control={<Switch checked={!showAll} onChange={handleChange} />} label={label} />
+    </FormGroup>
   )
 }
 
@@ -157,9 +176,10 @@ function EmployeeTableSearchDialog() {
 
 function EmployeeTable() {
   const employees = useAsyncValue();
+  const [showAll] = useSearchParam("showAll");
   return <>
     <Stack spacing={1} divider={<Divider />}>
-      {employees.map((employee) => <EmployeeRow key={employee.id} employee={employee} />)}
+      {employees.map((employee) => <EmployeeRow key={employee.id} employee={employee} showStatus={showAll} />)}
     </Stack>
   </>;
 };
@@ -174,34 +194,36 @@ const sx = {
   }
 }
 
-function EmployeeRow({ employee }) {
+function EmployeeRow({ employee, showStatus }) {
   const variant = useContext(VariantContext);
   return (
     <Stack direction="row" alignItems="center" sx={sx} mx={-0.5} px={0.5}>
-      <Link to={`${employee.id + ""}/new`}>
+      <Link to={employee.id + ""}>
         <Stack direction="row" spacing={1} flexWrap="wrap">
           <Typography>{employee.firstName} {employee.lastName}</Typography>
           <Typography color="text.secondary" sx={{textOverflow: 'ellipsis', overflow: 'hidden'}}>{employee.identifier}</Typography>
+          {showStatus && <StatusChip status={employee.status} /> }
         </Stack>
       </Link>
       {
         variant === "standard" &&
-          <EmployeeButtons employeeId={employee.id} />
+          <EmployeeButtons employee={employee} />
       }
     </Stack>
   );
 }
 
-function EmployeeButtons ({ employeeId }) {
+function EmployeeButtons ({ employee }) {
   const { t } = useTranslation();
   const variant = "dense";
+  const isActive = employee.status === "Active"
 
   return (
     <Stack direction="row" spacing={2} py={0.5}>
-      <TableButton title={t("New event")} to={employeeId + "/new"} variant={variant} icon={<AddOutlinedIcon />} />
-      <TableButton title={t("Events")} to={employeeId + "/events"} variant={variant} icon={<WorkHistoryOutlinedIcon />} />
-      <TableButton title={t("Documents")} to={employeeId + "/documents"} variant={variant} icon={<DescriptionOutlinedIcon />} />
-      <TableButton title={t("Missing data")} to={employeeId + "/missingdata"} variant={variant} icon={<NotificationImportantIcon />} />
+      {isActive && <TableButton title={t("New event")} to={employee.id + "/new"} variant={variant} icon={<AddOutlinedIcon />} /> }
+      <TableButton title={t("Events")} to={employee.id + "/events"} variant={variant} icon={<WorkHistoryOutlinedIcon />} />
+      <TableButton title={t("Documents")} to={employee.id + "/documents"} variant={variant} icon={<DescriptionOutlinedIcon />} />
+      {isActive && <TableButton title={t("Missing data")} to={employee.id + "/missingdata"} variant={variant} icon={<NotificationImportantIcon />} /> }
     </Stack>
   );
 };
