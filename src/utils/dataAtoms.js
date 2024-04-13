@@ -69,7 +69,11 @@ export const openMissingDataTasksAtom = atomWithRefresh(async get => {
   if (tenantId === null || payrollId === null)
     return [];
 
-  return getMissingData({tenantId, payrollId});
+  var missingData = await getMissingData({tenantId, payrollId});
+  if (!Array.isArray(missingData)) {
+    return [];
+  }
+  return missingData;
 });
 
 const missingDataMapAtom = atom(async get => {
