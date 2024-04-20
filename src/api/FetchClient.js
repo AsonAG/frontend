@@ -103,6 +103,11 @@ class FetchRequestBuilder {
         return this;
     }
 
+    withActive() {
+        this.searchParams.set("status", "Active");
+        return this;
+    }
+
     withTimout(timeout) {
         this.signal = AbortSignal.timeout(timeout);
         return this;

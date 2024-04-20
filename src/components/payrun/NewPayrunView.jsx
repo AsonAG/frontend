@@ -17,7 +17,7 @@ export function AsyncNewPayrunView() {
 }
 
 function NewPayrunView() {
-  const createdJob = useActionData();
+  const errorMessage = useActionData();
   const { user, payroll } = useRouteLoaderData('root');
   const submit = useSubmit();
   const employees = useAsyncValue();
@@ -36,11 +36,11 @@ function NewPayrunView() {
       payrunId: payrun.id,
       payrollId: payroll.id,
       userId: user.id,
-      name: state.jobName,
-      forecast: state.forecast,
+      name: state.jobName === "" ? null : state.jobName,
+      forecast: state.forecast === "" ? null : state.forecast,
       periodStart: state.period,
       employeeIdentifiers: state.employees.map(e => e.identifier),
-      reason: state.jobReason,
+      reason: state.jobReason === "" ? null : state.jobReason,
       retroPayMode: state.retroPayMode ? "ValueChange" : "None",
     }
     submit(jobInvocation, { method: "post", encType: "application/json" });
@@ -58,7 +58,7 @@ function NewPayrunView() {
       <TextField label={t("Reason")} value={state.jobReason} onChange={updateTextValue("set_job_reason")} />
       <EmployeeSelector allEmployees={employees} selectedEmployees={state.employees} updateEmployees={e => dispatch({type: "set_employees", value: e})} />
       <TextField label={t("Forecast")} value={state.forecast} onChange={updateTextValue("set_forecast")}/>
-      { createdJob && <Alert severity="error" variant="filled"><Typography>{createdJob.message}</Typography></Alert> }
+      { errorMessage && <Alert severity="error" variant="filled"><Typography>{errorMessage}</Typography></Alert> }
       <Stack direction="row" alignSelf="end" spacing={2}>
         <Button
           component={Link}

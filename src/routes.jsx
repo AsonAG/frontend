@@ -420,7 +420,9 @@ const routeData = [
               const payrun = await store.get(payrunAtom);
               return defer({
                 payrun,
-                data: getEmployees(params).fetchJson()
+                data: getEmployees(params)
+                      .withActive()
+                      .fetchJson()
               });
             },
             action: async ({params, request}) => {
@@ -429,9 +431,17 @@ const routeData = [
               if (response.status === 201) {
                 const job = await response.json();
                 if (job.jobStatus === "Abort") {
-                  return job;
+                  return job.message;
                 }
                 return redirect(`..`);
+              }
+              if (response.status === 400) {
+                try {
+                  const errorJson = await response.json();
+                  return errorJson.errors.Reason[0];
+                }
+                catch (e) {
+                }
               }
               return null;
             }
