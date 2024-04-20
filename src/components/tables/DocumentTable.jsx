@@ -32,7 +32,7 @@ function DocumentTable() {
   return (
     <>
       <Stack spacing={3} pb={3}>
-        {caseFields.map(caseField => <DocumentCard key={caseField.id} caseFieldName={caseField.name} />)}
+        {caseFields.map(caseField => <DocumentCard key={caseField.id} caseFieldName={caseField.name} displayName={caseField.displayName} />)}
       </Stack>
       <Outlet />
     </>
@@ -67,7 +67,7 @@ function LoadDocumentsButton({loading, hasMore, onClick, allLoadedText, sx}) {
   );
 }
 
-function DocumentCard({caseFieldName}) {
+function DocumentCard({caseFieldName, displayName}) {
   const [open, setOpen] = useState(true);
   const { documents, loading, hasMore, loadMore } = useDocuments(caseFieldName);
   const { t } = useTranslation();
@@ -84,7 +84,7 @@ function DocumentCard({caseFieldName}) {
     <Paper>
       <Stack>
         <Stack direction="row" alignItems="center" sx={{pl: 2, pr: 1, py: 1}} spacing={2}>
-          <Typography variant="h6" flex={1}>{caseFieldName}</Typography>
+          <Typography variant="h6" flex={1}>{displayName}</Typography>
           <IconButton onClick={onClick}>
             { open ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
