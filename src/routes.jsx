@@ -43,7 +43,8 @@ import {
   getReports,
   createEmployee,
   updateEmployee,
-  getDivision
+  getDivision,
+  addTask
 } from "./api/FetchClient";
 import EmployeeView, { EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -67,6 +68,7 @@ import { CompletionView } from "./components/compliance/CompletionView";
 import { MissingDataView } from "./components/MissingDataView";
 import { EmployeeForm } from "./components/EmployeeForm";
 import { withPage } from "./components/ContentLayout";
+import { NewTaskView } from "./components/NewTaskView";
 
 const store = getDefaultStore();
 
@@ -318,6 +320,20 @@ const routeData = [
           return defer({
             data: dataPromise
           });
+        }
+      },
+      {
+        path: "hr/tasks/new",
+        Component: NewTaskView,
+        loader: ({params}) => getEmployees(params).fetchJson(),
+        action: async ({params, request}) => {
+          const task = await request.json();
+          const response = await addTask(params, task);
+          if (response.ok) {
+            toast("success", "Task saved!");
+            return redirect("../hr/tasks");
+          }
+          return response;
         }
       },
       {

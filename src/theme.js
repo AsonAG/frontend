@@ -65,7 +65,7 @@ function createThemeSettings(mode) {
       },
       MuiAutocomplete: {
         defaultProps: {
-          size: "small"
+          size: "small" 
         },
         styleOverrides: {
           root: {
@@ -73,11 +73,16 @@ function createThemeSettings(mode) {
               height: "100%"
             }
           },
-          inputRoot: ({theme}) => ({
-            height: "100%",
-            paddingTop: theme.spacing(0.5) + " !important",
-            paddingBottom: theme.spacing(0.5) + " !important"
-          })
+          inputRoot: ({theme, ownerState}) => {
+            if (ownerState.size !== "small")
+              return;
+
+            return {
+              height: "100%",
+              paddingTop: theme.spacing(0.5) + " !important",
+              paddingBottom: theme.spacing(0.5) + " !important"
+            }
+          }
         }
       },
       MuiBadge: {

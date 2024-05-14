@@ -1,7 +1,8 @@
 import { ChevronRight } from "@mui/icons-material";
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, InputAdornment, List, ListItem, ListItemButton, ListItemIcon, ListItemText, OutlinedInput, TextField, useMediaQuery, useTheme } from "@mui/material";
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputAdornment, List, ListItem, ListItemButton, ListItemIcon, ListItemText, TextField, useMediaQuery, useTheme } from "@mui/material";
 import { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getEmployeeDisplayString } from "../../models/Employee";
 
 
 export function EmployeeSelector({allEmployees, selectedEmployees, updateEmployees}) {
@@ -82,7 +83,7 @@ function EmployeeDialog({onClose, allEmployees, selectedEmployees, setSelectedEm
                         disableRipple
                       />
                     </ListItemIcon>
-                    <ListItemText primary={getEmployeeName(employee)} />
+                    <ListItemText primary={getEmployeeDisplayString(employee)} />
                   </ListItemButton>
                 </ListItem>
               );
@@ -149,4 +150,3 @@ function getEmployeeSelectionText(employeeCount, selectedEmployees, t) {
   }
   return t("n_employees_selected", {count: selectedEmployees.length});
 }
-const getEmployeeName = employee => `${employee.firstName} ${employee.lastName}`;

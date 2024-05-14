@@ -97,8 +97,8 @@ export const ResponsiveDialogClose = React.forwardRef<HTMLButtonElement, Props>(
   }
 );
 
-export function ResponsiveDialog(args: any, context: any) {
+export function ResponsiveDialog(dialogProps: Dialog.DialogProps) {
   const isMobile = useIsMobile();
   const Component = isMobile ? Drawer : Dialog;
-  return Component.Root(args, context);
+  return <Component.Root {...dialogProps} />
 }

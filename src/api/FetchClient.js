@@ -298,6 +298,13 @@ export function getTask(routeParams) {
         .fetchJson();
 }
 
+export function addTask(routeParams, task) {
+    return new FetchRequestBuilder(tasksUrl, routeParams)
+        .withMethod("POST")
+        .withBody(task)
+        .fetch();
+}
+
 export function updateTask(routeParams, task) {
     return new FetchRequestBuilder(taskUrl, routeParams)
         .withMethod("PUT")

@@ -1,6 +1,6 @@
 import { React, forwardRef } from "react";
 import { Link as RouterLink, useAsyncValue, useLocation } from "react-router-dom";
-import { Stack, Typography, Paper, Divider, Tooltip, Avatar, useTheme, useMediaQuery, Snackbar, Alert } from "@mui/material";
+import { Stack, Typography, Paper, Divider, Tooltip, Avatar, useTheme, useMediaQuery } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
@@ -9,6 +9,8 @@ import { useTranslation } from "react-i18next";
 import { Person, Schedule } from "@mui/icons-material";
 import { CategoryLabel } from "../tasks/CategoryLabel";
 import { TaskTableFilter } from "../tasks/TaskTableFilter";
+import { TableButton } from "../buttons/TableButton";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -26,7 +28,7 @@ const Link = styled(forwardRef(function Link(itemProps, ref) {
 export function AsyncTaskTable() {
   const { t } = useTranslation(); 
   return (
-    <ContentLayout title={t("Tasks")} disableInset>
+    <ContentLayout title={t("Tasks")} buttons={<NewTaskButton />} disableInset>
       <AsyncDataRoute skipDataCheck>
         <TaskTable />
       </AsyncDataRoute>
@@ -58,6 +60,14 @@ function TaskTable() {
     </Stack>
   );
 };
+
+function NewTaskButton() {
+  const { search } = useLocation();
+  const { t } = useTranslation();
+  return (
+    <TableButton title={t("New task")} to="new" icon={<AddOutlinedIcon />} state={{ taskFilter: search }} />
+  )
+}
 
 function TaskRow({ task, variant, taskFilter }) {
   const { t } = useTranslation();
