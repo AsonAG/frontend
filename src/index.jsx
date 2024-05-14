@@ -8,27 +8,27 @@ import { authConfig, useOidc } from "./auth/authConfig";
 import SignIn from "./auth/SignIn";
 import "./translations";
 
-
-function Authentication({children}) {
-  if (!useOidc) {
-    return children;
-  }
-  return (
-    <AuthProvider {...authConfig}>
-      <SignIn>
-        {children}
-      </SignIn>
-    </AuthProvider>
-  )
+function Authentication({ children }) {
+	if (!useOidc) {
+		return children;
+	}
+	return (
+		<AuthProvider {...authConfig}>
+			<SignIn>{children}</SignIn>
+		</AuthProvider>
+	);
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <Authentication>
-      <RouterProvider router={browserRouter} future={{ v7_startTransition: true }} />
-    </Authentication>
-  </React.StrictMode>
+	<React.StrictMode>
+		<Authentication>
+			<RouterProvider
+				router={browserRouter}
+				future={{ v7_startTransition: true }}
+			/>
+		</Authentication>
+	</React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function

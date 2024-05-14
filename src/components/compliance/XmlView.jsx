@@ -2,17 +2,21 @@ import { Typography } from "@mui/material";
 import { useMemo } from "react";
 
 const codeTypographySx = {
-  whiteSpace: "pre-wrap",
-  wordBreak: "break-word",
-  overflow: "auto"
+	whiteSpace: "pre-wrap",
+	wordBreak: "break-word",
+	overflow: "auto",
 };
 
 export function XmlView({ title, xml, codeProps }) {
-  const prettyXml = useMemo(() => prettifyXml(xml), [xml]);
-  return <>
-    { title && <Typography variant="h6">{title}</Typography> }
-    <Typography variant="code" sx={{...codeProps, ...codeTypographySx}}>{prettyXml}</Typography>
-  </>;
+	const prettyXml = useMemo(() => prettifyXml(xml), [xml]);
+	return (
+		<>
+			{title && <Typography variant="h6">{title}</Typography>}
+			<Typography variant="code" sx={{ ...codeProps, ...codeTypographySx }}>
+				{prettyXml}
+			</Typography>
+		</>
+	);
 }
 
 const xlstTemplate = `
@@ -26,17 +30,19 @@ const xlstTemplate = `
   </xsl:template>
 </xsl:stylesheet>`;
 
-function prettifyXml(sourceXml)
-{
-  if (!sourceXml) {
-    return "";
-  }
-  var xmlDoc = new DOMParser().parseFromString(sourceXml, 'application/xml');
-  var xsltDoc = new DOMParser().parseFromString(xlstTemplate, 'application/xml');
+function prettifyXml(sourceXml) {
+	if (!sourceXml) {
+		return "";
+	}
+	var xmlDoc = new DOMParser().parseFromString(sourceXml, "application/xml");
+	var xsltDoc = new DOMParser().parseFromString(
+		xlstTemplate,
+		"application/xml",
+	);
 
-  var xsltProcessor = new XSLTProcessor();
-  xsltProcessor.importStylesheet(xsltDoc);
-  var resultDoc = xsltProcessor.transformToDocument(xmlDoc);
-  var resultXml = new XMLSerializer().serializeToString(resultDoc);
-  return resultXml;
-};
+	var xsltProcessor = new XSLTProcessor();
+	xsltProcessor.importStylesheet(xsltDoc);
+	var resultDoc = xsltProcessor.transformToDocument(xmlDoc);
+	var resultXml = new XMLSerializer().serializeToString(resultDoc);
+	return resultXml;
+}

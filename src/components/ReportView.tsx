@@ -1,4 +1,15 @@
-import { Stack, Button, CircularProgress, ButtonGroup, Paper, ClickAwayListener, MenuList, MenuItem, Grow, Popper } from "@mui/material";
+import {
+	Stack,
+	Button,
+	CircularProgress,
+	ButtonGroup,
+	Paper,
+	ClickAwayListener,
+	MenuList,
+	MenuItem,
+	Grow,
+	Popper,
+} from "@mui/material";
 import { ContentLayout } from "./ContentLayout";
 import { Loading } from "./Loading";
 import { useTranslation } from "react-i18next";
@@ -14,245 +25,293 @@ import { useAtomValue } from "jotai";
 import { userAtom } from "../utils/dataAtoms";
 import { ArrowDropDown } from "@mui/icons-material";
 
-
 export function AsyncReportView() {
-  const user = useAtomValue(userAtom);
-  const params = useParams();
-  const { state } = useLocation();
-  const [reportFile, setReportFile] = useState<Promise<ReportFile> | null>(null);
-  const { reportData, loading, isGenerating, buildReport, generateReport } = useReportBuilder(
-    {
-      tenantId: params.tenantId!,
-      payrollId: params.payrollId!,
-      reportId: params.reportId!,
-      user: user,
-      onReportGenerated: file => setReportFile(Promise.resolve(file))
-    }
-  );
-  
-  
-  const { t } = useTranslation();
+	const user = useAtomValue(userAtom);
+	const params = useParams();
+	const { state } = useLocation();
+	const [reportFile, setReportFile] = useState<Promise<ReportFile> | null>(
+		null,
+	);
+	const { reportData, loading, isGenerating, buildReport, generateReport } =
+		useReportBuilder({
+			tenantId: params.tenantId!,
+			payrollId: params.payrollId!,
+			reportId: params.reportId!,
+			user: user,
+			onReportGenerated: (file) => setReportFile(Promise.resolve(file)),
+		});
 
-  if (loading) {
-    const reportName = state?.reportName ? state.reportName : t("Loading...");
-    return <ContentLayout title={reportName}><Loading /></ContentLayout>;
-  }
-  return (
-    <ContentLayout title={reportData.displayName}>
-      <Stack spacing={2}>
-        <CaseFormContext.Provider value={{buildCase: buildReport}}>
-          {
-            reportData.parameters.map(p => (
-              <FieldContext.Provider key={p.id} value={{field: p, displayName: p.displayName, required: p.mandatory, buildCase: buildReport}}>
-                <FieldValueComponent />
-              </FieldContext.Provider>
-            ))
-          }
-        </CaseFormContext.Provider>
-      </Stack>
-      <Stack direction="row" spacing={2} justifyContent="end">
-        <Button component={Link} to=".." relative="path">{t("Back")}</Button>
-        <GenerateButton generate={generateReport} isGenerating={isGenerating}/>
-      </Stack>
-      {reportFile && <DocumentDialog documentPromise={reportFile} onClose={() => setReportFile(null)}/> }
-    </ContentLayout>
-  );
+	const { t } = useTranslation();
+
+	if (loading) {
+		const reportName = state?.reportName ? state.reportName : t("Loading...");
+		return (
+			<ContentLayout title={reportName}>
+				<Loading />
+			</ContentLayout>
+		);
+	}
+	return (
+		<ContentLayout title={reportData.displayName}>
+			<Stack spacing={2}>
+				<CaseFormContext.Provider value={{ buildCase: buildReport }}>
+					{reportData.parameters.map((p) => (
+						<FieldContext.Provider
+							key={p.id}
+							value={{
+								field: p,
+								displayName: p.displayName,
+								required: p.mandatory,
+								buildCase: buildReport,
+							}}
+						>
+							<FieldValueComponent />
+						</FieldContext.Provider>
+					))}
+				</CaseFormContext.Provider>
+			</Stack>
+			<Stack direction="row" spacing={2} justifyContent="end">
+				<Button component={Link} to=".." relative="path">
+					{t("Back")}
+				</Button>
+				<GenerateButton generate={generateReport} isGenerating={isGenerating} />
+			</Stack>
+			{reportFile && (
+				<DocumentDialog
+					documentPromise={reportFile}
+					onClose={() => setReportFile(null)}
+				/>
+			)}
+		</ContentLayout>
+	);
 }
 
 type ReportFile = {
-  name: string,
-  content: string,
-  contentType: string
+	name: string;
+	content: string;
+	contentType: string;
 };
 
 interface ReportBuilderParams {
-  tenantId: string,
-  payrollId: string
-  reportId: string,
-  user: {id: number, language: string},
-  onReportGenerated: (file: ReportFile) => void
+	tenantId: string;
+	payrollId: string;
+	reportId: string;
+	user: { id: number; language: string };
+	onReportGenerated: (file: ReportFile) => void;
 }
 
 type DocumentFormat = "pdf" | "word" | "excel" | "xml" | "xmlraw";
 
-function useReportBuilder({tenantId, payrollId, reportId, user, onReportGenerated}: ReportBuilderParams) {
+function useReportBuilder({
+	tenantId,
+	payrollId,
+	reportId,
+	user,
+	onReportGenerated,
+}: ReportBuilderParams) {
+	const [reportData, setReportData] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [isGenerating, setGenerating] = useState(false);
 
-  const [reportData, setReportData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isGenerating, setGenerating] = useState(false);
+	function getReportRequest() {
+		const reportRequest = {
+			language: user.language,
+			userId: user.id,
+			parameters: {},
+		};
 
-  function getReportRequest() {
-    const reportRequest = {
-      "language": user.language,
-      "userId": user.id,
-      "parameters": {}
-    };
+		if (reportData?.parameters) {
+			for (const parameter of reportData.parameters) {
+				if (parameter.attributes["input.hidden"]) continue;
 
-    if (reportData?.parameters) {
-      for(const parameter of reportData.parameters) {
-        if (parameter.attributes["input.hidden"])
-          continue;
+				reportRequest.parameters[parameter.name] = parameter.value;
+			}
+		}
+		return reportRequest;
+	}
 
-        reportRequest.parameters[parameter.name] = parameter.value;
-      }
-    }
-    return reportRequest;
-  }
+	useEffect(() => {
+		const controller = new AbortController();
 
+		const loadData = async () => {
+			try {
+				await _buildReport(controller.signal);
+				setLoading(false);
+			} catch (e) {}
+		};
+		loadData();
 
-  useEffect(() => {
-    const controller = new AbortController();
+		return () => controller.abort();
+	}, [tenantId, payrollId, reportId, user.id]);
 
-    const loadData = async () => {
-      try {
-        await _buildReport(controller.signal);
-        setLoading(false);
-      }
-      catch (e) {
-      }
-    };
-    loadData();
+	async function _buildReport(signal?: AbortSignal) {
+		const reportResponse = await getReport(
+			{ tenantId, payrollId, reportId },
+			getReportRequest(),
+			signal,
+		);
+		if (reportResponse.ok && !signal?.aborted) {
+			const report = await reportResponse.json();
+			processReportParameters(report.parameters);
+			setReportData(report);
+		}
+	}
 
-    return () => controller.abort();
+	async function _generateReport(format: DocumentFormat) {
+		try {
+			setGenerating(true);
+			const reportResponse = await generateReport(
+				{ tenantId, payrollId, reportId },
+				getReportRequest(),
+				format,
+			);
+			if (reportResponse.ok) {
+				const report = await reportResponse.json();
+				onReportGenerated(report);
+				return;
+			}
+		} finally {
+			setGenerating(false);
+		}
+	}
 
-  }, [tenantId, payrollId, reportId, user.id]);
-
-
-  async function _buildReport(signal?: AbortSignal) {
-    const reportResponse = await getReport({tenantId, payrollId, reportId}, getReportRequest(), signal);
-    if (reportResponse.ok && !signal?.aborted) {
-      const report = await reportResponse.json();
-      processReportParameters(report.parameters);
-      setReportData(report);
-    }
-  }
-
-  async function _generateReport(format: DocumentFormat) {
-    try {
-      setGenerating(true);
-      const reportResponse = await generateReport({tenantId, payrollId, reportId}, getReportRequest(), format);
-      if (reportResponse.ok) {
-        const report = await reportResponse.json();
-        onReportGenerated(report);
-        return;
-      }
-    }
-    finally {
-      setGenerating(false);
-    }
-  }
-
-  return {
-    reportData,
-    loading,
-    isGenerating,
-    buildReport: _buildReport,
-    generateReport: _generateReport
-  }
+	return {
+		reportData,
+		loading,
+		isGenerating,
+		buildReport: _buildReport,
+		generateReport: _generateReport,
+	};
 }
 
 function processReportParameters(parameters) {
-
-  for(const parameter of parameters) {
-    if (parameter.valueType === "Date") {
-      if (parameter.value === "today") {
-        parameter.value = dayjs().utc().startOf('day').toISOString();
-      }
-    }
-    if (parameter.valueType === "String") {
-      if (parameter.attributes["input.listSelection"]) {
-        const listSelection = JSON.parse(parameter.attributes["input.listSelection"]);
-        parameter.attributes["input.list"] = listSelection["dictionary"];
-        if (!parameter.value) {
-          parameter.value = listSelection["dictionary"][listSelection.selected];
-        }
-        parameter.attributes["input.disableClear"] = true;
-      }
-    }
-    if (parameter.attributes["lookupSettings"]) {
-      parameter.lookupSettings = parameter.attributes["lookupSettings"];
-    }
-  }
+	for (const parameter of parameters) {
+		if (parameter.valueType === "Date") {
+			if (parameter.value === "today") {
+				parameter.value = dayjs().utc().startOf("day").toISOString();
+			}
+		}
+		if (parameter.valueType === "String") {
+			if (parameter.attributes["input.listSelection"]) {
+				const listSelection = JSON.parse(
+					parameter.attributes["input.listSelection"],
+				);
+				parameter.attributes["input.list"] = listSelection["dictionary"];
+				if (!parameter.value) {
+					parameter.value = listSelection["dictionary"][listSelection.selected];
+				}
+				parameter.attributes["input.disableClear"] = true;
+			}
+		}
+		if (parameter.attributes["lookupSettings"]) {
+			parameter.lookupSettings = parameter.attributes["lookupSettings"];
+		}
+	}
 }
 
-const formatButtonText : Record<DocumentFormat, string> = {
-  "pdf": "Create PDF",
-  "word": "Create Word",
-  "excel": "Create Excel",
-  "xml": "Create XML",
-  "xmlraw" : "Create raw XML"
+const formatButtonText: Record<DocumentFormat, string> = {
+	pdf: "Create PDF",
+	word: "Create Word",
+	excel: "Create Excel",
+	xml: "Create XML",
+	xmlraw: "Create raw XML",
 };
 
-const documentFormats : DocumentFormat[] = ["pdf", "word", "excel", "xml", "xmlraw"];
+const documentFormats: DocumentFormat[] = [
+	"pdf",
+	"word",
+	"excel",
+	"xml",
+	"xmlraw",
+];
 
-function GenerateButton({generate, isGenerating}: {generate: (format: DocumentFormat) => void, isGenerating: boolean}) {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [selectedFormat, setSelectedFormat] = useState<DocumentFormat>("pdf");
-  const { t } = useTranslation();
+function GenerateButton({
+	generate,
+	isGenerating,
+}: {
+	generate: (format: DocumentFormat) => void;
+	isGenerating: boolean;
+}) {
+	const [open, setOpen] = React.useState(false);
+	const anchorRef = React.useRef<HTMLDivElement>(null);
+	const [selectedFormat, setSelectedFormat] = useState<DocumentFormat>("pdf");
+	const { t } = useTranslation();
 
-  const handleMenuItemClick = (format: DocumentFormat) => {
-    setSelectedFormat(format);
-    setOpen(false);
-  };
+	const handleMenuItemClick = (format: DocumentFormat) => {
+		setSelectedFormat(format);
+		setOpen(false);
+	};
 
-  const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
-  };
+	const handleToggle = () => {
+		setOpen((prevOpen) => !prevOpen);
+	};
 
-  const handleClose = (event: Event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
-      return;
-    }
+	const handleClose = (event: Event) => {
+		if (
+			anchorRef.current &&
+			anchorRef.current.contains(event.target as HTMLElement)
+		) {
+			return;
+		}
 
-    setOpen(false);
-  };
+		setOpen(false);
+	};
 
-  const icon = isGenerating ? <CircularProgress size="1em" sx={{color: "common.white"}} /> : null;
+	const icon = isGenerating ? (
+		<CircularProgress size="1em" sx={{ color: "common.white" }} />
+	) : null;
 
-  return (
-    <React.Fragment>
-      <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button" disabled={isGenerating}>
-        <Button onClick={() => generate(selectedFormat)} startIcon={icon}>{t(formatButtonText[selectedFormat])}</Button>
-        <Button
-          size="small"
-          onClick={handleToggle}
-        >
-          <ArrowDropDown />
-        </Button>
-      </ButtonGroup>
-      <Popper
-        sx={{
-          zIndex: 1,
-        }}
-        open={open}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        transition
-        disablePortal
-      >
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin:
-                placement === 'bottom' ? 'center top' : 'center bottom',
-            }}
-          >
-            <Paper>
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList autoFocusItem>
-                  {
-                    documentFormats.map(format => 
-                      <MenuItem key={format} selected={format === selectedFormat} onClick={() => handleMenuItemClick(format)}>{t(formatButtonText[format])}</MenuItem>
-                    )
-                  }
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
-      </Popper>
-    </React.Fragment>
-  );
+	return (
+		<React.Fragment>
+			<ButtonGroup
+				variant="contained"
+				ref={anchorRef}
+				aria-label="split button"
+				disabled={isGenerating}
+			>
+				<Button onClick={() => generate(selectedFormat)} startIcon={icon}>
+					{t(formatButtonText[selectedFormat])}
+				</Button>
+				<Button size="small" onClick={handleToggle}>
+					<ArrowDropDown />
+				</Button>
+			</ButtonGroup>
+			<Popper
+				sx={{
+					zIndex: 1,
+				}}
+				open={open}
+				anchorEl={anchorRef.current}
+				role={undefined}
+				transition
+				disablePortal
+			>
+				{({ TransitionProps, placement }) => (
+					<Grow
+						{...TransitionProps}
+						style={{
+							transformOrigin:
+								placement === "bottom" ? "center top" : "center bottom",
+						}}
+					>
+						<Paper>
+							<ClickAwayListener onClickAway={handleClose}>
+								<MenuList autoFocusItem>
+									{documentFormats.map((format) => (
+										<MenuItem
+											key={format}
+											selected={format === selectedFormat}
+											onClick={() => handleMenuItemClick(format)}
+										>
+											{t(formatButtonText[format])}
+										</MenuItem>
+									))}
+								</MenuList>
+							</ClickAwayListener>
+						</Paper>
+					</Grow>
+				)}
+			</Popper>
+		</React.Fragment>
+	);
 }

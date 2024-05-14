@@ -1,8 +1,8 @@
 export function getDateLocale(user) {
-    if (!user || !user.culture) {
-        return 'en';
-    }
+	if (!user || !user.culture) {
+		return "en";
+	}
 
-    const [locale] = user.culture.split("-");
-    return locale;
-};
+	const [locale] = user.culture.split("-");
+	return locale;
+}

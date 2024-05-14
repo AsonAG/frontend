@@ -14,30 +14,35 @@ export function Field({ field }) {
 	const required = !field.optional;
 	const theme = useTheme();
 	const mobile = useMediaQuery(theme.breakpoints.down(725));
-	const displayName = !mobile ? field.displayName : '';
+	const displayName = !mobile ? field.displayName : "";
 
 	return (
-		<FieldContext.Provider value={{ field, displayName, buildCase, attachments, isReadonly, required }} >
-			{
-				mobile ?
-					<MobileLayout field={field} /> :
-					<DefaultLayout field={field} />
-			}
+		<FieldContext.Provider
+			value={{
+				field,
+				displayName,
+				buildCase,
+				attachments,
+				isReadonly,
+				required,
+			}}
+		>
+			{mobile ? (
+				<MobileLayout field={field} />
+			) : (
+				<DefaultLayout field={field} />
+			)}
 		</FieldContext.Provider>
 	);
-};
+}
 
-function DefaultLayout({field}) {
+function DefaultLayout({ field }) {
 	return (
-		<Box
-			display="grid"
-			gridTemplateColumns="1fr 135px 135px"
-			columnGap="8px"
-		>
+		<Box display="grid" gridTemplateColumns="1fr 135px 135px" columnGap="8px">
 			<EditWithDescription />
 			<FieldPeriodSelector field={field} />
 		</Box>
-	)
+	);
 }
 
 function EditWithDescription() {
@@ -49,13 +54,15 @@ function EditWithDescription() {
 	);
 }
 
-function MobileLayout({field}) {
+function MobileLayout({ field }) {
 	if (field.valueType === "None") {
-		return <EditWithDescription />
+		return <EditWithDescription />;
 	}
 	return (
 		<Stack spacing={1}>
-			<Typography color="disabled" flex={1}>{field.displayName}&nbsp;*</Typography>
+			<Typography color="disabled" flex={1}>
+				{field.displayName}&nbsp;*
+			</Typography>
 			<EditWithDescription />
 			<Stack direction="row" spacing={1}>
 				<FieldPeriodSelector field={field} />

@@ -1,10 +1,21 @@
 import dayjs from "dayjs";
-import { useContext, } from "react";
+import { useContext } from "react";
 import { FieldContext } from "../Field";
 import { DatePicker } from "../../../DatePicker";
 
-export function FieldValueDateComponent({variant = "standard", propertyName = "value", displayName, required}) {
-	const { field, isReadonly, required: fieldRequired, buildCase, displayName: fieldDisplayName } = useContext(FieldContext);
+export function FieldValueDateComponent({
+	variant = "standard",
+	propertyName = "value",
+	displayName,
+	required,
+}) {
+	const {
+		field,
+		isReadonly,
+		required: fieldRequired,
+		buildCase,
+		displayName: fieldDisplayName,
+	} = useContext(FieldContext);
 	const fieldValue = field[propertyName];
 	const value = fieldValue ? dayjs.utc(fieldValue) : null;
 	required ??= fieldRequired;
@@ -14,7 +25,6 @@ export function FieldValueDateComponent({variant = "standard", propertyName = "v
 		field[propertyName] = newDate?.toISOString();
 		buildCase();
 	};
-
 
 	if (field.attributes["input.datePicker"] === "Month") {
 		variant = "month";
@@ -33,8 +43,8 @@ export function FieldValueDateComponent({variant = "standard", propertyName = "v
 			name={field.name}
 			disabled={isReadonly}
 			sx={{
-				flex: 1
+				flex: 1,
 			}}
 		/>
 	);
-};
+}

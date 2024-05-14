@@ -1,4 +1,10 @@
-import { Form, useParams, useLoaderData, useRouteLoaderData, useNavigate } from "react-router-dom";
+import {
+	Form,
+	useParams,
+	useLoaderData,
+	useRouteLoaderData,
+	useNavigate,
+} from "react-router-dom";
 import { CaseComponent } from "../../components/case/CaseComponent";
 import { createContext, useRef } from "react";
 import { CaseFormButtons } from "../../components/buttons/CaseFormButtons";
@@ -13,48 +19,61 @@ import { toast } from "../../utils/dataAtoms";
 export const CaseFormContext = createContext();
 
 export function Component() {
-  const navigate = useNavigate();
-  const { user, payroll } = useRouteLoaderData("root");
-  const loaderData = useLoaderData();
-  const redirectPath = loaderData?.redirect || "..";
-  const renderTitle = loaderData?.renderTitle ?? true;
-  const PageComponent = renderTitle ? ContentLayout : PageContent;
-  const params = useParams();
-  const { caseData, caseErrors, fatalError, attachments, loading, buildCase, addCase } = useCaseData(params, user, payroll);
-  const formRef = useRef();
+	const navigate = useNavigate();
+	const { user, payroll } = useRouteLoaderData("root");
+	const loaderData = useLoaderData();
+	const redirectPath = loaderData?.redirect || "..";
+	const renderTitle = loaderData?.renderTitle ?? true;
+	const PageComponent = renderTitle ? ContentLayout : PageContent;
+	const params = useParams();
+	const {
+		caseData,
+		caseErrors,
+		fatalError,
+		attachments,
+		loading,
+		buildCase,
+		addCase,
+	} = useCaseData(params, user, payroll);
+	const formRef = useRef();
 
-  const handleSubmit = () => {
-    if (formRef?.current?.reportValidity()) {
-      addCase(() => {
-        toast("success", "Saved!");
-        navigate(redirectPath, { relative: "path" });
-      });
-    }
-  }
+	const handleSubmit = () => {
+		if (formRef?.current?.reportValidity()) {
+			addCase(() => {
+				toast("success", "Saved!");
+				navigate(redirectPath, { relative: "path" });
+			});
+		}
+	};
 
-  let content = null;
-  if (fatalError) {
-    content = <ErrorView error={fatalError} />
-  } else if (loading) {
-    content = <Loading />;
-  } else {
-    content = <CaseFormContext.Provider value={{ buildCase, attachments }}>
-      <Form method="post" ref={formRef} id="case_form" autoComplete="off">
-      <Stack alignItems="stretch" spacing={4}>
-        {caseData && <CaseComponent _case={caseData} />}
-        <CaseErrorComponent errors={caseErrors} />
-        <CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath}/>
-      </Stack>
-      </Form>
-    </CaseFormContext.Provider>
-  }
+	let content = null;
+	if (fatalError) {
+		content = <ErrorView error={fatalError} />;
+	} else if (loading) {
+		content = <Loading />;
+	} else {
+		content = (
+			<CaseFormContext.Provider value={{ buildCase, attachments }}>
+				<Form method="post" ref={formRef} id="case_form" autoComplete="off">
+					<Stack alignItems="stretch" spacing={4}>
+						{caseData && <CaseComponent _case={caseData} />}
+						<CaseErrorComponent errors={caseErrors} />
+						<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} />
+					</Stack>
+				</Form>
+			</CaseFormContext.Provider>
+		);
+	}
 
-  return (
-    <Stack direction="row" minHeight="100%" spacing={4}>
-      <PageComponent title="New event" sx={{flex: 1}} disableInset={!renderTitle} >
-        {content}
-      </PageComponent>
-    </Stack>
-  )
- 
+	return (
+		<Stack direction="row" minHeight="100%" spacing={4}>
+			<PageComponent
+				title="New event"
+				sx={{ flex: 1 }}
+				disableInset={!renderTitle}
+			>
+				{content}
+			</PageComponent>
+		</Stack>
+	);
 }

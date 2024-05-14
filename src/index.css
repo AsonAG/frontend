@@ -3,77 +3,77 @@ body,
 #root,
 .app,
 main {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  scroll-padding-top: calc(var(--header-height) + 1em);
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	scroll-padding-top: calc(var(--header-height) + 1em);
 }
 
 .app {
-  display: flex;
-  position: relative;
+	display: flex;
+	position: relative;
 }
 
 main {
-  margin-top: var(--header-height);
+	margin-top: var(--header-height);
 }
 
-::-webkit-scrollbar{
-  width: 10px;
+::-webkit-scrollbar {
+	width: 10px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #e0e0e0;
+	background: #e0e0e0;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+	background: #888;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+	background: #555;
 }
 
 input[type="file"] {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 ::file-selector-button {
-  display: none;
+	display: none;
 }
 
 .file-upload-adorned-start {
-  padding: 0 !important;
-  margin: 0 !important;
+	padding: 0 !important;
+	margin: 0 !important;
 }
 
 :root {
-  --content-inset: 0px;
+	--content-inset: 0px;
 }
 
 @media (max-width: 600px) {
-  :root {
-    --content-inset: 16px;
-  }
+	:root {
+		--content-inset: 16px;
+	}
 }
 
 :root {
-  --header-height: 56px;
+	--header-height: 56px;
 }
 
-@media (min-width:0px) {
-  @media (orientation: landscape) {
-    :root {
-      --header-height: 48px;
-    }
-  }
+@media (min-width: 0px) {
+	@media (orientation: landscape) {
+		:root {
+			--header-height: 48px;
+		}
+	}
 }
 
 @media (min-width: 600px) {
-  :root {
-    --header-height: 64px;
-  }
+	:root {
+		--header-height: 64px;
+	}
 }
