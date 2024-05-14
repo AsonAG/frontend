@@ -7,6 +7,7 @@ import { forwardRef } from "react";
 import { Edit } from "@mui/icons-material";
 import { StatusChip } from "./StatusChip";
 import { useMissingDataCount } from "../../utils/dataAtoms";
+import { getEmployeeDisplayString } from "../../models/Employee";
 
 const Link = styled(forwardRef(function Link(itemProps, ref) {
   return <RouterLink ref={ref} {...itemProps} role={undefined} />;
@@ -60,8 +61,7 @@ function EmployeeView() {
     const { t } = useTranslation();
     const missingDataCount = useMissingDataCount(employee.id);
     const isActive = employee.status === "Active";
-    
-    const header = employee.firstName + " " + employee.lastName;
+    const header = getEmployeeDisplayString(employee);
     
     if (!outlet) {
       const to = isActive ? "new" : "events";
