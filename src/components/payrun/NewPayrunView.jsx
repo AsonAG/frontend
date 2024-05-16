@@ -114,7 +114,7 @@ function NewPayrunView() {
 }
 
 function createInitialState({ payrun, parameters, employees }) {
-	const period = dayjs().utc().startOf("month").add(1, "month");
+	const period = dayjs().utc().startOf("month");
 	return {
 		period,
 		jobName: getJobName(period),
