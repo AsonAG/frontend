@@ -1,4 +1,4 @@
-import { React, useRef, useState } from "react";
+import { React, useState } from "react";
 import { useAsyncValue, useLocation, Link, useSubmit } from "react-router-dom";
 import { Stack, Typography, Button, TextField } from "@mui/material";
 import { HtmlContent } from "./HtmlContent";
@@ -45,7 +45,6 @@ function TaskView() {
 	const taskComment = task.comment || "";
 	const [comment, setComment] = useState(taskComment);
 	const backLink = useBacklink();
-	const backLinkRef = useRef(backLink);
 	let completeText = t("Complete");
 	let commentText = t("Save comment");
 	let buttonText = taskCompleted ? commentText : completeText;
@@ -104,7 +103,7 @@ function TaskView() {
 						<Typography variant="h6" gutterBottom>
 							{t("Employee")}
 						</Typography>
-						<Link to={`../hr/employees/${task.employee.id}/data`}>
+						<Link to={`../hr/employees/${task.employee.id}/events`}>
 							<Typography>
 								{task.employee.firstName} {task.employee.lastName}
 							</Typography>
@@ -145,7 +144,7 @@ function TaskView() {
 					)}
 				</Stack>
 				<Stack direction="row" spacing={1} justifyContent="end">
-					<Button component={Link} to={backLinkRef.current} relative="path">
+					<Button component={Link} to={backLink} relative="path">
 						<Typography>{t("Back")}</Typography>
 					</Button>
 					<Button

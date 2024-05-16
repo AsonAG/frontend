@@ -396,9 +396,17 @@ const routeData = [
 							throw new Error("no action specified");
 					}
 					const response = await updateTask(params, task);
-					if (response.ok && data.action === "complete") {
-						toast("success", "Task completed!");
-						return redirect("../hr/tasks");
+					if (response.ok) {
+						if (data.action === "complete") {
+							toast("success", "Task completed!");
+							return redirect("../hr/tasks");
+						}
+						if (data.action === "accept") {
+							toast("success", "Task accepted");
+						}
+						if (data.action === "saveComment") {
+							toast("success", "Comment saved");
+						}
 					}
 					return response;
 				},

@@ -60,6 +60,8 @@ const translations = {
 		Category: "Kategorie",
 		Back: "Zurück",
 		"Task completed!": "Aufgabe abgeschlossen!",
+		"Task accepted": "Aufgabe akzeptiert",
+		"Comment saved": "Kommentar gespeichert",
 		"New task": "Neue Aufgabe",
 		selected: "ausgewählt",
 		no_employees_selected: "Keine Mitarbeiter $t(selected)",
