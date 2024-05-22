@@ -8,14 +8,21 @@ import {
 	Collapse,
 	CircularProgress,
 } from "@mui/material";
-import { React, useState } from "react";
-import { useAsyncValue, Outlet } from "react-router-dom";
-import { useDocuments } from "../../hooks/useDocuments";
+import { React, useEffect, useState } from "react";
+import { useAsyncValue, Outlet, useSubmit, Form, useFetcher } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import dayjs from "dayjs";
 import { DocumentLink } from "../DocumentLink";
+import {
+	ResponsiveDialog,
+	ResponsiveDialogClose,
+	ResponsiveDialogContent,
+	ResponsiveDialogTrigger,
+} from "../ResponsiveDialog";
+import { useRole } from "../../hooks/useRole";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 export function AsyncDocumentTable() {
 	return (
@@ -44,15 +51,62 @@ function DocumentTable() {
 	);
 }
 
+const itemSx = {
+	pl: 0.5,
+	borderRadius: 2,
+	"& > button": {
+		visibility: "hidden"
+	},
+	":hover": {
+		backgroundColor: (theme) => theme.palette.primary.hover,
+		"& > button": {
+			visibility: "visible"
+		}
+	}
+};
+
 function CaseValueRow({ caseValue }) {
+	const { t } = useTranslation();
+	const submit = useSubmit();
+	const onDelete = (documentId) => {
+		submit(null, {
+			method: "delete",
+			action: `${caseValue.id}/i/${documentId}`
+		});
+	};
+	const isProviderRole = useRole("provider");
+	const isMobile = useIsMobile();
 	return (
-		<Stack pl={0.5}>
+		<Stack>
 			{caseValue.documents.map((document) => (
-				<DocumentLink
-					key={document.id}
-					name={document.name}
-					to={`${caseValue.id}/i/${document.id}`}
-				/>
+				<Stack direction="row" alignItems="center" sx={itemSx} key={document.id}>
+					<DocumentLink
+						name={document.name}
+						to={`${caseValue.id}/i/${document.id}`}
+						sx={{ flex: 1 }}
+					/>
+					{isProviderRole && !isMobile &&
+						<ResponsiveDialog>
+							<ResponsiveDialogTrigger>
+								<IconButton size="small">
+									<Delete fontSize="small" />
+								</IconButton>
+							</ResponsiveDialogTrigger>
+							<ResponsiveDialogContent>
+								<Typography variant="h6">{t("Delete document")}</Typography>
+								<Typography>{t("delete_document_text", { documentName: document.name })}</Typography>
+								<Stack direction="row" justifyContent="end" spacing={1}>
+									<ResponsiveDialogClose>
+										<Button>{t("Cancel")}</Button>
+									</ResponsiveDialogClose>
+									<ResponsiveDialogClose>
+										<Button variant="contained" color="destructive" onClick={() => onDelete(document.id)}>{t("Delete")}</Button>
+									</ResponsiveDialogClose>
+								</Stack>
+							</ResponsiveDialogContent>
+						</ResponsiveDialog>
+					}
+				</Stack>
 			))}
 		</Stack>
 	);
@@ -81,10 +135,25 @@ function LoadDocumentsButton({ loading, hasMore, onClick, allLoadedText, sx }) {
 	);
 }
 
+const documentLoadSteps = 15;
 function DocumentCard({ caseFieldName, displayName }) {
+	const fetcher = useFetcher();
 	const [open, setOpen] = useState(true);
-	const { documents, loading, hasMore, loadMore } = useDocuments(caseFieldName);
 	const { t } = useTranslation();
+	const [top, setTop] = useState(documentLoadSteps);
+
+	const documents = fetcher.data;
+
+	useEffect(() => {
+		if (fetcher.state === "idle" && (!fetcher.data || (documents.items.length < top) && (documents.items.length < documents.count))) {
+			fetcher.load(`${encodeURIComponent(caseFieldName)}?top=${top}`);
+		}
+	}, [fetcher, top]);
+
+	if (!documents) {
+		return;
+	}
+
 	const onClick = () => setOpen((o) => !o);
 	const groupedDocuments = Object.groupBy(documents.items, ({ start }) => {
 		const date = dayjs.utc(start);
@@ -95,6 +164,10 @@ function DocumentCard({ caseFieldName, displayName }) {
 		documents.items.length === 0
 			? "No documents available"
 			: "Showing all documents";
+	const hasMore = documents.items.length !== documents.count;
+	function loadMore() {
+		setTop((top) => top + documentLoadSteps);
+	}
 
 	return (
 		<Paper>
@@ -122,7 +195,7 @@ function DocumentCard({ caseFieldName, displayName }) {
 						</Stack>
 					)}
 					<LoadDocumentsButton
-						loading={loading}
+						loading={fetcher.state === "loading"}
 						hasMore={hasMore}
 						onClick={loadMore}
 						allLoadedText={allLoadedText}
@@ -136,7 +209,7 @@ function DocumentCard({ caseFieldName, displayName }) {
 
 function DocumentMonthGroup({ month, items }) {
 	return (
-		<Stack>
+		<Stack alignSelf="stretch">
 			<Typography variant="subtitle">{month}</Typography>
 			{items.map((caseValue) => (
 				<CaseValueRow key={caseValue.id} caseValue={caseValue} />

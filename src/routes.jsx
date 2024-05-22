@@ -51,6 +51,8 @@ import {
 	updateEmployee,
 	getDivision,
 	addTask,
+	getDocumentsOfCaseField,
+	deleteDocument,
 } from "./api/FetchClient";
 import EmployeeView, { EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -122,6 +124,45 @@ function paginatedLoader({
 		return defer(result);
 	};
 }
+
+const documentRoutes = [
+	{
+		path: "documents",
+		Component: withPage("Documents", AsyncDocumentTable),
+		loader: ({ params }) => {
+			return defer({
+				data: getDocumentCaseFields(params),
+			});
+		},
+		children: [
+			{
+				path: ":caseFieldName",
+				loader: ({ params, request }) => {
+					const searchParams = new URL(request.url).searchParams;
+					return getDocumentsOfCaseField(params, params.caseFieldName, searchParams.get("top"));
+				}
+			},
+			{
+				path: ":caseValueId/i/:documentId",
+				Component: CaseValueDocumentDialog,
+				action: async ({ params }) => {
+					const response = await deleteDocument(params);
+					if (response.ok) {
+						toast("success", "Document deleted")
+					} else {
+						toast("error", "Could not delete document");
+					}
+					return redirect("..");
+				},
+				loader: ({ params }) => {
+					return defer({
+						document: getDocument(params),
+					});
+				},
+			},
+		]
+	}
+]
 
 const routeData = [
 	{
@@ -264,26 +305,7 @@ const routeData = [
 								getEmployeeCaseChanges(params, null, "created desc, id"),
 						}),
 					},
-					{
-						path: "documents",
-						Component: AsyncDocumentTable,
-						loader: ({ params }) => {
-							return defer({
-								data: getDocumentCaseFields(params),
-							});
-						},
-						children: [
-							{
-								path: ":caseValueId/i/:documentId",
-								Component: CaseValueDocumentDialog,
-								loader: ({ params }) => {
-									return defer({
-										document: getDocument(params),
-									});
-								},
-							},
-						],
-					},
+					...documentRoutes,
 					{
 						path: "missingdata/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
@@ -498,7 +520,7 @@ const routeData = [
 								try {
 									const errorJson = await response.json();
 									return errorJson.errors.Reason[0];
-								} catch (e) {}
+								} catch (e) { }
 							}
 							return null;
 						},
@@ -682,26 +704,7 @@ const routeData = [
 								getCompanyCaseChanges(params, null, "created desc, id"),
 						}),
 					},
-					{
-						path: "documents",
-						Component: withPage("Documents", AsyncDocumentTable),
-						loader: ({ params }) => {
-							return defer({
-								data: getDocumentCaseFields(params),
-							});
-						},
-						children: [
-							{
-								path: ":caseValueId/i/:documentId",
-								Component: CaseValueDocumentDialog,
-								loader: ({ params }) => {
-									return defer({
-										document: getDocument(params),
-									});
-								},
-							},
-						],
-					},
+					...documentRoutes
 				],
 			},
 			{
@@ -733,26 +736,7 @@ const routeData = [
 						path: "tasks/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
 					},
-					{
-						path: "documents",
-						Component: withPage("Documents", AsyncDocumentTable),
-						loader: ({ params }) => {
-							return defer({
-								data: getDocumentCaseFields(params),
-							});
-						},
-						children: [
-							{
-								path: ":caseValueId/i/:documentId",
-								Component: CaseValueDocumentDialog,
-								loader: ({ params }) => {
-									return defer({
-										document: getDocument(params),
-									});
-								},
-							},
-						],
-					},
+					...documentRoutes
 				],
 			},
 		],

@@ -450,7 +450,7 @@ export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
 		.withQueryParam("orderBy", "start desc")
 		.withQueryParam("result", "ItemsWithCount")
 		.withQueryParam("top", top)
-		.withQueryParam("filter", `CaseFieldName eq '${caseFieldName}'`)
+		.withQueryParam("filter", `CaseFieldName eq '${caseFieldName}' and DocumentCount gt 0`)
 		.withLocalization()
 		.withUser()
 		.fetchJson();
@@ -460,6 +460,14 @@ export function getDocument(routeParams) {
 	const url = routeParams.employeeId ? employeeDocumentUrl : companyDocumentUrl;
 
 	return new FetchRequestBuilder(url, routeParams).fetchJson();
+}
+
+export function deleteDocument(routeParams) {
+	const url = routeParams.employeeId ? employeeDocumentUrl : companyDocumentUrl;
+
+	return new FetchRequestBuilder(url, routeParams)
+		.withMethod("DELETE")
+		.fetch();
 }
 
 export function getCompliance(routeParams) {

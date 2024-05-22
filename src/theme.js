@@ -15,6 +15,10 @@ const lightModeDesignTokens = {
 			secondary: "rgba(0, 0, 0, 0.4)",
 		},
 		inputBorder: "rgba(0, 0, 0, 0.23)",
+		destructive: {
+			main: "#d32f2f",
+			contrastText: "#fff"
+		}
 	},
 };
 
@@ -30,6 +34,10 @@ const darkModeDesignTokens = {
 			secondary: "rgba(255, 255, 255, 0.4)",
 		},
 		inputBorder: "rgba(255, 255, 255, 0.23)",
+		destructive: {
+			main: "#d32f2f",
+			contrastText: "#fff"
+		}
 	},
 };
 

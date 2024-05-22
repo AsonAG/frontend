@@ -31,9 +31,9 @@ const translations = {
 		"Preview not available.": "Vorschau nicht verfügbar.",
 		"valid from": "Gültig ab",
 		until: "bis",
-		"No data available.": "Keine Daten verfügbar.",
 		Yes: "Ja",
 		No: "Nein",
+		"No documents available": "Keine Dokumente verfügbar",
 		"No data available": "Keine Daten verfügbar",
 		"Showing all documents": "Es werden alle Dokumente angezeigt",
 		"Load more": "Mehr laden",
@@ -101,6 +101,8 @@ const translations = {
 		"New employee created": "Neueintritt erfasst",
 		"Saving failed!": "Speichern fehlgeschlagen!",
 		Identifier: "Identifikator",
+		"Delete document": "Dokument löschen",
+		delete_document_text: "Möchten Sie das Dokument '{{documentName}}' wirklich löschen?",
 
 		// compliance
 		Submit: "Übermitteln",

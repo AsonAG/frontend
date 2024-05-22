@@ -4,7 +4,7 @@ import { useRouteError } from "react-router-dom";
 
 export function ErrorView() {
 	const error = useRouteError();
-	console.log(error);
+	console.log("RouteError", error);
 	return (
 		<Centered>
 			<Typography>Ooops something went wrong</Typography>

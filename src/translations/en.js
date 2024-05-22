@@ -6,6 +6,7 @@ const translations = {
 		employee_name_selected:
 			"{{employee.firstName}} {{employee.lastName}} ({{employee.identifier}}) $t(selected)",
 		n_employees_selected: "{{count}} employees $t(selected)",
+		delete_document_text: "Do you really want to delete the document '{{documentName}}'?",
 		"PayrunJobStatus.Draft": "Draft",
 		"PayrunJobStatus.Release": "Released",
 		"PayrunJobStatus.Process": "Processing",

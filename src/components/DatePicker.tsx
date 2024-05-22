@@ -129,7 +129,6 @@ export function DatePicker<T extends DatePickerVariants>({
 			return;
 		}
 		const validationError = !value ? t("Please enter a date") : "";
-		console.log(validationError);
 		inputRef.current?.setCustomValidity(validationError);
 	}, [value, inputRef.current, required]);
 
