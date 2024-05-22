@@ -1,5 +1,5 @@
 import { React, useState } from "react";
-import { useAsyncValue, useLocation, Link, useSubmit } from "react-router-dom";
+import { useAsyncValue, useLocation, Link, useSubmit, useRouteLoaderData } from "react-router-dom";
 import { Stack, Typography, Button, TextField } from "@mui/material";
 import { HtmlContent } from "./HtmlContent";
 import { ContentLayout } from "./ContentLayout";
@@ -41,30 +41,34 @@ function TaskView() {
 	const { t } = useTranslation();
 	const submit = useSubmit();
 	const title = getTaskTitle(task);
+	const { user } = useRouteLoaderData("root");
 	const taskCompleted = task.completed !== null;
 	const taskComment = task.comment || "";
 	const [comment, setComment] = useState(taskComment);
 	const backLink = useBacklink();
-	let completeText = t("Complete");
-	let commentText = t("Save comment");
-	let buttonText = taskCompleted ? commentText : completeText;
-	if (!taskCompleted && comment !== taskComment) {
-		buttonText = t("Save comment & complete");
-	}
+	let saveCommentText = t("Save comment");
 	const submitPost = (payload) =>
 		submit(payload, {
 			method: "post",
-			encType: "application/json",
-			state: { taskCompleted: true },
+			encType: "application/json"
 		});
-	const acceptTask = () => submitPost({ task, action: "accept" });
-	const saveTask = (markCompleted) => {
-		if (markCompleted) {
-			submitPost({ task, comment, action: "complete" });
-		} else {
-			submitPost({ task, comment, action: "saveComment" });
-		}
-	};
+
+
+	const saveComment = () => submitPost({ task, comment, action: "saveComment" });
+	let primaryAction;
+	let buttonText;
+	if (taskCompleted) {
+		primaryAction = saveComment;
+		buttonText = saveCommentText;
+	}
+	else if (task.assignedUserId !== user.id) {
+		primaryAction = () => submitPost({ task, action: "accept" });
+		buttonText = t("Accept task");
+	}
+	else {
+		primaryAction = () => submitPost({ task, comment, action: "complete" });
+		buttonText = comment !== taskComment ? t("Save comment & complete") : t("Complete");
+	}
 
 	return (
 		<ContentLayout title={title}>
@@ -85,18 +89,7 @@ function TaskView() {
 					<Typography variant="h6" gutterBottom>
 						{t("Assigned to")}
 					</Typography>
-					{task.assignedUser ? (
-						<Typography>{`${task.assignedUser.firstName} ${task.assignedUser.lastName}`}</Typography>
-					) : (
-						<Stack direction="row" spacing={2} alignItems="center">
-							<Typography>{t("not assigned")}</Typography>
-							{!taskCompleted && (
-								<Button variant="outlined" onClick={acceptTask}>
-									{t("Accept task")}
-								</Button>
-							)}
-						</Stack>
-					)}
+					<Typography>{task.assignedUser ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}` : t("not assigned")}</Typography>
 				</Stack>
 				{task.employee && (
 					<Stack>
@@ -137,9 +130,9 @@ function TaskView() {
 							variant="outlined"
 							disabled={taskComment === comment}
 							sx={{ alignSelf: "end", my: 1 }}
-							onClick={() => saveTask(false)}
+							onClick={saveComment}
 						>
-							<Typography>{t("Save comment")}</Typography>
+							<Typography>{saveCommentText}</Typography>
 						</Button>
 					)}
 				</Stack>
@@ -150,7 +143,7 @@ function TaskView() {
 					<Button
 						variant="contained"
 						disabled={taskCompleted && taskComment === comment}
-						onClick={() => saveTask(!taskCompleted)}
+						onClick={primaryAction}
 					>
 						<Typography>{t(buttonText)}</Typography>
 					</Button>
