@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { formatDate } from "../utils/DateUtils";
 import { CategoryLabel } from "./tasks/CategoryLabel";
+import { getEmployeeDisplayString } from "../models/Employee";
 
 const getTaskTitle = (task) => `${task.displayName} (#${task.id})`;
 
@@ -98,7 +99,7 @@ function TaskView() {
 						</Typography>
 						<Link to={`../hr/employees/${task.employee.id}/events`}>
 							<Typography>
-								{task.employee.firstName} {task.employee.lastName}
+								{getEmployeeDisplayString(task.employee)}
 							</Typography>
 						</Link>
 					</Stack>

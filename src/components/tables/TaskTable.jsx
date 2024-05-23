@@ -24,6 +24,7 @@ import { CategoryLabel } from "../tasks/CategoryLabel";
 import { TaskTableFilter } from "../tasks/TaskTableFilter";
 import { TableButton } from "../buttons/TableButton";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import { getEmployeeDisplayString } from "../../models/Employee";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {
@@ -129,7 +130,7 @@ function TaskRow({ task, variant, taskFilter }) {
 						spacing={rowInfoSpacing}
 					>
 						<Typography>
-							{task.employee.firstName} {task.employee.lastName}
+							{getEmployeeDisplayString(task.employee)}
 						</Typography>
 					</RowInfo>
 				)}

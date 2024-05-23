@@ -114,9 +114,8 @@ export default EmployeeView;
 
 export function EmployeeTitle() {
 	const employee = useLoaderData();
-	const header = employee.firstName + " " + employee.lastName;
 	return (
-		<ContentLayout title={header}>
+		<ContentLayout title={getEmployeeDisplayString(employee)}>
 			<Outlet />
 		</ContentLayout>
 	);

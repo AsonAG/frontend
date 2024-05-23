@@ -6,12 +6,11 @@ import { CategoryLabel } from "./tasks/CategoryLabel";
 import {
 	Link as RouterLink,
 	LinkProps as RouterLinkProps,
-	useAsyncValue,
-	useFetcher,
+	useAsyncValue
 } from "react-router-dom";
-import { Paper, Skeleton, Stack, Typography } from "@mui/material";
+import { Paper, Stack, Typography } from "@mui/material";
 import styled from "@emotion/styled";
-import { PaginatedContent } from "./PaginatedContent";
+import { Employee, getEmployeeDisplayString } from "../models/Employee";
 
 const Link = styled(
 	forwardRef<any, RouterLinkProps>((itemProps, ref) => {
@@ -46,15 +45,14 @@ type Case = {
 	clusters: string[];
 };
 
-type Employee = {
-	id: number;
-	firstName: string;
-	lastName: string;
-	cases: Case[];
-};
+type MissingCases = {
+	cases: Array<Case>
+}
+
+type MissingCasesPerEmployee = Employee & MissingCases;
 
 function EmployeeTable() {
-	const employees = useAsyncValue() as Employee[];
+	const employees = useAsyncValue() as Array<MissingCasesPerEmployee>;
 	return (
 		<Stack spacing={2}>
 			{employees.map((e) => (
@@ -73,7 +71,7 @@ function EmployeeSection({ employee }) {
 	return (
 		<Stack spacing={1}>
 			<Typography variant="h6">
-				{employee.firstName} {employee.lastName}
+				{getEmployeeDisplayString(employee)}
 			</Typography>
 			<Paper variant="outlined">
 				<Stack>
