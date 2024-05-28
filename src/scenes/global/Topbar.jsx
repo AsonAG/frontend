@@ -28,6 +28,7 @@ import { useAtomValue } from "jotai";
 import { tenantAtom, userAtom } from "../../utils/dataAtoms";
 import dayjs from "dayjs";
 import { requestExportDataDownload } from "../../api/FetchClient";
+import { useRole } from "../../hooks/useRole";
 
 function Topbar({ children }) {
 	const { isDarkMode, setDarkMode } = useDarkMode();
@@ -66,16 +67,16 @@ function Topbar({ children }) {
 }
 
 function ExportButton() {
-	const user = useAtomValue(userAtom);
 	const { t } = useTranslation();
-	if (user?.identifier !== "edu@ason.ch") {
+	const isProvider = useRole("provider");
+	if (!isProvider) {
 		return;
 	}
 
 	return (
 		<ResponsiveDialog>
 			<ResponsiveDialogTrigger>
-				<IconButton onClick={() => {}} size="large">
+				<IconButton onClick={() => { }} size="large">
 					<ImportExport />
 				</IconButton>
 			</ResponsiveDialogTrigger>
