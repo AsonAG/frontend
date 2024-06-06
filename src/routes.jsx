@@ -193,9 +193,9 @@ const routeData = [
 		loader: async ({ params }) => {
 			const { tenant, payrolls, user } = await getTenantData();
 			if (!params.payrollId) {
-				return redirect(payrolls[0].id + "");
+				return redirect(payrolls[0].id);
 			}
-			const payroll = payrolls.find((p) => p.id === Number(params.payrollId));
+			const payroll = payrolls.find((p) => p.id === params.payrollId);
 			const employee = await store.get(employeeAtom);
 			return { tenant, user, payrolls, payroll, employee };
 		},
