@@ -11,6 +11,7 @@ import {
 	RadioGroup,
 	Radio,
 	Button,
+	TextField,
 } from "@mui/material";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -25,10 +26,10 @@ import {
 import { useTranslation } from "react-i18next";
 import { DatePicker } from "../../components/DatePicker";
 import { useAtomValue } from "jotai";
-import { tenantAtom, userAtom } from "../../utils/dataAtoms";
-import dayjs from "dayjs";
+import { tenantAtom } from "../../utils/dataAtoms";
 import { requestExportDataDownload } from "../../api/FetchClient";
 import { useRole } from "../../hooks/useRole";
+import { Form } from "react-router-dom";
 
 function Topbar({ children }) {
 	const { isDarkMode, setDarkMode } = useDarkMode();
@@ -69,9 +70,12 @@ function Topbar({ children }) {
 function ExportButton() {
 	const { t } = useTranslation();
 	const isProvider = useRole("provider");
+	const tenant = useAtomValue(tenantAtom);
 	if (!isProvider) {
 		return;
 	}
+	
+	const dialog = tenant ? <ExportDialog tenant={tenant} /> : <ImportDialog />;
 
 	return (
 		<ResponsiveDialog>
@@ -83,7 +87,7 @@ function ExportButton() {
 			<ResponsiveDialogContent>
 				<Stack direction="row" spacing={1}>
 					<Typography variant="h6" flex={1}>
-						{t("Export data")}
+						{t("Tenant exportieren")}
 					</Typography>
 					<ResponsiveDialogClose>
 						<IconButton>
@@ -91,63 +95,38 @@ function ExportButton() {
 						</IconButton>
 					</ResponsiveDialogClose>
 				</Stack>
-				<ExportDialog />
+				{dialog}
 			</ResponsiveDialogContent>
 		</ResponsiveDialog>
 	);
 }
 
-function ExportDialog() {
-	const tenant = useAtomValue(tenantAtom);
-	const [selectedOption, setSelectedOption] = useState("tenantCreationDate");
-	const [exportDate, setExportDate] = useState(dayjs(tenant.created));
-	const downloadExport = async () => {
-		let name = `${tenant.identifier}_export`;
-		let cutoffDate = null;
-		if (selectedOption !== "all") {
-			cutoffDate = exportDate.toISOString();
-			name = `${name}_${cutoffDate}`;
-		}
-		name = name + ".json";
+function ImportDialog() {
+	const { t } = useTranslation();
+	return (
+		<Stack spacing={1}>
+			<Form method="POST" action="tenants/import" encType="multipart/form-data">
+				<TextField type="file" name="import_file" id="import_file" />
+				<Button type="submit" variant="contained" color="primary">
+					{t("Import")}
+				</Button>
+			</Form>
+		</Stack>
+	);
+}
 
-		await requestExportDataDownload({ tenantId: tenant.id }, cutoffDate, name);
+function ExportDialog({ tenant }) {
+	const { t } = useTranslation();
+	const downloadExport = async () => {
+		const name = `${tenant.identifier}_export.zip`;
+		await requestExportDataDownload({ tenantId: tenant.id }, name);
 	};
 	return (
 		<Stack spacing={1}>
 			<Typography>
-				Der Export beinhaltet alle Mitarbeiter und Company/Employee Case
-				Changes.
-				<br />
-				Für die Case Changes kann der Zeitpunkt noch gewählt werden:
 			</Typography>
-			<FormControl>
-				<RadioGroup
-					value={selectedOption}
-					onChange={(event) => setSelectedOption(event.target.value)}
-				>
-					<FormControlLabel value="all" control={<Radio />} label="Alle" />
-					<FormControlLabel
-						value="tenantCreationDate"
-						control={<Radio />}
-						label="Alle Case Changes nach dem Erstellungsdatum des Tenants"
-					/>
-					<FormControlLabel
-						value="customDate"
-						control={<Radio />}
-						label="Alle Case Changes ab Zeitpunkt"
-					/>
-				</RadioGroup>
-			</FormControl>
-			{selectedOption === "customDate" && (
-				<DatePicker
-					value={exportDate}
-					onChange={setExportDate}
-					variant="datetime"
-					slotProps={{ popper: { sx: { pointerEvents: "all" } } }}
-				/>
-			)}
 			<Button variant="contained" color="primary" onClick={downloadExport}>
-				Export
+				{t("Export")}
 			</Button>
 		</Stack>
 	);

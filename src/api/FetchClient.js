@@ -6,6 +6,7 @@ import { useOidc } from "../auth/authConfig";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const tenantsUrl = "/tenants";
+const tenantImportUrl = "/tenants/import";
 const tenantUrl = "/tenants/:tenantId";
 const payrollsUrl = "/tenants/:tenantId/payrolls";
 const payrollUrl = "/tenants/:tenantId/payrolls/:payrollId";
@@ -110,6 +111,14 @@ class FetchRequestBuilder {
 		return this;
 	}
 
+	withFileBody(body) {
+		if (body) {
+			this.body = body;
+			this.headers.delete("Content-Type");
+		}
+		return this;
+	}
+
 	withQueryParam(key, value) {
 		if (value) {
 			this.searchParams.set(key, value);
@@ -192,6 +201,10 @@ class FetchRequestBuilder {
 
 export function getTenants() {
 	return new FetchRequestBuilder(tenantsUrl).fetch();
+}
+
+export function importTenant(body) {
+	return new FetchRequestBuilder(tenantImportUrl).withMethod("POST").withTimout(600000).withFileBody(body).fetch();
 }
 
 export function getTenant(routeParams) {
@@ -569,12 +582,12 @@ export function getComplianceMessages(routeParams) {
 		.fetchJson();
 }
 
-export async function requestExportDataDownload(routeParams, cutoffDate, name) {
+export async function requestExportDataDownload(routeParams, name) {
 	const builder = new FetchRequestBuilder(
 		exportUrl,
 		routeParams,
-	).withQueryParam("createdDateCutoff", cutoffDate);
-	const response = await builder.fetch();
+	);
+	const response = await builder.withTimout(600000).fetch();
 	const blob = await response.blob();
 	let objectUrl = window.URL.createObjectURL(blob);
 	let anchor = document.createElement("a");

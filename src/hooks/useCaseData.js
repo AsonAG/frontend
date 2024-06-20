@@ -43,7 +43,7 @@ export function useCaseData(params, user, payroll) {
 			case: mapCase(caseData, attachments),
 		};
 		if (params.employeeId) {
-			caseChangeSetup.employeeId = Number(params.employeeId);
+			caseChangeSetup.employeeId = params.employeeId;
 		}
 		return caseChangeSetup;
 	}

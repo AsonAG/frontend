@@ -53,6 +53,7 @@ import {
 	addTask,
 	getDocumentsOfCaseField,
 	deleteDocument,
+	importTenant,
 } from "./api/FetchClient";
 import EmployeeView, { EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -184,6 +185,14 @@ const routeData = [
 					await getTenantData(); // reset cache
 					return getTenants();
 				},
+				children: [
+					{
+						path: "import",
+						action: async ({ request }) => {
+							return importTenant(await request.formData());
+						}
+					}
+				]
 			},
 		],
 	},
