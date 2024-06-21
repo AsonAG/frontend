@@ -71,7 +71,7 @@ function ExportButton() {
 	const { t } = useTranslation();
 	const isProvider = useRole("provider");
 	const tenant = useAtomValue(tenantAtom);
-	if (!isProvider) {
+	if (!isProvider && import.meta.env.PROD) {
 		return;
 	}
 	
