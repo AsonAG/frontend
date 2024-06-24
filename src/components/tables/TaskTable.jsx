@@ -120,7 +120,7 @@ function TaskRow({ task, variant, taskFilter }) {
 						sx={{ height: 20, alignSelf: "start" }}
 					/>
 					<Typography fontWeight="bold" fontSize="1rem">
-						{task.displayName}&nbsp;(#{task.id})
+						{task.displayName}
 					</Typography>
 				</Stack>
 				{task.employee && (

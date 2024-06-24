@@ -10,12 +10,10 @@ import { formatDate } from "../utils/DateUtils";
 import { CategoryLabel } from "./tasks/CategoryLabel";
 import { getEmployeeDisplayString } from "../models/Employee";
 
-const getTaskTitle = (task) => `${task.displayName} (#${task.id})`;
-
 export function AsyncTaskView() {
 	const { t } = useTranslation();
 	const { state } = useLocation();
-	const taskName = state?.task ? getTaskTitle(state.task) : t("Loading...");
+	const taskName = state?.task ? state.task.displayName : t("Loading...");
 	const loadingElement = (
 		<ContentLayout title={taskName}>
 			<Loading />
@@ -41,7 +39,6 @@ function TaskView() {
 	const task = useAsyncValue();
 	const { t } = useTranslation();
 	const submit = useSubmit();
-	const title = getTaskTitle(task);
 	const { user } = useRouteLoaderData("root");
 	const taskCompleted = task.completed !== null;
 	const taskComment = task.comment || "";
@@ -72,7 +69,7 @@ function TaskView() {
 	}
 
 	return (
-		<ContentLayout title={title}>
+		<ContentLayout title={task.displayName}>
 			<Stack spacing={2}>
 				<CategoryLabel
 					label={task.displayCategory}
