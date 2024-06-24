@@ -29,7 +29,7 @@
     "start": "vite",
     "build": "vite build",
     "staging": "vite build --mode staging",
-    "serve": "vite serve preview --port 3003"
+    "preview": "vite preview --port 3003"
   },
   "browserslist": {
     "production": [

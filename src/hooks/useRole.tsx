@@ -1,11 +1,19 @@
 import { useAtomValue } from "jotai";
 import { userAtom } from "../utils/dataAtoms";
+import { authUserRolesAtom } from "../auth/getUser";
 
 type Role = "provider" | "admin" | "onboarding" | "hr" | "user";
 
 export function useRole(role: Role): Boolean {
 	const user = useAtomValue(userAtom);
-	if (!user || !user.attributes.roles) return false;
+	const authUserRoles = useAtomValue(authUserRolesAtom);
+	if (authUserRoles.includes(role)) {
+		return true;
+	}
 
-	return user.attributes.roles.includes(role);
+	if (user?.attributes?.roles?.includes(role)) {
+		return true;
+	}
+
+	return false;
 }

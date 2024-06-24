@@ -9,7 +9,7 @@ import {
 	getMissingData,
 } from "../api/FetchClient";
 import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
-import { getAuthUser } from "../auth/getUser";
+import { authUserAtom } from "../auth/getUser";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 
 export const tenantAtom = atom((get) => {
@@ -36,7 +36,7 @@ export const payrollAtom = atom(async (get) => {
 export const userAtom = atom((get) => {
 	const tenantId = get(tenantIdAtom);
 	if (tenantId == null) return null;
-	const authUserEmail = getAuthUser()?.profile.email;
+	const authUserEmail = get(authUserAtom)?.profile.email;
 	return getUser({ tenantId }, authUserEmail);
 });
 
@@ -44,7 +44,7 @@ export const employeeAtom = atom((get) => {
 	const tenantId = get(tenantIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (tenantId === null || payrollId === null) return null;
-	const authUserEmail = getAuthUser()?.profile.email;
+	const authUserEmail = get(authUserAtom)?.profile.email;
 	return getEmployeeByIdentifier({ tenantId, payrollId }, authUserEmail);
 });
 

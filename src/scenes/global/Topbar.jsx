@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import {
 	Box,
 	IconButton,
@@ -6,10 +6,6 @@ import {
 	Toolbar,
 	Stack,
 	Typography,
-	FormControl,
-	FormControlLabel,
-	RadioGroup,
-	Radio,
 	Button,
 	TextField,
 } from "@mui/material";
@@ -24,7 +20,6 @@ import {
 	ResponsiveDialogTrigger,
 } from "../../components/ResponsiveDialog";
 import { useTranslation } from "react-i18next";
-import { DatePicker } from "../../components/DatePicker";
 import { useAtomValue } from "jotai";
 import { tenantAtom } from "../../utils/dataAtoms";
 import { requestExportDataDownload } from "../../api/FetchClient";
@@ -71,10 +66,10 @@ function ExportButton() {
 	const { t } = useTranslation();
 	const isProvider = useRole("provider");
 	const tenant = useAtomValue(tenantAtom);
-	if (!isProvider && import.meta.env.PROD) {
+	if (!isProvider) {
 		return;
 	}
-	
+
 	const dialog = tenant ? <ExportDialog tenant={tenant} /> : <ImportDialog />;
 
 	return (

@@ -1,42 +1,50 @@
 import { User } from "oidc-client-ts";
 import { authConfig, useOidc } from "./authConfig";
-import { atom, getDefaultStore } from "jotai";
+import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
-const store = getDefaultStore();
 
-export function getAuthUser() {
+function getAuthUserAtom() {
 	if (useOidc) {
-		return getOidcUser();
+		const storageKey = `oidc.user:${authConfig.authority}:${authConfig.client_id}`;
+		const rawAuthUserAtom = atomWithStorage(storageKey, null, window.localStorage, { getOnInit: true });
+		// return read only atom
+		return atom(get => User.fromStorageString(get(rawAuthUserAtom)));
 	}
-	return store.get(localUserAtom);
+
+	const defaultLocalUser = {
+		profile: {
+			email: "ajo@ason.ch",
+			"urn:zitadel:iam:org:project:210239088282829057:roles": {
+				user: {},
+				hr: {},
+				onboarding: {},
+				admin: {},
+				provider: {}
+			}
+		},
+	};
+
+	const localUserAtom = atomWithStorage("local.ason.user", defaultLocalUser, undefined, { getOnInit: true });
+	return localUserAtom;
 }
 
-function getOidcUser() {
-	const storageKey = `oidc.user:${authConfig.authority}:${authConfig.client_id}`;
-	const oidcStorage = localStorage.getItem(storageKey);
-	try {
-		return User.fromStorageString(oidcStorage);
-	} catch {
-		return initialValue;
-	}
-}
-
-const defaultLocalUser = {
-	profile: {
-		email: "ajo@ason.ch",
-	},
-};
-
-const localUserKey = "local.ason.user";
-
-const storedLocalUser = localStorage.getItem(localUserKey);
-const initialValue =
-	storedLocalUser === null ? defaultLocalUser : JSON.parse(storedLocalUser);
-
-const localUserAtom = atomWithStorage(localUserKey, initialValue);
+export const authUserAtom = getAuthUserAtom();
 
 export const localUserEmailAtom = atom(
-	(get) => get(localUserAtom)?.profile?.email,
-	(get, set, update) => set(localUserAtom, { profile: { email: update } }),
+	(get) => get(authUserAtom)?.profile?.email,
+	(get, set, update) => {
+		const user = get(authUserAtom);
+		user.profile.email = update;
+		set(authUserAtom, user);
+	}
 );
+
+export const authUserRolesAtom = atom((get) => {
+	const authUser = get(authUserAtom);
+	const rolesObject = authUser?.profile["urn:zitadel:iam:org:project:210239088282829057:roles"];
+	if (rolesObject) {
+		return Object.keys(rolesObject);
+	}
+	return [];
+});
