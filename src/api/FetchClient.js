@@ -211,6 +211,10 @@ export function getTenant(routeParams) {
 	return new FetchRequestBuilder(tenantUrl, routeParams).fetchJson();
 }
 
+export function deleteTenant(routeParams) {
+	return new FetchRequestBuilder(tenantUrl, routeParams).withMethod("DELETE").fetch();
+}
+
 export function getPayrolls(routeParams) {
 	return new FetchRequestBuilder(payrollsUrl, routeParams).fetchJson();
 }

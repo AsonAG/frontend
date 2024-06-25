@@ -20,6 +20,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import NotStartedOutlinedIcon from "@mui/icons-material/NotStartedOutlined";
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
@@ -28,6 +29,7 @@ import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
 import { openMissingDataTasksAtom, openTasksAtom } from "../../utils/dataAtoms";
 import { Description, NotificationImportant } from "@mui/icons-material";
+import { useRole } from "../../hooks/useRole";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {
@@ -128,14 +130,15 @@ function NavigationGroup({ name, children, hidden = false }) {
 
 const drawerWidth = 265;
 function Drawer({ temporary, open, onClose }) {
-	const { tenant, user, employee } = useLoaderData();
+	const { tenant, employee } = useLoaderData();
 	const location = useLocation();
 	const { t } = useTranslation();
 
 	useEffect(onClose, [location]);
 
 	const drawerVariant = temporary ? "temporary" : "permanent";
-	const isHrUser = user?.attributes.roles?.includes("hr");
+	const isHrUser = useRole("hr");
+	const isProvider = useRole("provider");
 
 	return (
 		<MuiDrawer
@@ -241,6 +244,14 @@ function Drawer({ temporary, open, onClose }) {
 							to="company/documents"
 							icon={<DescriptionOutlinedIcon />}
 						/>
+						{
+							isProvider &&
+							<NavigationItem
+								label={t("Settings")}
+								to="settings"
+								icon={<SettingsIcon />}
+							/>
+						}
 					</NavigationGroup>
 					<NavigationGroup name={t("Employee")} hidden={employee === null}>
 						<NavigationItem

@@ -8,7 +8,7 @@ import {
 	redirect,
 } from "react-router-dom";
 
-import Tenants from "./scenes/tenants";
+import { TenantList } from "./scenes/tenants";
 import Dashboard from "./scenes/dashboard";
 import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
@@ -54,6 +54,8 @@ import {
 	getDocumentsOfCaseField,
 	deleteDocument,
 	importTenant,
+	requestExportDataDownload,
+	deleteTenant
 } from "./api/FetchClient";
 import EmployeeView, { EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -88,6 +90,8 @@ import { MissingDataView } from "./components/MissingDataView";
 import { EmployeeForm } from "./components/EmployeeForm";
 import { withPage } from "./components/ContentLayout";
 import { NewTaskView } from "./components/NewTaskView";
+import { TenantImport } from "./scenes/tenants/TenantImport";
+import { TenantSettings } from "./scenes/tenants/TenantSettings";
 
 const store = getDefaultStore();
 
@@ -180,20 +184,33 @@ const routeData = [
 			},
 			{
 				path: "tenants",
-				element: <Tenants />,
+				Component: TenantList,
 				loader: async () => {
 					await getTenantData(); // reset cache
 					return getTenants();
-				},
-				children: [
-					{
-						path: "import",
-						action: async ({ request }) => {
-							return importTenant(await request.formData());
-						}
-					}
-				]
+				}
 			},
+			{
+				path: "tenants/import",
+				Component: TenantImport,
+				action: async ({ request }) => {
+					const formData = await request.formData();
+					const response = await importTenant(formData);
+					if (response.ok) {
+						const body = await response.json();
+						toast("success", "Tenant imported");
+						return redirect(`../tenants/${body}/payrolls`);
+					}
+					else if (response.status === 500) {
+						const body = await response.json();
+						const error = JSON.parse(body);
+						toast("error", error.Message);
+					} else {
+						toast("error", "Import was not successful");
+					}
+					return null;
+				}
+			}
 		],
 	},
 	{
@@ -229,6 +246,40 @@ const routeData = [
 					}
 					return null;
 				},
+			},
+			{
+				path: "settings",
+				Component: TenantSettings,
+				action: async ({ params, request }) => {
+					var formData = await request.formData();
+					switch (formData.get("intent")) {
+						case "export":
+							try {
+								const { tenant } = await getTenantData();
+								const name = `${tenant.identifier}_export.zip`;
+								await requestExportDataDownload({ tenantId: params.tenantId }, name);
+								toast("success", "Exported tenant");
+							}
+							catch {
+								toast("error", "Tenant could not be exported");
+							}
+							return null;
+						case "delete":
+							try {
+								var response = await deleteTenant(params);
+								if (response.ok) {
+									toast("success", "Tenant deleted");
+									return redirect("/tenants");
+								}
+							}
+							catch {
+								toast("error", "Tenant could not be deleted");
+							}
+							return null;
+						default:
+							throw new Error("Invalid intent");
+					}
+				}
 			},
 			{
 				path: "hr/employees",

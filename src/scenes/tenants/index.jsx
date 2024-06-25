@@ -8,13 +8,16 @@ import { Link, useLoaderData } from "react-router-dom";
 import { useDocumentTitle } from "usehooks-ts";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../../components/ContentLayout";
+import { useRole } from "../../hooks/useRole";
+import { IconButton, Tooltip } from "@mui/material";
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
-function Tenants() {
+export function TenantList() {
 	const tenants = useLoaderData();
 	const { t } = useTranslation();
 	useDocumentTitle("Ason - Tenants");
 	return (
-		<ContentLayout title={t("Select a company")}>
+		<ContentLayout title={t("Select a company")} buttons={<ImportButton />}>
 			<Paper>
 				<List>
 					{tenants.map((tenant) => (
@@ -34,4 +37,22 @@ function Tenants() {
 	);
 }
 
-export default Tenants;
+function ImportButton() {
+	const { t } = useTranslation();
+	const isProvider = useRole("provider");
+	if (!isProvider)
+		return null;
+
+	return (
+		<Tooltip title={t("Import tenant")} placement="top" arrow size="sm">
+			<IconButton
+				component={Link}
+				to="import"
+				color="primary"
+				size="small"
+			>
+				<FileUploadIcon />
+			</IconButton>
+		</Tooltip>
+	)
+}
