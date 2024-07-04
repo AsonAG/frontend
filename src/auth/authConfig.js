@@ -3,7 +3,7 @@ import { WebStorageStateStore } from "oidc-client-ts";
 export const useOidc = import.meta.env.PROD;
 
 export const authConfig = {
-	client_id: "210272222781178113@ason",
+	client_id: import.meta.env.VITE_CLIENT_ID,
 	response_type: "code",
 	response_mode: "query",
 	code_challenge_method: "S256",
