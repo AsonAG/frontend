@@ -130,10 +130,11 @@ function paginatedLoader({
 	};
 }
 
-const documentRoutes = [
-	{
+function getDocumentRoute(showTitle) {
+	const Component = showTitle ? withPage("Documents", AsyncDocumentTable) : AsyncDocumentTable;
+	return {
+		Component,
 		path: "documents",
-		Component: withPage("Documents", AsyncDocumentTable),
 		loader: ({ params }) => {
 			return defer({
 				data: getDocumentCaseFields(params),
@@ -166,8 +167,8 @@ const documentRoutes = [
 				},
 			},
 		]
-	}
-]
+	};
+}
 
 const routeData = [
 	{
@@ -365,7 +366,7 @@ const routeData = [
 								getEmployeeCaseChanges(params, null, "created desc, id"),
 						}),
 					},
-					...documentRoutes,
+					getDocumentRoute(false),
 					{
 						path: "missingdata/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
@@ -764,7 +765,7 @@ const routeData = [
 								getCompanyCaseChanges(params, null, "created desc, id"),
 						}),
 					},
-					...documentRoutes
+					getDocumentRoute(true),
 				],
 			},
 			{
@@ -796,7 +797,7 @@ const routeData = [
 						path: "tasks/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
 					},
-					...documentRoutes
+					getDocumentRoute(true),
 				],
 			},
 		],
