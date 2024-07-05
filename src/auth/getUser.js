@@ -4,6 +4,8 @@ import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 
+const authRoleProperty = `urn:zitadel:iam:org:project:${import.meta.env.VITE_PROJECT_ID}:roles`;
+
 function getAuthUserAtom() {
 	if (useOidc) {
 		const storageKey = `oidc.user:${authConfig.authority}:${authConfig.client_id}`;
@@ -15,7 +17,7 @@ function getAuthUserAtom() {
 	const defaultLocalUser = {
 		profile: {
 			email: "ajo@ason.ch",
-			"urn:zitadel:iam:org:project:210239088282829057:roles": {
+			[authRoleProperty]: {
 				user: {},
 				hr: {},
 				onboarding: {},
@@ -42,7 +44,7 @@ export const localUserEmailAtom = atom(
 
 export const authUserRolesAtom = atom((get) => {
 	const authUser = get(authUserAtom);
-	const rolesObject = authUser?.profile["urn:zitadel:iam:org:project:210239088282829057:roles"];
+	const rolesObject = authUser?.profile[authRoleProperty];
 	if (rolesObject) {
 		return Object.keys(rolesObject);
 	}
