@@ -18,9 +18,9 @@ import PayrollSelector from "../../components/selectors/PayrollSelector";
 import { Stack } from "@mui/system";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import NotStartedOutlinedIcon from "@mui/icons-material/NotStartedOutlined";
 import SettingsIcon from '@mui/icons-material/Settings';
+import BusinessIcon from '@mui/icons-material/Business';
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
@@ -137,8 +137,10 @@ function Drawer({ temporary, open, onClose }) {
 	useEffect(onClose, [location]);
 
 	const drawerVariant = temporary ? "temporary" : "permanent";
-	const isHrUser = useRole("hr");
+	const isEmployee = useRole("user");
+	const isAdmin = useRole("admin");
 	const isProvider = useRole("provider");
+	console.log(!isEmployee, isAdmin);
 
 	return (
 		<MuiDrawer
@@ -191,7 +193,12 @@ function Drawer({ temporary, open, onClose }) {
 				}}
 			>
 				<NavigationMenu>
-					<NavigationGroup name={t("HR")} hidden={!isHrUser}>
+					<NavigationGroup hidden={!isAdmin}>
+						<NavigationItem
+							label={t("Company")}
+							to="company"
+							icon={<BusinessIcon />}
+						/>
 						<NavigationItem
 							label={t("Employees")}
 							to="hr/employees"
@@ -217,33 +224,6 @@ function Drawer({ temporary, open, onClose }) {
 							to="hr/reports"
 							icon={<Description />}
 						/>
-						{/*
-              !import.meta.env.PROD && 
-                <NavigationItem label={t("Compliance")} to="hr/compliance" icon={<AssuredWorkloadIcon />} />
-              */}
-					</NavigationGroup>
-					<NavigationGroup name={t("Company")} hidden={!isHrUser}>
-						<NavigationItem
-							label={t("New event")}
-							to="company/new"
-							icon={<AddOutlinedIcon />}
-						/>
-						<NavigationItem
-							label={t("Missing data")}
-							to="company/missingdata"
-							icon={<NotificationImportant />}
-						/>
-						<NavigationItem
-							label={t("Events")}
-							to="company/events"
-							icon={<WorkHistoryOutlinedIcon />}
-							end
-						/>
-						<NavigationItem
-							label={t("Documents")}
-							to="company/documents"
-							icon={<DescriptionOutlinedIcon />}
-						/>
 						{
 							isProvider &&
 							<NavigationItem
@@ -253,7 +233,7 @@ function Drawer({ temporary, open, onClose }) {
 							/>
 						}
 					</NavigationGroup>
-					<NavigationGroup name={t("Employee")} hidden={employee === null}>
+					<NavigationGroup hidden={employee === null || (isEmployee && isAdmin)}>
 						<NavigationItem
 							label={t("New event")}
 							to={`employees/${employee?.id}/new`}

@@ -92,6 +92,7 @@ import { withPage } from "./components/ContentLayout";
 import { NewTaskView } from "./components/NewTaskView";
 import { TenantImport } from "./scenes/tenants/TenantImport";
 import { TenantSettings } from "./scenes/tenants/TenantSettings";
+import { CompanyView } from "./scenes/CompanyView";
 
 const store = getDefaultStore();
 
@@ -729,10 +730,11 @@ const routeData = [
 			},
 			{
 				path: "company",
+				Component: CompanyView,
 				children: [
 					{
 						path: "missingdata",
-						Component: withPage("Missing data", AsyncCaseTable),
+						Component: AsyncCaseTable,
 						loader: ({ params }) => {
 							return defer({
 								data: getCompanyCases(params, "CCT"),
@@ -742,10 +744,13 @@ const routeData = [
 					{
 						path: "missingdata/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
+						loader: () => ({
+							renderTitle: false,
+						})
 					},
 					{
 						path: "new",
-						Component: withPage("New event", AsyncCaseTable),
+						Component: AsyncCaseTable,
 						loader: ({ params }) => {
 							return defer({
 								data: getCompanyCases(params, "NewEvent"),
@@ -755,17 +760,20 @@ const routeData = [
 					{
 						path: "new/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
+						loader: () => ({
+							renderTitle: false,
+						})
 					},
 					{
 						path: "events",
-						Component: withPage("Events", AsyncEventTable),
+						Component: AsyncEventTable,
 						loader: paginatedLoader({
 							pageCount: 10,
 							getRequestBuilder: ({ params }) =>
 								getCompanyCaseChanges(params, null, "created desc, id"),
 						}),
 					},
-					getDocumentRoute(true),
+					getDocumentRoute(false),
 				],
 			},
 			{
