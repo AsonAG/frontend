@@ -12,7 +12,7 @@ import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";
 import { localUserEmailAtom } from "../../auth/getUser";
-import { userAtom } from "../../utils/dataAtoms";
+import { userInformationAtom } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
 import * as Popover from '@radix-ui/react-popover';
 import { AccountCircle } from "@mui/icons-material";
@@ -43,7 +43,7 @@ function AuthenticatedUserSettings() {
 	};
 
 	return (
-		<ButtonGroup variant="outlined">
+		<ButtonGroup variant="outlined" fullWidth>
 			<Button
 				sx={buttonSx}
 				color="primary"
@@ -93,26 +93,35 @@ function UserEdit() {
 
 function UserInformation() {
 	const { t } = useTranslation();
-	const user = useAtomValue(userAtom);
-	const title = user ? `${user.firstName} ${user.lastName}` : t("User does not exist!");
+	const userInformation = useAtomValue(userInformationAtom) ?? {
+		name: t("User does not exist!"),
+		email: "<MISSING EMAIL>"
+	};
+
 
 	return (
 		<Stack alignItems="center" width="100%">
-			<Typography variant="h6" gutterBottom>{title}</Typography>
+			<Typography variant="h6" gutterBottom>{userInformation.name}</Typography>
 			{
 				useOidc ?
-					<Typography variant="body2">{user.identifier}</Typography> :
+					<Typography variant="body2">{userInformation.email}</Typography> :
 					<UserEdit />
 			}
 		</Stack>
 	);
 }
 
-const popoverSx = { border: 1, borderColor: "divider", bgcolor: theme => theme.palette.background.default, overflow: "hidden", zIndex: theme => theme.zIndex.appBar };
+const popoverSx = {
+	border: 1,
+	borderColor: "divider",
+	bgcolor: theme => theme.palette.background.default,
+	overflow: "hidden",
+	zIndex: theme => theme.zIndex.appBar
+};
 
 export function UserAccountComponent() {
-	const user = useAtomValue(userAtom);
-	const icon = user ? <AccountCircle /> : <ErrorIcon color="error" />
+	const userInformation = useAtomValue(userInformationAtom);
+	const icon = userInformation ? <AccountCircle /> : <ErrorIcon color="error" />
 
 	return (
 		<Popover.Root>
@@ -142,21 +151,24 @@ function ThemeModePicker() {
 			<Button
 				variant={darkMode === "light" ? "contained" : "outlined"}
 				onClick={() => setDarkMode("light")}
-				startIcon={<LightModeOutlinedIcon fontSize="small" />}
+				startIcon={<LightModeOutlinedIcon sx={{ height: 16 }} />}
+				sx={buttonSx}
 			>
 				{t("Light")}
 			</Button>
 			<Button
 				variant={darkMode === "system" ? "contained" : "outlined"}
 				onClick={() => setDarkMode("system")}
-				startIcon={<ContrastIcon fontSize="small" />}
+				startIcon={<ContrastIcon sx={{ height: 16 }} />}
+				sx={buttonSx}
 			>
 				{t("System")}
 			</Button>
 			<Button
 				variant={darkMode === "dark" ? "contained" : "outlined"}
 				onClick={() => setDarkMode("dark")}
-				startIcon={<DarkModeOutlinedIcon fontSize="small" />}
+				startIcon={<DarkModeOutlinedIcon sx={{ height: 16 }} />}
+				sx={buttonSx}
 			>
 				{t("Dark")}
 			</Button>

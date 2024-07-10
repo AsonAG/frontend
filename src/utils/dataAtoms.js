@@ -11,6 +11,7 @@ import {
 import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
+import { useOidc } from "../auth/authConfig";
 
 export const tenantAtom = atom((get) => {
 	const tenantId = get(tenantIdAtom);
@@ -101,3 +102,21 @@ export function useMissingDataCount(employeeId) {
 	if (!employeeMissingData) return null;
 	return employeeMissingData.cases.length;
 }
+
+export const userInformationAtom = atom((async get => {
+	if (useOidc) {
+		const authUser = get(authUserAtom);
+		return {
+			email: authUser.profile.email,
+			name: authUser.profile.name
+		};
+	}
+	const user = await get(userAtom);
+	if (user) {
+		return {
+			email: user.identifier,
+			name: `${user.firstName} ${user.lastName}`
+		};
+	}
+	return null;
+}));
