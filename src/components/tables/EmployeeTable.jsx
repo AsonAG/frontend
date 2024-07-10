@@ -1,5 +1,5 @@
 import { React, createContext, useContext, useState, forwardRef } from "react";
-import { useAsyncValue, Link as RouterLink } from "react-router-dom";
+import { useAsyncValue, useLoaderData, Link as RouterLink } from "react-router-dom";
 import {
 	Divider,
 	Stack,
@@ -37,22 +37,25 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import { StatusChip } from "../../scenes/employees/StatusChip";
 import { useMissingDataCount } from "../../utils/dataAtoms";
 
-const VariantContext = createContext("standard");
+const TableContext = createContext({ variant: "standard", showButtons: true });
 
 export function AsyncEmployeeTable() {
+	const { showButtons = true } = useLoaderData();
 	const theme = useTheme();
 	const variant = useMediaQuery(theme.breakpoints.down("sm"))
 		? "dense"
 		: "standard";
 
+	const tableContext = { variant, showButtons };
+
 	return (
-		<VariantContext.Provider value={variant}>
+		<TableContext.Provider value={tableContext}>
 			<ContentLayout title="Employees" buttons={<EmployeeTableButtons />}>
 				<AsyncDataRoute>
 					<EmployeeTable />
 				</AsyncDataRoute>
 			</ContentLayout>
-		</VariantContext.Provider>
+		</TableContext.Provider>
 	);
 }
 
@@ -104,7 +107,7 @@ const SearchButton = styled(
 
 function EmployeeTableButtons() {
 	const { t } = useTranslation();
-	const variant = useContext(VariantContext);
+	const { variant } = useContext(TableContext);
 	return (
 		<Stack direction="row" spacing={2}>
 			<EmployeeStatusSwitch />
@@ -171,7 +174,7 @@ function EmployeeTableSearchField() {
 }
 
 function EmployeeTableSearch() {
-	const variant = useContext(VariantContext);
+	const { variant } = useContext(TableContext);
 	if (variant === "dense") {
 		return <EmployeeTableSearchDialog />;
 	}
@@ -235,6 +238,7 @@ function EmployeeTable() {
 }
 
 const sx = {
+	height: 45,
 	borderRadius: (theme) => theme.spacing(1),
 	"&:hover": {
 		backgroundColor: (theme) => theme.palette.primary.hover,
@@ -245,10 +249,10 @@ const sx = {
 };
 
 function EmployeeRow({ employee, showStatus }) {
-	const variant = useContext(VariantContext);
+	const { variant, showButtons } = useContext(TableContext);
 	return (
 		<Stack direction="row" alignItems="center" sx={sx} mx={-0.5} px={0.5}>
-			<Link to={employee.id + ""}>
+			<Link to={employee.id}>
 				<Stack direction="row" spacing={1} flexWrap="wrap">
 					<Typography>
 						{employee.firstName} {employee.lastName}
@@ -262,7 +266,7 @@ function EmployeeRow({ employee, showStatus }) {
 					{showStatus && <StatusChip status={employee.status} />}
 				</Stack>
 			</Link>
-			{variant === "standard" && <EmployeeButtons employee={employee} />}
+			{variant === "standard" && showButtons && <EmployeeButtons employee={employee} />}
 		</Stack>
 	);
 }

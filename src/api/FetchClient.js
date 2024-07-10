@@ -200,7 +200,7 @@ class FetchRequestBuilder {
 }
 
 export function getTenants() {
-	return new FetchRequestBuilder(tenantsUrl).fetch();
+	return new FetchRequestBuilder(tenantsUrl).fetchJson();
 }
 
 export function importTenant(body) {
@@ -221,6 +221,10 @@ export function getPayrolls(routeParams) {
 
 export function getPayroll(routeParams) {
 	return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
+}
+
+export function getDivisions(routeParams) {
+	return new FetchRequestBuilder(divisionsUrl, routeParams).fetchJson();
 }
 
 export function getDivision(routeParams, divisionId) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
 	Button,
 	Stack,
@@ -7,17 +7,29 @@ import {
 	InputLabel,
 	Select,
 	MenuItem,
+	FormControlLabel,
+	Checkbox,
+	Typography,
 } from "@mui/material";
 import { ContentLayout } from "./ContentLayout";
 import { useTranslation } from "react-i18next";
 import { Form, Link as RouterLink, useLoaderData } from "react-router-dom";
+import { Employee } from "../models/Employee";
+import { Division } from "../models/Division";
+import { useRole } from "../hooks/useRole";
+
+type LoaderData = {
+	employee: Employee,
+	divisions: Array<Division>,
+	selectedDivisions: Array<string>
+}
 
 export function EmployeeForm() {
-	const employee = useLoaderData() as any;
+	const { employee, } = useLoaderData() as LoaderData;
 	const isNew = !employee;
-	const divisions = JSON.stringify(employee?.divisions);
 	const title = isNew ? "New employee" : "Edit employee";
 	const { t } = useTranslation();
+	const divisionAssignmentView = useMemo(() => <PayrollAssignmentView />, []);
 	return (
 		<Form method="post">
 			<ContentLayout title={title}>
@@ -44,7 +56,8 @@ export function EmployeeForm() {
 					defaultValue={employee?.identifier}
 					disabled={!isNew}
 				/>
-				<input type="hidden" name="divisions" value={divisions} />
+				<Typography variant="h6">{t("Business Unit assignment")}</Typography>
+				{divisionAssignmentView}
 				<Stack direction="row" justifyContent="right" spacing={1}>
 					<Button component={RouterLink} to=".." relative="path">
 						{t("Back")}
@@ -56,6 +69,32 @@ export function EmployeeForm() {
 			</ContentLayout>
 		</Form>
 	);
+}
+
+function PayrollAssignmentView() {
+	const { divisions, selectedDivisions } = useLoaderData() as LoaderData;
+	const isAdmin = useRole("admin");
+	if (!isAdmin)
+		return null;
+
+	return (
+		<Stack>
+			{
+				divisions.map(division => {
+					return (
+						<FormControl key={division.id}>
+							<FormControlLabel
+								name="division"
+								label={division.name}
+								labelPlacement="end"
+								control={<Checkbox defaultChecked={selectedDivisions.includes(division.name)} value={division.name} name="divisions" />}
+							/>
+						</FormControl>
+					);
+				})
+			}
+		</Stack>
+	)
 }
 
 function StatusSelect({ status }) {

@@ -15,7 +15,7 @@ import { getEmployeeDisplayString } from "../../models/Employee";
 import { TabLink } from "../../components/TabLink";
 
 
-function EmployeeView() {
+export function EmployeeView() {
 	const outlet = useOutlet();
 	const { employee } = useLoaderData();
 	const { t } = useTranslation();
@@ -28,7 +28,7 @@ function EmployeeView() {
 		return <Navigate to={to} replace />;
 	}
 	const title = (
-		<Stack direction="row" spacing={1} flex={1} alignItems="center">
+		<Stack direction="row" spacing={1} flex={1} alignItems="center" width="100%">
 			<PageHeaderTitle title={header} />
 			<Tooltip title={t("Edit employee")} placement="top" arrow size="sm">
 				<IconButton
@@ -45,7 +45,7 @@ function EmployeeView() {
 	);
 	return (
 		<ContentLayout title={title}>
-			<Stack direction="row" spacing={2}>
+			<Stack direction="row" spacing={2} flexWrap="wrap">
 				{isActive && <TabLink title={t("New event")} to="new" />}
 				<TabLink title={t("Events")} to="events" />
 				<TabLink title={t("Documents")} to="documents" />
@@ -61,8 +61,6 @@ function EmployeeView() {
 		</ContentLayout>
 	);
 }
-
-export default EmployeeView;
 
 export function EmployeeTitle() {
 	const employee = useLoaderData();

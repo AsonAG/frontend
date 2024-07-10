@@ -5,9 +5,14 @@ import { useNavigation, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useRole } from "../../hooks/useRole";
 import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, ResponsiveDialogTrigger } from "../../components/ResponsiveDialog";
+import { Tenant } from "../../models/Tenant";
+
+type LoaderData = {
+  tenant: Tenant
+}
 
 export function TenantSettings() {
-  const { tenant } = useRouteLoaderData("root");
+  const { tenant } = useRouteLoaderData("tenantRoot") as LoaderData;
   const { t } = useTranslation();
   return (
     <ContentLayout title="Settings">

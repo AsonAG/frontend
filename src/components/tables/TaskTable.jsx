@@ -112,7 +112,7 @@ function TaskRow({ task, variant, taskFilter }) {
 		rowInfoSpacing = 0.75;
 	}
 	return (
-		<Link to={task.id + ""} state={{ task, taskFilter }}>
+		<Link to={task.id} state={{ task, taskFilter }}>
 			<Stack spacing={2} p={2} {...stackProps}>
 				<Stack spacing={0.5} flex={1}>
 					<CategoryLabel

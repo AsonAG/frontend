@@ -1,4 +1,4 @@
-import { React } from "react";
+import { React, Suspense } from "react";
 import Paper from "@mui/material/Paper";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -17,14 +17,14 @@ export function TenantList() {
 	const { t } = useTranslation();
 	useDocumentTitle("Ason - Tenants");
 	return (
-		<ContentLayout title={t("Select a company")} buttons={<ImportButton />}>
+		<ContentLayout title={t("Select a company")} buttons={<Suspense><ImportButton /></Suspense>}>
 			<Paper>
 				<List>
 					{tenants.map((tenant) => (
 						<ListItem disablePadding key={tenant.id}>
 							<ListItemButton
 								component={Link}
-								to={`${tenant.id}/payrolls`}
+								to={tenant.id}
 								state={{ tenant }}
 							>
 								<ListItemText primary={tenant.identifier} />

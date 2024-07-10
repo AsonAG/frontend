@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useCreateTheme } from "./theme";
 import {
 	CssBaseline,
-	Box,
-	Divider,
 	ThemeProvider,
 	Stack,
 	useMediaQuery,

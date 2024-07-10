@@ -1,6 +1,13 @@
 import { Stack, Typography } from "@mui/material";
+import React, { FC, PropsWithChildren, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useLoaderData } from "react-router-dom";
+
+type ContentLayoutProps = {
+	title: ReactNode | string,
+	disableInset?: boolean,
+	buttons?: ReactNode
+} & PropsWithChildren;
 
 export function ContentLayout({
 	title: defaultTitle,
@@ -8,7 +15,7 @@ export function ContentLayout({
 	children,
 	buttons,
 	...sxProps
-}) {
+}: ContentLayoutProps) {
 	return (
 		<Stack
 			py={3}
@@ -26,9 +33,13 @@ export function ContentLayout({
 	);
 }
 
+type LoaderData = {
+	title: string
+};
+
 export function PageHeader({ title, buttons }) {
 	const { t } = useTranslation();
-	const loaderData = useLoaderData();
+	const loaderData = useLoaderData() as LoaderData;
 	let headerTitle = title;
 	if (typeof title === "string") {
 		headerTitle = (
@@ -48,7 +59,12 @@ export function PageHeader({ title, buttons }) {
 	);
 }
 
-export function PageHeaderTitle({ title, flex = undefined }) {
+type PageHeaderTitleProps = {
+	title: string,
+	flex: number | string | undefined
+};
+
+export function PageHeaderTitle({ title, flex = undefined }: PageHeaderTitleProps) {
 	return (
 		<Typography variant="h2" fontWeight={500} flex={flex} noWrap>
 			{title}
@@ -74,10 +90,11 @@ export function PageContent({ children, disableInset, ...sxProps }) {
 	);
 }
 
-export function withPage(header, Component) {
-	return function withPageHOC(props) {
+export function withPage<T>(header: ReactNode | string, Component: FC<T>) {
+	return function withPageHOC(props: T) {
 		return (
 			<ContentLayout title={header}>
+				{/* @ts-ignore */}
 				<Component {...props} />
 			</ContentLayout>
 		);

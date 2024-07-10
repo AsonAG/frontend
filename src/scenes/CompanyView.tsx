@@ -18,7 +18,7 @@ export function CompanyView() {
   }
   return (
     <ContentLayout title={t("Company")}>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2} flexWrap="wrap">
         <TabLink title={t("New event")} to="new" />
         <TabLink title={t("Events")} to="events" />
         <TabLink title={t("Documents")} to="documents" />

@@ -11,10 +11,11 @@ import {
 	NavLink as RouterLink,
 	useLoaderData,
 	useLocation,
+	useParams,
 } from "react-router-dom";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import PayrollSelector from "../../components/selectors/PayrollSelector";
+import { PayrollSelector } from "../../components/selectors/PayrollSelector";
 import { Stack } from "@mui/system";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
@@ -128,19 +129,118 @@ function NavigationGroup({ name, children, hidden = false }) {
 	);
 }
 
+function MenuItemsTenant() {
+	const { t } = useTranslation();
+	return (
+		<NavigationGroup>
+			<NavigationItem
+				label={t("Employees")}
+				to="employees"
+				icon={<PeopleOutlinedIcon />}
+			/>
+			<NavigationItem
+				label={t("Settings")}
+				to="settings"
+				icon={<SettingsIcon />}
+			/>
+		</NavigationGroup>
+	);
+}
+
+function MenuItemsPayrollAdmin() {
+	const { t } = useTranslation();
+	return (
+		<NavigationGroup>
+			<NavigationItem
+				label={t("Company")}
+				to="company"
+				icon={<BusinessIcon />}
+			/>
+			<NavigationItem
+				label={t("Employees")}
+				to="hr/employees"
+				icon={<PeopleOutlinedIcon />}
+			/>
+			<NavigationItem
+				label={t("Tasks")}
+				to="hr/tasks"
+				icon={<OpenTasksBadgeIcon />}
+			/>
+			<NavigationItem
+				label={t("Missing data")}
+				to="hr/missingdata"
+				icon={<MissingDataBadgeIcon />}
+			/>
+			<NavigationItem
+				label={t("Payruns")}
+				to="hr/payruns"
+				icon={<NotStartedOutlinedIcon />}
+			/>
+			<NavigationItem
+				label={t("Reports")}
+				to="hr/reports"
+				icon={<Description />}
+			/>
+		</NavigationGroup>
+	)
+}
+
+function MenuItemsPayrollEmployee({ employee }) {
+	const { t } = useTranslation();
+	return (
+		<NavigationGroup>
+			<NavigationItem
+				label={t("New event")}
+				to={`employees/${employee.id}/new`}
+				icon={<AddOutlinedIcon />}
+			/>
+			<NavigationItem
+				label={t("Tasks")}
+				to={`employees/${employee.id}/tasks`}
+				icon={<FormatListBulletedIcon />}
+			/>
+			<NavigationItem
+				label={t("Documents")}
+				to={`employees/${employee.id}/documents`}
+				icon={<DescriptionOutlinedIcon />}
+			/>
+		</NavigationGroup>
+	);
+}
+
+function MenuItemsUnknown() {
+	const { t } = useTranslation();
+	return <Typography>{t("No features available for this user")}</Typography>
+}
+
+function MenuItems() {
+	const { employee } = useLoaderData();
+	const { payrollId } = useParams();
+	const isAdmin = useRole("admin");
+	const isEmployee = useRole("user");
+	if (!payrollId && isAdmin) {
+		return <MenuItemsTenant />;
+	}
+	else if (payrollId && isAdmin) {
+		return <MenuItemsPayrollAdmin />;
+	}
+	else if (payrollId && isEmployee && employee) {
+		return <MenuItemsPayrollEmployee employee={employee} />;
+	}
+	else {
+		return <MenuItemsUnknown />;
+	}
+
+}
+
 const drawerWidth = 265;
 function Drawer({ temporary, open, onClose }) {
-	const { tenant, employee } = useLoaderData();
 	const location = useLocation();
 	const { t } = useTranslation();
 
 	useEffect(onClose, [location]);
 
 	const drawerVariant = temporary ? "temporary" : "permanent";
-	const isEmployee = useRole("user");
-	const isAdmin = useRole("admin");
-	const isProvider = useRole("provider");
-	console.log(!isEmployee, isAdmin);
 
 	return (
 		<MuiDrawer
@@ -193,96 +293,54 @@ function Drawer({ temporary, open, onClose }) {
 				}}
 			>
 				<NavigationMenu>
-					<NavigationGroup hidden={!isAdmin}>
-						<NavigationItem
-							label={t("Company")}
-							to="company"
-							icon={<BusinessIcon />}
-						/>
-						<NavigationItem
-							label={t("Employees")}
-							to="hr/employees"
-							icon={<PeopleOutlinedIcon />}
-						/>
-						<NavigationItem
-							label={t("Tasks")}
-							to="hr/tasks"
-							icon={<OpenTasksBadgeIcon />}
-						/>
-						<NavigationItem
-							label={t("Missing data")}
-							to="hr/missingdata"
-							icon={<MissingDataBadgeIcon />}
-						/>
-						<NavigationItem
-							label={t("Payruns")}
-							to="hr/payruns"
-							icon={<NotStartedOutlinedIcon />}
-						/>
-						<NavigationItem
-							label={t("Reports")}
-							to="hr/reports"
-							icon={<Description />}
-						/>
-						{
-							isProvider &&
-							<NavigationItem
-								label={t("Settings")}
-								to="settings"
-								icon={<SettingsIcon />}
-							/>
-						}
-					</NavigationGroup>
-					<NavigationGroup hidden={employee === null || (isEmployee && isAdmin)}>
-						<NavigationItem
-							label={t("New event")}
-							to={`employees/${employee?.id}/new`}
-							icon={<AddOutlinedIcon />}
-						/>
-						<NavigationItem
-							label={t("Tasks")}
-							to={`employees/${employee?.id}/tasks`}
-							icon={<FormatListBulletedIcon />}
-						/>
-						<NavigationItem
-							label={t("Documents")}
-							to={`employees/${employee?.id}/documents`}
-							icon={<DescriptionOutlinedIcon />}
-						/>
-					</NavigationGroup>
+					<MenuItems />
 				</NavigationMenu>
 				<Divider />
-				<Stack sx={{ p: 2 }} spacing={1}>
-					<Typography>{t("Company")}</Typography>
-					<Stack spacing={1} direction="row">
-						<Typography
-							variant="body2"
-							textOverflow="ellipsis"
-							overflow="hidden"
-						>
-							{tenant.identifier}
-						</Typography>
-						<Typography
-							component={RouterLink}
-							variant="body2"
-							color="primary.main"
-							to="/tenants"
-							sx={{
-								textDecoration: "none",
-								"&: hover": {
-									fontWeight: "bold",
-								},
-							}}
-						>
-							{t("Select...")}
-						</Typography>
-					</Stack>
-				</Stack>
+				<TenantSection />
 				<Divider />
 				<UserAccountComponent />
 			</Stack>
 		</MuiDrawer>
 	);
+}
+
+function TenantSection() {
+	const { t } = useTranslation();
+	const { tenant } = useLoaderData();
+	const isProvider = useRole("provider");
+	if (!isProvider)
+		return null;
+
+	return (
+		<Stack sx={{ p: 2 }} spacing={1}>
+			<Typography>{t("Company")}</Typography>
+			<Stack spacing={1} direction="row">
+				<Typography
+					variant="body2"
+					textOverflow="ellipsis"
+					overflow="hidden"
+				>
+					{tenant.identifier}
+				</Typography>
+				<Typography
+					component={RouterLink}
+					variant="body2"
+					color="primary.main"
+					to="/tenants"
+					sx={{
+						textDecoration: "none",
+						"&: hover": {
+							fontWeight: "bold",
+						},
+					}}
+				>
+					{t("Select...")}
+				</Typography>
+			</Stack>
+		</Stack>
+
+	);
+
 }
 
 export default Drawer;

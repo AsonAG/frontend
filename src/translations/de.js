@@ -1,6 +1,7 @@
 const translations = {
 	translation: {
 		"Business Unit": "Geschäftseinheit",
+		"Business Unit assignment": "Geschäftseinheitszugehörigkeit",
 		Employees: "Mitarbeiter",
 		Company: "Firma",
 		"New event": "Neues Ereignis",
@@ -122,6 +123,7 @@ const translations = {
 		"Tenant could not be exported": "Der Tenant konnte nicht exportiert werden",
 		"Tenant deleted": "Tenant gelöscht",
 		"Tenant could not be deleted": "Der Tenant konnte nicht gelöscht werden",
+		"No features available for this user": "Keine Funktionen verfügbar für diesen User",
 
 		// compliance
 		Submit: "Übermitteln",

@@ -49,15 +49,15 @@ import {
 	getReports,
 	createEmployee,
 	updateEmployee,
-	getDivision,
 	addTask,
 	getDocumentsOfCaseField,
 	deleteDocument,
 	importTenant,
 	requestExportDataDownload,
-	deleteTenant
+	deleteTenant,
+	getDivisions
 } from "./api/FetchClient";
-import EmployeeView, { EmployeeTitle } from "./scenes/employees/EmployeeView";
+import { EmployeeView, EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
@@ -131,7 +131,7 @@ function paginatedLoader({
 	};
 }
 
-function getDocumentRoute(showTitle) {
+function createRouteDocument(showTitle) {
 	const Component = showTitle ? withPage("Documents", AsyncDocumentTable) : AsyncDocumentTable;
 	return {
 		Component,
@@ -171,6 +171,100 @@ function getDocumentRoute(showTitle) {
 	};
 }
 
+function createRouteEmployeeTable(path, showButtons = true) {
+	return {
+		path,
+		Component: AsyncEmployeeTable,
+		loader: async ({ request, params }) => {
+			const [_, queryString] = request.url.split("?");
+			const searchParams = new URLSearchParams(queryString);
+			const searchTerm = searchParams.get("search");
+			const showAll = !!searchParams.get("showAll");
+			let filter;
+			if (searchTerm) {
+				filter = `startswith_ci(firstName, '${searchTerm}') or startswith_ci(lastName, '${searchTerm}') or startswith_ci(identifier, '${searchTerm}')`;
+			}
+			return defer({
+				showButtons,
+				data: getEmployees(params)
+					.withQueryParam("filter", filter)
+					.withQueryParam("status", showAll ? null : "Active")
+					.fetchJson(),
+			});
+		}
+	};
+}
+
+function createRouteEmployeeEdit(path, createUrlRedirect) {
+	return {
+		path,
+		Component: EmployeeForm,
+		loader: async ({ params }) => {
+			const employee = await getEmployee(params);
+			const divisions = await getDivisions(params);
+			return { employee, divisions, selectedDivisions: employee.divisions };
+		},
+		action: async ({ params, request }) => {
+			const formData = await request.formData();
+			const response = await updateEmployee(params, {
+				identifier: formData.get("identifier"),
+				status: formData.get("status"),
+				firstName: formData.get("firstName"),
+				lastName: formData.get("lastName"),
+				divisions: formData.getAll("divisions"),
+			});
+
+			if (response.ok) {
+				toast("success", "Saved!");
+				const urlRedirect = createUrlRedirect(params.employeeId);
+				return redirect(urlRedirect);
+			} else {
+				let errorMessage = await response.json();
+				if (!errorMessage || typeof errorMessage !== "string") {
+					errorMessage = "Saving failed!";
+				}
+				toast("error", errorMessage);
+			}
+			return response;
+		},
+	};
+}
+
+function createRouteEmployeeNew(path, createUrlRedirect) {
+	return {
+		path,
+		Component: EmployeeForm,
+		loader: async ({ params }) => {
+			const divisions = await getDivisions(params);
+			const payroll = await store.get(payrollAtom);
+			const selectedDivisions = !!payroll ? [divisions.find(d => d.id === payroll.divisionId).name] : [];
+			return { divisions, selectedDivisions };
+		},
+		action: async ({ params, request }) => {
+			const formData = await request.formData();
+			const response = await createEmployee(params, {
+				identifier: formData.get("identifier"),
+				firstName: formData.get("firstName"),
+				lastName: formData.get("lastName"),
+				divisions: formData.getAll("divisions")
+			});
+
+			if (response.status === 201) {
+				const employee = await response.json();
+				toast("success", "New employee created");
+				const urlRedirect = createUrlRedirect(employee.id);
+				return redirect(urlRedirect);
+			}
+			let errorMessage = await response.json();
+			if (!errorMessage || typeof errorMessage !== "string") {
+				errorMessage = "Saving failed!";
+			}
+			toast("error", errorMessage);
+			return response;
+		},
+	};
+}
+
 const routeData = [
 	{
 		path: "/",
@@ -188,8 +282,11 @@ const routeData = [
 				path: "tenants",
 				Component: TenantList,
 				loader: async () => {
-					await getTenantData(); // reset cache
-					return getTenants();
+					const tenants = await getTenants();
+					if (tenants.length === 1) {
+						return redirect(`../tenants/${tenants[0].id}`);
+					}
+					return tenants;
 				}
 			},
 			{
@@ -214,6 +311,67 @@ const routeData = [
 				}
 			}
 		],
+	},
+	{
+		path: "tenants/:tenantId",
+		element: <App renderDrawer />,
+		ErrorBoundary: ErrorView,
+		loader: async () => {
+			const { tenant, payrolls, user } = await getTenantData();
+			const employee = await store.get(employeeAtom);
+			return { tenant, user, payrolls, employee };
+		},
+		id: "tenantRoot",
+		children: [
+			{
+				index: true,
+				loader: async () => {
+					const { user } = await getTenantData();
+					const isAdmin = user?.attributes.roles?.includes("admin");
+					if (isAdmin)
+						return redirect("employees");
+					return redirect("payrolls");
+
+				}
+			},
+			createRouteEmployeeTable("employees", false),
+			createRouteEmployeeNew("employees/new", () => "../employees"),
+			createRouteEmployeeEdit("employees/:employeeId", () => "../employees"),
+			{
+				path: "settings",
+				Component: TenantSettings,
+				action: async ({ params, request }) => {
+					var formData = await request.formData();
+					switch (formData.get("intent")) {
+						case "export":
+							try {
+								const { tenant } = await getTenantData();
+								const name = `${tenant.identifier}_export.zip`;
+								await requestExportDataDownload({ tenantId: params.tenantId }, name);
+								toast("success", "Exported tenant");
+							}
+							catch {
+								toast("error", "Tenant could not be exported");
+							}
+							return null;
+						case "delete":
+							try {
+								var response = await deleteTenant(params);
+								if (response.ok) {
+									toast("success", "Tenant deleted");
+									return redirect("/tenants");
+								}
+							}
+							catch {
+								toast("error", "Tenant could not be deleted");
+							}
+							return null;
+						default:
+							throw new Error("Invalid intent");
+					}
+				}
+			}
+		]
 	},
 	{
 		path: "tenants/:tenantId/payrolls/:payrollId?",
@@ -249,88 +407,9 @@ const routeData = [
 					return null;
 				},
 			},
-			{
-				path: "settings",
-				Component: TenantSettings,
-				action: async ({ params, request }) => {
-					var formData = await request.formData();
-					switch (formData.get("intent")) {
-						case "export":
-							try {
-								const { tenant } = await getTenantData();
-								const name = `${tenant.identifier}_export.zip`;
-								await requestExportDataDownload({ tenantId: params.tenantId }, name);
-								toast("success", "Exported tenant");
-							}
-							catch {
-								toast("error", "Tenant could not be exported");
-							}
-							return null;
-						case "delete":
-							try {
-								var response = await deleteTenant(params);
-								if (response.ok) {
-									toast("success", "Tenant deleted");
-									return redirect("/tenants");
-								}
-							}
-							catch {
-								toast("error", "Tenant could not be deleted");
-							}
-							return null;
-						default:
-							throw new Error("Invalid intent");
-					}
-				}
-			},
-			{
-				path: "hr/employees",
-				Component: AsyncEmployeeTable,
-				loader: ({ params, request }) => {
-					const [_, queryString] = request.url.split("?");
-					const searchParams = new URLSearchParams(queryString);
-					const searchTerm = searchParams.get("search");
-					const showAll = !!searchParams.get("showAll");
-					let filter;
-					if (searchTerm) {
-						filter = `startswith_ci(firstName, '${searchTerm}') or startswith_ci(lastName, '${searchTerm}') or startswith_ci(identifier, '${searchTerm}')`;
-					}
-					return defer({
-						data: getEmployees(params)
-							.withQueryParam("filter", filter)
-							.withQueryParam("status", showAll ? null : "Active")
-							.fetchJson(),
-					});
-				},
-			},
-			{
-				path: "hr/employees/new",
-				Component: EmployeeForm,
-				action: async ({ params, request }) => {
-					const payroll = await store.get(payrollAtom);
-					if (!payroll) return null;
-					const division = await getDivision(params, payroll.divisionId);
-					const formData = await request.formData();
-					const response = await createEmployee(params, {
-						identifier: formData.get("identifier"),
-						firstName: formData.get("firstName"),
-						lastName: formData.get("lastName"),
-						divisions: [division.name],
-					});
-
-					if (response.status === 201) {
-						const employee = await response.json();
-						toast("success", "New employee created");
-						return redirect(`../hr/employees/${employee.id}/missingdata`);
-					}
-					let errorMessage = await response.json();
-					if (!errorMessage || typeof errorMessage !== "string") {
-						errorMessage = "Saving failed!";
-					}
-					toast("error", errorMessage);
-					return response;
-				},
-			},
+			createRouteEmployeeTable("hr/employees"),
+			createRouteEmployeeNew("hr/employees/new", employeeId => `../hr/employees/${employeeId}/missingdata`),
+			createRouteEmployeeEdit("hr/employees/:employeeId/edit", employeeId => `../hr/employees/${employeeId}`),
 			{
 				path: "hr/employees/:employeeId",
 				element: <EmployeeView />,
@@ -350,7 +429,6 @@ const routeData = [
 							});
 						},
 					},
-
 					{
 						path: "new/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
@@ -367,7 +445,7 @@ const routeData = [
 								getEmployeeCaseChanges(params, null, "created desc, id"),
 						}),
 					},
-					getDocumentRoute(false),
+					createRouteDocument(false),
 					{
 						path: "missingdata/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
@@ -386,33 +464,6 @@ const routeData = [
 						},
 					},
 				],
-			},
-			{
-				path: "hr/employees/:employeeId/edit",
-				Component: EmployeeForm,
-				loader: async ({ params }) => getEmployee(params),
-				action: async ({ params, request }) => {
-					const formData = await request.formData();
-					const response = await updateEmployee(params, {
-						identifier: formData.get("identifier"),
-						status: formData.get("status"),
-						firstName: formData.get("firstName"),
-						lastName: formData.get("lastName"),
-						divisions: JSON.parse(formData.get("divisions")),
-					});
-
-					if (response.ok) {
-						toast("success", "Saved!");
-						return redirect(`../hr/employees/${params.employeeId}`);
-					} else {
-						let errorMessage = await response.json();
-						if (!errorMessage || typeof errorMessage !== "string") {
-							errorMessage = "Saving failed!";
-						}
-						toast("error", errorMessage);
-					}
-					return response;
-				},
 			},
 			{
 				path: "hr/tasks",
@@ -773,7 +824,7 @@ const routeData = [
 								getCompanyCaseChanges(params, null, "created desc, id"),
 						}),
 					},
-					getDocumentRoute(false),
+					createRouteDocument(false),
 				],
 			},
 			{
@@ -805,7 +856,7 @@ const routeData = [
 						path: "tasks/:caseName",
 						lazy: () => import("./scenes/global/CaseForm"),
 					},
-					getDocumentRoute(true),
+					createRouteDocument(true),
 				],
 			},
 		],

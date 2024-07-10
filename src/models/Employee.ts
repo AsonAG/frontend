@@ -1,8 +1,13 @@
+import { UUID } from "crypto";
+import { StatusEnum } from "./StatusEnum";
+
 export type Employee = {
-	id: number;
+	id: UUID;
+	status: StatusEnum;
 	firstName: string;
 	lastName: string;
 	identifier: string;
+	divisions: Array<string>;
 };
 
 export function getEmployeeDisplayString(employee: Employee) {
