@@ -1,17 +1,13 @@
 import {
 	Box,
-	IconButton,
 	AppBar,
 	Toolbar,
 	Stack,
 } from "@mui/material";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import { useDarkMode } from "../../theme";
+import { UserAccountComponent } from "./UserAccountComponent";
+import { Suspense } from "react";
 
 function Topbar({ children }) {
-	const { isDarkMode, setDarkMode } = useDarkMode();
-
 	return (
 		<AppBar
 			elevation={0}
@@ -30,12 +26,9 @@ function Topbar({ children }) {
 				<Box sx={{ flexGrow: 1 }} />
 
 				<Stack direction="row" spacing={0.5}>
-					<IconButton
-						onClick={() => setDarkMode(isDarkMode ? "light" : "dark")}
-						size="large"
-					>
-						{isDarkMode ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
-					</IconButton>
+					<Suspense>
+						<UserAccountComponent />
+					</Suspense>
 				</Stack>
 			</Toolbar>
 		</AppBar>

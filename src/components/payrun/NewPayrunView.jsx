@@ -15,6 +15,7 @@ import { EmployeeSelector } from "./EmployeeSelector";
 import { useTranslation } from "react-i18next";
 import { CircularProgress } from "@mui/material";
 import { DatePicker } from "../DatePicker";
+import i18next from "i18next"; 
 
 export function AsyncNewPayrunView() {
 	return (
@@ -178,7 +179,7 @@ function reducer(state, action) {
 }
 
 const getJobName = (period) =>
-	`Payrun ${period.format("MMMM")} ${period.year()}`;
+	`${i18next.t("Payrun")} ${period.format("MMMM")} ${period.year()}`;
 const iconProps = {
 	size: "1em",
 	sx: {

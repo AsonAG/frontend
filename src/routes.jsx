@@ -547,14 +547,14 @@ const routeData = [
 				},
 			},
 			{
-				path: "hr/missingdata",
+				path: "hr/controlling",
 				Component: MissingDataView,
 				loader: () => {
 					store.set(openMissingDataTasksAtom);
 
 					return defer({
 						data: store.get(openMissingDataTasksAtom),
-						title: "Missing data",
+						title: "Controlling",
 					});
 				},
 				children: [
@@ -568,7 +568,7 @@ const routeData = [
 				],
 			},
 			{
-				path: "hr/missingdata/:employeeId",
+				path: "hr/controlling/:employeeId",
 				Component: EmployeeTitle,
 				loader: ({ params }) => getEmployee(params),
 				children: [

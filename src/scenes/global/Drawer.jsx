@@ -19,17 +19,17 @@ import { PayrollSelector } from "../../components/selectors/PayrollSelector";
 import { Stack } from "@mui/system";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import NotStartedOutlinedIcon from "@mui/icons-material/NotStartedOutlined";
 import SettingsIcon from '@mui/icons-material/Settings';
 import BusinessIcon from '@mui/icons-material/Business';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import PaymentsIcon from '@mui/icons-material/Payments';
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
-import { UserAccountComponent } from "./UserAccountComponent";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
 import { openMissingDataTasksAtom, openTasksAtom } from "../../utils/dataAtoms";
-import { Description, NotificationImportant } from "@mui/icons-material";
+import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
 const Link = styled(
@@ -79,8 +79,8 @@ function OpenTasksBadgeIcon() {
 	);
 }
 
-function MissingDataBadgeIcon() {
-	const icon = <NotificationImportant />;
+function ControllingBadgeIcon() {
+	const icon = <TaskAltIcon />;
 	const count = (data) =>
 		data.map((x) => x.cases.length).reduce((a, b) => a + b, 0);
 	return (
@@ -167,14 +167,14 @@ function MenuItemsPayrollAdmin() {
 				icon={<OpenTasksBadgeIcon />}
 			/>
 			<NavigationItem
-				label={t("Missing data")}
-				to="hr/missingdata"
-				icon={<MissingDataBadgeIcon />}
+				label={t("Controlling")}
+				to="hr/controlling"
+				icon={<ControllingBadgeIcon />}
 			/>
 			<NavigationItem
 				label={t("Payruns")}
 				to="hr/payruns"
-				icon={<NotStartedOutlinedIcon />}
+				icon={<PaymentsIcon />}
 			/>
 			<NavigationItem
 				label={t("Reports")}
@@ -295,10 +295,7 @@ function Drawer({ temporary, open, onClose }) {
 				<NavigationMenu>
 					<MenuItems />
 				</NavigationMenu>
-				<Divider />
 				<TenantSection />
-				<Divider />
-				<UserAccountComponent />
 			</Stack>
 		</MuiDrawer>
 	);
@@ -312,33 +309,35 @@ function TenantSection() {
 		return null;
 
 	return (
-		<Stack sx={{ p: 2 }} spacing={1}>
-			<Typography>{t("Company")}</Typography>
-			<Stack spacing={1} direction="row">
-				<Typography
-					variant="body2"
-					textOverflow="ellipsis"
-					overflow="hidden"
-				>
-					{tenant.identifier}
-				</Typography>
-				<Typography
-					component={RouterLink}
-					variant="body2"
-					color="primary.main"
-					to="/tenants"
-					sx={{
-						textDecoration: "none",
-						"&: hover": {
-							fontWeight: "bold",
-						},
-					}}
-				>
-					{t("Select...")}
-				</Typography>
+		<>
+			<Divider />
+			<Stack sx={{ p: 2 }} spacing={1}>
+				<Typography>{t("Company")}</Typography>
+				<Stack spacing={1} direction="row">
+					<Typography
+						variant="body2"
+						textOverflow="ellipsis"
+						overflow="hidden"
+					>
+						{tenant.identifier}
+					</Typography>
+					<Typography
+						component={RouterLink}
+						variant="body2"
+						color="primary.main"
+						to="/tenants"
+						sx={{
+							textDecoration: "none",
+							"&: hover": {
+								fontWeight: "bold",
+							},
+						}}
+					>
+						{t("Select...")}
+					</Typography>
+				</Stack>
 			</Stack>
-		</Stack>
-
+		</>
 	);
 
 }

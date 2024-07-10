@@ -8,6 +8,7 @@
     "@mui/icons-material": "^5.14.9",
     "@mui/material": "^5.14.9",
     "@mui/x-date-pickers": "^6.12.0",
+    "@radix-ui/react-popover": "^1.1.1",
     "dayjs": "^1.11.9",
     "i18next": "^23.5.1",
     "interweave": "^13.1.0",

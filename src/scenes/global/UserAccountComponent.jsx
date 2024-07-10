@@ -4,8 +4,7 @@ import {
 	ButtonGroup,
 	Button,
 	TextField,
-	useTheme,
-	Alert,
+	IconButton
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
@@ -15,6 +14,13 @@ import { useAtom, useAtomValue } from "jotai";
 import { localUserEmailAtom } from "../../auth/getUser";
 import { userAtom } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
+import * as Popover from '@radix-ui/react-popover';
+import { AccountCircle } from "@mui/icons-material";
+import { useDarkMode } from "../../theme";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import ContrastIcon from '@mui/icons-material/Contrast';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const buttonSx = {
 	flexGrow: 1,
@@ -23,7 +29,11 @@ const buttonSx = {
 };
 const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
 
-function AuthenticatedUserAccountComponent() {
+function AuthenticatedUserSettings() {
+	// this does not change at runtime
+	if (!useOidc)
+		return null;
+
 	const { t } = useTranslation();
 	const auth = useAuth();
 	const handleLogout = () => {
@@ -33,36 +43,34 @@ function AuthenticatedUserAccountComponent() {
 	};
 
 	return (
-		<Stack spacing={2} sx={{ p: 2 }}>
-			<UserInformation />
-			<ButtonGroup variant="outlined">
-				<Button
-					sx={buttonSx}
-					color="primary"
-					component={Link}
-					to={settingsLink}
-				>
-					{t("Settings")}
-				</Button>
-				<Button
-					sx={buttonSx}
-					color="primary"
-					endIcon={<LogoutIcon sx={{ height: 16 }} />}
-					onClick={handleLogout}
-				>
-					Logout
-				</Button>
-			</ButtonGroup>
-		</Stack>
+		<ButtonGroup variant="outlined">
+			<Button
+				sx={buttonSx}
+				color="primary"
+				component={Link}
+				to={settingsLink}
+			>
+				{t("Settings")}
+			</Button>
+			<Button
+				sx={buttonSx}
+				color="primary"
+				endIcon={<LogoutIcon sx={{ height: 16 }} />}
+				onClick={handleLogout}
+			>
+				Logout
+			</Button>
+		</ButtonGroup>
 	);
 }
 
-function LocalUserAccountComponent() {
+function UserEdit() {
 	const [storedUserEmail, setStoredUserEmail] = useAtom(localUserEmailAtom);
-	const theme = useTheme();
 	const updateUser = (email) => {
-		setStoredUserEmail(email);
-		window.location.reload();
+		if (email !== storedUserEmail) {
+			setStoredUserEmail(email);
+			window.location.reload();
+		}
 	};
 	const onKeyDown = (event) => {
 		if (event.keyCode === 13) {
@@ -70,50 +78,88 @@ function LocalUserAccountComponent() {
 		}
 	};
 	return (
-		<Stack>
-			<UserInformation sx={{ p: 2 }} />
-			<Stack p={2} spacing={0.5} sx={{ background: getDevBg(theme) }}>
-				<Typography variant="body2">DEV</Typography>
-				<TextField
-					defaultValue={storedUserEmail}
-					variant="standard"
-					onBlur={(event) => updateUser(event.target.value)}
-					onKeyDown={onKeyDown}
-				/>
-			</Stack>
-		</Stack>
+		<TextField
+			defaultValue={storedUserEmail}
+			fullWidth
+			variant="standard"
+			onBlur={(event) => updateUser(event.target.value)}
+			onKeyDown={onKeyDown}
+			inputProps={{
+				style: { textAlign: "center" }
+			}}
+		/>
 	);
 }
 
-function UserInformation({ sx }) {
+function UserInformation() {
 	const { t } = useTranslation();
 	const user = useAtomValue(userAtom);
-	if (user === null) {
-		return (
-			<Alert severity="error" sx={sx}>
-				<Typography>{t("User not found!")}</Typography>
-			</Alert>
-		);
-	}
+	const title = user ? `${user.firstName} ${user.lastName}` : t("User does not exist!");
+
 	return (
-		<Stack sx={sx}>
-			<Typography gutterBottom>
-				{user.firstName} {user.lastName}
-			</Typography>
-			<Typography variant="body2">{user.identifier}</Typography>
+		<Stack alignItems="center" width="100%">
+			<Typography variant="h6" gutterBottom>{title}</Typography>
+			{
+				useOidc ?
+					<Typography variant="body2">{user.identifier}</Typography> :
+					<UserEdit />
+			}
 		</Stack>
 	);
 }
 
-function getDevBg(theme) {
-	const bgColor = theme.palette.background.default;
-	const stripeColor = "rgba(255, 221, 0, 0.2)";
-	return `repeating-linear-gradient(305deg, ${bgColor}, ${bgColor} 10px, ${stripeColor} 10px, ${stripeColor} 20px)`;
+const popoverSx = { border: 1, borderColor: "divider", bgcolor: theme => theme.palette.background.default, overflow: "hidden", zIndex: theme => theme.zIndex.appBar };
+
+export function UserAccountComponent() {
+	const user = useAtomValue(userAtom);
+	const icon = user ? <AccountCircle /> : <ErrorIcon color="error" />
+
+	return (
+		<Popover.Root>
+			<Popover.Trigger asChild>
+				<IconButton size="large">
+					{icon}
+				</IconButton>
+			</Popover.Trigger>
+			<Popover.Portal>
+				<Popover.Content asChild>
+					<Stack spacing={2} borderRadius={2} mx={2} p={2} sx={popoverSx} alignItems="center">
+						<UserInformation />
+						<AuthenticatedUserSettings />
+						<ThemeModePicker />
+					</Stack>
+				</Popover.Content>
+			</Popover.Portal>
+		</Popover.Root>
+	);
 }
 
-export function UserAccountComponent(props) {
-	if (useOidc) {
-		return AuthenticatedUserAccountComponent(props);
-	}
-	return LocalUserAccountComponent(props);
+function ThemeModePicker() {
+	const { t } = useTranslation();
+	const { darkMode, setDarkMode } = useDarkMode();
+	return (
+		<ButtonGroup>
+			<Button
+				variant={darkMode === "light" ? "contained" : "outlined"}
+				onClick={() => setDarkMode("light")}
+				startIcon={<LightModeOutlinedIcon fontSize="small" />}
+			>
+				{t("Light")}
+			</Button>
+			<Button
+				variant={darkMode === "system" ? "contained" : "outlined"}
+				onClick={() => setDarkMode("system")}
+				startIcon={<ContrastIcon fontSize="small" />}
+			>
+				{t("System")}
+			</Button>
+			<Button
+				variant={darkMode === "dark" ? "contained" : "outlined"}
+				onClick={() => setDarkMode("dark")}
+				startIcon={<DarkModeOutlinedIcon fontSize="small" />}
+			>
+				{t("Dark")}
+			</Button>
+		</ButtonGroup>
+	)
 }
