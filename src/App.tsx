@@ -121,7 +121,6 @@ function RenderProductionBanner() {
 	const isProvider = useRole("provider");
 	useEffect(() => {
 		const value = isProvider ? "' '" : null;
-		console.log("isProvider", isProvider);
 		document.documentElement.style.setProperty('--production', value);
 	}, [isProvider]);
 	return null;

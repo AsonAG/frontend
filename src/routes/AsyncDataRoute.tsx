@@ -1,17 +1,24 @@
-import { Suspense } from "react";
+import { PropsWithChildren, ReactNode, Suspense } from "react";
 import { Loading } from "../components/Loading";
 import { ErrorView } from "../components/ErrorView";
 import { Await, useLoaderData } from "react-router-dom";
 import { Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import React from "react";
+
+type AsyncDataRouteProps = {
+	loadingElement?: ReactNode,
+	skipDataCheck?: boolean,
+	noDataAvailableText?: string
+} & PropsWithChildren;
 
 export function AsyncDataRoute({
 	children,
 	loadingElement,
 	skipDataCheck,
 	noDataAvailableText = "No data available",
-}) {
-	const routeData = useLoaderData();
+}: AsyncDataRouteProps) {
+	const routeData = useLoaderData() as any;
 	const { t } = useTranslation();
 	const loading = loadingElement || <Loading />;
 	return (
@@ -29,7 +36,7 @@ export function AsyncDataRoute({
 	);
 }
 
-function hasData(value) {
+function hasData(value: { length: number; count: number; }) {
 	if (Array.isArray(value)) {
 		return value.length > 0;
 	}

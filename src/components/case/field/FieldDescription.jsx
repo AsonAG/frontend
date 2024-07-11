@@ -1,13 +1,14 @@
 import { useContext } from "react";
-import { Tooltip, styled } from "@mui/material";
+import { Box, Tooltip, styled } from "@mui/material";
 import { HtmlContent } from "../../HtmlContent";
-import { Info } from "@mui/icons-material";
+import { History, Info } from "@mui/icons-material";
 import {
 	ResponsiveDialog,
 	ResponsiveDialogContent,
 	ResponsiveDialogTrigger,
 } from "../../ResponsiveDialog";
 import { FieldContext } from "./Field";
+import { Link } from "react-router-dom";
 
 const ButtonBox = styled("div")(({ theme }) =>
 	theme.unstable_sx({
@@ -48,4 +49,24 @@ export function FieldDescription() {
 			</ResponsiveDialogContent>
 		</ResponsiveDialog>
 	);
+}
+
+export function FieldHistory({ sx }) {
+	const { field } = useContext(FieldContext);
+	const { name } = field;
+
+	return (
+		<Tooltip
+			arrow
+			title="History"
+			placement="top"
+		>
+			<Box component={Link} to={`history/${encodeURIComponent(name)}`} sx={sx}>
+				<ButtonBox>
+					<History />
+				</ButtonBox>
+			</Box>
+		</Tooltip>
+	);
+
 }

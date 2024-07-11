@@ -12,6 +12,7 @@ const payrollsUrl = "/tenants/:tenantId/payrolls";
 const payrollUrl = "/tenants/:tenantId/payrolls/:payrollId";
 const divisionsUrl = "/tenants/:tenantId/divisions";
 const caseSetsUrl = "/tenants/:tenantId/payrolls/:payrollId/cases/sets";
+const caseValuesUrl = "/tenants/:tenantId/payrolls/:payrollId/changes/values";
 const missingDataUrl = "/tenants/:tenantId/payrolls/:payrollId/missingdata";
 const lookupValuesUrl = "/tenants/:tenantId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
@@ -273,6 +274,17 @@ export function getEmployeeCases(routeParams, clusterSetName) {
 		.withQueryParam("clusterSetName", clusterSetName)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("orderBy", `name asc`)
+		.withLocalization()
+		.withUser()
+		.fetchJson();
+}
+
+export function getEmployeeCaseValues(routeParams) {
+	return new FetchRequestBuilder(caseValuesUrl, routeParams)
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParam("filter", `CaseFieldName eq '${routeParams.caseFieldName}'`)
+		.withQueryParam("caseType", "Employee")
+		.withQueryParam("orderBy", "created desc")
 		.withLocalization()
 		.withUser()
 		.fetchJson();

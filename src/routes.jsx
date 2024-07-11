@@ -55,7 +55,8 @@ import {
 	importTenant,
 	requestExportDataDownload,
 	deleteTenant,
-	getDivisions
+	getDivisions,
+	getEmployeeCaseValues
 } from "./api/FetchClient";
 import { EmployeeView, EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -93,6 +94,7 @@ import { NewTaskView } from "./components/NewTaskView";
 import { TenantImport } from "./scenes/tenants/TenantImport";
 import { TenantSettings } from "./scenes/tenants/TenantSettings";
 import { CompanyView } from "./scenes/CompanyView";
+import { AsynCaseFieldHistoryDialog } from "./components/CaseFieldHistoryDialog";
 
 const store = getDefaultStore();
 
@@ -435,6 +437,17 @@ const routeData = [
 						loader: () => ({
 							renderTitle: false,
 						}),
+						children: [
+							{
+								path: "history/:caseFieldName",
+								Component: AsynCaseFieldHistoryDialog,
+								loader: ({ params }) => {
+									return defer({
+										data: getEmployeeCaseValues(params)
+									});
+								}
+							}
+						]
 					},
 					{
 						path: "events",

@@ -1,5 +1,6 @@
 import {
 	Form,
+	Outlet,
 	useParams,
 	useLoaderData,
 	useRouteLoaderData,
@@ -59,6 +60,7 @@ export function Component() {
 						{caseData && <CaseComponent _case={caseData} />}
 						<CaseErrorComponent errors={caseErrors} />
 						<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} />
+						<Outlet />
 					</Stack>
 				</Form>
 			</CaseFormContext.Provider>

@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
 import { FieldValueComponent } from "./value/FieldValueComponent";
-import { FieldDescription } from "./FieldDescription";
+import { FieldDescription, FieldHistory } from "./FieldDescription";
 import { createContext, useContext } from "react";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
 import { useTheme } from "@emotion/react";
@@ -38,9 +38,10 @@ export function Field({ field }) {
 
 function DefaultLayout({ field }) {
 	return (
-		<Box display="grid" gridTemplateColumns="1fr 135px 135px" columnGap="8px">
+		<Box display="grid" gridTemplateColumns="1fr 135px 135px 37px" columnGap="8px">
 			<EditWithDescription />
 			<FieldPeriodSelector field={field} />
+			<FieldHistory sx={{ gridColumn: 4 }} />
 		</Box>
 	);
 }
@@ -66,6 +67,7 @@ function MobileLayout({ field }) {
 			<EditWithDescription />
 			<Stack direction="row" spacing={1}>
 				<FieldPeriodSelector field={field} />
+				<FieldHistory sx={{ gridColumn: 4 }} />
 			</Stack>
 		</Stack>
 	);
