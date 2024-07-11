@@ -1,6 +1,6 @@
-import { UUID } from "crypto";
+import { IdType } from "./IdType";
 
 export type Tenant = {
-  id: UUID;
+  id: IdType;
   identifier: string;
 }

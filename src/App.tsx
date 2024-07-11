@@ -32,11 +32,16 @@ import "dayjs/locale/de";
 import "dayjs/locale/en";
 import { useAtom } from "jotai";
 import { toastNotificationAtom } from "./utils/dataAtoms";
+import { User } from "./models/User";
+
+type LoaderData = {
+	user: User
+};
 
 export function App({ renderDrawer = false }) {
 	const theme = useCreateTheme();
 	const useTemporaryDrawer = useMediaQuery(theme.breakpoints.down("lg"));
-	const { user } = useLoaderData();
+	const { user } = useLoaderData() as LoaderData;
 	const { i18n } = useTranslation();
 
 	useEffect(() => {
@@ -86,9 +91,7 @@ export function App({ renderDrawer = false }) {
 
 function Snackbar() {
 	const { t } = useTranslation();
-	const [toastNotification, setToastNotification] = useAtom(
-		toastNotificationAtom,
-	);
+	const [toastNotification, setToastNotification] = useAtom(toastNotificationAtom);
 	const handleClose = () => setToastNotification(null);
 
 	if (toastNotification === null) return null;

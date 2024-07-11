@@ -1,20 +1,24 @@
 import { User } from "oidc-client-ts";
 import { authConfig, useOidc } from "./authConfig";
-import { atom } from "jotai";
+import { Atom, WritableAtom, atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 
 
 const authRoleProperty = `urn:zitadel:iam:org:project:${import.meta.env.VITE_PROJECT_ID}:roles`;
 
-function getAuthUserAtom() {
+function getAuthUserAtom(): Atom<User> {
 	if (useOidc) {
 		const storageKey = `oidc.user:${authConfig.authority}:${authConfig.client_id}`;
-		const rawAuthUserAtom = atomWithStorage(storageKey, null, window.localStorage, { getOnInit: true });
+		const rawAuthUserAtom = atomWithStorage<string | null>(storageKey, null, window.localStorage as SyncStorage<string | null>, { getOnInit: true });
 		// return read only atom
-		return atom(get => User.fromStorageString(get(rawAuthUserAtom)));
+		return atom(get => User.fromStorageString(get(rawAuthUserAtom) ?? ""));
 	}
 
-	const defaultLocalUser = {
+	const defaultLocalUser: User = {
+		session_state: null,
+		access_token: "",
+		token_type: "Bearer",
 		profile: {
 			email: "ajo@ason.ch",
 			[authRoleProperty]: {
@@ -23,8 +27,20 @@ function getAuthUserAtom() {
 				onboarding: {},
 				admin: {},
 				provider: {}
-			}
+			},
+			sub: "",
+			iss: "",
+			aud: "",
+			exp: 0,
+			iat: 0
 		},
+		state: undefined,
+		expires_in: undefined,
+		expired: undefined,
+		scopes: [],
+		toStorageString: function(): string {
+			throw new Error("Function not implemented.");
+		}
 	};
 
 	const localUserAtom = atomWithStorage("local.ason.user", defaultLocalUser, undefined, { getOnInit: true });
@@ -33,12 +49,18 @@ function getAuthUserAtom() {
 
 export const authUserAtom = getAuthUserAtom();
 
+function isWritable<T>(atom: Atom<T>): atom is WritableAtom<T, [T], unknown> {
+	return "write" in atom;
+}
+
 export const localUserEmailAtom = atom(
 	(get) => get(authUserAtom)?.profile?.email,
-	(get, set, update) => {
+	(get, set, update: string) => {
 		const user = get(authUserAtom);
 		user.profile.email = update;
-		set(authUserAtom, user);
+		if (isWritable(authUserAtom)) {
+			set(authUserAtom, user);
+		}
 	}
 );
 

@@ -1,7 +1,7 @@
-import { UUID } from "crypto";
+import { IdType } from "./IdType";
 
 export type Payroll = {
-  id: UUID;
+  id: IdType;
   name: string;
   divisionId: UUID;
 }

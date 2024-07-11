@@ -1,4 +1,3 @@
-import { atomWithRefresh } from "./atomWithRefresh";
 import {
 	getPayrolls,
 	getTasks,
@@ -12,6 +11,9 @@ import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
+import { IdType } from "../models/IdType";
+import { MissingData } from "../models/MissingData";
+import { atomWithRefresh } from "jotai/utils";
 
 export const tenantAtom = atom((get) => {
 	const tenantId = get(tenantIdAtom);
@@ -71,7 +73,7 @@ export const openTasksAtom = atomWithRefresh(async (get) => {
 	return getTasks({ tenantId, payrollId }, filter, orderBy);
 });
 
-export const openMissingDataTasksAtom = atomWithRefresh(async (get) => {
+export const openMissingDataTasksAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
 	const tenantId = get(tenantIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (tenantId === null || payrollId === null) return [];
@@ -83,20 +85,29 @@ export const openMissingDataTasksAtom = atomWithRefresh(async (get) => {
 	return missingData;
 });
 
-const missingDataMapAtom = atom(async (get) => {
+const missingDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async (get) => {
 	const missingData = await get(openMissingDataTasksAtom);
-	if (!missingData) return {};
-	const kvp = missingData.map((x) => [x.id, x]);
-	return new Map(kvp);
+	const map = new Map();
+	for (var data of missingData || []) {
+		map.set(data.id, data);
+	}
+	return map;
 });
 
-export const toastNotificationAtom = atom(null);
+type ToastSeverity = 'error' | 'info' | 'success' | 'warning';
 
-export function toast(severity, message) {
+export type Toast = {
+	severity: ToastSeverity,
+	message: string
+};
+
+export const toastNotificationAtom = atom<Toast | null>(null);
+
+export function toast(severity: ToastSeverity, message: string) {
 	getDefaultStore().set(toastNotificationAtom, { severity, message });
 }
 
-export function useMissingDataCount(employeeId) {
+export function useMissingDataCount(employeeId: IdType) {
 	const allMissingData = useAtomValue(missingDataMapAtom);
 	const employeeMissingData = allMissingData.get(employeeId);
 	if (!employeeMissingData) return null;

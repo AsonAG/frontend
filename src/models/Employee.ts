@@ -1,8 +1,8 @@
-import { UUID } from "crypto";
+import { IdType } from "./IdType";
 import { StatusEnum } from "./StatusEnum";
 
 export type Employee = {
-	id: UUID;
+	id: IdType;
 	status: StatusEnum;
 	firstName: string;
 	lastName: string;
