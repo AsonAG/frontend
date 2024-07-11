@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useCreateTheme } from "./theme";
 import {
 	CssBaseline,
@@ -33,6 +33,7 @@ import "dayjs/locale/en";
 import { useAtom } from "jotai";
 import { toastNotificationAtom } from "./utils/dataAtoms";
 import { User } from "./models/User";
+import { useRole } from "./hooks/useRole";
 
 type LoaderData = {
 	user: User
@@ -84,6 +85,9 @@ export function App({ renderDrawer = false }) {
 					</Container>
 				</Stack>
 				<Snackbar />
+				<Suspense>
+					<RenderProductionBanner />
+				</Suspense>
 			</Stack>
 		</ThemeProvider>
 	);
@@ -108,4 +112,17 @@ function Snackbar() {
 			</Alert>
 		</MuiSnackbar>
 	);
+}
+
+function RenderProductionBanner() {
+	if (!import.meta.env.PROD) {
+		return null;
+	}
+	const isProvider = useRole("provider");
+	useEffect(() => {
+		const value = isProvider ? "' '" : null;
+		console.log("isProvider", isProvider);
+		document.documentElement.style.setProperty('--production', value);
+	}, [isProvider]);
+	return null;
 }

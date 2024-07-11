@@ -14,6 +14,15 @@ main {
 	position: relative;
 }
 
+.app::after {
+	content: var(--production);
+	position: fixed;
+	width: 100%;
+	height: 8px;
+	background-color: #e11313;
+	z-index: 10000;
+}
+
 main {
 	margin-top: var(--header-height);
 }
