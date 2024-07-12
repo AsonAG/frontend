@@ -75,14 +75,17 @@ export function App({ renderDrawer = false }) {
 						onClose={() => setDrawerOpen(false)}
 					/>
 				)}
-				<Stack sx={{ flexGrow: 1, minWidth: 0 }}>
+				<Stack sx={{ flex: 1, minWidth: 0 }}>
 					<Topbar>
 						{drawerButton}
 						{topbarLogo}
 					</Topbar>
-					<Container component="main" maxWidth="lg" sx={containerProps}>
-						<Outlet />
-					</Container>
+					<Stack id="content" direction="row" sx={{ flex: 1, minWidth: 0 }}>
+						<Container component="main" maxWidth="lg" sx={containerProps}>
+							<Outlet />
+						</Container>
+						<div id="sidebar-container"></div>
+					</Stack>
 				</Stack>
 				<Snackbar />
 				<Suspense>

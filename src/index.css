@@ -2,7 +2,8 @@ html,
 body,
 #root,
 .app,
-main {
+main,
+#sidebar-container {
 	height: 100%;
 	width: 100%;
 	margin: 0;
@@ -23,8 +24,15 @@ main {
 	z-index: 10000;
 }
 
-main {
+#content {
 	margin-top: var(--header-height);
+}
+
+#sidebar-container {
+	max-width: 485px;
+	/* display: none; */
+	max-height: calc(100dvh - var(--header-height));
+	overflow-y: auto;
 }
 
 ::-webkit-scrollbar {
