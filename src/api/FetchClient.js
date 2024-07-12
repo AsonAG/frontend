@@ -279,11 +279,12 @@ export function getEmployeeCases(routeParams, clusterSetName) {
 		.fetchJson();
 }
 
-export function getEmployeeCaseValues(routeParams) {
+export function getCaseValues(routeParams) {
+	const caseType = routeParams.employeeId ? "Employee" : "Company";
 	return new FetchRequestBuilder(caseValuesUrl, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("filter", `CaseFieldName eq '${routeParams.caseFieldName}'`)
-		.withQueryParam("caseType", "Employee")
+		.withQueryParam("caseType", caseType)
 		.withQueryParam("orderBy", "created desc")
 		.withLocalization()
 		.withUser()

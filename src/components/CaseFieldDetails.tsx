@@ -8,7 +8,7 @@ import { formatDate } from "../utils/DateUtils";
 import { useTranslation } from "react-i18next";
 import { IdType } from "../models/IdType";
 import { formatCaseValue } from "../utils/Format";
-import { ContentLayout, PageContent } from "./ContentLayout";
+import { ContentLayout } from "./ContentLayout";
 import { HtmlContent } from "./HtmlContent";
 import { Loading } from "./Loading";
 
@@ -122,7 +122,7 @@ function CaseFieldHistoryTable({ caseFieldName }) {
   const caseValues = fetcher.data as Array<CaseChangeCaseValue>;
 
   if (caseValues.length === 0)
-    return <Typography>{t("No values saved")}</Typography>;
+    return <Typography>{t("No data")}</Typography>;
 
 
   return (

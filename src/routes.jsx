@@ -56,7 +56,7 @@ import {
 	requestExportDataDownload,
 	deleteTenant,
 	getDivisions,
-	getEmployeeCaseValues
+	getCaseValues
 } from "./api/FetchClient";
 import { EmployeeView, EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -129,6 +129,21 @@ function paginatedLoader({
 				.fetchJson(),
 		};
 		return defer(result);
+	};
+}
+
+function createRouteCaseForm(path, data) {
+	const loader = data ? () => data : undefined;
+	return {
+		path,
+		loader,
+		lazy: () => import("./scenes/global/CaseForm"),
+		children: [
+			{
+				path: "history/:caseFieldName",
+				loader: ({ params }) => getCaseValues(params)
+			}
+		]
 	};
 }
 
@@ -430,19 +445,9 @@ const routeData = [
 							});
 						},
 					},
-					{
-						path: "new/:caseName",
-						lazy: () => import("./scenes/global/CaseForm"),
-						loader: () => ({
-							renderTitle: false,
-						}),
-						children: [
-							{
-								path: "history/:caseFieldName",
-								loader: ({ params }) => getEmployeeCaseValues(params)
-							}
-						]
-					},
+					createRouteCaseForm("new/:caseName", {
+						renderTitle: false,
+					}),
 					{
 						path: "events",
 						Component: AsyncEventTable,
@@ -453,13 +458,9 @@ const routeData = [
 						}),
 					},
 					createRouteDocument(false),
-					{
-						path: "missingdata/:caseName",
-						lazy: () => import("./scenes/global/CaseForm"),
-						loader: () => ({
-							renderTitle: false,
-						}),
-					},
+					createRouteCaseForm("missingdata/:caseName", {
+						renderTitle: false,
+					}),
 					{
 						path: "missingdata",
 						Component: AsyncCaseTable,
@@ -579,14 +580,10 @@ const routeData = [
 				Component: EmployeeTitle,
 				loader: ({ params }) => getEmployee(params),
 				children: [
-					{
-						path: ":caseName",
-						lazy: () => import("./scenes/global/CaseForm"),
-						loader: () => ({
-							redirect: "../..",
-							renderTitle: false,
-						}),
-					},
+					createRouteCaseForm(":caseName", {
+						redirect: "../..",
+						renderTitle: false,
+					})
 				],
 			},
 			{
@@ -799,13 +796,9 @@ const routeData = [
 							});
 						},
 					},
-					{
-						path: "missingdata/:caseName",
-						lazy: () => import("./scenes/global/CaseForm"),
-						loader: () => ({
-							renderTitle: false,
-						})
-					},
+					createRouteCaseForm("missingdata/:caseName", {
+						renderTitle: false,
+					}),
 					{
 						path: "new",
 						Component: AsyncCaseTable,
@@ -815,13 +808,9 @@ const routeData = [
 							});
 						},
 					},
-					{
-						path: "new/:caseName",
-						lazy: () => import("./scenes/global/CaseForm"),
-						loader: () => ({
-							renderTitle: false,
-						})
-					},
+					createRouteCaseForm("new/:caseName", {
+						renderTitle: false,
+					}),
 					{
 						path: "events",
 						Component: AsyncEventTable,
@@ -846,10 +835,7 @@ const routeData = [
 							});
 						},
 					},
-					{
-						path: "new/:caseName",
-						lazy: () => import("./scenes/global/CaseForm"),
-					},
+					createRouteCaseForm("new/:caseName"),
 					{
 						path: "tasks",
 						Component: withPage("Tasks", AsyncCaseTable),
@@ -859,10 +845,7 @@ const routeData = [
 							});
 						},
 					},
-					{
-						path: "tasks/:caseName",
-						lazy: () => import("./scenes/global/CaseForm"),
-					},
+					createRouteCaseForm("tasks/:caseName"),
 					createRouteDocument(true),
 				],
 			},
