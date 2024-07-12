@@ -21,10 +21,14 @@ const ButtonBox = styled("button")(({ theme }) =>
 	}),
 );
 
-export function FieldDescription() {
+export function FieldDetails() {
 	const { setCaseFieldDetails } = useContext(CaseFormContext);
 	const { field } = useContext(FieldContext);
 	const { t } = useTranslation();
+
+	if (field.attributes["input.hidden"] || field.timeType === "Timeless") {
+		return null;
+	}
 
 	return (
 		<Tooltip

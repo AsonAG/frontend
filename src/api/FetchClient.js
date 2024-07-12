@@ -286,6 +286,7 @@ export function getCaseValues(routeParams) {
 		.withQueryParam("filter", `CaseFieldName eq '${routeParams.caseFieldName}'`)
 		.withQueryParam("caseType", caseType)
 		.withQueryParam("orderBy", "created desc")
+		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
 		.withUser()
 		.fetchJson();

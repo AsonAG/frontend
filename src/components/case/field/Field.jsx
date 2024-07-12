@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
 import { FieldValueComponent } from "./value/FieldValueComponent";
-import { FieldDescription } from "./FieldDescription";
+import { FieldDetails } from "./FieldDescription";
 import { createContext, useContext } from "react";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
 import { useTheme } from "@emotion/react";
@@ -49,7 +49,7 @@ function EditWithDescription() {
 	return (
 		<Stack direction="row" spacing={1}>
 			<FieldValueComponent />
-			<FieldDescription />
+			<FieldDetails />
 		</Stack>
 	);
 }
