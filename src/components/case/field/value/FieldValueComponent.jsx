@@ -7,7 +7,7 @@ import {
 } from "./FieldValueDropdownComponent";
 import { FieldValueNumberComponent } from "./FieldValueNumberComponent";
 import { FieldValueTextComponent } from "./FieldValueTextComponent";
-import { FieldValueDateComponent } from "./FieldValueDateComponent";
+import { FieldValueDateComponent, getDatePickerVariant } from "./FieldValueDateComponent";
 import { FieldValueBooleanComponent } from "./FieldValueBooleanComponent";
 import { FieldContext } from "../Field";
 
@@ -39,9 +39,9 @@ export function FieldValueComponent() {
 		case "Document":
 			return <FieldValueFileComponent />;
 		case "Date":
-			return <FieldValueDateComponent />;
+			return <FieldValueDateComponent variant={getDatePickerVariant(field.attributes["input.datePicker"])} />;
 		case "DateTime":
-			return <FieldValueDateComponent variant="datetime" />;
+			return <FieldValueDateComponent variant={getDatePickerVariant(field.attributes["input.datePicker"], "datetime")} />;
 		case "Boolean":
 			return <FieldValueBooleanComponent />;
 		case "WebResource":

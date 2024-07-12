@@ -3,6 +3,16 @@ import { useContext } from "react";
 import { FieldContext } from "../Field";
 import { DatePicker } from "../../../DatePicker";
 
+export function getDatePickerVariant(configuration, defaultValue = "standard", defaultMonth = "month") {
+	if (configuration === "Month") {
+		return defaultMonth;
+	}
+	if (configuration === "Year") {
+		return "year";
+	}
+	return defaultValue;
+}
+
 export function FieldValueDateComponent({
 	variant = "standard",
 	propertyName = "value",
@@ -25,13 +35,6 @@ export function FieldValueDateComponent({
 		field[propertyName] = newDate?.toISOString();
 		buildCase();
 	};
-
-	if (field.attributes["input.datePicker"] === "Month") {
-		variant = "month";
-	}
-	if (field.attributes["input.datePicker"] === "Year") {
-		variant = "year";
-	}
 
 	return (
 		<DatePicker

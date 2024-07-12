@@ -42,7 +42,7 @@ function DatePickerInputAdornment({
 }
 
 interface DatePickerProps extends MuiDatePickerProps<Dayjs> {
-	variant: "standard" | "month" | "year";
+	variant: "standard" | "month" | "month-short" | "year";
 	required?: boolean;
 }
 interface DateTimePickerProps extends MuiDateTimePickerProps<Dayjs> {
@@ -90,29 +90,35 @@ export function DatePicker<T extends DatePickerVariants>({
 		},
 		openPickerButton: { tabIndex: -1 },
 	};
-	if (variant === "month") {
-		const setNewValue = (v: Dayjs | null | undefined) => {
-			if (!v || !onChange) return;
-			handleDateChange(v, { validationError: null });
-		};
-		slots = {
-			...slots,
-			// @ts-ignore
-			inputAdornment: DatePickerInputAdornment,
-		};
-
-		slotProps = {
-			...slotProps,
-			inputAdornment: {
-				// @ts-ignore
-				handleBack: () => setNewValue(value?.subtract(1, "month")),
-				handleForward: () => setNewValue(value?.add(1, "month")),
-			},
-		};
+	if (variant === "month" || variant === "month-short") {
 		pickerProps = {
 			views: ["year", "month"],
 			openTo: "month",
 		};
+		if (variant !== "month-short") {
+			const setNewValue = (v: Dayjs | null | undefined) => {
+				if (!v || !onChange) return;
+				handleDateChange(v, { validationError: null });
+			};
+			slots = {
+				...slots,
+				// @ts-ignore
+				inputAdornment: DatePickerInputAdornment,
+			};
+
+			slotProps = {
+				...slotProps,
+				inputAdornment: {
+					// @ts-ignore
+					handleBack: () => setNewValue(value?.subtract(1, "month")),
+					handleForward: () => setNewValue(value?.add(1, "month")),
+				},
+			};
+		}
+		else {
+			// @ts-ignore
+			pickerProps.format = "MMM YYYY";
+		}
 	}
 	if (variant === "year") {
 		pickerProps = {
