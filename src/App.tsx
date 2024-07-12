@@ -9,6 +9,7 @@ import {
 	Snackbar as MuiSnackbar,
 	Alert,
 	Typography,
+	Box,
 } from "@mui/material";
 import Topbar from "./scenes/global/Topbar";
 import Drawer from "./scenes/global/Drawer";
@@ -84,7 +85,7 @@ export function App({ renderDrawer = false }) {
 						<Container component="main" maxWidth="lg" sx={containerProps}>
 							<Outlet />
 						</Container>
-						<div id="sidebar-container"></div>
+						<Box id="sidebar-container" sx={{ px: 3, maxWidth: 485, borderLeftColor: "divider", borderLeftStyle: "solid", borderLeftWidth: "thin" }} />
 					</Stack>
 				</Stack>
 				<Snackbar />

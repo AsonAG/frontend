@@ -94,7 +94,6 @@ import { NewTaskView } from "./components/NewTaskView";
 import { TenantImport } from "./scenes/tenants/TenantImport";
 import { TenantSettings } from "./scenes/tenants/TenantSettings";
 import { CompanyView } from "./scenes/CompanyView";
-import { AsynCaseFieldHistoryDialog } from "./components/CaseFieldHistoryDialog";
 
 const store = getDefaultStore();
 
@@ -440,12 +439,7 @@ const routeData = [
 						children: [
 							{
 								path: "history/:caseFieldName",
-								Component: AsynCaseFieldHistoryDialog,
-								loader: ({ params }) => {
-									return defer({
-										data: getEmployeeCaseValues(params)
-									});
-								}
+								loader: ({ params }) => getEmployeeCaseValues(params)
 							}
 						]
 					},

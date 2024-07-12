@@ -29,10 +29,11 @@ main,
 }
 
 #sidebar-container {
-	max-width: 485px;
-	/* display: none; */
 	max-height: calc(100dvh - var(--header-height));
 	overflow-y: auto;
+}
+#sidebar-container:empty {
+	display: none;
 }
 
 ::-webkit-scrollbar {

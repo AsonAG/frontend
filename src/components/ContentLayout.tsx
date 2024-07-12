@@ -72,7 +72,7 @@ export function PageHeaderTitle({ title, flex = undefined }: PageHeaderTitleProp
 	);
 }
 
-export function PageContent({ children, disableInset, ...sxProps }) {
+export function PageContent({ children, disableInset = false, ...sxProps }) {
 	const px = disableInset ? undefined : "var(--content-inset)";
 	return (
 		<Stack

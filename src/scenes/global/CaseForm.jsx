@@ -7,7 +7,7 @@ import {
 	useNavigate,
 } from "react-router-dom";
 import { CaseComponent } from "../../components/case/CaseComponent";
-import { createContext, useRef } from "react";
+import { createContext, useRef, useState } from "react";
 import { CaseFormButtons } from "../../components/buttons/CaseFormButtons";
 import { Stack } from "@mui/material";
 import { useCaseData } from "../../hooks/useCaseData.js";
@@ -16,6 +16,7 @@ import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
 import { ErrorView } from "../../components/ErrorView";
 import { ContentLayout, PageContent } from "../../components/ContentLayout";
 import { toast } from "../../utils/dataAtoms";
+import { CaseFieldDetails } from "../../components/CaseFieldDetails";
 
 export const CaseFormContext = createContext();
 
@@ -23,6 +24,7 @@ export function Component() {
 	const navigate = useNavigate();
 	const { user, payroll } = useRouteLoaderData("root");
 	const loaderData = useLoaderData();
+	const [caseFieldDetails, setCaseFieldDetails] = useState(null);
 	const redirectPath = loaderData?.redirect || "..";
 	const renderTitle = loaderData?.renderTitle ?? true;
 	const PageComponent = renderTitle ? ContentLayout : PageContent;
@@ -54,13 +56,13 @@ export function Component() {
 		content = <Loading />;
 	} else {
 		content = (
-			<CaseFormContext.Provider value={{ buildCase, attachments }}>
+			<CaseFormContext.Provider value={{ buildCase, attachments, setCaseFieldDetails }}>
 				<Form method="post" ref={formRef} id="case_form" autoComplete="off">
 					<Stack alignItems="stretch" spacing={4}>
 						{caseData && <CaseComponent _case={caseData} />}
 						<CaseErrorComponent errors={caseErrors} />
 						<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} />
-						<Outlet />
+						{caseFieldDetails && <CaseFieldDetails caseField={caseFieldDetails} onClose={() => setCaseFieldDetails(null)} />}
 					</Stack>
 				</Form>
 			</CaseFormContext.Provider>

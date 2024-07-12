@@ -1,16 +1,11 @@
 import { useContext } from "react";
-import { Box, Tooltip, styled } from "@mui/material";
-import { HtmlContent } from "../../HtmlContent";
-import { History, Info } from "@mui/icons-material";
-import {
-	ResponsiveDialog,
-	ResponsiveDialogContent,
-	ResponsiveDialogTrigger,
-} from "../../ResponsiveDialog";
+import { Tooltip, styled } from "@mui/material";
+import { Info } from "@mui/icons-material";
 import { FieldContext } from "./Field";
-import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { CaseFormContext } from "../../../scenes/global/CaseForm";
 
-const ButtonBox = styled("div")(({ theme }) =>
+const ButtonBox = styled("button")(({ theme }) =>
 	theme.unstable_sx({
 		border: 1,
 		borderRadius: 1,
@@ -21,52 +16,25 @@ const ButtonBox = styled("div")(({ theme }) =>
 		justifyContent: "center",
 		alignItems: "center",
 		color: theme.palette.text.secondary,
+		backgroundColor: theme.palette.background.default,
+		cursor: "pointer"
 	}),
 );
 
 export function FieldDescription() {
+	const { setCaseFieldDetails } = useContext(CaseFormContext);
 	const { field } = useContext(FieldContext);
-	const { description, displayName } = field;
-	if (!description) {
-		return null;
-	}
-
-	return (
-		<ResponsiveDialog title={displayName}>
-			<ResponsiveDialogTrigger>
-				<Tooltip
-					arrow
-					title={<HtmlContent content={description} />}
-					placement="top"
-				>
-					<ButtonBox>
-						<Info />
-					</ButtonBox>
-				</Tooltip>
-			</ResponsiveDialogTrigger>
-			<ResponsiveDialogContent>
-				<HtmlContent content={description} />
-			</ResponsiveDialogContent>
-		</ResponsiveDialog>
-	);
-}
-
-export function FieldHistory({ sx }) {
-	const { field } = useContext(FieldContext);
-	const { name } = field;
+	const { t } = useTranslation();
 
 	return (
 		<Tooltip
 			arrow
-			title="History"
-			placement="top"
+			title={t("Details")}
+			placement="right"
 		>
-			<Box component={Link} to={`history/${encodeURIComponent(name)}`} sx={sx}>
-				<ButtonBox>
-					<History />
-				</ButtonBox>
-			</Box>
+			<ButtonBox type="button" onClick={() => setCaseFieldDetails(field)}>
+				<Info />
+			</ButtonBox>
 		</Tooltip>
 	);
-
 }

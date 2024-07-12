@@ -14,6 +14,7 @@ const translations = {
 		Tasks: "Aufgaben",
 		"Select...": "Auswählen...",
 		Settings: "Einstellungen",
+		History: "Verlauf",
 		"Select a company": "Firma auswählen",
 		"First name": "Vorname",
 		"Last name": "Nachname",
