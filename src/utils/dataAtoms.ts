@@ -117,6 +117,7 @@ export function useMissingDataCount(employeeId: IdType) {
 export const userInformationAtom = atom((async get => {
 	if (useOidc) {
 		const authUser = get(authUserAtom);
+		if (!authUser) return null;
 		return {
 			email: authUser.profile.email,
 			name: authUser.profile.name

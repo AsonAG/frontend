@@ -7,12 +7,18 @@ import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 
 const authRoleProperty = `urn:zitadel:iam:org:project:${import.meta.env.VITE_PROJECT_ID}:roles`;
 
-function getAuthUserAtom(): Atom<User> {
+function getAuthUserAtom(): Atom<User | null> {
 	if (useOidc) {
 		const storageKey = `oidc.user:${authConfig.authority}:${authConfig.client_id}`;
 		const rawAuthUserAtom = atomWithStorage<string | null>(storageKey, null, window.localStorage as SyncStorage<string | null>, { getOnInit: true });
 		// return read only atom
-		return atom(get => User.fromStorageString(get(rawAuthUserAtom) ?? ""));
+		return atom(get => {
+			const user = get(rawAuthUserAtom);
+			if (!user) {
+				return null;
+			}
+			return User.fromStorageString(user);
+		});
 	}
 
 	const defaultLocalUser: User = {
@@ -57,8 +63,8 @@ export const localUserEmailAtom = atom(
 	(get) => get(authUserAtom)?.profile?.email,
 	(get, set, update: string) => {
 		const user = get(authUserAtom);
-		user.profile.email = update;
-		if (isWritable(authUserAtom)) {
+		if (isWritable(authUserAtom) && user) {
+			user.profile.email = update;
 			set(authUserAtom, user);
 		}
 	}
