@@ -1,23 +1,19 @@
 import { User } from "oidc-client-ts";
 import { authConfig, useOidc } from "./authConfig";
-import { Atom, WritableAtom, atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
-
+import { Atom, WritableAtom, atom, getDefaultStore } from "jotai";
+import { atomWithRefresh, atomWithStorage } from "jotai/utils";
 
 const authRoleProperty = `urn:zitadel:iam:org:project:${import.meta.env.VITE_PROJECT_ID}:roles`;
+const storageKey = `oidc.user:${authConfig.authority}:${authConfig.client_id}`;
 
-function getAuthUserAtom(): Atom<User | null> {
+type NullableUser = User | null;
+
+function createAuthUserAtom(): WritableAtom<NullableUser, [NullableUser], void> {
 	if (useOidc) {
-		const storageKey = `oidc.user:${authConfig.authority}:${authConfig.client_id}`;
-		const rawAuthUserAtom = atomWithStorage<string | null>(storageKey, null, window.localStorage as SyncStorage<string | null>, { getOnInit: true });
-		// return read only atom
-		return atom(get => {
-			const user = get(rawAuthUserAtom);
-			if (!user) {
-				return null;
-			}
-			return User.fromStorageString(user);
+		return atomWithRefresh<User | null>(_ => {
+			const oidcStorage = localStorage.getItem(storageKey);
+			if (!oidcStorage) return null;
+			return User.fromStorageString(oidcStorage);
 		});
 	}
 
@@ -49,11 +45,11 @@ function getAuthUserAtom(): Atom<User | null> {
 		}
 	};
 
-	const localUserAtom = atomWithStorage("local.ason.user", defaultLocalUser, undefined, { getOnInit: true });
+	const localUserAtom = atomWithStorage<User | null>("local.ason.user", defaultLocalUser, undefined, { getOnInit: true });
 	return localUserAtom;
 }
 
-export const authUserAtom = getAuthUserAtom();
+export const authUserAtom = createAuthUserAtom();
 
 function isWritable<T>(atom: Atom<T>): atom is WritableAtom<T, [T], unknown> {
 	return "write" in atom;
@@ -78,3 +74,10 @@ export const authUserRolesAtom = atom((get) => {
 	}
 	return [];
 });
+
+window.addEventListener("storage", event => {
+	if (event.key === storageKey) {
+		// @ts-ignore
+		getDefaultStore().set(authUserAtom);
+	}
+})
