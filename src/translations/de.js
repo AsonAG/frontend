@@ -40,6 +40,7 @@ const translations = {
 		"Showing all documents": "Es werden alle Dokumente angezeigt",
 		"Load more": "Mehr laden",
 		"Loading...": "Laden...",
+		"Showing all values": "Es werden alle Werte angezeigt",
 		"Without date": "Ohne Datum",
 		"Invalid date": "Ungültiges Datum",
 		"Please enter a date": "Bitte geben Sie ein Datum ein",

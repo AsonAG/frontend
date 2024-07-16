@@ -1,8 +1,5 @@
-import {
-  useFetcher,
-} from "react-router-dom";
-import React, { Fragment, useEffect } from "react";
-import { Box, Dialog, Divider, IconButton, Portal, Stack, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
+import React, { Fragment } from "react";
+import { Box, Button, Dialog, Divider, IconButton, Portal, Stack, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { formatDate } from "../utils/DateUtils";
 import { useTranslation } from "react-i18next";
@@ -11,6 +8,7 @@ import { formatCaseValue } from "../utils/Format";
 import { ContentLayout } from "./ContentLayout";
 import { HtmlContent } from "./HtmlContent";
 import { Loading } from "./Loading";
+import { useIncrementallyLoadedData } from "../hooks/useIncrementallyLoadedData";
 
 export function CaseFieldDetails({ caseField, onClose }) {
   const { t } = useTranslation();
@@ -109,41 +107,42 @@ function CaseFieldHistory({ caseFieldName }) {
 
 function CaseFieldHistoryTable({ caseFieldName }) {
   const { t } = useTranslation();
-  const fetcher = useFetcher();
-  useEffect(() => {
-    if (!fetcher.data && fetcher.state === "idle") {
-      fetcher.load(`history/${encodeURIComponent(caseFieldName)}`);
-    }
-  }, [fetcher, caseFieldName]);
-
-  if (fetcher.data === undefined || fetcher.state === "loading") {
+  const { items, loading, hasMore, loadMore } = useIncrementallyLoadedData<CaseChangeCaseValue>(`history/${encodeURIComponent(caseFieldName)}`, 20);
+  if (items.length === 0 && loading) {
     return <Loading />;
   }
-  const caseValues = fetcher.data as Array<CaseChangeCaseValue>;
 
-  if (caseValues.length === 0)
+  if (items.length === 0 && !loading)
     return <Typography>{t("No data")}</Typography>;
+
+  const buttonEnabled = hasMore && !loading;
+  const buttonLabel = loading ? t("Loading...") :
+    hasMore ? t("Load more") :
+      t("Showing all values")
 
 
   return (
-    <Box display="grid" gridTemplateColumns="1fr 75px 75px 75px" columnGap="8px">
-      <Typography fontWeight="bold">{t("Value")}</Typography>
-      <Typography fontWeight="bold">{t("Start")}</Typography>
-      <Typography fontWeight="bold">{t("End")}</Typography>
-      <Typography fontWeight="bold">{t("Created")}</Typography>
-      {
-        caseValues.map(cv => {
-          const caseValueFormatted = formatCaseValue(cv, t);
-          return (
-            <Fragment key={cv.id}>
-              <Typography noWrap title={caseValueFormatted}>{caseValueFormatted}</Typography>
-              <Typography>{formatDate(cv.start)}</Typography>
-              <Typography>{formatDate(cv.end)}</Typography>
-              <Typography title={formatDate(cv.created, true)}>{formatDate(cv.created)}</Typography>
-            </Fragment>
-          )
-        })
-      }
-    </Box>
+    <Stack spacing={1}>
+      <Box display="grid" gridTemplateColumns="1fr 75px 75px 75px" columnGap="8px">
+        <Typography fontWeight="bold">{t("Value")}</Typography>
+        <Typography fontWeight="bold">{t("Start")}</Typography>
+        <Typography fontWeight="bold">{t("End")}</Typography>
+        <Typography fontWeight="bold">{t("Created")}</Typography>
+        {
+          items.map(cv => {
+            const caseValueFormatted = formatCaseValue(cv, t);
+            return (
+              <Fragment key={cv.id}>
+                <Typography noWrap title={caseValueFormatted}>{caseValueFormatted}</Typography>
+                <Typography>{formatDate(cv.start)}</Typography>
+                <Typography>{formatDate(cv.end)}</Typography>
+                <Typography title={formatDate(cv.created, true)}>{formatDate(cv.created)}</Typography>
+              </Fragment>
+            )
+          })
+        }
+      </Box>
+      <Button onClick={loadMore} disabled={!buttonEnabled}>{buttonLabel}</Button>
+    </Stack>
   );
 }

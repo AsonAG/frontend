@@ -106,6 +106,10 @@ async function getTenantData() {
 	return { tenant, payrolls, user };
 }
 
+function getQueryParam(request, name, defaultValue = null) {
+	return new URL(request.url).searchParams.get(name) || defaultValue;
+}
+
 function paginatedLoader({
 	pageCount,
 	name,
@@ -113,7 +117,7 @@ function paginatedLoader({
 	getLoaderData,
 }) {
 	return async (loaderParams) => {
-		let page = new URL(loaderParams.request.url).searchParams.get("page") || 1;
+		let page = getQueryParam(loaderParams.request, "page", 1);
 		page = Number(page) - 1;
 		const loaderData = getLoaderData
 			? await Promise.resolve(getLoaderData(loaderParams))
@@ -141,7 +145,10 @@ function createRouteCaseForm(path, data) {
 		children: [
 			{
 				path: "history/:caseFieldName",
-				loader: ({ params }) => getCaseValues(params)
+				loader: ({ request, params }) => {
+					const top = getQueryParam(request, "top");
+					return getCaseValues(params, top);
+				}
 			}
 		]
 	};
