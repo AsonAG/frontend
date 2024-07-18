@@ -28,7 +28,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { openMissingDataTasksAtom, openTasksAtom } from "../../utils/dataAtoms";
+import { openMissingDataTasksAtom, openTasksAtom, showTenantSelectionAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
@@ -295,7 +295,9 @@ function Drawer({ temporary, open, onClose }) {
 				<NavigationMenu>
 					<MenuItems />
 				</NavigationMenu>
-				<TenantSection />
+				<Suspense>
+					<TenantSection />
+				</Suspense>
 			</Stack>
 		</MuiDrawer>
 	);
@@ -305,7 +307,8 @@ function TenantSection() {
 	const { t } = useTranslation();
 	const { tenant } = useLoaderData();
 	const isProvider = useRole("provider");
-	if (!isProvider)
+	const showTenantSelection = useAtomValue(showTenantSelectionAtom);
+	if (!isProvider && !showTenantSelection)
 		return null;
 
 	return (

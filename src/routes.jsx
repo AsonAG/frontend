@@ -75,6 +75,7 @@ import {
 	toast,
 	payrollAtom,
 	openMissingDataTasksAtom,
+	tenantsAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
@@ -305,7 +306,8 @@ const routeData = [
 				path: "tenants",
 				Component: TenantList,
 				loader: async () => {
-					const tenants = await getTenants();
+					store.set(tenantsAtom); // refresh
+					const tenants = await store.get(tenantsAtom);
 					if (tenants.length === 1) {
 						return redirect(`../tenants/${tenants[0].id}`);
 					}

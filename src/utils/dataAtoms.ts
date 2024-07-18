@@ -6,6 +6,7 @@ import {
 	getEmployeeByIdentifier,
 	getPayruns,
 	getMissingData,
+	getTenants,
 } from "../api/FetchClient";
 import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
@@ -14,6 +15,11 @@ import { useOidc } from "../auth/authConfig";
 import { IdType } from "../models/IdType";
 import { MissingData } from "../models/MissingData";
 import { atomWithRefresh } from "jotai/utils";
+
+export const tenantsAtom = atomWithRefresh((get => {
+	const _ = get(authUserAtom);
+	return getTenants();
+}));
 
 export const tenantAtom = atom((get) => {
 	const tenantId = get(tenantIdAtom);
@@ -83,6 +89,11 @@ export const openMissingDataTasksAtom = atomWithRefresh<Promise<Array<MissingDat
 		return [];
 	}
 	return missingData;
+});
+
+export const showTenantSelectionAtom = atom(async (get) => {
+	const tenants = await get(tenantsAtom);
+	return tenants.length > 1;
 });
 
 const missingDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async (get) => {
