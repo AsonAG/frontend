@@ -8,7 +8,6 @@ import {
 import { Tenant } from "../../models/Tenant";
 import { Payroll } from "../../models/Payroll";
 import { useTranslation } from "react-i18next";
-import { useRole } from "../../hooks/useRole";
 
 type LoaderData = {
 	tenant: Tenant,
@@ -25,7 +24,7 @@ export function PayrollSelector() {
 	const handleClose = () => setAnchorEl(null);
 	const adminTitle = t("Admin");
 	const currentSelection = payroll?.name ?? adminTitle;
-	const isAdmin = useRole("admin");
+	const isAdminPanelViewer = tenant?.userRelations?.includes("admin_panel_viewer");
 
 	return (
 		<>
@@ -52,7 +51,7 @@ export function PayrollSelector() {
 				</Typography>
 			</Button>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-				{isAdmin && <MenuItem component={Link} to={`/tenants/${tenant.id}`} onClick={handleClose}>{adminTitle}</MenuItem>}
+				{isAdminPanelViewer && <MenuItem component={Link} to={`/tenants/${tenant.id}`} onClick={handleClose}>{adminTitle}</MenuItem>}
 				{
 					payrolls.map(payroll => (
 						<MenuItem key={payroll.id} component={Link} to={`/tenants/${tenant.id}/payrolls/${payroll.id}`} onClick={handleClose}>

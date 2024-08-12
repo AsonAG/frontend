@@ -7,6 +7,7 @@ export type User = {
   firstName: string;
   lastName: string;
   identifier: string;
+  email: string;
   culture: string;
   language: string;
 };

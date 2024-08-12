@@ -19,7 +19,6 @@ import { App } from "./App";
 
 // TODO AJO error states when network requests fail
 import {
-	getTenants,
 	getEmployees,
 	getEmployee,
 	getEmployeeCases,
@@ -56,7 +55,8 @@ import {
 	requestExportDataDownload,
 	deleteTenant,
 	getDivisions,
-	getCaseValues
+	getCaseValues,
+	getTenantUsers
 } from "./api/FetchClient";
 import { EmployeeView, EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -95,6 +95,7 @@ import { NewTaskView } from "./components/NewTaskView";
 import { TenantImport } from "./scenes/tenants/TenantImport";
 import { TenantSettings } from "./scenes/tenants/TenantSettings";
 import { CompanyView } from "./scenes/CompanyView";
+import { UserTable } from "./components/UserTable";
 
 const store = getDefaultStore();
 
@@ -260,6 +261,7 @@ function createRouteEmployeeNew(path, createUrlRedirect) {
 		Component: EmployeeForm,
 		loader: async ({ params }) => {
 			const divisions = await getDivisions(params);
+
 			const payroll = await store.get(payrollAtom);
 			const selectedDivisions = !!payroll ? [divisions.find(d => d.id === payroll.divisionId).name] : [];
 			return { divisions, selectedDivisions };
@@ -351,9 +353,10 @@ const routeData = [
 			{
 				index: true,
 				loader: async () => {
-					const { user } = await getTenantData();
-					const isAdmin = user?.attributes.roles?.includes("admin");
-					if (isAdmin)
+					const { tenant } = await getTenantData();
+					const adminPanelViewer = tenant.userRelations?.includes("admin_panel_viewer");
+					console.log("adminPanelViewer", adminPanelViewer);
+					if (adminPanelViewer)
 						return redirect("employees");
 					return redirect("payrolls");
 
@@ -362,6 +365,30 @@ const routeData = [
 			createRouteEmployeeTable("employees", false),
 			createRouteEmployeeNew("employees/new", () => "../employees"),
 			createRouteEmployeeEdit("employees/:employeeId", () => "../employees"),
+			{
+				path: "users",
+				Component: UserTable,
+				loader: async ({ params }) => {
+					const users = await getTenantUsers(params);
+					return { users };
+				},
+				children: [
+					{
+						path: "divisions",
+						loader: async ({ params }) => {
+							const divisions = await getDivisions(params);
+							return divisions;
+						}
+					},
+					{
+						path: "employees",
+						loader: async ({ params }) => {
+							const employees = await getEmployees(params).fetchJson();
+							return employees;
+						}
+					}
+				]
+			},
 			{
 				path: "settings",
 				Component: TenantSettings,

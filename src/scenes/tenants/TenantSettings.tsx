@@ -3,7 +3,6 @@ import { ContentLayout } from "../../components/ContentLayout";
 import { Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useNavigation, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useRole } from "../../hooks/useRole";
 import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, ResponsiveDialogTrigger } from "../../components/ResponsiveDialog";
 import { Tenant } from "../../models/Tenant";
 
@@ -24,31 +23,35 @@ export function TenantSettings() {
 
 function ProviderTenantSection({ tenant }) {
   const { t } = useTranslation();
-  const isProvider = useRole("provider");
+  const canExport = tenant.userRelations?.includes("exporter");
+  const canDelete = tenant.userRelations?.includes("deleter");
   const [onExport, exportButtonDisabled, exportButtonIcon] = useAction("export");
   const [onDelete, deleteButtonDisabled, deleteButtonIcon] = useAction("delete");
-  if (!isProvider) return null;
+  if (!canExport || !canDelete) return null;
 
   return (
     <Stack spacing={2}>
-      <Stack direction="row" alignItems="center">
-        <Typography flex={1}>{t("Export the data of the tenant")}</Typography>
-        <Button variant="outlined" color="primary" disabled={exportButtonDisabled} startIcon={exportButtonIcon} onClick={onExport}>
-          {t("Export")}
-        </Button>
-      </Stack>
-      <Stack direction="row" alignItems="center">
-        <Typography flex={1}>{t("Deletes the tenant completely")}</Typography>
-        <ResponsiveDialog>
-          <ResponsiveDialogTrigger>
-            <Button variant="contained" color="destructive" disabled={deleteButtonDisabled} startIcon={deleteButtonIcon}>
-              {t("Delete")}
-            </Button>
-          </ResponsiveDialogTrigger>
-          <DeleteTenantDialogContent tenant={tenant} onDelete={onDelete} />
-        </ResponsiveDialog>
-      </Stack>
-
+      {canExport &&
+        <Stack direction="row" alignItems="center">
+          <Typography flex={1}>{t("Export the data of the tenant")}</Typography>
+          <Button variant="outlined" color="primary" disabled={exportButtonDisabled} startIcon={exportButtonIcon} onClick={onExport}>
+            {t("Export")}
+          </Button>
+        </Stack>
+      }
+      {canDelete &&
+        <Stack direction="row" alignItems="center">
+          <Typography flex={1}>{t("Deletes the tenant completely")}</Typography>
+          <ResponsiveDialog>
+            <ResponsiveDialogTrigger>
+              <Button variant="contained" color="destructive" disabled={deleteButtonDisabled} startIcon={deleteButtonIcon}>
+                {t("Delete")}
+              </Button>
+            </ResponsiveDialogTrigger>
+            <DeleteTenantDialogContent tenant={tenant} onDelete={onDelete} />
+          </ResponsiveDialog>
+        </Stack>
+      }
     </Stack>
   )
 }

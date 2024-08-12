@@ -9,7 +9,7 @@ import {
 	CircularProgress,
 } from "@mui/material";
 import { React, useEffect, useState } from "react";
-import { useAsyncValue, Outlet, useSubmit, Form, useFetcher } from "react-router-dom";
+import { useAsyncValue, Outlet, useSubmit, useFetcher, useRouteLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
@@ -21,7 +21,6 @@ import {
 	ResponsiveDialogContent,
 	ResponsiveDialogTrigger,
 } from "../ResponsiveDialog";
-import { useRole } from "../../hooks/useRole";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
 export function AsyncDocumentTable() {
@@ -67,6 +66,7 @@ const itemSx = {
 
 function CaseValueRow({ caseValue }) {
 	const { t } = useTranslation();
+	const { tenant } = useRouteLoaderData("root");
 	const submit = useSubmit();
 	const onDelete = (documentId) => {
 		submit(null, {
@@ -74,7 +74,7 @@ function CaseValueRow({ caseValue }) {
 			action: `${caseValue.id}/i/${documentId}`
 		});
 	};
-	const isProviderRole = useRole("provider");
+	const canDeleteDocument = tenant.userRelations?.includes("document_deleter");
 	const isMobile = useIsMobile();
 	return (
 		<Stack>
@@ -85,7 +85,7 @@ function CaseValueRow({ caseValue }) {
 						to={`${caseValue.id}/i/${document.id}`}
 						sx={{ flex: 1 }}
 					/>
-					{isProviderRole && !isMobile &&
+					{canDeleteDocument && !isMobile &&
 						<ResponsiveDialog>
 							<ResponsiveDialogTrigger>
 								<IconButton size="small">

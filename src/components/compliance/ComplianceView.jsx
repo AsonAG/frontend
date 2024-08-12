@@ -8,12 +8,11 @@ import {
 	ComplianceItemView,
 } from "./ComplianceDocumentsView";
 import { ComplianceMessagesView } from "./ComplianceSubmissionView";
-import { useRole } from "../../hooks/useRole";
 
 export function ComplianceView() {
 	const { t } = useTranslation();
 	const routeData = useLoaderData();
-	const showButton = useRole("onboarding");
+	const showButton = false;
 	var button = showButton && (
 		<IconButton LinkComponent={Link} to="settings">
 			<Settings />

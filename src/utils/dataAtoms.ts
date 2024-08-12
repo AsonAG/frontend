@@ -43,10 +43,8 @@ export const payrollAtom = atom(async (get) => {
 });
 
 export const userAtom = atom((get) => {
-	const tenantId = get(tenantIdAtom);
-	if (tenantId == null) return null;
 	const authUserEmail = get(authUserAtom)?.profile.email;
-	return getUser({ tenantId }, authUserEmail);
+	return getUser({}, authUserEmail);
 });
 
 export const employeeAtom = atom((get) => {

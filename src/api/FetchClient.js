@@ -8,6 +8,7 @@ const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const tenantsUrl = "/tenants";
 const tenantImportUrl = "/tenants/import";
 const tenantUrl = "/tenants/:tenantId";
+const tenantUsersUrl = "/users/t/:tenantId";
 const payrollsUrl = "/tenants/:tenantId/payrolls";
 const payrollUrl = "/tenants/:tenantId/payrolls/:payrollId";
 const divisionsUrl = "/tenants/:tenantId/divisions";
@@ -19,7 +20,7 @@ const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
 const caseFieldsUrl = "/tenants/:tenantId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:tenantId/employees";
 const employeeUrl = "/tenants/:tenantId/employees/:employeeId";
-const usersUrl = "/tenants/:tenantId/users";
+const usersUrl = "/users";
 const employeeDocumentUrl =
 	"/tenants/:tenantId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
 const companyDocumentUrl =
@@ -72,8 +73,9 @@ class FetchRequestBuilder {
 	routeParams = {};
 	addUserQueryParam = false;
 	addPayrollDivision = false;
+	loadRelations = []
 
-	constructor(url, routeParams) {
+	constructor(url, routeParams, loadRelations) {
 		if (!url) {
 			throw new Error("Url cannot be empty");
 		}
@@ -88,6 +90,9 @@ class FetchRequestBuilder {
 		}
 		this.headers.set("Accept", "application/json");
 		this.headers.set("Content-Type", "application/json");
+		if (loadRelations) {
+			this.headers.set("X-l-r", loadRelations?.join(","));
+		}
 	}
 
 	withRouteParams(routeParams) {
@@ -209,15 +214,20 @@ export function importTenant(body) {
 }
 
 export function getTenant(routeParams) {
-	return new FetchRequestBuilder(tenantUrl, routeParams).fetchJson();
+	return new FetchRequestBuilder(tenantUrl, routeParams, ["writer", "admin_panel_viewer", "exporter", "deleter", "document_deleter"]).fetchJson();
 }
 
 export function deleteTenant(routeParams) {
 	return new FetchRequestBuilder(tenantUrl, routeParams).withMethod("DELETE").fetch();
 }
 
+export function getTenantUsers(routeParams) {
+	return new FetchRequestBuilder(tenantUsersUrl, routeParams).fetchJson();
+}
+
+
 export function getPayrolls(routeParams) {
-	return new FetchRequestBuilder(payrollsUrl, routeParams).fetchJson();
+	return new FetchRequestBuilder(payrollsUrl, routeParams, ["event_adder", "selfservice_event_adder", "report_executer", "task_processor", "payrun_controller"]).fetchJson();
 }
 
 export function getPayroll(routeParams) {
@@ -225,7 +235,7 @@ export function getPayroll(routeParams) {
 }
 
 export function getDivisions(routeParams) {
-	return new FetchRequestBuilder(divisionsUrl, routeParams).fetchJson();
+	return new FetchRequestBuilder(divisionsUrl, routeParams, ["can_assign_employees"]).fetchJson();
 }
 
 export function getDivision(routeParams, divisionId) {

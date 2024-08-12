@@ -10,8 +10,7 @@ import { Suspense, forwardRef, useEffect } from "react";
 import {
 	NavLink as RouterLink,
 	useLoaderData,
-	useLocation,
-	useParams,
+	useLocation
 } from "react-router-dom";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -28,8 +27,8 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { openMissingDataTasksAtom, openTasksAtom, showTenantSelectionAtom } from "../../utils/dataAtoms";
-import { Description } from "@mui/icons-material";
+import { openMissingDataTasksAtom, openTasksAtom, payrollAtom, showTenantSelectionAtom } from "../../utils/dataAtoms";
+import { Description, ManageAccounts } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
 const Link = styled(
@@ -139,6 +138,11 @@ function MenuItemsTenant() {
 				icon={<PeopleOutlinedIcon />}
 			/>
 			<NavigationItem
+				label={t("Users")}
+				to="users"
+				icon={<ManageAccounts />}
+			/>
+			<NavigationItem
 				label={t("Settings")}
 				to="settings"
 				icon={<SettingsIcon />}
@@ -147,40 +151,57 @@ function MenuItemsTenant() {
 	);
 }
 
-function MenuItemsPayrollAdmin() {
+function MenuItemsPayroll({ payroll }) {
 	const { t } = useTranslation();
+	const isEventAdder = payroll.userRelations?.includes("event_adder");
+	const isReportExecuter = payroll.userRelations?.includes("report_executer");
+	const isTaskProcessor = payroll.userRelations?.includes("task_processor");
+	const isPayrunController = payroll.userRelations?.includes("payrun_controller");
+
 	return (
 		<NavigationGroup>
-			<NavigationItem
-				label={t("Company")}
-				to="company"
-				icon={<BusinessIcon />}
-			/>
-			<NavigationItem
-				label={t("Employees")}
-				to="hr/employees"
-				icon={<PeopleOutlinedIcon />}
-			/>
-			<NavigationItem
-				label={t("Tasks")}
-				to="hr/tasks"
-				icon={<OpenTasksBadgeIcon />}
-			/>
-			<NavigationItem
-				label={t("Controlling")}
-				to="hr/controlling"
-				icon={<ControllingBadgeIcon />}
-			/>
-			<NavigationItem
-				label={t("Payruns")}
-				to="hr/payruns"
-				icon={<PaymentsIcon />}
-			/>
-			<NavigationItem
-				label={t("Reports")}
-				to="hr/reports"
-				icon={<Description />}
-			/>
+			{isEventAdder &&
+				<NavigationItem
+					label={t("Company")}
+					to="company"
+					icon={<BusinessIcon />}
+				/>
+			}
+			{isEventAdder &&
+				<NavigationItem
+					label={t("Employees")}
+					to="hr/employees"
+					icon={<PeopleOutlinedIcon />}
+				/>
+			}
+			{isTaskProcessor &&
+				<NavigationItem
+					label={t("Tasks")}
+					to="hr/tasks"
+					icon={<OpenTasksBadgeIcon />}
+				/>
+			}
+			{isEventAdder &&
+				<NavigationItem
+					label={t("Controlling")}
+					to="hr/controlling"
+					icon={<ControllingBadgeIcon />}
+				/>
+			}
+			{isPayrunController &&
+				<NavigationItem
+					label={t("Payruns")}
+					to="hr/payruns"
+					icon={<PaymentsIcon />}
+				/>
+			}
+			{isReportExecuter &&
+				<NavigationItem
+					label={t("Reports")}
+					to="hr/reports"
+					icon={<Description />}
+				/>
+			}
 		</NavigationGroup>
 	)
 }
@@ -214,18 +235,16 @@ function MenuItemsUnknown() {
 }
 
 function MenuItems() {
-	const { employee } = useLoaderData();
-	const { payrollId } = useParams();
-	const isAdmin = useRole("admin");
-	const isEmployee = useRole("user");
-	if (!payrollId && isAdmin) {
+	const { employee, tenant } = useLoaderData();
+	const payroll = useAtomValue(payrollAtom);
+	if (!payroll && tenant.userRelations?.includes("admin_panel_viewer")) {
 		return <MenuItemsTenant />;
 	}
-	else if (payrollId && isAdmin) {
-		return <MenuItemsPayrollAdmin />;
-	}
-	else if (payrollId && isEmployee && employee) {
+	else if (employee && payroll && payroll.userRelations?.includes("selfservice_event_adder")) {
 		return <MenuItemsPayrollEmployee employee={employee} />;
+	}
+	else if (payroll) {
+		return <MenuItemsPayroll payroll={payroll} />;
 	}
 	else {
 		return <MenuItemsUnknown />;
@@ -293,7 +312,9 @@ function Drawer({ temporary, open, onClose }) {
 				}}
 			>
 				<NavigationMenu>
-					<MenuItems />
+					<Suspense>
+						<MenuItems />
+					</Suspense>
 				</NavigationMenu>
 				<Suspense>
 					<TenantSection />

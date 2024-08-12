@@ -16,7 +16,6 @@ import { useTranslation } from "react-i18next";
 import { Form, Link as RouterLink, useLoaderData } from "react-router-dom";
 import { Employee } from "../models/Employee";
 import { Division } from "../models/Division";
-import { useRole } from "../hooks/useRole";
 
 type LoaderData = {
 	employee: Employee,
@@ -73,14 +72,14 @@ export function EmployeeForm() {
 
 function PayrollAssignmentView() {
 	const { divisions, selectedDivisions } = useLoaderData() as LoaderData;
-	const isAdmin = useRole("admin");
-	if (!isAdmin)
+	const assignableDivisions = divisions.filter(d => d.userRelations?.includes("can_assign_employees"));
+	if (assignableDivisions.length === 0)
 		return null;
 
 	return (
 		<Stack>
 			{
-				divisions.map(division => {
+				assignableDivisions.map(division => {
 					return (
 						<FormControl key={division.id}>
 							<FormControlLabel
