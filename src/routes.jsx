@@ -56,7 +56,10 @@ import {
 	deleteTenant,
 	getDivisions,
 	getCaseValues,
-	getTenantUsers
+	getTenantUsers,
+	getTenantUserRole,
+	saveTenantUserRole,
+	getTenantUser
 } from "./api/FetchClient";
 import { EmployeeView, EmployeeTitle } from "./scenes/employees/EmployeeView";
 import { ErrorView } from "./components/ErrorView";
@@ -96,6 +99,7 @@ import { TenantImport } from "./scenes/tenants/TenantImport";
 import { TenantSettings } from "./scenes/tenants/TenantSettings";
 import { CompanyView } from "./scenes/CompanyView";
 import { UserTable } from "./components/UserTable";
+import { UserEditDialog } from "./components/UserEditDialog";
 
 const store = getDefaultStore();
 
@@ -368,23 +372,33 @@ const routeData = [
 			{
 				path: "users",
 				Component: UserTable,
+				id: "userTable",
 				loader: async ({ params }) => {
 					const users = await getTenantUsers(params);
 					return { users };
 				},
 				children: [
 					{
-						path: "divisions",
+						path: ":userId/edit",
+						Component: UserEditDialog,
 						loader: async ({ params }) => {
 							const divisions = await getDivisions(params);
-							return divisions;
-						}
-					},
-					{
-						path: "employees",
-						loader: async ({ params }) => {
 							const employees = await getEmployees(params).fetchJson();
-							return employees;
+							return {
+								divisions,
+								employees
+							};
+						},
+						action: async ({ params, request }) => {
+							const role = await request.json();
+							const response = await saveTenantUserRole(params, role);
+							if (response.ok) {
+								toast("success", "Saved!");
+								return redirect("..");
+							} else {
+								toast("error", "Something went wrong");
+							}
+							return null;
 						}
 					}
 				]

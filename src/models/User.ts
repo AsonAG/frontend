@@ -10,4 +10,11 @@ export type User = {
   email: string;
   culture: string;
   language: string;
+  role: string;
 };
+
+export type UserRole = {
+  "$type": string
+  DivisionIds?: Array<IdType>
+  EmployeeId?: IdType
+}

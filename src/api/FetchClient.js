@@ -8,7 +8,8 @@ const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const tenantsUrl = "/tenants";
 const tenantImportUrl = "/tenants/import";
 const tenantUrl = "/tenants/:tenantId";
-const tenantUsersUrl = "/users/t/:tenantId";
+const tenantUsersUrl = "/tenants/:tenantId/users";
+const tenantUserRolesUrl = "/tenants/:tenantId/users/:userId/role";
 const payrollsUrl = "/tenants/:tenantId/payrolls";
 const payrollUrl = "/tenants/:tenantId/payrolls/:payrollId";
 const divisionsUrl = "/tenants/:tenantId/divisions";
@@ -223,6 +224,23 @@ export function deleteTenant(routeParams) {
 
 export function getTenantUsers(routeParams) {
 	return new FetchRequestBuilder(tenantUsersUrl, routeParams).fetchJson();
+}
+
+export function getTenantUser(routeParams) {
+	return new FetchRequestBuilder(tenantUsersUrl, routeParams)
+		.withQueryParam("filter", `id eq '${routeParams.userId}'`)
+		.fetchSingle();
+}
+
+export function getTenantUserRole(routeParams) {
+	return new FetchRequestBuilder(tenantUserRolesUrl, routeParams).fetchJson();
+}
+
+export function saveTenantUserRole(routeParams, userRole) {
+	return new FetchRequestBuilder(tenantUserRolesUrl, routeParams)
+		.withMethod("PUT")
+		.withBody(userRole)
+		.fetch();
 }
 
 
