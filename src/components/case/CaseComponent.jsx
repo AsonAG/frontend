@@ -14,9 +14,6 @@ export function CaseComponent({ _case, pt = 0 }) {
 				{_case.fields?.map((field) => (
 					<Field key={field.id} field={field} />
 				))}
-				{_case.relatedCases?.map((relatedCase) => (
-					<CaseComponent key={relatedCase.id} _case={relatedCase} pt={2} />
-				))}
 			</Stack>
 		</Stack>
 	);
