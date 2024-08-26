@@ -19,7 +19,6 @@ export function EmployeeView() {
 	const outlet = useOutlet();
 	const { employee } = useLoaderData();
 	const { t } = useTranslation();
-	const missingDataCount = useMissingDataCount(employee.id);
 	const isActive = employee.status === "Active";
 	const header = getEmployeeDisplayString(employee);
 
@@ -49,16 +48,25 @@ export function EmployeeView() {
 				{isActive && <TabLink title={t("New event")} to="new" />}
 				<TabLink title={t("Events")} to="events" />
 				<TabLink title={t("Documents")} to="documents" />
-				{isActive && missingDataCount && (
-					<TabLink
-						title={t("Missing data")}
-						to="missingdata"
-						badgeCount={missingDataCount}
-					/>
-				)}
+				{isActive && <MissingDataLink employeeId={employee.id} />}
 			</Stack>
 			{outlet}
 		</ContentLayout>
+	);
+}
+
+function MissingDataLink({ employeeId }) {
+	const { t } = useTranslation();
+	const missingDataCount = useMissingDataCount(employeeId);
+	if (missingDataCount === 0)
+		return;
+	return (
+		<TabLink
+			title={t("Missing data")}
+			to="missingdata"
+			badgeCount={missingDataCount}
+		/>
+
 	);
 }
 

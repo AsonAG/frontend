@@ -20,6 +20,7 @@ const lookupValuesUrl = "/tenants/:tenantId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
 const caseFieldsUrl = "/tenants/:tenantId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:tenantId/employees";
+const employeesSelfServiceUrl = "/tenants/:tenantId/employees/self_service";
 const employeeUrl = "/tenants/:tenantId/employees/:employeeId";
 const usersUrl = "/users";
 const employeeDocumentUrl =
@@ -28,11 +29,10 @@ const companyDocumentUrl =
 	"/tenants/:tenantId/companycases/:caseValueId/documents/:documentId";
 const tasksUrl = "/tenants/:tenantId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
-const payrunsUrl = "/tenants/:tenantId/payruns";
-const payrunParametersUrl = "/tenants/:tenantId/payruns/:payrunId/parameters";
-const payrunJobsUrl = "/tenants/:tenantId/payruns/jobs";
+const payrunUrl = "/tenants/:tenantId/payrolls/:payrollId/payrun";
+const payrunJobsUrl = "/tenants/:tenantId/payrolls/:payrollId/payrunjobs";
 const payrunJobStatusUrl =
-	"/tenants/:tenantId/payruns/jobs/:payrunJobId/status";
+	"/tenants/:tenantId/payrolls/:payrollId/payrunjobs/:payrunJobId/status";
 const complianceUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance";
 const complianceSettingsUrl =
 	"/tenants/:tenantId/payrolls/:payrollId/compliance/settings";
@@ -215,7 +215,7 @@ export function importTenant(body) {
 }
 
 export function getTenant(routeParams) {
-	return new FetchRequestBuilder(tenantUrl, routeParams, ["writer", "admin_panel_viewer", "exporter", "deleter", "document_deleter"]).fetchJson();
+	return new FetchRequestBuilder(tenantUrl, routeParams, ["writer", "admin_panel_viewer", "user_viewer", "exporter", "deleter", "document_deleter"]).fetchJson();
 }
 
 export function deleteTenant(routeParams) {
@@ -245,7 +245,7 @@ export function saveTenantUserRole(routeParams, userRole) {
 
 
 export function getPayrolls(routeParams) {
-	return new FetchRequestBuilder(payrollsUrl, routeParams, ["event_adder", "selfservice_event_adder", "report_executer", "task_processor", "payrun_controller"]).fetchJson();
+	return new FetchRequestBuilder(payrollsUrl, routeParams, ["event_adder", "self_service_event_adder", "report_executor", "task_processor", "payrun_controller"]).fetchJson();
 }
 
 export function getPayroll(routeParams) {
@@ -290,10 +290,9 @@ export function updateEmployee(routeParams, employee) {
 		.fetch();
 }
 
-export function getEmployeeByIdentifier(routeParams, identifier) {
-	return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
-		.withQueryParam("filter", `Identifier eq '${identifier}'`)
-		.fetchSingle();
+export function getSelfServiceEmployee(routeParams) {
+	return new FetchRequestBuilder(employeesSelfServiceUrl, routeParams)
+		.fetchJson();
 }
 
 export function getEmployeeCases(routeParams, clusterSetName) {
@@ -391,32 +390,21 @@ export function updateTask(routeParams, task) {
 		.fetch();
 }
 
-export function getPayruns(routeParams) {
-	return new FetchRequestBuilder(payrunsUrl, routeParams)
-		.withQueryParam("filter", `payrollId eq '${routeParams.payrollId}'`)
+export function getPayrun(routeParams) {
+	return new FetchRequestBuilder(payrunUrl, routeParams)
 		.fetchJson();
 }
 
 export function getDraftPayrunJobs(routeParams) {
 	return new FetchRequestBuilder(payrunJobsUrl, routeParams)
-		.withQueryParam(
-			"filter",
-			`payrollId eq '${routeParams.payrollId}' and jobStatus eq 'Draft'`,
-		)
+		.withQueryParam("filter", `jobStatus eq 'Draft'`)
 		.fetchJson();
 }
 
 export function getPayrunJobs(routeParams) {
 	return new FetchRequestBuilder(payrunJobsUrl, routeParams)
-		.withQueryParam(
-			"filter",
-			`payrollId eq '${routeParams.payrollId}' and payrunId eq '${routeParams.payrunId}' and jobStatus ne 'Draft'`,
-		)
+		.withQueryParam("filter", `jobStatus ne 'Draft'`)
 		.withQueryParam("orderBy", "periodStart desc");
-}
-
-export function getPayrunParameters(routeParams) {
-	return new FetchRequestBuilder(payrunParametersUrl, routeParams).fetchJson();
 }
 
 export function startPayrunJob(routeParams, jobInvocation) {

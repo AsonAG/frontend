@@ -3,8 +3,8 @@ import {
 	getTasks,
 	getTenant,
 	getUser,
-	getEmployeeByIdentifier,
-	getPayruns,
+	getSelfServiceEmployee,
+	getPayrun,
 	getMissingData,
 	getTenants,
 } from "../api/FetchClient";
@@ -51,16 +51,14 @@ export const employeeAtom = atom((get) => {
 	const tenantId = get(tenantIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (tenantId === null || payrollId === null) return null;
-	const authUserEmail = get(authUserAtom)?.profile.email;
-	return getEmployeeByIdentifier({ tenantId, payrollId }, authUserEmail);
+	return getSelfServiceEmployee({ tenantId, payrollId });
 });
 
 export const payrunAtom = atom(async (get) => {
 	const tenantId = get(tenantIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (tenantId === null || payrollId === null) return [];
-	const payruns = await getPayruns({ tenantId, payrollId });
-	return payruns[0] || null;
+	if (tenantId === null || payrollId === null) return null;
+	return getPayrun({ tenantId, payrollId });
 });
 
 export const openTasksAtom = atomWithRefresh(async (get) => {

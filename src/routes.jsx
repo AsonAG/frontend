@@ -314,9 +314,9 @@ const routeData = [
 				loader: async () => {
 					store.set(tenantsAtom); // refresh
 					const tenants = await store.get(tenantsAtom);
-					if (tenants.length === 1) {
-						return redirect(`../tenants/${tenants[0].id}`);
-					}
+					// if (tenants.length === 1) {
+					// 	return redirect(`../tenants/${tenants[0].id}`);
+					// }
 					return tenants;
 				}
 			},
@@ -642,9 +642,8 @@ const routeData = [
 				loader: paginatedLoader({
 					pageCount: 15,
 					name: "payrunJobs",
-					getRequestBuilder: async ({ params }) => {
-						const payrun = await store.get(payrunAtom);
-						return getPayrunJobs({ ...params, payrunId: payrun.id });
+					getRequestBuilder: ({ params }) => {
+						return getPayrunJobs(params);
 					},
 					getLoaderData: ({ params }) => ({
 						draftPayrunJobs: getDraftPayrunJobs(params),

@@ -154,7 +154,7 @@ function MenuItemsTenant() {
 function MenuItemsPayroll({ payroll }) {
 	const { t } = useTranslation();
 	const isEventAdder = payroll.userRelations?.includes("event_adder");
-	const isReportExecuter = payroll.userRelations?.includes("report_executer");
+	const isReportExecutor = payroll.userRelations?.includes("report_executor");
 	const isTaskProcessor = payroll.userRelations?.includes("task_processor");
 	const isPayrunController = payroll.userRelations?.includes("payrun_controller");
 
@@ -195,7 +195,7 @@ function MenuItemsPayroll({ payroll }) {
 					icon={<PaymentsIcon />}
 				/>
 			}
-			{isReportExecuter &&
+			{isReportExecutor &&
 				<NavigationItem
 					label={t("Reports")}
 					to="hr/reports"
@@ -240,7 +240,7 @@ function MenuItems() {
 	if (!payroll && tenant.userRelations?.includes("admin_panel_viewer")) {
 		return <MenuItemsTenant />;
 	}
-	else if (employee && payroll && payroll.userRelations?.includes("selfservice_event_adder")) {
+	else if (employee && payroll && payroll.userRelations?.includes("self_service_event_adder")) {
 		return <MenuItemsPayrollEmployee employee={employee} />;
 	}
 	else if (payroll) {
