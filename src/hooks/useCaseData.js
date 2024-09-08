@@ -13,8 +13,7 @@ function mapCase(_case, attachments) {
 			documents: attachments[f.id],
 			tags: f.valueTags,
 			attributes: f.valueAttributes,
-		})),
-		relatedCases: _case.relatedCases.map((c) => mapCase(c, attachments)),
+		}))
 	};
 }
 

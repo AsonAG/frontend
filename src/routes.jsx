@@ -169,8 +169,8 @@ function createRouteDocument(showTitle) {
 			{
 				path: ":caseFieldName",
 				loader: ({ params, request }) => {
-					const searchParams = new URL(request.url).searchParams;
-					return getDocumentsOfCaseField(params, params.caseFieldName, searchParams.get("top"));
+					const top = getQueryParam(request, "top");
+					return getDocumentsOfCaseField(params, params.caseFieldName, top);
 				}
 			},
 			{
@@ -200,8 +200,7 @@ function createRouteEmployeeTable(path, showButtons = true) {
 		path,
 		Component: AsyncEmployeeTable,
 		loader: async ({ request, params }) => {
-			const [_, queryString] = request.url.split("?");
-			const searchParams = new URLSearchParams(queryString);
+			const searchParams = new URL(request.url).searchParams;
 			const searchTerm = searchParams.get("search");
 			const showAll = !!searchParams.get("showAll");
 			let filter;
@@ -462,8 +461,14 @@ const routeData = [
 						Component: AsyncEventTable,
 						loader: paginatedLoader({
 							pageCount: 10,
-							getRequestBuilder: ({ params }) =>
-								getEmployeeCaseChanges(params, null, "created desc, id"),
+							getRequestBuilder: ({ request, params }) => {
+								const caseName = getQueryParam(request, "cn");
+								let filter = null;
+								if (caseName) {
+									filter = `contains(caseName, '${encodeURIComponent(caseName)}')`;
+								}
+								return getEmployeeCaseChanges(params, filter, "created desc, id");
+							}
 						}),
 					},
 					createRouteDocument(false),
@@ -487,8 +492,7 @@ const routeData = [
 				Component: AsyncTaskTable,
 				loader: async ({ params, request }) => {
 					const { user } = await getTenantData();
-					const [_, queryString] = request.url.split("?");
-					const searchParams = new URLSearchParams(queryString);
+					const searchParams = new URL(request.url).searchParams;
 					let dataPromise = null;
 					if (searchParams.has("completed")) {
 						const filter = "completed ne null";
