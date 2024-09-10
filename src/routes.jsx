@@ -462,12 +462,8 @@ const routeData = [
 						loader: paginatedLoader({
 							pageCount: 10,
 							getRequestBuilder: ({ request, params }) => {
-								const caseName = getQueryParam(request, "cn");
-								let filter = null;
-								if (caseName) {
-									filter = `contains(caseName, '${encodeURIComponent(caseName)}')`;
-								}
-								return getEmployeeCaseChanges(params, filter, "created desc, id");
+								const search = getQueryParam(request, "q");
+								return getEmployeeCaseChanges(params, search, "created desc, id");
 							}
 						}),
 					},
@@ -829,8 +825,10 @@ const routeData = [
 						Component: AsyncEventTable,
 						loader: paginatedLoader({
 							pageCount: 10,
-							getRequestBuilder: ({ params }) =>
-								getCompanyCaseChanges(params, null, "created desc, id"),
+							getRequestBuilder: ({ params }) => {
+								const search = getQueryParam(request, "q");
+								return getCompanyCaseChanges(params, search, "created desc, id");
+							},
 						}),
 					},
 					createRouteDocument(false),

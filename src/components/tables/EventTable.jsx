@@ -1,4 +1,4 @@
-import { React } from "react";
+import { React, useState } from "react";
 import { useAsyncValue } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -11,22 +11,26 @@ import {
 	Typography,
 	useMediaQuery,
 	useTheme,
+	TextField,
+	InputAdornment
 } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { formatCaseValue } from "../../utils/Format";
 import { ScrollToTop } from "../ScrollToTop";
-import { MoreVert } from "@mui/icons-material";
+import { Clear, MoreVert } from "@mui/icons-material";
 import { PaginatedContent } from "../PaginatedContent";
+import { useSearchParam } from "../../hooks/useSearchParam";
 
 export function AsyncEventTable() {
-	return (
+	return <>
+		<TableSearch />
 		<AsyncDataRoute>
 			<PaginatedContent>
 				<EventTable />
 			</PaginatedContent>
 		</AsyncDataRoute>
-	);
+	</>;
 }
 
 function EventTable() {
@@ -47,6 +51,56 @@ function EventTable() {
 			</Stack>
 			<ScrollToTop />
 		</>
+	);
+}
+
+function TableSearch() {
+	const { t } = useTranslation();
+	const [searchTerm, setSearchTerm] = useSearchParam("q", {
+		replace: true,
+		exclusive: true
+	});
+	const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+
+	const onChange = (event) => {
+		const updatedValue = event.target.value;
+		setLocalSearchTerm(updatedValue);
+	};
+
+	const onClear = () => {
+		setLocalSearchTerm("");
+		setSearchTerm("");
+	}
+
+	const onSubmit = (event) => {
+		setSearchTerm(localSearchTerm);
+		event.preventDefault();
+	};
+
+	let clearButton = null;
+	if (searchTerm) {
+		clearButton = (
+			<InputAdornment position="end">
+				<IconButton onClick={onClear}>
+					<Clear />
+				</IconButton>
+			</InputAdornment>
+		)
+	}
+
+	return (
+		<form onSubmit={onSubmit}>
+			<TextField
+				fullWidth
+				variant="outlined"
+				label={t("Search")}
+				onChange={onChange}
+				value={localSearchTerm}
+				InputProps={{
+					endAdornment: clearButton,
+				}}
+			/>
+		</form>
 	);
 }
 

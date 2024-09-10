@@ -294,12 +294,12 @@ export function getCaseValues(routeParams, top) {
 		.fetchJson();
 }
 
-export function getEmployeeCaseChanges(routeParams, filter, orderBy) {
+export function getEmployeeCaseChanges(routeParams, search, orderBy) {
 	const url = payrollUrl + "/changes";
 	return new FetchRequestBuilder(url, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", "Employee")
-		.withQueryParam("filter", filter)
+		.withQueryParam("searchTerm", search)
 		.withQueryParam("orderBy", orderBy)
 		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
@@ -316,11 +316,11 @@ export function getCompanyCases(routeParams, clusterSetName) {
 		.fetchJson();
 }
 
-export function getCompanyCaseChanges(routeParams, filter, orderBy) {
+export function getCompanyCaseChanges(routeParams, search, orderBy) {
 	const url = payrollUrl + "/changes";
 	return new FetchRequestBuilder(url, routeParams)
 		.withQueryParam("caseType", "Company")
-		.withQueryParam("filter", filter)
+		.withQueryParam("searchTerm", search)
 		.withQueryParam("orderBy", orderBy)
 		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()

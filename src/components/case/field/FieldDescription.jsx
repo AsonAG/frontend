@@ -36,7 +36,7 @@ export function FieldDetails() {
 			title={t("Details")}
 			placement="right"
 		>
-			<ButtonBox type="button" onClick={() => setCaseFieldDetails(field)}>
+			<ButtonBox type="button" tabIndex={-1} onClick={() => setCaseFieldDetails(field)}>
 				<Info />
 			</ButtonBox>
 		</Tooltip>

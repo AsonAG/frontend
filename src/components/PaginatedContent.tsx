@@ -7,11 +7,17 @@ import {
 import { Stack, Pagination } from "@mui/material";
 import { useIsMobile } from "../hooks/useIsMobile";
 
+const parameterName = "page";
+
 function usePageSearchParam(): [number, (number: number) => void] {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const setPage = (pageNumber: number) =>
-		setSearchParams((o) => ({ ...o, page: pageNumber }));
-	const page = searchParams.get("page") || 1;
+		setSearchParams((o) => {
+			const updated = new URLSearchParams(o);
+			updated.set(parameterName, pageNumber + '');
+			return updated;
+		});
+	const page = searchParams.get(parameterName) || 1;
 	return [Number(page), setPage];
 }
 
