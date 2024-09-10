@@ -205,7 +205,7 @@ function createRouteEmployeeTable(path, showButtons = true) {
 			const showAll = !!searchParams.get("showAll");
 			let filter;
 			if (searchTerm) {
-				filter = `startswith_ci(firstName, '${searchTerm}') or startswith_ci(lastName, '${searchTerm}') or startswith_ci(identifier, '${searchTerm}')`;
+				filter = `contains_ci(firstName, '${searchTerm}') or contains_ci(lastName, '${searchTerm}') or contains_ci(identifier, '${searchTerm}')`;
 			}
 			return defer({
 				showButtons,
