@@ -825,7 +825,7 @@ const routeData = [
 						Component: AsyncEventTable,
 						loader: paginatedLoader({
 							pageCount: 10,
-							getRequestBuilder: ({ params }) => {
+							getRequestBuilder: ({ params, request }) => {
 								const search = getQueryParam(request, "q");
 								return getCompanyCaseChanges(params, search, "created desc, id");
 							},

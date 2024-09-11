@@ -93,7 +93,7 @@ function TableSearch() {
 			<TextField
 				fullWidth
 				variant="outlined"
-				label={t("Search")}
+				placeholder={t("Search")}
 				onChange={onChange}
 				value={localSearchTerm}
 				InputProps={{
