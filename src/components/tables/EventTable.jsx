@@ -96,8 +96,10 @@ function TableSearch() {
 				placeholder={t("Search")}
 				onChange={onChange}
 				value={localSearchTerm}
-				InputProps={{
-					endAdornment: clearButton,
+				slotProps={{
+					input: {
+						endAdornment: clearButton,
+					}
 				}}
 			/>
 		</form>

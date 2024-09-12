@@ -39,35 +39,37 @@ export function FieldValueFileComponent() {
 			required={required}
 			disabled={isReadonly}
 			type="file"
-			InputLabelProps={{
-				shrink: true,
-			}}
-			inputProps={{
-				multiple: true,
-				accept: extensions,
-				id: fileUploadId,
-			}}
-			InputProps={{
-				startAdornment: (
-					<Box
-						component="label"
-						htmlFor={fileUploadId}
-						sx={{
-							paddingLeft: 2,
-							paddingRight: 1.5,
-							display: "flex",
-							alignContent: "center",
-							flexWrap: "wrap",
-							height: "100%",
-							cursor: "pointer",
-						}}
-					>
-						<CloudUpload />
-					</Box>
-				),
-				classes: {
-					adornedStart: "file-upload-adorned-start",
+			slotProps={{
+				input: {
+					startAdornment: (
+						<Box
+							component="label"
+							htmlFor={fileUploadId}
+							sx={{
+								paddingLeft: 2,
+								paddingRight: 1.5,
+								display: "flex",
+								alignContent: "center",
+								flexWrap: "wrap",
+								height: "100%",
+								cursor: "pointer",
+							}}
+						>
+							<CloudUpload />
+						</Box>
+					),
+					classes: {
+						adornedStart: "file-upload-adorned-start",
+					}
 				},
+				htmlInput: {
+					multiple: true,
+					accept: extensions,
+					id: fileUploadId
+				},
+				inputLabel: {
+					shrink: true
+				}
 			}}
 			sx={{
 				flex: 1,

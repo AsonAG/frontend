@@ -162,12 +162,14 @@ function EmployeeTableSearchField() {
 			label={t("Search")}
 			onChange={onChange}
 			value={localSearchTerm}
-			InputProps={{
-				endAdornment: (
-					<InputAdornment position="end">
-						<Search />
-					</InputAdornment>
-				),
+			slotProps={{
+				input: {
+					endAdornment: (
+						<InputAdornment position="end">
+							<Search />
+						</InputAdornment>
+					)
+				}
 			}}
 		/>
 	);

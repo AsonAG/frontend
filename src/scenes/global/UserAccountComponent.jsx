@@ -84,8 +84,10 @@ function UserEdit() {
 			variant="standard"
 			onBlur={(event) => updateUser(event.target.value)}
 			onKeyDown={onKeyDown}
-			inputProps={{
-				style: { textAlign: "center" }
+			slotProps={{
+				htmlInput: {
+					style: { textAlign: "center" }
+				}
 			}}
 		/>
 	);

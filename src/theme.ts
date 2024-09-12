@@ -72,6 +72,7 @@ function createThemeSettings(mode: ThemeMode): ThemeOptions {
 
   return {
     ...palette,
+    cssVariables: true,
     components: {
       MuiStack: {
         defaultProps: {
@@ -108,7 +109,7 @@ function createThemeSettings(mode: ThemeMode): ThemeOptions {
             },
           },
           inputRoot: ({ theme, ownerState }) => {
-            if (ownerState.size !== "small") return;
+            if (ownerState?.size !== "small") return;
 
             return {
               height: "100%",

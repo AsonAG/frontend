@@ -23,7 +23,6 @@ function FieldValueDropdownComponent({ useDataHook }) {
 
 	return (
 		<Autocomplete
-			size="small"
 			{...data}
 			disabled={isReadonly}
 			fullWidth
@@ -33,20 +32,22 @@ function FieldValueDropdownComponent({ useDataHook }) {
 					{...params}
 					required={required}
 					label={displayName}
-					inputProps={{
-						...params.inputProps,
-						required: required && (data.value?.length ?? 0) === 0,
-					}}
-					InputProps={{
-						...params.InputProps,
-						endAdornment: (
-							<>
-								{data.loading ? (
-									<CircularProgress color="inherit" size={20} />
-								) : null}
-								{params.InputProps.endAdornment}
-							</>
-						),
+					slotProps={{
+						input: {
+							...params.InputProps,
+							endAdornment: (
+								<>
+									{data.loading ? (
+										<CircularProgress color="inherit" size={20} />
+									) : null}
+									{params.InputProps.endAdornment}
+								</>
+							)
+						},
+						htmlInput: {
+							...params.inputProps,
+							required: required && (data.value?.length ?? 0) === 0,
+						}
 					}}
 					sx={{ flex: 1 }}
 				/>

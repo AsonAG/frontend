@@ -43,14 +43,16 @@ export function EmployeeSelector({
 				value={fieldValue}
 				disabled
 				label={t("Employees")}
-				InputProps={{
-					endAdornment: (
-						<InputAdornment position="end">
-							<IconButton onClick={() => setOpen(true)}>
-								<ChevronRight />
-							</IconButton>
-						</InputAdornment>
-					),
+				slotProps={{
+					input: {
+						endAdornment: (
+							<InputAdornment position="end">
+								<IconButton onClick={() => setOpen(true)}>
+									<ChevronRight />
+								</IconButton>
+							</InputAdornment>
+						)
+					}
 				}}
 			/>
 			{open && (
