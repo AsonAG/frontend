@@ -120,3 +120,5 @@ export function ResponsiveDialog(dialogProps: Dialog.DialogProps) {
 	const Component = isMobile ? Drawer : Dialog;
 	return <Component.Root {...dialogProps} />;
 }
+
+export const ResponsiveDialogTitle = Dialog.Title;

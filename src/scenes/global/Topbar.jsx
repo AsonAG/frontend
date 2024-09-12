@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import { UserAccountComponent } from "./UserAccountComponent";
 import { Suspense } from "react";
+import { NewEventCommand } from "../../components/NewEventCommand";
 
 function Topbar({ children }) {
 	return (
@@ -25,7 +26,8 @@ function Topbar({ children }) {
 				{children}
 				<Box sx={{ flexGrow: 1 }} />
 
-				<Stack direction="row" spacing={0.5}>
+				<Stack direction="row" spacing={2.5} alignItems="center">
+					<NewEventCommand />
 					<Suspense>
 						<UserAccountComponent />
 					</Suspense>
