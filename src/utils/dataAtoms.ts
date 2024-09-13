@@ -49,7 +49,7 @@ export const userAtom = atom((get) => {
 	return getUser({ tenantId }, authUserEmail);
 });
 
-export const employeeAtom = atom((get) => {
+export const selfServiceEmployeeAtom = atom((get) => {
 	const tenantId = get(tenantIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (tenantId === null || payrollId === null) return null;

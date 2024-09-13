@@ -268,12 +268,13 @@ export function getEmployeeByIdentifier(routeParams, identifier) {
 		.fetchSingle();
 }
 
-export function getEmployeeCases(routeParams, clusterSetName) {
+export function getEmployeeCases(routeParams, clusterSetName, signal) {
 	return new FetchRequestBuilder(caseSetsUrl, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("clusterSetName", clusterSetName)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("orderBy", `name asc`)
+		.withSignal(signal)
 		.withLocalization()
 		.withUser()
 		.fetchJson();
@@ -306,11 +307,12 @@ export function getEmployeeCaseChanges(routeParams, search, orderBy) {
 		.withUser();
 }
 
-export function getCompanyCases(routeParams, clusterSetName) {
+export function getCompanyCases(routeParams, clusterSetName, signal) {
 	return new FetchRequestBuilder(caseSetsUrl, routeParams)
 		.withQueryParam("clusterSetName", clusterSetName)
 		.withQueryParam("caseType", "Company")
 		.withQueryParam("orderBy", `nameLocalizationsde asc`)
+		.withSignal(signal)
 		.withLocalization()
 		.withUser()
 		.fetchJson();

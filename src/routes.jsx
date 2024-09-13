@@ -70,7 +70,7 @@ import {
 	payrollsAtom,
 	tenantAtom,
 	userAtom,
-	employeeAtom,
+	selfServiceEmployeeAtom,
 	payrunAtom,
 	toast,
 	payrollAtom,
@@ -342,7 +342,7 @@ const routeData = [
 		ErrorBoundary: ErrorView,
 		loader: async () => {
 			const { tenant, payrolls, user } = await getTenantData();
-			const employee = await store.get(employeeAtom);
+			const employee = await store.get(selfServiceEmployeeAtom);
 			return { tenant, user, payrolls, employee };
 		},
 		id: "tenantRoot",
@@ -406,7 +406,7 @@ const routeData = [
 				return redirect(payrolls[0].id);
 			}
 			const payroll = payrolls.find((p) => p.id === params.payrollId);
-			const employee = await store.get(employeeAtom);
+			const employee = await store.get(selfServiceEmployeeAtom);
 			return { tenant, user, payrolls, payroll, employee };
 		},
 		shouldRevalidate: ({ currentParams, nextParams }) =>
@@ -424,7 +424,7 @@ const routeData = [
 					if (isHrUser) {
 						return redirect("hr/tasks");
 					}
-					const employee = await store.get(employeeAtom);
+					const employee = await store.get(selfServiceEmployeeAtom);
 					if (employee !== null) {
 						return redirect(`employees/${employee.id}/new`);
 					}

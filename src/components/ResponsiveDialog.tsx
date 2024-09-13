@@ -27,8 +27,8 @@ const DrawerContent = styled("div", {
 );
 
 const DialogContent = styled("div", {
-	shouldForwardProp: () => true,
-})(({ theme }) =>
+	shouldForwardProp: (name) => !(name === "containerWidth" || name === "disablePadding"),
+})<Props>(({ theme, containerWidth, disablePadding }) =>
 	theme.unstable_sx({
 		position: "fixed",
 		borderRadius: 1,
@@ -37,19 +37,21 @@ const DialogContent = styled("div", {
 		left: "50%",
 		transform: "translate(-50%, -50%)",
 		width: "90vw",
-		maxWidth: 600,
+		maxWidth: containerWidth ? 1200 : 600,
 		maxHeight: "85vh",
-		padding: 3,
+		padding: disablePadding ? 0 : 3,
 		zIndex: theme.zIndex.modal,
 		":focus-visible": {
 			outline: "none",
 		},
-		boxShadow: theme.shadows[1],
+		boxShadow: theme.shadows[1]
 	}),
 );
 
 interface Props {
 	children?: ReactNode;
+	containerWidth?: boolean;
+	disablePadding?: boolean;
 }
 
 export const ResponsiveDialogContent = React.forwardRef<HTMLDivElement, Props>(
@@ -122,3 +124,4 @@ export function ResponsiveDialog(dialogProps: Dialog.DialogProps) {
 }
 
 export const ResponsiveDialogTitle = Dialog.Title;
+export const ResponsiveDialogDescription = Dialog.Description;
