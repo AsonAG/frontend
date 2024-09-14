@@ -25,7 +25,7 @@ export function Component() {
 	const { user, payroll } = useRouteLoaderData("root");
 	const loaderData = useLoaderData();
 	const [caseFieldDetails, setCaseFieldDetails] = useState(null);
-	const redirectPath = loaderData?.redirect || "..";
+	const redirectPath = loaderData?.redirect || "../../events";
 	const renderTitle = loaderData?.renderTitle ?? true;
 	const PageComponent = renderTitle ? ContentLayout : PageContent;
 	const params = useParams();

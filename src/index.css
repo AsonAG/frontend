@@ -99,14 +99,15 @@ input[type="file"] {
 }
 
 
+
 [cmdk-root] {
   width: 100%;
-  background: var(--mui-palette-common-background);
   border-radius: var(--mui-shape-borderRadius);
   overflow: hidden;
   padding: 0;
   font: var(--mui-font-body1);
   outline: none;
+  --cmdk-max-height: 700px;
 }
 
 
@@ -117,7 +118,6 @@ input[type="file"] {
   font-size: 1rem;
   padding: calc(2 * var(--mui-spacing));
   outline: none;
-  background: var(--mui-palette-common-background);
   color: var(--mui-palette-text-primary);
   border-bottom: 1px solid var(--mui-palette-divider);
   border-radius: 0;
@@ -131,7 +131,7 @@ input[type="file"] {
 [cmdk-item] {
   content-visibility: auto;
   cursor: pointer;
-  height: 48px;
+  height: 56px;
   display: flex;
   align-items: center;
   gap: calc(2 * var(--mui-spacing));
@@ -141,10 +141,21 @@ input[type="file"] {
   transition: all 150ms ease;
   transition-property: none;
   position: relative;
+  margin: 0 calc(2 * var(--mui-spacing));
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: calc(2 * var(--mui-shape-borderRadius));
+  background-color: var(--mui-palette-background-paper);
+}
+[cmdk-loading] {
+  height: var(--cmdk-max-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 [cmdk-item][data-selected=true] {
-  background: var(--mui-palette-primary-hover);
-  color: var(--mui-palette-primary);
+  color: var(--mui-palette-primary-main);
+  border: 1px solid var(--mui-palette-primary-main);
+  background-color: var(--mui-palette-primary-hover);
 }
 [cmdk-item][data-disabled=true] {
   color: var(--mui-palette-text-disabled);
@@ -154,13 +165,16 @@ input[type="file"] {
   transition-property: background;
   background: var(--gray4);
 }
+[cmdk-item]:last-child {
+  margin-bottom: calc(2 * var(--mui-spacing));
+}
 [cmdk-item] + [cmdk-item] {
-  margin-top: calc(0.5 * var(--mui-spacing));
+	margin-top: var(--mui-spacing);
 }
 
 [cmdk-list] {
-  height: min(300px, var(--cmdk-list-height));
-  max-height: 700px;
+  height: min(var(--cmdk-max-height), calc(16px + var(--cmdk-list-height)));
+  max-height: max(300px, 60vh);
   overflow: auto;
   overscroll-behavior: contain;
   transition: 100ms ease;
@@ -170,8 +184,9 @@ input[type="file"] {
 [cmdk-group-heading] {
   user-select: none;
   font-size: 12px;
-  color: var(--gray11);
-  padding: 0 8px;
+  color: var(--mui-palette-text-secondary);
+  padding: calc(2 * var(--mui-spacing));
+  text-transform: uppercase;
   display: flex;
   align-items: center;
 }
@@ -181,7 +196,7 @@ input[type="file"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 64px;
+  height: 56px;
   white-space: pre-wrap;
-  color: var(--gray11);
+  color: var(--mui-palette-text-disabled);
 }

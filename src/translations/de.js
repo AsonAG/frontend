@@ -169,6 +169,16 @@ const translations = {
 
 		Failed: "Fehlgeschlagen",
 		Processing: "In Verarbeitung",
+
+
+		// Command
+		"Select event": "Ereignis auswählen",
+		"Select event context": "Kontext für Ereignis auswählen",
+		"Mask for selecting a new event to report": "Maske für das Auswählen eines Ereignisses",
+		"Company event": "Firmenereignis",
+		"No employee found": "Mitarbeiter nicht gefunden",
+		"No event found": "Ereignis nicht gefunden",
+		"Available events": "Verfügbare Ereignisse"
 	},
 };
 

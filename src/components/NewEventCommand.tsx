@@ -1,19 +1,21 @@
 import { Command } from "cmdk";
-import React, { Suspense, useEffect, useId, useMemo, useReducer, useRef, useState } from "react";
+import React, { Dispatch, forwardRef, Suspense, useEffect, useId, useMemo, useReducer, useRef, useState } from "react";
 import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogDescription, ResponsiveDialogTitle, ResponsiveDialogTrigger } from "./ResponsiveDialog";
-import { Box, Button, Divider, Typography } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Box, Button, Card, Chip, CircularProgress, Divider, Paper, Stack, Typography } from "@mui/material";
+import { Add, Business, ChevronRight, Event, PeopleOutlined, SvgIconComponent } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { selfServiceEmployeeAtom, payrollAtom } from "../utils/dataAtoms";
+import { payrollAtom } from "../utils/dataAtoms";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
 import { getCompanyCases, getEmployeeCases, getEmployees } from "../api/FetchClient";
-import { generatePath, useFetcher, useParams } from "react-router-dom";
+import { generatePath, useNavigate, useParams } from "react-router-dom";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 export function NewEventCommand() {
   const params = useParams();
-  if (!params.tenantId || !params.payrollId) {
+  const isMobile = useIsMobile();
+  if (!params.tenantId || !params.payrollId || isMobile) {
     return;
   }
   return <InternalNewEventCommand />;
@@ -40,7 +42,7 @@ function InternalNewEventCommand() {
       <ResponsiveDialogTrigger>
         <Button variant="contained" onClick={() => setOpen(true)} sx={{ px: 1, tabIndex: -1 }} disableRipple>
           <Add sx={{ mr: 0.5, pb: 0.125 }} />
-          Neues Ereignis...
+          {t("New event")}
           <Box component="div" sx={{
             borderWidth: "thin",
             borderStyle: "solid",
@@ -53,21 +55,19 @@ function InternalNewEventCommand() {
         </Button>
       </ResponsiveDialogTrigger>
       <Suspense>
-        {open && <NewEventDialogContent />}
+        {open && <NewEventDialogContent close={() => setOpen(false)} />}
       </Suspense>
     </ResponsiveDialog>
   );
 };
 
-function NewEventDialogContent() {
+function NewEventDialogContent({ close }: { close: () => void }) {
   const { t } = useTranslation();
-  // const payroll = useAtomValue(payrollAtom);
-  const preselectedEmployee: Employee = useAtomValue(selfServiceEmployeeAtom);
+  const payroll = useAtomValue(payrollAtom);
   const params = useParams();
-  const [search, setSearch] = useState("");
   const [state, dispatch] = useReducer(
     reducer,
-    preselectedEmployee,
+    null,
     createInitialState,
   );
 
@@ -90,7 +90,9 @@ function NewEventDialogContent() {
             type: "initialize", state: {
               initialized: true,
               loading: false,
+              placeholder: "Select event",
               page: "employee",
+              search: "",
               employees,
               employee,
               cases
@@ -104,6 +106,8 @@ function NewEventDialogContent() {
             initialized: true,
             loading: false,
             page: "context",
+            search: "",
+            placeholder: "Select event context",
             employees
           }
         });
@@ -117,35 +121,108 @@ function NewEventDialogContent() {
     return () => controller.abort();
   }, []);
 
+  useEffect(() => {
+    // initialze state
+    if (!state.initialized)
+      return;
+
+    async function fetchCases(getCases: () => Promise<Array<any>>) {
+      try {
+        // TODO Dispatch loading
+        dispatch({ type: "start-loading-cases" });
+
+        const cases = await getCases();
+
+        dispatch({
+          type: "cases-loaded", cases
+        });
+      } catch (e) {
+        // TODO AJO 
+      }
+    };
+    if (state.page === "employee" && state.cases === null) {
+      const controller = new AbortController();
+      const getCases = () => getEmployeeCases({ ...params, employeeId: state.employee.id }, "NewEvent", controller.signal);
+      fetchCases(getCases);
+      return () => controller.abort();
+    }
+
+    if (state.page === "company" && state.cases === null) {
+      const controller = new AbortController();
+      const getCases = () => getCompanyCases(params, "NewEvent", controller.signal);
+      fetchCases(getCases);
+      return () => controller.abort();
+
+    }
+
+  }, [state.initialized && state.page])
+
   return (
-    <ResponsiveDialogContent containerWidth disablePadding>
+    <ResponsiveDialogContent containerWidth disablePadding spacing={0}>
       <VisuallyHidden>
         <ResponsiveDialogTitle>{t("New event")}</ResponsiveDialogTitle>
         <ResponsiveDialogDescription>{t("Mask for selecting a new event to report")}</ResponsiveDialogDescription>
       </VisuallyHidden>
+      <Stack direction="row" spacing={1} sx={{ px: 2, pt: 2 }} alignItems="center">
+        <Chip
+          label={payroll.name}
+          icon={<Business />}
+          size="small"
+          variant="outlined"
+          onClick={() => dispatch({ type: "context" })}
+          sx={{ pl: 0.75, pr: 0.25, borderRadius: 1 }} />
+        <ContextChip state={state} />
+      </Stack>
       <Command
-        label="Global Command Menu"
+        label="New Event Command Menu"
         onKeyDown={(e) => {
-          if (e.key === "Backspace" && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && !search) {
+          if (e.key === "Backspace" && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && !state.search) {
             e.preventDefault();
+            dispatch({ type: "context" });
           }
         }}
+        filter={(value, search, keywords) => {
+          if (value.toLowerCase().includes(search.toLowerCase())) return 1;
+          const allKeywords = keywords.join(' ');
+          if (allKeywords.toLowerCase().includes(search.toLowerCase())) return 0.9;
+          return 0;
+        }}
       >
-        <Command.Input value={search} onValueChange={setSearch} placeholder={t("Select the context")} />
+        <Command.Input value={state.search} onValueChange={s => dispatch({ type: "set-search", search: s })} autoFocus placeholder={t(state.placeholder)} />
         <LoadingCommandList state={state}>
-          <ContextCommandGroup state={state} />
+          <ContextCommandGroup state={state} dispatch={dispatch} />
+          <EmployeeCasesCommandGroup state={state} dispatch={dispatch} close={close} />
+          <CompanyCasesCommandGroup state={state} dispatch={dispatch} close={close} />
         </LoadingCommandList>
       </Command>
     </ResponsiveDialogContent>
   )
 }
 
+function ContextChip({ state }: { state: State }) {
+  const { t } = useTranslation();
+  if (!state.initialized)
+    return;
+
+  if (state.page === "context")
+    return;
+
+  const label = state.page === "employee" ? getEmployeeDisplayString(state.employee) : t("Company event");
+  const icon = state.page === "employee" ? <PeopleOutlined /> : <Event />;
+  return (
+    <>
+      <ChevronRight sx={{ color: theme => theme.palette.text.disabled }} />
+      <Chip label={label} icon={icon} size="small" variant="outlined" sx={{ pl: 0.75, pr: 0.25, borderRadius: 1 }} />
+    </>
+  );
+}
+
 function LoadingCommandList({ state, children }: { state: State, children: React.ReactNode }) {
   const { t } = useTranslation();
   const elements = !state.initialized || state.loading ?
-    <Command.Loading>{t("Fetching")}</Command.Loading> :
+    <Command.Loading><CircularProgress /></Command.Loading> :
     <>
-      <Command.Empty>{t("No event found.")}</Command.Empty>
+      <Command.Empty>{state.page === "context" ? t("No employee found") : t("No event found")}</Command.Empty>
       {children}
     </>
   return (
@@ -155,11 +232,13 @@ function LoadingCommandList({ state, children }: { state: State, children: React
   )
 }
 
-function ContextCommandGroup({ state }: { state: State }) {
+function ContextCommandGroup({ state, dispatch }: { state: State, dispatch: Dispatch<Action> }) {
   const { t } = useTranslation();
   const employeeState = state.initialized ? state.employees : null;
   const employees = useMemo(() => employeeState?.map((employee: Employee) => (
-    <Command.Item key={employee.id}>{getEmployeeDisplayString(employee)}</Command.Item>
+    <Command.Item key={employee.id} onSelect={() => dispatch({ type: "select-employee", employee: employee })}>
+      <CommandItem text={getEmployeeDisplayString(employee)} subtext={employee.identifier} />
+    </Command.Item>
   )), [employeeState]);
 
   const isContextPage = state.initialized && state.page === "context";
@@ -167,7 +246,8 @@ function ContextCommandGroup({ state }: { state: State }) {
     return;
 
   return <>
-    <Command.Group heading={t("Firma")}>
+    <Command.Group heading={t("Company")}>
+      <Command.Item onSelect={() => dispatch({ type: "select-company" })}>{t("Company event")}</Command.Item>
     </Command.Group>
     {
       employees &&
@@ -178,44 +258,167 @@ function ContextCommandGroup({ state }: { state: State }) {
   </>
 }
 
+function getCaseKeywords(_case: AvailableCase) {
+  let keywords = [_case.name];
+  if (_case.description) {
+    keywords.push(_case.description);
+  }
+  if (_case.nameSynonyms) {
+    for (const synonym of _case.nameSynonyms) {
+      keywords.push(synonym);
+    }
+  }
+  if (_case.caseFields) {
+    for (const field of _case.caseFields) {
+      keywords.push(field.name);
+      if (field.description) {
+        keywords.push(field.description);
+      }
+    }
+  }
+  return keywords;
+}
+
+
+type CommandItemProps = {
+  text: string
+  subtext?: string
+}
+
+function CommandItem({ text, subtext }: CommandItemProps) {
+  return (
+    <Stack>
+      <Typography>{text}</Typography>
+      {
+        subtext && <Typography variant="body2" noWrap>{subtext}</Typography>
+      }
+    </Stack>
+  );
+};
+
+function EmployeeCasesCommandGroup({ state, close, dispatch }: { state: State, close: () => void, dispatch: Dispatch<Action> }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const params = useParams();
+  const casesState = state.initialized && state.page === "employee" ? state.cases : null;
+  function onCaseSelected(_case: AvailableCase) {
+    const employee = state.initialized && state.page === "employee" && state.employee;
+    if (!employee)
+      throw new Error("no employee found"); // this should never happen
+    const path = generatePath(`/tenants/:tenantId/payrolls/:payrollId/hr/employees/:employeeId/new/:caseName`, { tenantId: params.tenantId!, payrollId: params.payrollId!, employeeId: employee.id, caseName: _case.name });
+    navigate(path);
+    close();
+  }
+  const cases = useMemo(() => casesState?.map((_case) => (
+    <Command.Item key={_case.name} onSelect={() => onCaseSelected(_case)} keywords={getCaseKeywords(_case)}>
+      <CommandItem text={_case.displayName} subtext={_case.description} />
+    </Command.Item>
+  )), [casesState]);
+
+  const isEmployeeCasesPage = state.initialized && state.page === "employee";
+  if (!isEmployeeCasesPage)
+    return;
+
+  return (
+    <Command.Group heading={t("Available events")}>
+      {cases}
+    </Command.Group>
+  );
+}
+
+
+function CompanyCasesCommandGroup({ state, close, dispatch }: { state: State, close: () => void, dispatch: Dispatch<Action> }) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const params = useParams();
+  const casesState = state.initialized && state.page === "company" ? state.cases : null;
+  function onCaseSelected(_case: AvailableCase) {
+    const path = generatePath(`/tenants/:tenantId/payrolls/:payrollId/company/new/:caseName`, { tenantId: params.tenantId!, payrollId: params.payrollId!, caseName: _case.name });
+    navigate(path);
+    close();
+  }
+  const cases = useMemo(() => casesState?.map((_case) => (
+    <Command.Item key={_case.name} onSelect={() => onCaseSelected(_case)} keywords={getCaseKeywords(_case)}>
+      <CommandItem text={_case.displayName} subtext={_case.description} />
+    </Command.Item>
+  )), [casesState]);
+
+  const isCompanyCasesPage = state.initialized && state.page === "company";
+  if (!isCompanyCasesPage)
+    return;
+
+  return (
+    <Command.Group heading={t("Available events")}>
+      {cases}
+    </Command.Group>
+  );
+}
+
 type State = {
   initialized: false
+  search: string
+  placeholder: string
 } | {
   initialized: true
   employees: Array<Employee>
   loading: boolean
+  search: string
+  placeholder: string
 } & ({
   page: "employee"
   employee: Employee,
-  cases: Array<{}> | null
+  cases: Array<AvailableCase> | null
 } | {
   page: "company"
-  cases: Array<{}> | null
+  cases: Array<AvailableCase> | null
 } | {
   page: "context"
 })
 
 type Action = {
-  type: "select_employee"
+  type: "select-employee"
   employee: Employee
 } | {
-  type: "select_company"
+  type: "select-company"
+} | {
+  type: "start-loading-cases"
+} | {
+  type: "cases-loaded"
+  cases: Array<AvailableCase>
 } | {
   type: "context"
 } | {
   type: "initialize"
   state: State
+} | {
+  type: "set-search",
+  search: string
+}
+
+type AvailableCase = {
+  name: string
+  displayName: string
+  nameSynonyms?: Array<string>
+  description?: string
+  caseFields: Array<AvailableCaseField>
+}
+
+type AvailableCaseField = {
+  name: string
+  description?: string
 }
 
 function createInitialState(): State {
   return {
-    initialized: false
+    initialized: false,
+    search: "",
+    placeholder: ""
   };
 }
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case "select_employee":
+    case "select-employee":
       if (!state.initialized)
         throw new Error("not initialized");
       if (!action.employee || state.page === "company")
@@ -223,10 +426,12 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         page: "employee",
+        search: "",
+        placeholder: "Select event",
         employee: action.employee,
         cases: null
       };
-    case "select_company":
+    case "select-company":
       if (!state.initialized)
         throw new Error("not initialized");
       if (state.page === "employee")
@@ -234,6 +439,8 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         page: "company",
+        search: "",
+        placeholder: "Select event",
         cases: null
       };
     case "context":
@@ -244,14 +451,41 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         page: "context",
+        search: "",
+        placeholder: "Select event context"
       }
+    case "start-loading-cases":
+      if (!state.initialized)
+        throw new Error("not initialized");
+      return {
+        ...state,
+        loading: true
+      };
+    case "cases-loaded":
+      if (!state.initialized)
+        throw new Error("not initialized");
+      if (!(state.page === "employee" || state.page === "company"))
+        throw new Error("invalid context");
+
+      return {
+        ...state,
+        loading: false,
+        cases: action.cases
+      };
     case "initialize":
       if (state.initialized)
         throw new Error("Already initialized");
       if (!action.state.initialized)
         throw new Error("New State should be initialized");
       return action.state;
+    case "set-search":
+      return {
+        ...state,
+        search: action.search
+      };
     default:
       throw new Error("unknown action type");
   }
 }
+
+

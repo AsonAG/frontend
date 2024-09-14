@@ -6,7 +6,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { ReactNode } from "react";
 
 const DrawerContent = styled("div", {
-	shouldForwardProp: () => true,
+	shouldForwardProp: (name) => !(name === "containerWidth" || name === "disablePadding"),
 })(({ theme }) =>
 	theme.unstable_sx({
 		position: "fixed",
@@ -52,10 +52,11 @@ interface Props {
 	children?: ReactNode;
 	containerWidth?: boolean;
 	disablePadding?: boolean;
+	spacing?: number
 }
 
 export const ResponsiveDialogContent = React.forwardRef<HTMLDivElement, Props>(
-	({ children, ...props }, forwardedRef) => {
+	({ children, spacing, ...props }, forwardedRef) => {
 		const isMobile = useIsMobile();
 		const Component = isMobile ? Drawer : Dialog;
 		const Content = isMobile ? DrawerContent : DialogContent;
@@ -71,7 +72,7 @@ export const ResponsiveDialogContent = React.forwardRef<HTMLDivElement, Props>(
 				/>
 				<Component.Content asChild {...props} ref={forwardedRef}>
 					<Content>
-						<Stack spacing={2}>
+						<Stack spacing={spacing ?? 2}>
 							{isMobile && (
 								<Box
 									sx={{
