@@ -72,7 +72,6 @@ function createThemeSettings(mode: ThemeMode): ThemeOptions {
 
   return {
     ...palette,
-    cssVariables: true,
     components: {
       MuiStack: {
         defaultProps: {
@@ -207,7 +206,7 @@ type ThemeMode = "dark" | "light";
 export const useCreateTheme = () => {
   const { isDarkMode } = useDarkMode();
   const mode: ThemeMode = isDarkMode ? "dark" : "light";
-  const theme = useMemo(() => createTheme(createThemeSettings(mode)), [mode]);
+  const theme = useMemo(() => createTheme({ ...createThemeSettings(mode), cssVariables: true }), [mode]);
   return theme;
 };
 
