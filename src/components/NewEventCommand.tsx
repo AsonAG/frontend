@@ -26,7 +26,7 @@ function InternalNewEventCommand() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const down = (e) => {
+    const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         setOpen(true)
@@ -61,6 +61,8 @@ function InternalNewEventCommand() {
   );
 };
 
+const chipSx = { pl: 0.75, pr: 0.25, borderRadius: 1, fontSize: "0.75rem" };
+
 function NewEventDialogContent({ close }: { close: () => void }) {
   const { t } = useTranslation();
   const payroll = useAtomValue(payrollAtom);
@@ -79,26 +81,27 @@ function NewEventDialogContent({ close }: { close: () => void }) {
     async function fetchInitialState() {
       try {
 
-        const employeePromise = getEmployees(params).withSignal(controller.signal).fetchJson();
+        const employeePromise = getEmployees(params).withActive().withSignal(controller.signal).fetchJson();
         if (params.employeeId) {
           const casesPromise = getEmployeeCases(params, "NewEvent", controller.signal);
           const [employees, cases]: [Array<Employee>, Array<any>] = await Promise.all([employeePromise, casesPromise]);
           const employee = employees.find(x => x.id === params.employeeId);
-          if (!employee)
-            throw new Error("Employee not found")
-          dispatch({
-            type: "initialize", state: {
-              initialized: true,
-              loading: false,
-              placeholder: "Select event",
-              page: "employee",
-              search: "",
-              employees,
-              employee,
-              cases
-            }
-          });
-          return;
+          // if employee does not exists, the employee could not be found or is inactive
+          if (employee) {
+            dispatch({
+              type: "initialize", state: {
+                initialized: true,
+                loading: false,
+                placeholder: "Select event",
+                page: "employee",
+                search: "",
+                employees,
+                employee,
+                cases
+              }
+            });
+            return;
+          }
         }
         const employees: Array<Employee> = await employeePromise;
         dispatch({
@@ -163,14 +166,13 @@ function NewEventDialogContent({ close }: { close: () => void }) {
         <ResponsiveDialogTitle>{t("New event")}</ResponsiveDialogTitle>
         <ResponsiveDialogDescription>{t("Mask for selecting a new event to report")}</ResponsiveDialogDescription>
       </VisuallyHidden>
-      <Stack direction="row" spacing={1} sx={{ px: 2, pt: 2 }} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ p: 2, pb: 1 }} alignItems="center">
         <Chip
           label={payroll.name}
           icon={<Business />}
-          size="small"
           variant="outlined"
           onClick={() => dispatch({ type: "context" })}
-          sx={{ pl: 0.75, pr: 0.25, borderRadius: 1 }} />
+          sx={chipSx} />
         <ContextChip state={state} />
       </Stack>
       <Command
@@ -212,7 +214,7 @@ function ContextChip({ state }: { state: State }) {
   return (
     <>
       <ChevronRight sx={{ color: theme => theme.palette.text.disabled }} />
-      <Chip label={label} icon={icon} size="small" variant="outlined" sx={{ pl: 0.75, pr: 0.25, borderRadius: 1 }} />
+      <Chip label={label} icon={icon} variant="outlined" sx={chipSx} />
     </>
   );
 }

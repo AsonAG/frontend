@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 import { ThemeOptions, createTheme } from "@mui/material/styles";
 import { useLocalStorage } from "usehooks-ts";
@@ -38,6 +37,7 @@ const lightModeDesignTokens = {
     },
     text: {
       secondary: "rgba(0, 0, 0, 0.4)",
+      tertiary: "rgba(0, 0, 0, 0.3)"
     },
     inputBorder: "rgba(0, 0, 0, 0.23)",
     destructive: {
@@ -57,6 +57,7 @@ const darkModeDesignTokens = {
     },
     text: {
       secondary: "rgba(255, 255, 255, 0.4)",
+      tertiary: "rgba(255, 255, 255, 0.3)"
     },
     inputBorder: "rgba(255, 255, 255, 0.23)",
     destructive: {
