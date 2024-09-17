@@ -172,6 +172,7 @@ function NewEventDialogContent({ close }: { close: () => void }) {
           icon={<Business />}
           variant="outlined"
           onClick={() => dispatch({ type: "context" })}
+          color="primary"
           sx={chipSx} />
         <ContextChip state={state} />
       </Stack>
