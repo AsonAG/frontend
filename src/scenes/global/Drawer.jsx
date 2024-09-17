@@ -162,11 +162,6 @@ function MenuItemsPayrollAdmin() {
 				icon={<PeopleOutlinedIcon />}
 			/>
 			<NavigationItem
-				label={t("Tasks")}
-				to="hr/tasks"
-				icon={<OpenTasksBadgeIcon />}
-			/>
-			<NavigationItem
 				label={t("Controlling")}
 				to="hr/controlling"
 				icon={<ControllingBadgeIcon />}
@@ -180,6 +175,11 @@ function MenuItemsPayrollAdmin() {
 				label={t("Reports")}
 				to="hr/reports"
 				icon={<Description />}
+			/>
+			<NavigationItem
+				label={t("Tasks")}
+				to="hr/tasks"
+				icon={<OpenTasksBadgeIcon />}
 			/>
 		</NavigationGroup>
 	)
