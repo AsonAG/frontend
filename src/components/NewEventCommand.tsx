@@ -318,11 +318,11 @@ function EmployeeCasesCommandGroup({ state, close, dispatch }: { state: State, c
   )), [casesState]);
 
   const isEmployeeCasesPage = state.initialized && state.page === "employee";
-  if (!isEmployeeCasesPage)
+  if (!isEmployeeCasesPage || (casesState?.length ?? 0) === 0)
     return;
 
   return (
-    <Command.Group heading={t("Available events")}>
+    <Command.Group>
       {cases}
     </Command.Group>
   );
@@ -346,11 +346,11 @@ function CompanyCasesCommandGroup({ state, close, dispatch }: { state: State, cl
   )), [casesState]);
 
   const isCompanyCasesPage = state.initialized && state.page === "company";
-  if (!isCompanyCasesPage)
+  if (!isCompanyCasesPage || (casesState?.length ?? 0) === 0)
     return;
 
   return (
-    <Command.Group heading={t("Available events")}>
+    <Command.Group>
       {cases}
     </Command.Group>
   );

@@ -179,8 +179,7 @@ const translations = {
 		"Mask for selecting a new event to report": "Maske für das Auswählen eines Ereignisses",
 		"Company event": "Firmenereignis",
 		"No employee found": "Mitarbeiter nicht gefunden",
-		"No event found": "Ereignis nicht gefunden",
-		"Available events": "Verfügbare Ereignisse"
+		"No event found": "Ereignis nicht gefunden"
 	},
 };
 

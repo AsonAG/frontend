@@ -165,15 +165,12 @@ input[type="file"] {
   transition-property: background;
   background: var(--gray4);
 }
-[cmdk-item]:last-child {
-  margin-bottom: calc(2 * var(--mui-spacing));
-}
 [cmdk-item] + [cmdk-item] {
 	margin-top: var(--mui-spacing);
 }
 
 [cmdk-list] {
-  height: min(var(--cmdk-max-height), calc(16px + var(--cmdk-list-height)));
+  height: min(var(--cmdk-max-height), var(--cmdk-list-height));
   max-height: max(300px, 60vh);
   overflow: auto;
   overscroll-behavior: contain;
@@ -181,11 +178,16 @@ input[type="file"] {
   transition-property: height;
 }
 
+[cmdk-group] {
+  padding: calc(2 * var(--mui-spacing)) 0;
+}
+
 [cmdk-group-heading] {
   user-select: none;
   font-size: 12px;
   color: var(--mui-palette-text-tertiary);
   padding: calc(2 * var(--mui-spacing));
+  padding-top: 0;
   text-transform: uppercase;
   display: flex;
   align-items: center;
