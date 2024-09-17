@@ -282,13 +282,6 @@ function EmployeeButtons({ employee }) {
 	return (
 		<Stack direction="row" spacing={2} py={0.5}>
 			<TableButton
-				title={t("New event")}
-				to={employee.id + "/new"}
-				variant={variant}
-				icon={<AddOutlinedIcon />}
-				disabled={!isActive}
-			/>
-			<TableButton
 				title={t("Events")}
 				to={employee.id + "/events"}
 				variant={variant}

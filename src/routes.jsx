@@ -57,7 +57,7 @@ import {
 	getDivisions,
 	getCaseValues
 } from "./api/FetchClient";
-import { EmployeeView, EmployeeTitle } from "./scenes/employees/EmployeeView";
+import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
@@ -73,8 +73,9 @@ import {
 	payrunAtom,
 	toast,
 	payrollAtom,
-	openMissingDataTasksAtom,
-	orgsAtom
+	missingDataTasksAtom,
+	orgsAtom,
+	missingDataMapAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
@@ -89,11 +90,12 @@ import { AsyncReportView } from "./components/ReportView";
 import { CompletionView } from "./components/compliance/CompletionView";
 import { MissingDataView } from "./components/MissingDataView";
 import { EmployeeForm } from "./components/EmployeeForm";
-import { withPage } from "./components/ContentLayout";
+import { ContentLayout, withPage, withSuspense } from "./components/ContentLayout";
 import { NewTaskView } from "./components/NewTaskView";
 import { OrganizationImport } from "./organization/Import";
 import { OrganizationSettings } from "./organization/Settings";
-import { CompanyView } from "./scenes/CompanyView";
+import { EventTabbedView } from "./components/EventTabbedView";
+import { getEmployeeDisplayString } from "./models/Employee";
 
 const store = getDefaultStore();
 
@@ -425,7 +427,7 @@ const routeData = [
 					}
 					const employee = await store.get(selfServiceEmployeeAtom);
 					if (employee !== null) {
-						return redirect(`employees/${employee.id}/new`);
+						return redirect(`employees/${employee.id}/documents`);
 					}
 					return null;
 				},
@@ -435,10 +437,15 @@ const routeData = [
 			createRouteEmployeeEdit("hr/employees/:employeeId/edit", employeeId => `../hr/employees/${employeeId}`),
 			{
 				path: "hr/employees/:employeeId",
-				element: <EmployeeView />,
+				Component: withSuspense(EmployeeTabbedView),
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
-					return { employee };
+					console.log("loading employee");
+					return {
+						pageTitle: getEmployeeDisplayString(employee),
+						status: employee.status,
+						missingDataId: employee.id
+					};
 				},
 				id: "employee",
 				ErrorBoundary: ErrorView,
@@ -452,9 +459,7 @@ const routeData = [
 							});
 						},
 					},
-					createRouteCaseForm("new/:caseName", {
-						renderTitle: false,
-					}),
+					createRouteCaseForm("new/:caseName"),
 					{
 						path: "events",
 						Component: AsyncEventTable,
@@ -566,31 +571,39 @@ const routeData = [
 				path: "hr/controlling",
 				Component: MissingDataView,
 				loader: () => {
-					store.set(openMissingDataTasksAtom);
+					// refresh missing data
+					store.set(missingDataTasksAtom);
 
 					return defer({
-						data: store.get(openMissingDataTasksAtom),
+						data: store.get(missingDataMapAtom),
 						title: "Controlling",
 					});
+				}
+			},
+			{
+				path: "hr/controlling/employee/:employeeId",
+				Component: ContentLayout,
+				loader: async ({ params }) => {
+					const employee = await getEmployee(params);
+					return {
+						title: getEmployeeDisplayString(employee)
+					};
 				},
 				children: [
-					{
-						path: ":employeeId",
-						loader: async ({ params }) => {
-							const caseTasks = await getEmployeeCases(params, "HRCT");
-							return Array.isArray(caseTasks) ? caseTasks : [];
-						},
-					},
+					createRouteCaseForm(":caseName", {
+						redirect: "../../.."
+					})
 				],
 			},
 			{
-				path: "hr/controlling/:employeeId",
-				Component: EmployeeTitle,
-				loader: ({ params }) => getEmployee(params),
+				path: "hr/controlling/company",
+				Component: ContentLayout,
+				loader: () => ({
+					title: "Company"
+				}),
 				children: [
 					createRouteCaseForm(":caseName", {
-						redirect: "../..",
-						renderTitle: false,
+						redirect: "../.."
 					})
 				],
 			},
@@ -793,7 +806,13 @@ const routeData = [
 			},
 			{
 				path: "company",
-				Component: CompanyView,
+				Component: withSuspense(EventTabbedView),
+				loader: ({ params }) => {
+					return {
+						pageTitle: "Company",
+						missingDataId: params.payrollId
+					}
+				},
 				children: [
 					{
 						path: "missingdata",

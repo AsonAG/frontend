@@ -1,7 +1,7 @@
 import { Stack, Typography } from "@mui/material";
-import React, { FC, PropsWithChildren, ReactNode } from "react";
+import React, { FC, PropsWithChildren, ReactNode, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useOutlet } from "react-router-dom";
 
 type ContentLayoutProps = {
 	title: ReactNode | string,
@@ -41,7 +41,7 @@ export function PageHeader({ title, buttons }) {
 	const { t } = useTranslation();
 	const loaderData = useLoaderData() as LoaderData;
 	let headerTitle = title;
-	if (typeof title === "string") {
+	if (typeof title === "string" || !title) {
 		headerTitle = (
 			<PageHeaderTitle title={t(loaderData?.title || title)} flex={1} />
 		);
@@ -61,7 +61,7 @@ export function PageHeader({ title, buttons }) {
 
 type PageHeaderTitleProps = {
 	title: string,
-	flex: number | string | undefined
+	flex?: number | string
 };
 
 export function PageHeaderTitle({ title, flex = undefined }: PageHeaderTitleProps) {
@@ -74,6 +74,7 @@ export function PageHeaderTitle({ title, flex = undefined }: PageHeaderTitleProp
 
 export function PageContent({ children, disableInset = false, ...sxProps }) {
 	const px = disableInset ? undefined : "var(--content-inset)";
+	const outlet = useOutlet();
 	return (
 		<Stack
 			px={px}
@@ -85,7 +86,7 @@ export function PageContent({ children, disableInset = false, ...sxProps }) {
 				...sxProps,
 			}}
 		>
-			{children}
+			{children ?? outlet}
 		</Stack>
 	);
 }
@@ -97,6 +98,17 @@ export function withPage<T>(header: ReactNode | string, Component: FC<T>) {
 				{/* @ts-ignore */}
 				<Component {...props} />
 			</ContentLayout>
+		);
+	};
+}
+
+export function withSuspense<T>(Component: FC<T>) {
+	return function withPageHOC(props: T) {
+		return (
+			<Suspense>
+				{/* @ts-ignore */}
+				<Component {...props} />
+			</Suspense>
 		);
 	};
 }

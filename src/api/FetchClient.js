@@ -13,7 +13,8 @@ const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
 const divisionsUrl = "/tenants/:orgId/divisions";
 const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
 const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
-const missingDataUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
+const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
+const missingDataEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
 const lookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
@@ -329,8 +330,15 @@ export function getCompanyCaseChanges(routeParams, search, orderBy) {
 		.withUser();
 }
 
-export function getMissingData(routeParams) {
-	return new FetchRequestBuilder(missingDataUrl, routeParams)
+export function getCompanyMissingDataCases(routeParams) {
+	return new FetchRequestBuilder(missingDataCompanyUrl, routeParams)
+		.withLocalization()
+		.withUser()
+		.fetchJson();
+}
+
+export function getEmployeeMissingData(routeParams) {
+	return new FetchRequestBuilder(missingDataEmployeeUrl, routeParams)
 		.withLocalization()
 		.withUser()
 		.fetchJson();

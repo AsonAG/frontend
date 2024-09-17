@@ -8,15 +8,20 @@ import {
 	LinkProps as RouterLinkProps,
 	useAsyncValue
 } from "react-router-dom";
-import { Paper, Stack, Typography } from "@mui/material";
+import { Paper, Stack, Theme, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
+import { MissingData, MissingDataCase } from "../models/MissingData";
+import { useAtomValue } from "jotai";
+import { payrollAtom } from "../utils/dataAtoms";
+import { IdType } from "../models/IdType";
+import { Payroll } from "../models/Payroll";
 
 const Link = styled(
 	forwardRef<any, RouterLinkProps>((itemProps, ref) => {
 		return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 	}),
-)(({ theme }) => {
+)(({ theme }: { theme: Theme }) => {
 	return {
 		textDecoration: "none",
 		color: theme.palette.text.primary,
@@ -30,7 +35,7 @@ const Link = styled(
 export function MissingDataView() {
 	const { t } = useTranslation();
 	return (
-		<ContentLayout title={t("Missing data")}>
+		<ContentLayout title={t("Controlling")}>
 			<AsyncDataRoute>
 				<EmployeeTable />
 			</AsyncDataRoute>
@@ -38,48 +43,62 @@ export function MissingDataView() {
 	);
 }
 
-type Case = {
-	id: number;
-	caseName: string;
-	displayCaseName: string;
-	clusters: string[];
-};
-
-type MissingCases = {
-	cases: Array<Case>
-}
-
-type MissingCasesPerEmployee = Employee & MissingCases;
-
 function EmployeeTable() {
-	const employees = useAsyncValue() as Array<MissingCasesPerEmployee>;
+	const { t } = useTranslation();
+	const missingData = useAsyncValue() as Map<IdType, MissingData>;
+	const payroll = useAtomValue(payrollAtom) as Payroll;
+	const payrollMissingData = missingData.get(payroll.id);
 	return (
 		<Stack spacing={2}>
-			{employees.map((e) => (
-				<EmployeeSection key={e.id} employee={e} />
-			))}
+			{(payrollMissingData?.cases.length ?? 0) > 0 &&
+				<CompanySection title={t("Company")} data={payrollMissingData} />
+			}
+			{Array.from(missingData).map(([id, data]) => {
+				if (id === payroll.id)
+					return;
+				return <EmployeeSection key={id} data={data} />;
+			})}
 		</Stack>
 	);
 }
 
-function EmployeeSection({ employee }) {
-	const caseTasks = employee.cases;
 
-	const ect = caseTasks.filter((ct: Case) => ct.clusters?.includes("ECT"));
-	const hrct = caseTasks.filter((ct: Case) => ct.clusters?.includes("HRCT"));
+function CompanySection({ title, data }) {
+	return (
+		<Stack spacing={1}>
+			<Typography variant="h6">
+				{title}
+			</Typography>
+			<Paper variant="outlined">
+				<Stack>
+					{data.cases.map((c: MissingDataCase) => (
+						<CaseTask key={c.id} objectId={data.id} _case={c} type="CCT" />
+					))}
+				</Stack>
+			</Paper>
+		</Stack>
+	);
+
+}
+
+function EmployeeSection({ data }) {
+	const caseTasks = data.cases;
+
+	const ect = caseTasks.filter((ct: MissingDataCase) => ct.clusters?.includes("ECT"));
+	const hrct = caseTasks.filter((ct: MissingDataCase) => ct.clusters?.includes("HRCT"));
 
 	return (
 		<Stack spacing={1}>
 			<Typography variant="h6">
-				{getEmployeeDisplayString(employee)}
+				{getEmployeeDisplayString(data)}
 			</Typography>
 			<Paper variant="outlined">
 				<Stack>
-					{ect.map((c: Case) => (
-						<CaseTask key={c.id} employee={employee} _case={c} type="ECT" />
+					{ect.map((c: MissingDataCase) => (
+						<CaseTask key={c.id} objectId={data.id} _case={c} type="ECT" />
 					))}
-					{hrct.map((c: Case) => (
-						<CaseTask key={c.id} employee={employee} _case={c} type="HRCT" />
+					{hrct.map((c: MissingDataCase) => (
+						<CaseTask key={c.id} objectId={data.id} _case={c} type="HRCT" />
 					))}
 				</Stack>
 			</Paper>
@@ -87,9 +106,10 @@ function EmployeeSection({ employee }) {
 	);
 }
 
-function CaseTask({ employee, type, _case }) {
+function CaseTask({ objectId, type, _case }) {
+	const subPath = type === "CCT" ? "company" : `employee/${objectId}`;
 	return (
-		<Link to={`${employee.id}/${encodeURIComponent(_case.name)}`}>
+		<Link to={`${subPath}/${encodeURIComponent(_case.name)}`}>
 			<Stack spacing={1} flex={1} direction="row" p={1}>
 				<CategoryLabel
 					label={type}

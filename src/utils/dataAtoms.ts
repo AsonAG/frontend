@@ -5,8 +5,9 @@ import {
 	getUser,
 	getEmployeeByIdentifier,
 	getPayruns,
-	getMissingData,
+	getEmployeeMissingData,
 	getOrganizations,
+	getCompanyMissingDataCases,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
@@ -79,14 +80,23 @@ export const openTasksAtom = atomWithRefresh(async (get) => {
 	return getTasks({ orgId, payrollId }, filter, orderBy);
 });
 
-export const openMissingDataTasksAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
+export const missingDataTasksAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return [];
 
-	var missingData = await getMissingData({ orgId, payrollId });
-	if (!Array.isArray(missingData)) {
-		return [];
+	let missingData: Array<MissingData> = [];
+	var employeeMissingData = await getEmployeeMissingData({ orgId, payrollId });
+	var companyMissingDataCases = await getCompanyMissingDataCases({ orgId, payrollId });
+	if (Array.isArray(employeeMissingData)) {
+		missingData = employeeMissingData;
+	}
+	if (Array.isArray(companyMissingDataCases)) {
+		const companyMissingData: MissingData = {
+			id: payrollId,
+			cases: companyMissingDataCases
+		};
+		missingData.push(companyMissingData);
 	}
 	return missingData;
 });
@@ -96,8 +106,8 @@ export const showOrgSelectionAtom = atom(async (get) => {
 	return orgs.length > 1;
 });
 
-const missingDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async (get) => {
-	const missingData = await get(openMissingDataTasksAtom);
+export const missingDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async (get) => {
+	const missingData = await get(missingDataTasksAtom);
 	const map = new Map();
 	for (var data of missingData || []) {
 		map.set(data.id, data);
@@ -118,11 +128,11 @@ export function toast(severity: ToastSeverity, message: string) {
 	getDefaultStore().set(toastNotificationAtom, { severity, message });
 }
 
-export function useMissingDataCount(employeeId: IdType) {
+export function useMissingDataCount(objectId: IdType) {
 	const allMissingData = useAtomValue(missingDataMapAtom);
-	const employeeMissingData = allMissingData.get(employeeId);
-	if (!employeeMissingData) return null;
-	return employeeMissingData.cases.length;
+	const missingData = allMissingData.get(objectId);
+	if (!missingData) return null;
+	return missingData.cases.length;
 }
 
 export const userInformationAtom = atom((async get => {

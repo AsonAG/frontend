@@ -10,6 +10,6 @@ export type Employee = {
 	divisions: Array<string>;
 };
 
-export function getEmployeeDisplayString(employee: Employee) {
+export function getEmployeeDisplayString(employee: { firstName: string, lastName: string, identifier: string }) {
 	return `${employee.firstName} ${employee.lastName} (${employee.identifier})`;
 }

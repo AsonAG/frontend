@@ -26,8 +26,6 @@ export function Component() {
 	const loaderData = useLoaderData();
 	const [caseFieldDetails, setCaseFieldDetails] = useState(null);
 	const redirectPath = loaderData?.redirect || "../../events";
-	const renderTitle = loaderData?.renderTitle ?? true;
-	const PageComponent = renderTitle ? ContentLayout : PageContent;
 	const params = useParams();
 	const {
 		caseData,
@@ -70,14 +68,8 @@ export function Component() {
 	}
 
 	return (
-		<Stack direction="row" minHeight="100%" spacing={4}>
-			<PageComponent
-				title="New event"
-				sx={{ flex: 1 }}
-				disableInset={!renderTitle}
-			>
-				{content}
-			</PageComponent>
-		</Stack>
+		<PageContent disableInset sx={{ flex: 1 }}>
+			{content}
+		</PageContent>
 	);
 }

@@ -2,13 +2,13 @@ import { IdType } from "./IdType"
 
 export type MissingData = {
   id: IdType,
-  firstName: string,
-  lastName: string,
-  identifier: string,
-  cases: Array<EmployeeCase>
+  firstName?: string,
+  lastName?: string,
+  identifier?: string,
+  cases: Array<MissingDataCase>
 };
 
-export type EmployeeCase = {
+export type MissingDataCase = {
   id: IdType,
   name: string,
   displayName: string,

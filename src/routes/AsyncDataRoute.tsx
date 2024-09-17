@@ -40,5 +40,8 @@ function hasData(value: { length: number; count: number; }) {
 	if (Array.isArray(value)) {
 		return value.length > 0;
 	}
+	if (value instanceof Map) {
+		return value.size > 0;
+	}
 	return value.count > 0;
 }

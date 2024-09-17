@@ -28,7 +28,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { openMissingDataTasksAtom, openTasksAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
+import { missingDataTasksAtom, openTasksAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
@@ -85,7 +85,7 @@ function ControllingBadgeIcon() {
 		data.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0);
 	return (
 		<Suspense fallback={icon}>
-			<AtomBadge atom={openMissingDataTasksAtom} countFunc={count}>
+			<AtomBadge atom={missingDataTasksAtom} countFunc={count}>
 				{icon}
 			</AtomBadge>
 		</Suspense>
