@@ -56,7 +56,7 @@ export function EmployeeForm() {
 					defaultValue={employee?.identifier}
 					disabled={!isNew}
 				/>
-				<Typography variant="h6">{t("Business Unit assignment")}</Typography>
+				<Typography variant="h6">{t("Organization unit assignment")}</Typography>
 				{divisionAssignmentView}
 				<Stack direction="row" justifyContent="right" spacing={1}>
 					<Button component={RouterLink} to=".." relative="path">

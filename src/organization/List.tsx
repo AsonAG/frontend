@@ -1,4 +1,4 @@
-import { React, Suspense } from "react";
+import React, { Suspense } from "react";
 import Paper from "@mui/material/Paper";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -7,27 +7,28 @@ import ListItemText from "@mui/material/ListItemText";
 import { Link, useLoaderData } from "react-router-dom";
 import { useDocumentTitle } from "usehooks-ts";
 import { useTranslation } from "react-i18next";
-import { ContentLayout } from "../../components/ContentLayout";
-import { useRole } from "../../hooks/useRole";
+import { ContentLayout } from "../components/ContentLayout";
+import { useRole } from "../hooks/useRole";
 import { IconButton, Tooltip } from "@mui/material";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import { Organization } from "../models/Organization";
 
-export function TenantList() {
-	const tenants = useLoaderData();
+export function OrganizationList() {
+	const organizations = useLoaderData() as Array<Organization>;
 	const { t } = useTranslation();
-	useDocumentTitle("Ason - Tenants");
+	useDocumentTitle(`Ason - ${t("Organizations")}`);
 	return (
-		<ContentLayout title={t("Select a company")} buttons={<Suspense><ImportButton /></Suspense>}>
+		<ContentLayout title={t("Select an organization")} buttons={<Suspense><ImportButton /></Suspense>}>
 			<Paper>
 				<List>
-					{tenants.map((tenant) => (
-						<ListItem disablePadding key={tenant.id}>
+					{organizations.map((org) => (
+						<ListItem disablePadding key={org.id}>
 							<ListItemButton
 								component={Link}
-								to={tenant.id}
-								state={{ tenant }}
+								to={org.id}
+								state={{ org }}
 							>
-								<ListItemText primary={tenant.identifier} />
+								<ListItemText primary={org.identifier} />
 							</ListItemButton>
 						</ListItem>
 					))}
@@ -44,7 +45,7 @@ function ImportButton() {
 		return null;
 
 	return (
-		<Tooltip title={t("Import tenant")} placement="top" arrow size="sm">
+		<Tooltip title={t("Import organization")} placement="top" arrow>
 			<IconButton
 				component={Link}
 				to="import"

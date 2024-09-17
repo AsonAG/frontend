@@ -76,7 +76,7 @@ export function useListData(field, onChange) {
 }
 
 export function useLookupData(field, onChange) {
-	const { tenantId, payrollId } = useParams();
+	const { orgId, payrollId } = useParams();
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(true);
 
@@ -85,7 +85,7 @@ export function useLookupData(field, onChange) {
 
 		(async () => {
 			const lookupData = await getLookupValues(
-				{ tenantId, payrollId },
+				{ orgId, payrollId },
 				field.lookupSettings.lookupName,
 			);
 			const lookupValues = lookupData[0].values.map((lv) =>

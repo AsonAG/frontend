@@ -34,7 +34,7 @@ export function AsyncReportView() {
 	);
 	const { reportData, loading, isGenerating, buildReport, generateReport } =
 		useReportBuilder({
-			tenantId: params.tenantId!,
+			orgId: params.orgId!,
 			payrollId: params.payrollId!,
 			reportId: params.reportId!,
 			user: user,
@@ -93,7 +93,7 @@ type ReportFile = {
 };
 
 interface ReportBuilderParams {
-	tenantId: string;
+	orgId: string;
 	payrollId: string;
 	reportId: string;
 	user: { id: number; language: string };
@@ -103,7 +103,7 @@ interface ReportBuilderParams {
 type DocumentFormat = "pdf" | "word" | "excel" | "xml" | "xmlraw";
 
 function useReportBuilder({
-	tenantId,
+	orgId,
 	payrollId,
 	reportId,
 	user,
@@ -137,16 +137,16 @@ function useReportBuilder({
 			try {
 				await _buildReport(controller.signal);
 				setLoading(false);
-			} catch (e) {}
+			} catch (e) { }
 		};
 		loadData();
 
 		return () => controller.abort();
-	}, [tenantId, payrollId, reportId, user.id]);
+	}, [orgId, payrollId, reportId, user.id]);
 
 	async function _buildReport(signal?: AbortSignal) {
 		const reportResponse = await getReport(
-			{ tenantId, payrollId, reportId },
+			{ orgId, payrollId, reportId },
 			getReportRequest(),
 			signal,
 		);
@@ -161,7 +161,7 @@ function useReportBuilder({
 		try {
 			setGenerating(true);
 			const reportResponse = await generateReport(
-				{ tenantId, payrollId, reportId },
+				{ orgId, payrollId, reportId },
 				getReportRequest(),
 				format,
 			);

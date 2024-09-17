@@ -1,6 +1,6 @@
 import { IdType } from "./IdType";
 
-export type Tenant = {
+export type Organization = {
   id: IdType;
   identifier: string;
 }

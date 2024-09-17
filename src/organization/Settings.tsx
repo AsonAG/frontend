@@ -1,28 +1,28 @@
 import React, { useState } from "react";
-import { ContentLayout } from "../../components/ContentLayout";
+import { ContentLayout } from "../components/ContentLayout";
 import { Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useNavigation, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useRole } from "../../hooks/useRole";
-import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, ResponsiveDialogTrigger } from "../../components/ResponsiveDialog";
-import { Tenant } from "../../models/Tenant";
+import { useRole } from "../hooks/useRole";
+import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, ResponsiveDialogTrigger } from "../components/ResponsiveDialog";
+import { Organization } from "../models/Organization";
 
 type LoaderData = {
-  tenant: Tenant
+  org: Organization
 }
 
-export function TenantSettings() {
-  const { tenant } = useRouteLoaderData("tenantRoot") as LoaderData;
+export function OrganizationSettings() {
+  const { org } = useRouteLoaderData("orgRoot") as LoaderData;
   const { t } = useTranslation();
   return (
     <ContentLayout title="Settings">
-      <TextField value={tenant.identifier} disabled label={t("Company name")} />
-      <ProviderTenantSection tenant={tenant} />
+      <TextField value={org.identifier} disabled label={t("Company name")} />
+      <ProviderOrganizationSection org={org} />
     </ContentLayout>
   );
 }
 
-function ProviderTenantSection({ tenant }) {
+function ProviderOrganizationSection({ org }) {
   const { t } = useTranslation();
   const isProvider = useRole("provider");
   const [onExport, exportButtonDisabled, exportButtonIcon] = useAction("export");
@@ -32,20 +32,20 @@ function ProviderTenantSection({ tenant }) {
   return (
     <Stack spacing={2}>
       <Stack direction="row" alignItems="center">
-        <Typography flex={1}>{t("Export the data of the tenant")}</Typography>
+        <Typography flex={1}>{t("Export the data of the organization")}</Typography>
         <Button variant="outlined" color="primary" disabled={exportButtonDisabled} startIcon={exportButtonIcon} onClick={onExport}>
           {t("Export")}
         </Button>
       </Stack>
       <Stack direction="row" alignItems="center">
-        <Typography flex={1}>{t("Deletes the tenant completely")}</Typography>
+        <Typography flex={1}>{t("Deletes the organization completely")}</Typography>
         <ResponsiveDialog>
           <ResponsiveDialogTrigger>
             <Button variant="contained" color="destructive" disabled={deleteButtonDisabled} startIcon={deleteButtonIcon}>
               {t("Delete")}
             </Button>
           </ResponsiveDialogTrigger>
-          <DeleteTenantDialogContent tenant={tenant} onDelete={onDelete} />
+          <DeleteOrganizationDialogContent org={org} onDelete={onDelete} />
         </ResponsiveDialog>
       </Stack>
 
@@ -53,16 +53,16 @@ function ProviderTenantSection({ tenant }) {
   )
 }
 
-function DeleteTenantDialogContent({ tenant, onDelete }) {
+function DeleteOrganizationDialogContent({ org, onDelete }) {
   const { t } = useTranslation();
-  const [confirmTenantName, setConfirmTenantName] = useState('');
-  const deleteButtonEnabled = confirmTenantName === tenant.identifier;
+  const [confirmOrgName, setConfirmOrgName] = useState('');
+  const deleteButtonEnabled = confirmOrgName === org.identifier;
   return (
     <ResponsiveDialogContent>
-      <Typography variant="h6">{t("Delete tenant")}</Typography>
-      <Typography>{t("delete_tenant_description", { tenantName: tenant.identifier })}</Typography>
-      <Typography>{t("confirm_tenant_deletion")}</Typography>
-      <TextField variant="standard" value={confirmTenantName} placeholder={t("Tenant name")} onChange={e => setConfirmTenantName(e.target.value)} />
+      <Typography variant="h6">{t("Delete organization")}</Typography>
+      <Typography>{t("delete_organization_description", { orgName: org.identifier })}</Typography>
+      <Typography>{t("confirm_organization_deletion")}</Typography>
+      <TextField variant="standard" value={confirmOrgName} placeholder={t("Organization name")} onChange={e => setConfirmOrgName(e.target.value)} />
       <Stack direction="row" justifyContent="end" spacing={1}>
         <ResponsiveDialogClose>
           <Button>{t("Cancel")}</Button>

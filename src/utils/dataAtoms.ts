@@ -1,14 +1,14 @@
 import {
 	getPayrolls,
 	getTasks,
-	getTenant,
+	getOrganization,
 	getUser,
 	getEmployeeByIdentifier,
 	getPayruns,
 	getMissingData,
-	getTenants,
+	getOrganizations,
 } from "../api/FetchClient";
-import { payrollIdAtom, tenantIdAtom } from "./routeParamAtoms";
+import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
@@ -16,21 +16,21 @@ import { IdType } from "../models/IdType";
 import { MissingData } from "../models/MissingData";
 import { atomWithRefresh } from "jotai/utils";
 
-export const tenantsAtom = atomWithRefresh((get => {
+export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
-	return getTenants();
+	return getOrganizations();
 }));
 
-export const tenantAtom = atom((get) => {
-	const tenantId = get(tenantIdAtom);
-	if (tenantId == null) return null;
-	return getTenant({ tenantId });
+export const orgAtom = atom((get) => {
+	const orgId = get(orgIdAtom);
+	if (orgId == null) return null;
+	return getOrganization({ orgId });
 });
 
 export const payrollsAtom = atom((get) => {
-	const tenantId = get(tenantIdAtom);
-	if (tenantId == null) return [];
-	return getPayrolls({ tenantId });
+	const orgId = get(orgIdAtom);
+	if (orgId == null) return [];
+	return getPayrolls({ orgId });
 });
 
 export const payrollAtom = atom(async (get) => {
@@ -43,32 +43,32 @@ export const payrollAtom = atom(async (get) => {
 });
 
 export const userAtom = atom((get) => {
-	const tenantId = get(tenantIdAtom);
-	if (tenantId == null) return null;
+	const orgId = get(orgIdAtom);
+	if (orgId == null) return null;
 	const authUserEmail = get(authUserAtom)?.profile.email;
-	return getUser({ tenantId }, authUserEmail);
+	return getUser({ orgId }, authUserEmail);
 });
 
 export const selfServiceEmployeeAtom = atom((get) => {
-	const tenantId = get(tenantIdAtom);
+	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (tenantId === null || payrollId === null) return null;
+	if (orgId === null || payrollId === null) return null;
 	const authUserEmail = get(authUserAtom)?.profile.email;
-	return getEmployeeByIdentifier({ tenantId, payrollId }, authUserEmail);
+	return getEmployeeByIdentifier({ orgId, payrollId }, authUserEmail);
 });
 
 export const payrunAtom = atom(async (get) => {
-	const tenantId = get(tenantIdAtom);
+	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (tenantId === null || payrollId === null) return [];
-	const payruns = await getPayruns({ tenantId, payrollId });
+	if (orgId === null || payrollId === null) return [];
+	const payruns = await getPayruns({ orgId, payrollId });
 	return payruns[0] || null;
 });
 
 export const openTasksAtom = atomWithRefresh(async (get) => {
-	const tenantId = get(tenantIdAtom);
+	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (tenantId === null || payrollId === null) return { count: 0, items: [] };
+	if (orgId === null || payrollId === null) return { count: 0, items: [] };
 
 	const user = await get(userAtom);
 	let orderBy = "completed, scheduled, created";
@@ -76,24 +76,24 @@ export const openTasksAtom = atomWithRefresh(async (get) => {
 		orderBy = `assignedUserId eq ${user.id}, ${orderBy}`;
 	}
 	const filter = "completed eq null";
-	return getTasks({ tenantId, payrollId }, filter, orderBy);
+	return getTasks({ orgId, payrollId }, filter, orderBy);
 });
 
 export const openMissingDataTasksAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
-	const tenantId = get(tenantIdAtom);
+	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (tenantId === null || payrollId === null) return [];
+	if (orgId === null || payrollId === null) return [];
 
-	var missingData = await getMissingData({ tenantId, payrollId });
+	var missingData = await getMissingData({ orgId, payrollId });
 	if (!Array.isArray(missingData)) {
 		return [];
 	}
 	return missingData;
 });
 
-export const showTenantSelectionAtom = atom(async (get) => {
-	const tenants = await get(tenantsAtom);
-	return tenants.length > 1;
+export const showOrgSelectionAtom = atom(async (get) => {
+	const orgs = await get(orgsAtom);
+	return orgs.length > 1;
 });
 
 const missingDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async (get) => {

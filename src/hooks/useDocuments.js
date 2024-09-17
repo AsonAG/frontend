@@ -32,7 +32,7 @@ export function useDocuments(caseFieldName) {
 		load();
 	}, [
 		caseFieldName,
-		params.tenantId,
+		params.orgId,
 		params.payrollId,
 		params.employeeId,
 		top,

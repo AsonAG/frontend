@@ -8,7 +8,7 @@ import {
 	redirect,
 } from "react-router-dom";
 
-import { TenantList } from "./scenes/tenants";
+import { OrganizationList } from "./organization/List";
 import Dashboard from "./scenes/dashboard";
 import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
@@ -19,7 +19,6 @@ import { App } from "./App";
 
 // TODO AJO error states when network requests fail
 import {
-	getTenants,
 	getEmployees,
 	getEmployee,
 	getEmployeeCases,
@@ -52,9 +51,9 @@ import {
 	addTask,
 	getDocumentsOfCaseField,
 	deleteDocument,
-	importTenant,
+	importOrganization,
 	requestExportDataDownload,
-	deleteTenant,
+	deleteOrganization,
 	getDivisions,
 	getCaseValues
 } from "./api/FetchClient";
@@ -68,14 +67,14 @@ import { getDefaultStore } from "jotai";
 import {
 	openTasksAtom,
 	payrollsAtom,
-	tenantAtom,
+	orgAtom,
 	userAtom,
 	selfServiceEmployeeAtom,
 	payrunAtom,
 	toast,
 	payrollAtom,
 	openMissingDataTasksAtom,
-	tenantsAtom
+	orgsAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
@@ -92,19 +91,19 @@ import { MissingDataView } from "./components/MissingDataView";
 import { EmployeeForm } from "./components/EmployeeForm";
 import { withPage } from "./components/ContentLayout";
 import { NewTaskView } from "./components/NewTaskView";
-import { TenantImport } from "./scenes/tenants/TenantImport";
-import { TenantSettings } from "./scenes/tenants/TenantSettings";
+import { OrganizationImport } from "./organization/Import";
+import { OrganizationSettings } from "./organization/Settings";
 import { CompanyView } from "./scenes/CompanyView";
 
 const store = getDefaultStore();
 
-async function getTenantData() {
-	const [tenant, payrolls, user] = await Promise.all([
-		store.get(tenantAtom),
+async function getOrganizationData() {
+	const [org, payrolls, user] = await Promise.all([
+		store.get(orgAtom),
 		store.get(payrollsAtom),
 		store.get(userAtom),
 	]);
-	return { tenant, payrolls, user };
+	return { org, payrolls, user };
 }
 
 function getQueryParam(request, name, defaultValue = null) {
@@ -299,30 +298,30 @@ const routeData = [
 		children: [
 			{
 				index: true,
-				element: <Navigate to="tenants" replace />,
+				element: <Navigate to="orgs" replace />,
 			},
 			{
-				path: "tenants",
-				Component: TenantList,
+				path: "orgs",
+				Component: OrganizationList,
 				loader: async () => {
-					store.set(tenantsAtom); // refresh
-					const tenants = await store.get(tenantsAtom);
-					if (tenants.length === 1) {
-						return redirect(`../tenants/${tenants[0].id}`);
+					store.set(orgsAtom); // refresh
+					const orgs = await store.get(orgsAtom);
+					if (orgs.length === 1) {
+						return redirect(`../orgs/${orgs[0].id}`);
 					}
-					return tenants;
+					return orgs;
 				}
 			},
 			{
-				path: "tenants/import",
-				Component: TenantImport,
+				path: "orgs/import",
+				Component: OrganizationImport,
 				action: async ({ request }) => {
 					const formData = await request.formData();
-					const response = await importTenant(formData);
+					const response = await importOrganization(formData);
 					if (response.ok) {
 						const body = await response.json();
-						toast("success", "Tenant imported");
-						return redirect(`../tenants/${body}/payrolls`);
+						toast("success", "Organization imported");
+						return redirect(`../orgs/${body}/payrolls`);
 					}
 					else if (response.status === 500) {
 						const body = await response.json();
@@ -337,20 +336,20 @@ const routeData = [
 		],
 	},
 	{
-		path: "tenants/:tenantId",
+		path: "orgs/:orgId",
 		element: <App renderDrawer />,
 		ErrorBoundary: ErrorView,
 		loader: async () => {
-			const { tenant, payrolls, user } = await getTenantData();
+			const { org, payrolls, user } = await getOrganizationData();
 			const employee = await store.get(selfServiceEmployeeAtom);
-			return { tenant, user, payrolls, employee };
+			return { org, user, payrolls, employee };
 		},
-		id: "tenantRoot",
+		id: "orgRoot",
 		children: [
 			{
 				index: true,
 				loader: async () => {
-					const { user } = await getTenantData();
+					const { user } = await getOrganizationData();
 					const isAdmin = user?.attributes.roles?.includes("admin");
 					if (isAdmin)
 						return redirect("employees");
@@ -363,31 +362,31 @@ const routeData = [
 			createRouteEmployeeEdit("employees/:employeeId", () => "../employees"),
 			{
 				path: "settings",
-				Component: TenantSettings,
+				Component: OrganizationSettings,
 				action: async ({ params, request }) => {
 					var formData = await request.formData();
 					switch (formData.get("intent")) {
 						case "export":
 							try {
-								const { tenant } = await getTenantData();
-								const name = `${tenant.identifier}_export.zip`;
-								await requestExportDataDownload({ tenantId: params.tenantId }, name);
-								toast("success", "Exported tenant");
+								const { org } = await getOrganizationData();
+								const name = `${org.identifier}_export.zip`;
+								await requestExportDataDownload({ orgId: params.orgId }, name);
+								toast("success", "Exported organization");
 							}
 							catch {
-								toast("error", "Tenant could not be exported");
+								toast("error", "Organization could not be exported");
 							}
 							return null;
 						case "delete":
 							try {
-								var response = await deleteTenant(params);
+								var response = await deleteOrganization(params);
 								if (response.ok) {
-									toast("success", "Tenant deleted");
-									return redirect("/tenants");
+									toast("success", "Organization deleted");
+									return redirect("/orgs");
 								}
 							}
 							catch {
-								toast("error", "Tenant could not be deleted");
+								toast("error", "Organization could not be deleted");
 							}
 							return null;
 						default:
@@ -398,19 +397,19 @@ const routeData = [
 		]
 	},
 	{
-		path: "tenants/:tenantId/payrolls/:payrollId?",
+		path: "orgs/:orgId/payrolls/:payrollId?",
 		element: <App renderDrawer />,
 		loader: async ({ params }) => {
-			const { tenant, payrolls, user } = await getTenantData();
+			const { org, payrolls, user } = await getOrganizationData();
 			if (!params.payrollId) {
 				return redirect(payrolls[0].id);
 			}
 			const payroll = payrolls.find((p) => p.id === params.payrollId);
 			const employee = await store.get(selfServiceEmployeeAtom);
-			return { tenant, user, payrolls, payroll, employee };
+			return { org, user, payrolls, payroll, employee };
 		},
 		shouldRevalidate: ({ currentParams, nextParams }) =>
-			currentParams.tenantId !== nextParams.tenantId ||
+			currentParams.orgId !== nextParams.orgId ||
 			currentParams.payrollId !== nextParams.payrollId,
 		id: "root",
 		ErrorBoundary: ErrorView,
@@ -419,7 +418,7 @@ const routeData = [
 				index: true,
 				Component: Dashboard,
 				loader: async () => {
-					const { user } = await getTenantData();
+					const { user } = await getOrganizationData();
 					const isHrUser = user?.attributes.roles?.includes("hr");
 					if (isHrUser) {
 						return redirect("hr/tasks");
@@ -487,7 +486,7 @@ const routeData = [
 				path: "hr/tasks",
 				Component: AsyncTaskTable,
 				loader: async ({ params, request }) => {
-					const { user } = await getTenantData();
+					const { user } = await getOrganizationData();
 					const searchParams = new URL(request.url).searchParams;
 					let dataPromise = null;
 					if (searchParams.has("completed")) {

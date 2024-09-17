@@ -5,59 +5,59 @@ import { payrollAtom, userAtom } from "../utils/dataAtoms";
 import { useOidc } from "../auth/authConfig";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
-const tenantsUrl = "/tenants";
-const tenantImportUrl = "/tenants/import";
-const tenantUrl = "/tenants/:tenantId";
-const payrollsUrl = "/tenants/:tenantId/payrolls";
-const payrollUrl = "/tenants/:tenantId/payrolls/:payrollId";
-const divisionsUrl = "/tenants/:tenantId/divisions";
-const caseSetsUrl = "/tenants/:tenantId/payrolls/:payrollId/cases/sets";
-const caseValuesUrl = "/tenants/:tenantId/payrolls/:payrollId/changes/values";
-const missingDataUrl = "/tenants/:tenantId/payrolls/:payrollId/missingdata";
-const lookupValuesUrl = "/tenants/:tenantId/payrolls/:payrollId/lookups/values";
-const payrollEmployeesUrl = "/tenants/:tenantId/payrolls/:payrollId/employees";
-const caseFieldsUrl = "/tenants/:tenantId/payrolls/:payrollId/casefields";
-const employeesUrl = "/tenants/:tenantId/employees";
-const employeeUrl = "/tenants/:tenantId/employees/:employeeId";
-const usersUrl = "/tenants/:tenantId/users";
+const organizationsUrl = "/tenants";
+const organizationImportUrl = "/tenants/import";
+const organizationUrl = "/tenants/:orgId";
+const payrollsUrl = "/tenants/:orgId/payrolls";
+const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
+const divisionsUrl = "/tenants/:orgId/divisions";
+const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
+const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
+const missingDataUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
+const lookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
+const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
+const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
+const employeesUrl = "/tenants/:orgId/employees";
+const employeeUrl = "/tenants/:orgId/employees/:employeeId";
+const usersUrl = "/tenants/:orgId/users";
 const employeeDocumentUrl =
-	"/tenants/:tenantId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
+	"/tenants/:orgId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
 const companyDocumentUrl =
-	"/tenants/:tenantId/companycases/:caseValueId/documents/:documentId";
-const tasksUrl = "/tenants/:tenantId/payrolls/:payrollId/tasks";
-const taskUrl = "/tenants/:tenantId/payrolls/:payrollId/tasks/:taskId";
-const payrunsUrl = "/tenants/:tenantId/payruns";
-const payrunParametersUrl = "/tenants/:tenantId/payruns/:payrunId/parameters";
-const payrunJobsUrl = "/tenants/:tenantId/payruns/jobs";
+	"/tenants/:orgId/companycases/:caseValueId/documents/:documentId";
+const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
+const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
+const payrunsUrl = "/tenants/:orgId/payruns";
+const payrunParametersUrl = "/tenants/:orgId/payruns/:payrunId/parameters";
+const payrunJobsUrl = "/tenants/:orgId/payruns/jobs";
 const payrunJobStatusUrl =
-	"/tenants/:tenantId/payruns/jobs/:payrunJobId/status";
-const complianceUrl = "/tenants/:tenantId/payrolls/:payrollId/compliance";
+	"/tenants/:orgId/payruns/jobs/:payrunJobId/status";
+const complianceUrl = "/tenants/:orgId/payrolls/:payrollId/compliance";
 const complianceSettingsUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/settings";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/settings";
 const complianceCertificatesUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/certificates";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/certificates";
 const complianceDocumentsUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/documents";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/documents";
 const generateComplianceDocumentUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/documents/generate";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/documents/generate";
 const complianceDocumentUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/documents/:documentId";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/documents/:documentId";
 const complianceSubmissionsUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/submissions";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/submissions";
 const complianceSubmissionUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/submissions/:submissionId";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/submissions/:submissionId";
 const complianceMessagesUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/messages";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/messages";
 const compliancePingUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/ping";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/ping";
 const complianceCheckInteroperabilityUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/compliance/checkinteroperability";
-const reportsUrl = "/tenants/:tenantId/payrolls/:payrollId/reports";
+	"/tenants/:orgId/payrolls/:payrollId/compliance/checkinteroperability";
+const reportsUrl = "/tenants/:orgId/payrolls/:payrollId/reports";
 const buildReportUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/reports/:reportId/build";
+	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/build";
 const generateReportUrl =
-	"/tenants/:tenantId/payrolls/:payrollId/reports/:reportId/generate";
-const exportUrl = "/tenants/:tenantId/export";
+	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/generate";
+const exportUrl = "/tenants/:orgId/export";
 
 const store = getDefaultStore();
 
@@ -200,20 +200,20 @@ class FetchRequestBuilder {
 	}
 }
 
-export function getTenants() {
-	return new FetchRequestBuilder(tenantsUrl).fetchJson();
+export function getOrganizations() {
+	return new FetchRequestBuilder(organizationsUrl).fetchJson();
 }
 
-export function importTenant(body) {
-	return new FetchRequestBuilder(tenantImportUrl).withMethod("POST").withTimout(600000).withFileBody(body).fetch();
+export function importOrganization(body) {
+	return new FetchRequestBuilder(organizationImportUrl).withMethod("POST").withTimout(600000).withFileBody(body).fetch();
 }
 
-export function getTenant(routeParams) {
-	return new FetchRequestBuilder(tenantUrl, routeParams).fetchJson();
+export function getOrganization(routeParams) {
+	return new FetchRequestBuilder(organizationUrl, routeParams).fetchJson();
 }
 
-export function deleteTenant(routeParams) {
-	return new FetchRequestBuilder(tenantUrl, routeParams).withMethod("DELETE").fetch();
+export function deleteOrganization(routeParams) {
+	return new FetchRequestBuilder(organizationUrl, routeParams).withMethod("DELETE").fetch();
 }
 
 export function getPayrolls(routeParams) {

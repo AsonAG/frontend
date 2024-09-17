@@ -1,14 +1,14 @@
 import React from "react";
-import { ContentLayout } from "../../components/ContentLayout";
+import { ContentLayout } from "../components/ContentLayout";
 import { useActionData, useNavigation, useSubmit, Link } from "react-router-dom";
-import { Button, Box, Stack, Typography, CircularProgress, Alert } from "@mui/material";
+import { Button, Box, Stack, Typography, CircularProgress, Alert, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDropzone } from "react-dropzone";
 import styled from "@emotion/styled";
 
 const Dropzone = styled(Box, {
   shouldForwardProp: (prop) => prop !== "isDragActive",
-})(({ theme, isDragActive }) => {
+})(({ theme, isDragActive }: { theme: Theme, isDragActive: boolean }) => {
   return {
     height: 300,
     cursor: "pointer",
@@ -21,7 +21,7 @@ const Dropzone = styled(Box, {
   };
 });
 
-export function TenantImport() {
+export function OrganizationImport() {
   const { t } = useTranslation();
   const submit = useSubmit();
   const actionData = useActionData() as string;
@@ -39,7 +39,7 @@ export function TenantImport() {
   let fileSelected = false;
   let icon: React.JSX.Element | null = null;
   if (acceptedFiles[0]) {
-    buttonText = t("import_tenant_button", { fileName: acceptedFiles[0].name });
+    buttonText = t("import_organization_button", { fileName: acceptedFiles[0].name });
     fileSelected = true;
   }
   if (isImporting) {
@@ -60,7 +60,7 @@ export function TenantImport() {
 
 
   return (
-    <ContentLayout title={t("Import tenant")}>
+    <ContentLayout title={t("Import organization")}>
       <Dropzone {...getRootProps({ isDragActive })}>
         <input {...getInputProps()} />
         <Stack justifyContent="center" height="100%">
@@ -71,7 +71,7 @@ export function TenantImport() {
           ) : (
             <Typography alignSelf="center">
               {t(
-                "Drag and drop tenant data here, or click to select file",
+                "Drag and drop an organization export here, or click to select file",
               )}
             </Typography>
           )}

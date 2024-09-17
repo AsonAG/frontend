@@ -49,7 +49,7 @@ export function App({ renderDrawer = false }) {
 	useEffect(() => {
 		dayjs.locale(getDateLocale(user));
 		const languageCode = getLanguageCode(user?.language);
-		i18n.changeLanguage(languageCode);
+		i18n.changeLanguage("de-ch");
 	}, [user?.culture, user?.language]);
 
 	const [drawerOpen, setDrawerOpen] = useState(false);

@@ -28,7 +28,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { openMissingDataTasksAtom, openTasksAtom, showTenantSelectionAtom } from "../../utils/dataAtoms";
+import { openMissingDataTasksAtom, openTasksAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
@@ -82,7 +82,7 @@ function OpenTasksBadgeIcon() {
 function ControllingBadgeIcon() {
 	const icon = <TaskAltIcon />;
 	const count = (data) =>
-		data.map((x) => x.cases.length).reduce((a, b) => a + b, 0);
+		data.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0);
 	return (
 		<Suspense fallback={icon}>
 			<AtomBadge atom={openMissingDataTasksAtom} countFunc={count}>
@@ -129,7 +129,7 @@ function NavigationGroup({ name, children, hidden = false }) {
 	);
 }
 
-function MenuItemsTenant() {
+function MenuItemsOrganization() {
 	const { t } = useTranslation();
 	return (
 		<NavigationGroup>
@@ -219,7 +219,7 @@ function MenuItems() {
 	const isAdmin = useRole("admin");
 	const isEmployee = useRole("user");
 	if (!payrollId && isAdmin) {
-		return <MenuItemsTenant />;
+		return <MenuItemsOrganization />;
 	}
 	else if (payrollId && isAdmin) {
 		return <MenuItemsPayrollAdmin />;
@@ -276,7 +276,7 @@ function Drawer({ temporary, open, onClose }) {
 						fontWeight="bold"
 						px={1}
 					>
-						{t("Business Unit")}
+						{t("Organization unit")}
 					</Typography>
 					<PayrollSelector />
 				</Stack>
@@ -296,39 +296,39 @@ function Drawer({ temporary, open, onClose }) {
 					<MenuItems />
 				</NavigationMenu>
 				<Suspense>
-					<TenantSection />
+					<OrganizationSection />
 				</Suspense>
 			</Stack>
 		</MuiDrawer>
 	);
 }
 
-function TenantSection() {
+function OrganizationSection() {
 	const { t } = useTranslation();
-	const { tenant } = useLoaderData();
+	const { org } = useLoaderData();
 	const isProvider = useRole("provider");
-	const showTenantSelection = useAtomValue(showTenantSelectionAtom);
-	if (!isProvider && !showTenantSelection)
+	const showOrgSelection = useAtomValue(showOrgSelectionAtom);
+	if (!isProvider && !showOrgSelection)
 		return null;
 
 	return (
 		<>
 			<Divider />
 			<Stack sx={{ p: 2 }} spacing={1}>
-				<Typography>{t("Company")}</Typography>
+				<Typography>{t("Organization")}</Typography>
 				<Stack spacing={1} direction="row">
 					<Typography
 						variant="body2"
 						textOverflow="ellipsis"
 						overflow="hidden"
 					>
-						{tenant.identifier}
+						{org.identifier}
 					</Typography>
 					<Typography
 						component={RouterLink}
 						variant="body2"
 						color="primary.main"
-						to="/tenants"
+						to="/orgs"
 						sx={{
 							textDecoration: "none",
 							"&: hover": {

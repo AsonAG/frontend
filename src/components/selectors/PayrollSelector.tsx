@@ -5,20 +5,20 @@ import {
 	Link,
 	useLoaderData,
 } from "react-router-dom";
-import { Tenant } from "../../models/Tenant";
+import { Organization } from "../../models/Organization";
 import { Payroll } from "../../models/Payroll";
 import { useTranslation } from "react-i18next";
 import { useRole } from "../../hooks/useRole";
 
 type LoaderData = {
-	tenant: Tenant,
+	org: Organization,
 	payroll?: Payroll,
 	payrolls: Array<Payroll>
 };
 
 export function PayrollSelector() {
 	const { t } = useTranslation();
-	const { tenant, payroll, payrolls } = useLoaderData() as LoaderData;
+	const { org, payroll, payrolls } = useLoaderData() as LoaderData;
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 	const open = Boolean(anchorEl);
 	const handleClick = (event: MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
@@ -52,10 +52,10 @@ export function PayrollSelector() {
 				</Typography>
 			</Button>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-				{isAdmin && <MenuItem component={Link} to={`/tenants/${tenant.id}`} onClick={handleClose}>{adminTitle}</MenuItem>}
+				{isAdmin && <MenuItem component={Link} to={`/orgs/${org.id}`} onClick={handleClose}>{adminTitle}</MenuItem>}
 				{
 					payrolls.map(payroll => (
-						<MenuItem key={payroll.id} component={Link} to={`/tenants/${tenant.id}/payrolls/${payroll.id}`} onClick={handleClose}>
+						<MenuItem key={payroll.id} component={Link} to={`/orgs/${org.id}/payrolls/${payroll.id}`} onClick={handleClose}>
 							{payroll.name}
 						</MenuItem>
 					))

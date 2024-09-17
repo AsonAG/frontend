@@ -15,7 +15,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 export function NewEventCommand() {
   const params = useParams();
   const isMobile = useIsMobile();
-  if (!params.tenantId || !params.payrollId || isMobile) {
+  if (!params.orgId || !params.payrollId || isMobile) {
     return;
   }
   return <InternalNewEventCommand />;
@@ -307,7 +307,7 @@ function EmployeeCasesCommandGroup({ state, close, dispatch }: { state: State, c
     const employee = state.initialized && state.page === "employee" && state.employee;
     if (!employee)
       throw new Error("no employee found"); // this should never happen
-    const path = generatePath(`/tenants/:tenantId/payrolls/:payrollId/hr/employees/:employeeId/new/:caseName`, { tenantId: params.tenantId!, payrollId: params.payrollId!, employeeId: employee.id, caseName: _case.name });
+    const path = generatePath(`/orgs/:orgId/payrolls/:payrollId/hr/employees/:employeeId/new/:caseName`, { orgId: params.orgId!, payrollId: params.payrollId!, employeeId: employee.id, caseName: _case.name });
     navigate(path);
     close();
   }
@@ -335,7 +335,7 @@ function CompanyCasesCommandGroup({ state, close, dispatch }: { state: State, cl
   const params = useParams();
   const casesState = state.initialized && state.page === "company" ? state.cases : null;
   function onCaseSelected(_case: AvailableCase) {
-    const path = generatePath(`/tenants/:tenantId/payrolls/:payrollId/company/new/:caseName`, { tenantId: params.tenantId!, payrollId: params.payrollId!, caseName: _case.name });
+    const path = generatePath(`/orgs/:orgId/payrolls/:payrollId/company/new/:caseName`, { orgId: params.orgId!, payrollId: params.payrollId!, caseName: _case.name });
     navigate(path);
     close();
   }
