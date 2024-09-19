@@ -87,6 +87,7 @@ const translations = {
 		"PayrunJobStatus.Abort": "Abgebrochen",
 		"PayrunJobStatus.Cancel": "Fehlgeschlagen",
 		Period: "Periode",
+		"Open period": "Offene Periode",
 		Forecast: "Szenario",
 		Reason: "Grund",
 		"Select employees": "Mitarbeiter auswählen",
