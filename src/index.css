@@ -107,7 +107,7 @@ input[type="file"] {
   padding: 0;
   font: var(--mui-font-body1);
   outline: none;
-  --cmdk-max-height: 700px;
+  --cmdk-max-height: 60vh;
 }
 
 
@@ -171,7 +171,7 @@ input[type="file"] {
 
 [cmdk-list] {
   height: min(var(--cmdk-max-height), var(--cmdk-list-height));
-  max-height: max(300px, 60vh);
+  max-height: max(300px, var(--cmdk-max-height));
   overflow: auto;
   overscroll-behavior: contain;
   transition: 100ms ease;
