@@ -3,36 +3,33 @@ import {
   Navigate,
   useOutlet,
   useLoaderData,
-  NavLink as RouterLink,
-  Outlet,
   useParams,
 } from "react-router-dom";
-import { ContentLayout, PageHeaderTitle } from "../components/ContentLayout";
-import { IconButton, Stack, Tooltip } from "@mui/material";
+import { ContentLayout } from "../components/ContentLayout";
+import { Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useMissingDataCount } from "../utils/dataAtoms";
 import { TabLink } from "../components/TabLink";
-import { IdType } from "../models/IdType";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { MissingData } from "../models/MissingData";
 
 type LoaderData = {
-  pageTitle: string,
-  missingDataId: IdType;
+  pageTitle: string
+  missingData: MissingData
 }
 
 export function EventTabbedView({ title, showMissingData }: { title: ReactNode, showMissingData?: boolean }) {
   const outlet = useOutlet();
   const isMobile = useIsMobile();
-  const { pageTitle, missingDataId } = useLoaderData() as LoaderData;
+  const { pageTitle, missingData } = useLoaderData() as LoaderData;
   const { t } = useTranslation();
   const params = useParams();
   const renderTitleOnly = !!params.caseName;
 
-  const missingDataCount = useMissingDataCount(missingDataId);
+  const missingDataCount = missingData?.cases?.length ?? 0;
 
   if (!outlet) {
     let to = "events";
-    if (showMissingData && (missingDataCount ?? 0) > 0) {
+    if (showMissingData && missingDataCount > 0) {
       to = "missingdata"
     }
     else if (isMobile) {
@@ -48,7 +45,7 @@ export function EventTabbedView({ title, showMissingData }: { title: ReactNode, 
           {isMobile && <TabLink title={t("New Event")} to="new" />}
           <TabLink title={t("Events")} to="events" />
           <TabLink title={t("Documents")} to="documents" />
-          {showMissingData && missingDataCount && (
+          {showMissingData && missingDataCount > 0 && (
             <TabLink
               title={t("Missing data")}
               to="missingdata"

@@ -1,6 +1,5 @@
 import {
 	Form,
-	Outlet,
 	useParams,
 	useLoaderData,
 	useRouteLoaderData,
@@ -25,7 +24,7 @@ export function Component() {
 	const { user, payroll } = useRouteLoaderData("root");
 	const loaderData = useLoaderData();
 	const [caseFieldDetails, setCaseFieldDetails] = useState(null);
-	const redirectPath = loaderData?.redirect || "../../events";
+	const redirectPath = loaderData?.redirect || "../..";
 	const params = useParams();
 	const {
 		caseData,

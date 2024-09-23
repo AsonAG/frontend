@@ -284,7 +284,7 @@ function createRouteEmployeeNew(path, createUrlRedirect) {
 				errorMessage = "Saving failed!";
 			}
 			toast("error", errorMessage);
-			return response;
+			return null;
 		},
 	};
 }
@@ -437,17 +437,19 @@ const routeData = [
 			createRouteEmployeeEdit("hr/employees/:employeeId/edit", employeeId => `../hr/employees/${employeeId}`),
 			{
 				path: "hr/employees/:employeeId",
-				Component: withSuspense(EmployeeTabbedView),
+				Component: EmployeeTabbedView,
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
-					console.log("loading employee");
+					store.set(missingDataTasksAtom);
+					const map = await store.get(missingDataMapAtom);
 					return {
 						pageTitle: getEmployeeDisplayString(employee),
 						status: employee.status,
-						missingDataId: employee.id
+						missingData: map.get(employee.id)
 					};
 				},
 				id: "employee",
+				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathname !== nextUrl.pathname,
 				ErrorBoundary: ErrorView,
 				children: [
 					{
@@ -455,9 +457,9 @@ const routeData = [
 						Component: AsyncCaseTable,
 						loader: ({ params }) => {
 							return defer({
-								data: getEmployeeCases(params, "NewEvent"),
+								data: getEmployeeCases(params, "NewEvent")
 							});
-						},
+						}
 					},
 					createRouteCaseForm("new/:caseName"),
 					{
@@ -469,12 +471,10 @@ const routeData = [
 								const search = getQueryParam(request, "q");
 								return getEmployeeCaseChanges(params, search, "created desc, id");
 							}
-						}),
+						})
 					},
 					createRouteDocument(false),
-					createRouteCaseForm("missingdata/:caseName", {
-						renderTitle: false,
-					}),
+					createRouteCaseForm("missingdata/:caseName"),
 					{
 						path: "missingdata",
 						Component: AsyncCaseTable,
@@ -483,9 +483,9 @@ const routeData = [
 								data: getEmployeeCases(params, "HRCT"),
 								noDataAvailableText: "Data complete.",
 							});
-						},
-					},
-				],
+						}
+					}
+				]
 			},
 			{
 				path: "hr/tasks",

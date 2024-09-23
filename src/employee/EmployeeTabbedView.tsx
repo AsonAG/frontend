@@ -1,7 +1,7 @@
 import React from "react";
 import {
-	useLoaderData,
 	NavLink as RouterLink,
+	useRouteLoaderData,
 } from "react-router-dom";
 import { PageHeaderTitle } from "../components/ContentLayout";
 import { IconButton, Stack, Tooltip } from "@mui/material";
@@ -17,7 +17,7 @@ type LoaderData = {
 }
 
 export function EmployeeTabbedView() {
-	const { pageTitle, status } = useLoaderData() as LoaderData;
+	const { pageTitle, status } = useRouteLoaderData("employee") as LoaderData;
 	const { t } = useTranslation();
 
 
