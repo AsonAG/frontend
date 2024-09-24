@@ -614,7 +614,10 @@ const routeData = [
 				path: "hr/payruns",
 				Component: PayrunDashboard,
 				loader: async ({ params, request }) => {
-					const employees = await getEmployees(params).withActive().fetchJson();
+					const employees = await getEmployees(params)
+						.withActive()
+						.withQueryParam("orderBy", `lastName asc`)
+						.fetchJson();
 					const wageTypes = await Promise.all(employees.map(async e => {
 						const result = await getPayrollResult(params, "2024-07", e.id)
 						if (result) {
