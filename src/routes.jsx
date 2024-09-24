@@ -55,7 +55,9 @@ import {
 	requestExportDataDownload,
 	deleteOrganization,
 	getDivisions,
-	getCaseValues
+	getCaseValues,
+	getPayrollResult,
+	getWageTypes
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -78,6 +80,7 @@ import {
 	missingDataMapAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
+import { PayrunDashboard } from "./payrun/Dashboard";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
 import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
 import { ComplianceView } from "./components/compliance/ComplianceView";
@@ -609,6 +612,28 @@ const routeData = [
 			},
 			{
 				path: "hr/payruns",
+				Component: PayrunDashboard,
+				loader: async ({ params, request }) => {
+					const employees = await getEmployees(params).fetchJson();
+					const wageTypes = await Promise.all(employees.map(async e => {
+						const result = await getPayrollResult(params, "2024-07", e.id)
+						if (result) {
+							return await getWageTypes(params, result.id);
+						}
+						else {
+							return null;
+						}
+					}));
+					const payrollControllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "PC")));
+					for (let i = 0; i < employees.length; i++) {
+						employees[i].wageTypes = wageTypes[i];
+						employees[i].controllingTasks = payrollControllingTasks[i];
+					}
+					return { employees };
+				}
+			},
+			{
+				path: "hr/payruns_old",
 				Component: AsyncPayrunView,
 				loader: paginatedLoader({
 					pageCount: 15,

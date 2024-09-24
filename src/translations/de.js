@@ -174,6 +174,12 @@ const translations = {
 		Processing: "In Verarbeitung",
 
 
+		// Payruns
+		"Net": "Netto",
+		"Paid out": "Ausbezahlt",
+		"Open": "Offen",
+		"Payout": "Auszahlen",
+
 		// Command
 		"Select event": "Ereignis auswählen",
 		"Select event context": "Kontext für Ereignis auswählen",
