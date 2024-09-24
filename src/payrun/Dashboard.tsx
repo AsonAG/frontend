@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import { Link, useSubmit, useLoaderData, Await, useOutlet, useAsyncValue } from "react-router-dom";
-import { Stack, Typography, Skeleton, Divider, IconButton, Tooltip, Paper, Button } from "@mui/material";
+import { Stack, Typography, Skeleton, Divider, IconButton, Tooltip, Paper, Button, Checkbox } from "@mui/material";
 import { Add, Cancel, Clear, DangerousRounded, DoneAll, Error, InsightsRounded, Mode, Outbox, SyncAlt } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
 import { ErrorView } from "../components/ErrorView";
@@ -35,6 +35,7 @@ function EmployeeHeaderRow() {
   const { t } = useTranslation();
   return (
     <Stack direction="row" spacing={2}>
+      <Typography variant="h6" sx={{ width: 30, py: 0.625 }} ></Typography>
       <Typography variant="h6" flex={1} sx={{ py: 0.625 }} >{t("Employee")}</Typography>
       <Typography variant="h6" sx={{ width: 100, py: 0.625 }} >{t("Net")}</Typography>
       <Typography variant="h6" sx={{ width: 100, py: 0.625 }} >{t("Paid out")}</Typography>
@@ -44,40 +45,42 @@ function EmployeeHeaderRow() {
   );
 }
 function EmployeeRow({ employee }) {
-  const { t } = useTranslation();
+  const [controllingTasks, setControllingTasks] = useState(employee.controllingTasks);
+  const [selected, setSelected] = useState(false);
   const netWage = employee.wageTypes?.find(wt => wt.wageTypeNumber === 6500)?.value;
   const advancePayment = employee.wageTypes?.find(wt => wt.wageTypeNumber === 6510)?.value;
 
   const possiblePayout = !!netWage ? netWage - (advancePayment ?? 0) : null;
+  let stackSx = {
+    borderRadius: 2
+  };
+  if (selected) {
+    stackSx.backgroundColor = theme => theme.palette.primary.hover;
+  };
   return (
-    <Stack direction="row" spacing={2}>
-      <Typography flex={1} noWrap sx={{ py: 0.625 }}>{getEmployeeDisplayString(employee)}</Typography>
+    <Stack direction="row" spacing={2} sx={stackSx}>
+      <Checkbox sx={{ py: 0.625, mx: 0, width: 30 }} size="small" disableRipple checked={selected} onChange={e => setSelected(e.target.checked)} />
+      <Typography flex={1} noWrap sx={{ py: 0.625 }}><Tooltip title={employee.identifier} placement="right"><span>{employee.lastName} {employee.firstName}</span></Tooltip></Typography>
       <Typography sx={{ width: 100, py: 0.625 }}>{netWage?.toFixed(2)}</Typography>
       <Typography sx={{ width: 100, py: 0.625 }}>{advancePayment?.toFixed(2)}</Typography>
       <Typography sx={{ width: 100, py: 0.625 }}>{possiblePayout?.toFixed(2)}</Typography>
       <Stack direction="row" sx={{ width: 200, flexWrap: "wrap" }}>
-        {employee.controllingTasks?.map(task => <TaskButton key={task.name} task={task} />)}
+        {controllingTasks?.map(task => <TaskButton key={task.name} task={task} onClick={() => {
+          setControllingTasks(tasks => tasks.filter(t => t !== task));
+        }} />)}
       </Stack>
     </Stack>
   );
 }
 
-function TaskButton({ task }) {
+function TaskButton({ task, onClick }) {
   return (
     <Tooltip title={task.displayName}>
-      <IconButton color="warning" size="small">
+      <IconButton color="warning" size="small" onClick={onClick}>
         <Error />
       </IconButton>
     </Tooltip>
   )
-}
-
-function PeriodView() {
-  return (
-    <Stack>
-      <Typography>Aktuelle Periode</Typography>
-    </Stack>
-  );
 }
 
 function AwaitPayrunJobs() {
