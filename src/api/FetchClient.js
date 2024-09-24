@@ -201,7 +201,7 @@ class FetchRequestBuilder {
 
 	async fetchJson() {
 		const response = await this.fetch();
-		if (this.ignoreErrors && !response.status.ok) {
+		if (this.ignoreErrors && !response.ok) {
 			return null;
 		}
 		return response.json();
