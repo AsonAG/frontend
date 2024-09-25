@@ -11,7 +11,7 @@ import { Employee } from "../models/Employee";
 export function PayrunDashboard() {
   const { t } = useTranslation();
   return (
-    <ContentLayout title={t("Payruns")}>
+    <ContentLayout title={t("Payroll")}>
       <EmployeeTable />
     </ContentLayout>
   );

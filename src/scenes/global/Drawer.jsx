@@ -167,7 +167,7 @@ function MenuItemsPayrollAdmin() {
 				icon={<ControllingBadgeIcon />}
 			/>
 			<NavigationItem
-				label={t("Payruns")}
+				label={t("Payroll")}
 				to="hr/payruns"
 				icon={<PaymentsIcon />}
 			/>
