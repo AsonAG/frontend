@@ -175,6 +175,7 @@ const translations = {
 
 
 		// Payruns
+		"Current period": "Aktuelle Periode",
 		"Gross": "Brutto",
 		"Net": "Netto",
 		"Paid out": "Ausbezahlt",

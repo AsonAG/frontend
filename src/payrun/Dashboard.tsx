@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Stack, Typography, IconButton, Tooltip, Paper, Button, Checkbox, SxProps, Theme } from "@mui/material";
-import { Check, Error } from "@mui/icons-material";
+import { CalendarMonth, Check, Error } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { useSearchParam } from "../hooks/useSearchParam";
@@ -21,7 +21,8 @@ function EmployeeTable() {
   const { t } = useTranslation();
   const { employees } = useLoaderData() as { employees: Array<Employee> };
   return (
-    <Stack spacing={1}>
+    <Stack spacing={1} >
+      <PeriodSection />
       <EmployeeHeaderRow />
       {employees.map(e => <EmployeeRow key={e.id} employee={e} />)}
       <Stack direction="row" justifyContent="end">
@@ -29,6 +30,17 @@ function EmployeeTable() {
       </Stack>
     </Stack>
   )
+}
+
+function PeriodSection() {
+  const { t } = useTranslation();
+  return (
+    <Stack direction="row" spacing={1} alignItems="center">
+      <Typography>{t("Current period")}:</Typography>
+      <Typography fontWeight="bold">Juli 2024</Typography>
+      <IconButton size="small" color="primary"><CalendarMonth /></IconButton>
+    </Stack>
+  );
 }
 
 function EmployeeHeaderRow() {
@@ -45,6 +57,7 @@ function EmployeeHeaderRow() {
     </Stack>
   );
 }
+
 function EmployeeRow({ employee }) {
   const [selected, setSelected] = useState(false);
   const grossWage = employee.wageTypes?.find(wt => wt.wageTypeNumber === 5000)?.value;
@@ -90,14 +103,4 @@ function EmployeeRow({ employee }) {
       }
     </Stack>
   );
-}
-
-function TaskButton({ task, onClick }) {
-  return (
-    <Tooltip title={task.displayName}>
-      <IconButton color="warning" size="small" onClick={onClick}>
-        <Error />
-      </IconButton>
-    </Tooltip>
-  )
 }
