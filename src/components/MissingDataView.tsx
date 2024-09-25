@@ -1,4 +1,4 @@
-import React, {  } from "react";
+import React, { } from "react";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "./ContentLayout";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
@@ -66,8 +66,8 @@ function CompanySection({ title, data }) {
 function EmployeeSection({ data }) {
 	const caseTasks = data.cases;
 
-	const clusterE = caseTasks.filter((ct: MissingDataCase) => ct.clusters?.includes("E"));
-	const clusterHr = caseTasks.filter((ct: MissingDataCase) => ct.clusters?.includes("HR"));
+	const ect = caseTasks.filter((ct: MissingDataCase) => ct.clusters?.includes("ECT"));
+	const hrct = caseTasks.filter((ct: MissingDataCase) => ct.clusters?.includes("HRCT"));
 
 	return (
 		<Stack spacing={1}>
@@ -76,10 +76,10 @@ function EmployeeSection({ data }) {
 			</Typography>
 			<Paper variant="outlined">
 				<Stack>
-					{clusterE.map((c: MissingDataCase) => (
+					{ect.map((c: MissingDataCase) => (
 						<CaseTask key={c.id} objectId={data.id} _case={c} type="E" />
 					))}
-					{clusterHr.map((c: MissingDataCase) => (
+					{hrct.map((c: MissingDataCase) => (
 						<CaseTask key={c.id} objectId={data.id} _case={c} type="HR" />
 					))}
 				</Stack>
