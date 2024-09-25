@@ -8,8 +8,7 @@ import {
 	LinkProps as RouterLinkProps,
 	useAsyncValue
 } from "react-router-dom";
-import { Paper, Stack, Theme, Typography } from "@mui/material";
-import styled from "@emotion/styled";
+import { Paper, Stack, Theme, Typography, styled } from "@mui/material";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
 import { MissingData, MissingDataCase } from "../models/MissingData";
 import { useAtomValue } from "jotai";
@@ -21,7 +20,7 @@ const Link = styled(
 	forwardRef<any, RouterLinkProps>((itemProps, ref) => {
 		return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 	}),
-)(({ theme }: { theme: Theme }) => {
+)<RouterLinkProps>(({ theme }: { theme: Theme }) => {
 	return {
 		textDecoration: "none",
 		color: theme.palette.text.primary,
@@ -115,7 +114,7 @@ function CaseTask({ objectId, type, _case }) {
 					label={type}
 					sx={{ height: 21, alignSelf: "center", flex: "0 0 60px" }}
 				/>
-				<Typography fontWeight="bold" fontSize="1rem">
+				<Typography>
 					{_case.displayName}
 				</Typography>
 			</Stack>
