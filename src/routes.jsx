@@ -633,7 +633,7 @@ const routeData = [
 							return null;
 						}
 					}));
-					const payrollControllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "PC")));
+					const payrollControllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
 					for (let i = 0; i < employees.length; i++) {
 						employees[i].wageTypes = wageTypes[i];
 						employees[i].controllingTasks = payrollControllingTasks[i];
