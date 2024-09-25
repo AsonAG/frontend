@@ -29,11 +29,7 @@ function Topbar({ children }) {
 			>
 				{children}
 				<Stack sx={{ flexGrow: 1 }} alignItems="center" justifyContent="center" direction="row">
-					<Suspense>
-						<OpenPeriod />
-					</Suspense>
 				</Stack>
-
 				<Stack direction="row" spacing={2.5} alignItems="center">
 					<NewEventCommand />
 					<Suspense>
@@ -43,24 +39,6 @@ function Topbar({ children }) {
 			</Toolbar>
 		</AppBar>
 	);
-}
-
-function OpenPeriod() {
-	const { t } = useTranslation();
-	const payroll = useAtomValue(payrollAtom);
-	if (!payroll?.attributes?.["showOpenPeriod"]) {
-		return;
-	}
-	return (
-		<>
-			<DatePicker
-				variant="month-short"
-				label={t("Open period")}
-				value={dayjs(new Date(2024, 7, 1))}
-			/>
-		</>
-	)
-
 }
 
 export default Topbar;

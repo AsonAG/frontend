@@ -308,7 +308,7 @@ function EmployeeCasesCommandGroup({ state, close, dispatch }: { state: State, c
     const employee = state.initialized && state.page === "employee" && state.employee;
     if (!employee)
       throw new Error("no employee found"); // this should never happen
-    const path = generatePath(`/orgs/:orgId/payrolls/:payrollId/hr/employees/:employeeId/new/:caseName`, { orgId: params.orgId!, payrollId: params.payrollId!, employeeId: employee.id, caseName: _case.name });
+    const path = generatePath(`/orgs/:orgId/payrolls/:payrollId/hr/employees/:employeeId/new/:caseName`, { orgId: params.orgId!, payrollId: params.payrollId!, employeeId: employee.id, caseName: encodeURIComponent(_case.name) });
     navigate(path);
     close();
   }
