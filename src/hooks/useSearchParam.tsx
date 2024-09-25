@@ -8,8 +8,8 @@ interface SearchParamOptions {
 
 export function useSearchParam(
 	name: string,
-	opts: SearchParamOptions | undefined,
-) {
+	opts?: SearchParamOptions | undefined,
+): [string, (updatedValue: string) => void] {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const value = searchParams.get(name) || "";
 	const setValue = (updatedValue: string) =>

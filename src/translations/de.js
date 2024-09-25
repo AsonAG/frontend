@@ -175,6 +175,7 @@ const translations = {
 
 
 		// Payruns
+		"Gross": "Brutto",
 		"Net": "Netto",
 		"Paid out": "Ausbezahlt",
 		"Open": "Offen",

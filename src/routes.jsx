@@ -142,7 +142,12 @@ function paginatedLoader({
 }
 
 function createRouteCaseForm(path, data) {
-	const loader = data ? () => data : undefined;
+	let loader = undefined;
+	if (data instanceof Function) {
+		loader = data;
+	} else if (!!data) {
+		loader = () => data;
+	}
 	return {
 		path,
 		loader,
@@ -584,7 +589,7 @@ const routeData = [
 				}
 			},
 			{
-				path: "hr/controlling/employee/:employeeId",
+				path: "hr/controlling/employees/:employeeId",
 				Component: ContentLayout,
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
@@ -613,6 +618,7 @@ const routeData = [
 			{
 				path: "hr/payruns",
 				Component: PayrunDashboard,
+				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathName !== nextUrl.pathName,
 				loader: async ({ params, request }) => {
 					const employees = await getEmployees(params)
 						.withActive()
@@ -634,6 +640,24 @@ const routeData = [
 					}
 					return { employees };
 				}
+			},
+			{
+				path: "hr/payruns/employees/:employeeId",
+				Component: ContentLayout,
+				loader: async ({ params }) => {
+					const employee = await getEmployee(params);
+					return {
+						title: getEmployeeDisplayString(employee)
+					}
+				},
+				children: [
+					createRouteCaseForm(":caseName", ({ params }) => {
+						const { employeeId } = params;
+						return {
+							redirect: `../../../?e=${employeeId}`
+						};
+					})
+				]
 			},
 			{
 				path: "hr/payruns_old",

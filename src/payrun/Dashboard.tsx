@@ -1,12 +1,12 @@
-import React, { Suspense, useState } from "react";
-import { Link, useSubmit, useLoaderData, Await, useOutlet, useAsyncValue } from "react-router-dom";
-import { Stack, Typography, Skeleton, Divider, IconButton, Tooltip, Paper, Button, Checkbox } from "@mui/material";
-import { Add, Cancel, Clear, DangerousRounded, DoneAll, Error, InsightsRounded, Mode, Outbox, SyncAlt } from "@mui/icons-material";
+import React, { useState } from "react";
+import { useLoaderData } from "react-router-dom";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, Checkbox, SxProps, Theme } from "@mui/material";
+import { Check, Error } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
-import { ErrorView } from "../components/ErrorView";
 import { useTranslation } from "react-i18next";
-import { PaginatedContent } from "../components/PaginatedContent";
-import { getEmployeeDisplayString } from "../models/Employee";
+import { useSearchParam } from "../hooks/useSearchParam";
+import { CaseTask } from "../components/CaseTask";
+import { Employee } from "../models/Employee";
 
 export function PayrunDashboard() {
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ export function PayrunDashboard() {
 
 function EmployeeTable() {
   const { t } = useTranslation();
-  const { employees } = useLoaderData();
+  const { employees } = useLoaderData() as { employees: Array<Employee> };
   return (
     <Stack spacing={1}>
       <EmployeeHeaderRow />
@@ -34,41 +34,60 @@ function EmployeeTable() {
 function EmployeeHeaderRow() {
   const { t } = useTranslation();
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction="row" spacing={2} sx={{ p: 0.5 }}>
       <Typography variant="h6" sx={{ width: 30, py: 0.625 }} ></Typography>
       <Typography variant="h6" flex={1} sx={{ py: 0.625 }} >{t("Employee")}</Typography>
+      <Typography variant="h6" sx={{ width: 100, py: 0.625 }} >{t("Gross")}</Typography>
       <Typography variant="h6" sx={{ width: 100, py: 0.625 }} >{t("Net")}</Typography>
       <Typography variant="h6" sx={{ width: 100, py: 0.625 }} >{t("Paid out")}</Typography>
       <Typography variant="h6" sx={{ width: 100, py: 0.625 }} >{t("Open")}</Typography>
-      <Typography variant="h6" sx={{ width: 200, py: 0.625 }} >{t("Controlling")}</Typography>
+      <Typography variant="h6" sx={{ width: 70, py: 0.625 }} >{t("Blocker")}</Typography>
     </Stack>
   );
 }
 function EmployeeRow({ employee }) {
-  const [controllingTasks, setControllingTasks] = useState(employee.controllingTasks);
   const [selected, setSelected] = useState(false);
+  const grossWage = employee.wageTypes?.find(wt => wt.wageTypeNumber === 5000)?.value;
   const netWage = employee.wageTypes?.find(wt => wt.wageTypeNumber === 6500)?.value;
   const advancePayment = employee.wageTypes?.find(wt => wt.wageTypeNumber === 6510)?.value;
+  const [expanded, setExpanded] = useSearchParam("e");
 
   const possiblePayout = !!netWage ? netWage - (advancePayment ?? 0) : null;
-  let stackSx = {
-    borderRadius: 2
+  let stackSx: SxProps = {
+    borderRadius: 1,
+    p: 0.5
   };
+  const isExpanded = expanded === employee.id;
+  const hasControllingTasks = (employee.controllingTasks?.length ?? 0) > 0;
+  const elevation = isExpanded && hasControllingTasks ? 1 : 0;
   if (selected) {
-    stackSx.backgroundColor = theme => theme.palette.primary.hover;
+    stackSx.backgroundColor = (theme: Theme) => theme.palette.primary.hover;
   };
+
   return (
-    <Stack direction="row" spacing={2} sx={stackSx}>
-      <Checkbox sx={{ py: 0.625, mx: 0, width: 30 }} size="small" disableRipple checked={selected} onChange={e => setSelected(e.target.checked)} />
-      <Typography flex={1} noWrap sx={{ py: 0.625 }}><Tooltip title={employee.identifier} placement="right"><span>{employee.lastName} {employee.firstName}</span></Tooltip></Typography>
-      <Typography sx={{ width: 100, py: 0.625 }}>{netWage?.toFixed(2)}</Typography>
-      <Typography sx={{ width: 100, py: 0.625 }}>{advancePayment?.toFixed(2)}</Typography>
-      <Typography sx={{ width: 100, py: 0.625 }}>{possiblePayout?.toFixed(2)}</Typography>
-      <Stack direction="row" sx={{ width: 200, flexWrap: "wrap" }}>
-        {controllingTasks?.map(task => <TaskButton key={task.name} task={task} onClick={() => {
-          setControllingTasks(tasks => tasks.filter(t => t !== task));
-        }} />)}
+    <Stack component={Paper} elevation={elevation}>
+      <Stack direction="row" spacing={2} sx={stackSx}>
+        <Checkbox sx={{ py: 0.625, mx: 0, width: 30 }} size="small" disableRipple checked={selected} onChange={e => setSelected(e.target.checked)} />
+        <Typography flex={1} noWrap sx={{ py: 0.625 }}><Tooltip title={employee.identifier} placement="right"><span>{employee.lastName} {employee.firstName}</span></Tooltip></Typography>
+        <Typography sx={{ width: 100, py: 0.625 }}>{grossWage?.toFixed(2)}</Typography>
+        <Typography sx={{ width: 100, py: 0.625 }}>{netWage?.toFixed(2)}</Typography>
+        <Typography sx={{ width: 100, py: 0.625 }}>{advancePayment?.toFixed(2)}</Typography>
+        <Typography sx={{ width: 100, py: 0.625 }}>{possiblePayout?.toFixed(2)}</Typography>
+        <Stack direction="row" sx={{ width: 70, justifyContent: "center" }}>
+          {
+            hasControllingTasks ?
+              <IconButton color="warning" size="small" onClick={() => setExpanded(isExpanded ? "" : employee.id)}><Error /></IconButton> :
+              <IconButton color="success" size="small" disabled><Check /></IconButton>
+          }
+        </Stack>
+        {
+        }
       </Stack>
+      {isExpanded && hasControllingTasks &&
+        <Stack>
+          {employee.controllingTasks?.map(task => <CaseTask key={task.name} _case={task} objectId={employee.id} type="P" />)}
+        </Stack>
+      }
     </Stack>
   );
 }
@@ -81,135 +100,4 @@ function TaskButton({ task, onClick }) {
       </IconButton>
     </Tooltip>
   )
-}
-
-function AwaitPayrunJobs() {
-  const { payrunJobs } = useLoaderData();
-  return (
-    <Suspense fallback={<Skeleton />}>
-      <Await resolve={payrunJobs} errorElement={<ErrorView />}>
-        <PayrunJobs />
-      </Await>
-    </Suspense>
-  );
-}
-
-function PayrunJobs() {
-  const jobs = useAsyncValue();
-  if (jobs.count === 0) {
-    return null;
-  }
-  return (
-    <PaginatedContent>
-      <Paper variant="outlined">
-        <Stack divider={<Divider flexItem />}>
-          {jobs.items.map(job => <PayrunJobRow key={job.id} payrunJob={job} />)}
-        </Stack>
-      </Paper>
-    </PaginatedContent>
-  )
-}
-
-function AwaitDraftPayrun() {
-  const { draftPayrunJobs } = useLoaderData();
-  return (
-    <Suspense fallback={<Skeleton />}>
-      <Await resolve={draftPayrunJobs} errorElement={<ErrorView />}>
-        <DraftPayrun />
-      </Await>
-    </Suspense>
-  );
-}
-
-function DraftPayrun() {
-  const drafts = useAsyncValue();
-  return drafts.length > 0 ? <DraftPayrunJobRow payrunJob={drafts[0]} /> : <NewPayrunJobRow />;
-}
-
-function DraftPayrunJobRow({ payrunJob }) {
-  const { abort, complete } = useChangeStatus(payrunJob.id);
-  const { t } = useTranslation();
-  const buttons = (
-    <Stack direction="row">
-      <Tooltip title={t("Abort")}>
-        <IconButton sx={{ "&:hover": { color: theme => theme.palette.error.light } }} size="small" onClick={abort}><Clear /></IconButton>
-      </Tooltip>
-      <Tooltip title={t("Release")}>
-        <IconButton color="primary" size="small" onClick={complete}><DoneAll /></IconButton>
-      </Tooltip>
-    </Stack>
-  );
-  const icon = <JobIcon payrunJob={payrunJob} />;
-  return (
-    <Paper variant="outlined">
-      <Row icon={icon} title={payrunJob.name} subtitle={payrunJob.reason} buttons={buttons} bgcolor="rgba(255, 221, 0, 0.2)" />
-    </Paper>
-  );
-}
-
-function PayrunJobRow({ payrunJob }) {
-  const icon = <JobIcon payrunJob={payrunJob} />
-  return <Row icon={icon} title={payrunJob.name} subtitle={payrunJob.reason} />
-}
-
-function NewPayrunJobRow() {
-  const { t } = useTranslation();
-  const row = <Row icon={<Add fontSize="small" />} title={t("New payrun")} />;
-  return <Button component={Link} to="new" variant="outlined" sx={{ p: 0, justifyContent: "start" }} >{row}</Button>
-}
-
-function Row({ title, subtitle, buttons, icon, bgcolor }) {
-  return (
-    <Stack direction="row" spacing={1.5} alignItems="center" minHeight={50} px={2} py={1} bgcolor={bgcolor}>
-      {icon}
-      <Stack direction={{ sm: "row" }} flex={1} spacing={1} alignItems={{ sm: "center" }} >
-        <Typography>{title}</Typography>
-        <Typography variant="caption">{subtitle}</Typography>
-      </Stack>
-      {buttons}
-    </Stack>
-  );
-}
-
-function useChangeStatus(payrunJobId) {
-  const submit = useSubmit();
-  const changeStatus = newStatus => submit({ status: newStatus, type: "change_status", jobId: payrunJobId }, { method: "post", encType: "application/json" });
-  return { abort: () => changeStatus("Abort"), complete: () => changeStatus("Complete") };
-}
-
-function JobIcon({ payrunJob }) {
-  const { t } = useTranslation();
-  let Icon = null;
-  let color = "action";
-  switch (payrunJob.jobStatus) {
-    case "Draft":
-      Icon = Mode;
-      break;
-    case "Release":
-      Icon = Outbox;
-      color = "success";
-      break;
-    case "Process":
-      Icon = SyncAlt;
-      color = "success";
-      break;
-    case "Complete":
-      Icon = DoneAll;
-      color = "success";
-      break;
-    case "Forecast":
-      Icon = InsightsRounded;
-      color = "secondary";
-      break;
-    case "Abort":
-      Icon = Cancel;
-      color = "error";
-      break;
-    case "Cancel":
-      Icon = DangerousRounded;
-      color = "error";
-      break;
-  }
-  if (Icon === null) return null;
-  return <Tooltip title={t("PayrunJobStatus." + payrunJob.jobStatus)}><Icon fontSize="small" color={color} /></Tooltip>
 }
