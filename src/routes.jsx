@@ -576,7 +576,7 @@ const routeData = [
 				},
 			},
 			{
-				path: "hr/controlling",
+				path: "hr/missingdata",
 				Component: MissingDataView,
 				loader: () => {
 					// refresh missing data
@@ -584,12 +584,12 @@ const routeData = [
 
 					return defer({
 						data: store.get(missingDataMapAtom),
-						title: "Controlling",
+						title: "Missing data",
 					});
 				}
 			},
 			{
-				path: "hr/controlling/employees/:employeeId",
+				path: "hr/missingdata/employees/:employeeId",
 				Component: ContentLayout,
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
@@ -604,7 +604,7 @@ const routeData = [
 				],
 			},
 			{
-				path: "hr/controlling/company",
+				path: "hr/missingdata/company",
 				Component: ContentLayout,
 				loader: () => ({
 					title: "Company"

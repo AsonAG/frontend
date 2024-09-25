@@ -17,7 +17,7 @@ import { Payroll } from "../models/Payroll";
 export function MissingDataView() {
 	const { t } = useTranslation();
 	return (
-		<ContentLayout title={t("Controlling")}>
+		<ContentLayout title={t("Missing data")}>
 			<AsyncDataRoute>
 				<EmployeeTable />
 			</AsyncDataRoute>
