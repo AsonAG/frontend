@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useMemo, useReducer } from "react";
-import { useLoaderData } from "react-router-dom";
+import { Link, Outlet, useLoaderData } from "react-router-dom";
 import { Stack, Typography, IconButton, Tooltip, Paper, Button, Checkbox, SxProps, Theme, Chip, Box } from "@mui/material";
 import { CalendarMonth, Check, Error, FilterList } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
@@ -12,9 +12,12 @@ import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
 export function PayrunDashboard() {
   const { t } = useTranslation();
   return (
-    <ContentLayout title={t("Payroll")}>
-      <EmployeeTable />
-    </ContentLayout>
+    <>
+      <ContentLayout title={t("Payroll")}>
+        <EmployeeTable />
+      </ContentLayout>
+      <Outlet />
+    </>
   );
 }
 
@@ -160,7 +163,7 @@ function EmployeeRow({ employee, selected, toggleSelected }) {
         </Stack>
         <Stack direction="row" sx={{ width: 30, justifyContent: "center" }}>
           <Tooltip title={t("Payslip")} placement="left">
-            <IconButton size="small"><FilePresentRoundedIcon /></IconButton>
+            <IconButton size="small" component={Link} to={employee.documentUrl}><FilePresentRoundedIcon /></IconButton>
           </Tooltip>
         </Stack>
       </Stack>

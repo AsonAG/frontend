@@ -634,12 +634,34 @@ const routeData = [
 						}
 					}));
 					const payrollControllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
+					const documentCaseValues = await Promise.all(employees.map(async e => {
+						const response = await getDocumentsOfCaseField({ ...params, employeeId: e.id }, "CH.Swissdec.EmployeeDocumentPayslip", 1);
+						if (response.count > 0)
+							return response.items[0];
+						return null;
+					}));
 					for (let i = 0; i < employees.length; i++) {
-						employees[i].wageTypes = wageTypes[i];
-						employees[i].controllingTasks = payrollControllingTasks[i];
+						const employee = employees[i];
+						employee.wageTypes = wageTypes[i];
+						employee.controllingTasks = payrollControllingTasks[i];
+						const caseValue = documentCaseValues[i];
+						if (caseValue) {
+							employee.documentUrl = `employees/${employee.id}/v/${caseValue.id}/i/${caseValue.documents[0].id}`;
+						}
 					}
 					return { employees };
-				}
+				},
+				children: [
+					{
+						path: "employees/:employeeId/v/:caseValueId/i/:documentId",
+						Component: CaseValueDocumentDialog,
+						loader: ({ params }) => {
+							return defer({
+								document: getDocument(params),
+							});
+						}
+					}
+				]
 			},
 			{
 				path: "hr/payruns/employees/:employeeId",
