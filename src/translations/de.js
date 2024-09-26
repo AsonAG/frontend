@@ -180,7 +180,7 @@ const translations = {
 		"Net": "Netto",
 		"Paid out": "Ausbezahlt",
 		"Open": "Offen",
-		payout_sum: "{{amount}} auszahlen",
+		"Payout": "auszahlen",
 		"Payslip": "Lohnabrechnung",
 
 		// Command

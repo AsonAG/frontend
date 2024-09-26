@@ -1,6 +1,6 @@
-import React, { useMemo, useReducer } from "react";
+import React, { PropsWithChildren, useMemo, useReducer } from "react";
 import { useLoaderData } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, Checkbox, SxProps, Theme, Chip } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, Checkbox, SxProps, Theme, Chip, Box } from "@mui/material";
 import { CalendarMonth, Check, Error, FilterList } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
@@ -46,7 +46,7 @@ function EmployeeTable() {
     createInitialState
   );
   const { filtered, selected, mode } = state;
-  const [totalGross, totalNetto, totalOpen] = useMemo(() => {
+  const [totalGross, totalNetto, totalAdvancePayments, totalOpen] = useMemo(() => {
     let totalGross = 0;
     let totalNetto = 0;
     let totalAdvancePayments = 0;
@@ -56,7 +56,7 @@ function EmployeeTable() {
       totalAdvancePayments += (se.wageTypes?.find(wt => wt.wageTypeNumber === 6510)?.value ?? 0);
     }
 
-    return [totalGross, totalNetto, totalNetto - totalAdvancePayments];
+    return [totalGross, totalNetto, totalAdvancePayments, totalNetto - totalAdvancePayments];
   }, [selected]);
   return (
     <Stack spacing={1} >
@@ -67,14 +67,24 @@ function EmployeeTable() {
           <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL", employees: sl }) }} color="primary" />
           <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML", employees: ml }) }} color="primary" />
         </Stack>
-        <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{totalGross ? totalGross.toFixed(2) : null}</Typography>
-        <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{totalNetto ? totalNetto.toFixed(2) : null}</Typography>
-        <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{}</Typography>
-        <Stack sx={{ width: 232 }} alignItems="end">
+        <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{formatValue(totalGross)}</Typography>
+        <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{formatValue(totalNetto)}</Typography>
+        <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{formatValue(totalAdvancePayments)}</Typography>
+        <Stack sx={{ width: 186 }} alignItems="end">
           {totalOpen > 0 &&
-            <Button variant="contained" >{t("payout_sum", { amount: totalOpen.toFixed(2) })}</Button>
+            <Button variant="contained" sx={{ mr: 0.75 }} >
+              <Stack direction="row">
+                <Box component="span">
+                  {formatValue(totalOpen)}
+                </Box>
+                <Box component="span" sx={{ width: 64, textAlign: "right" }}>
+                  {t("Payout")}
+                </Box>
+              </Stack>
+            </Button>
           }
         </Stack>
+        <Stack sx={{ width: 30 }}></Stack>
       </Stack>
       <EmployeeHeaderRow />
       {filtered.map(e => {
@@ -124,8 +134,8 @@ function EmployeeRow({ employee, selected, toggleSelected }) {
     p: 0.5
   };
   const isExpanded = expanded === employee.id;
-  const hasControllingTasks = (employee.controllingTasks?.length ?? 0) > 0;
-  const elevation = isExpanded && hasControllingTasks ? 1 : 0;
+  const hasTasks = hasControllingTasks(employee);
+  const elevation = isExpanded && hasTasks ? 1 : 0;
   if (selected) {
     stackSx.backgroundColor = (theme: Theme) => theme.palette.primary.hover;
   };
@@ -133,15 +143,17 @@ function EmployeeRow({ employee, selected, toggleSelected }) {
   return (
     <Stack component={Paper} elevation={elevation}>
       <Stack direction="row" spacing={2} sx={stackSx}>
-        <Checkbox sx={{ py: 0.625, mx: 0, width: 30 }} size="small" disableRipple checked={selected} onChange={toggleSelected} />
+        <Forbidden isForbidden={hasTasks} forbiddenText={t("This employee has blockers")}>
+          <Checkbox sx={{ py: 0.625, mx: 0, width: 30, cursor: hasTasks ? "not-allowed" : undefined }} size="small" disableRipple checked={selected} onChange={toggleSelected} disabled={hasTasks} />
+        </Forbidden>
         <Typography flex={1} noWrap sx={{ py: 0.625 }}><Tooltip title={employee.identifier} placement="right"><span>{employee.lastName} {employee.firstName}</span></Tooltip></Typography>
-        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{grossWage?.toFixed(2)}</Typography>
-        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{netWage?.toFixed(2)}</Typography>
-        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{advancePayment?.toFixed(2)}</Typography>
-        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{possiblePayout?.toFixed(2)}</Typography>
+        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(grossWage)}</Typography>
+        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(netWage)}</Typography>
+        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(advancePayment)}</Typography>
+        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(possiblePayout)}</Typography>
         <Stack direction="row" sx={{ width: 70, justifyContent: "center" }}>
           {
-            hasControllingTasks ?
+            hasTasks ?
               <IconButton color="warning" size="small" onClick={() => setExpanded(isExpanded ? "" : employee.id)}><Error /></IconButton> :
               <IconButton color="success" size="small" disabled><Check /></IconButton>
           }
@@ -152,13 +164,31 @@ function EmployeeRow({ employee, selected, toggleSelected }) {
           </Tooltip>
         </Stack>
       </Stack>
-      {isExpanded && hasControllingTasks &&
+      {isExpanded && hasTasks &&
         <Stack>
           {employee.controllingTasks?.map(task => <CaseTask key={task.name} _case={task} objectId={employee.id} type="P" />)}
         </Stack>
       }
     </Stack>
   );
+}
+
+type ForbiddenProps = PropsWithChildren & {
+  isForbidden: boolean
+  forbiddenText: string
+}
+
+function Forbidden({ isForbidden, forbiddenText, children }: ForbiddenProps) {
+  if (!isForbidden)
+    return children;
+
+  return (
+    <Tooltip title={forbiddenText}>
+      <Box sx={{ cursor: "not-allowed" }}>
+        {children}
+      </Box>
+    </Tooltip>
+  )
 }
 
 type FilterMode = "All" | "ML" | "SL";
@@ -199,7 +229,7 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         mode: action.mode,
-        selected: action.employees,
+        selected: action.employees.filter(e => !hasControllingTasks(e)),
         filtered: action.employees
       }
     }
@@ -219,3 +249,11 @@ function createInitialState(employees: Employee[]): State {
     mode: "All"
   };
 }
+
+const formatter = new Intl.NumberFormat("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function formatValue(value: number | null | undefined) {
+  if (!value)
+    return null;
+  return formatter.format(value);
+}
+const hasControllingTasks = (employee: Employee) => (employee.controllingTasks?.length ?? 0) > 0;
