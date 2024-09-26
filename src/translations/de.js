@@ -178,7 +178,7 @@ const translations = {
 		"Current period": "Aktuelle Periode",
 		"Gross": "Brutto",
 		"Net": "Netto",
-		"Paid out": "Ausbezahlt",
+		"Paid": "Bezahlt",
 		"Open": "Offen",
 		"Payout": "auszahlen",
 		"Payslip": "Lohnabrechnung",

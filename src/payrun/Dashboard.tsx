@@ -116,7 +116,7 @@ function EmployeeHeaderRow() {
       <Typography variant="h6" flex={1} sx={{ py: 0.625 }} >{t("Employee")}</Typography>
       <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Gross")}</Typography>
       <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Net")}</Typography>
-      <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Paid out")}</Typography>
+      <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Paid")}</Typography>
       <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Open")}</Typography>
       <Typography variant="h6" textAlign="center" sx={{ width: 70, py: 0.625 }} >{t("Blocker")}</Typography>
       <Typography variant="h6" textAlign="right" sx={{ width: 30, py: 0.625 }} ></Typography>
