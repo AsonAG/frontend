@@ -619,7 +619,7 @@ const routeData = [
 				path: "hr/payruns",
 				Component: PayrunDashboard,
 				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathName !== nextUrl.pathName,
-				loader: async ({ params, request }) => {
+				loader: async ({ params }) => {
 					const employees = await getEmployees(params)
 						.withActive()
 						.withQueryParam("orderBy", `lastName asc`)

@@ -180,7 +180,8 @@ const translations = {
 		"Net": "Netto",
 		"Paid out": "Ausbezahlt",
 		"Open": "Offen",
-		"Payout": "Auszahlen",
+		payout_sum: "{{amount}} auszahlen",
+		"Payslip": "Lohnabrechnung",
 
 		// Command
 		"Select event": "Ereignis auswählen",
