@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { NavigateOptions, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 interface SearchParamOptions {
 	replace: boolean
@@ -9,7 +9,7 @@ interface SearchParamOptions {
 export function useSearchParam(
 	name: string,
 	opts: SearchParamOptions | undefined,
-) {
+): [string, (newValue: string) => void] {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const value = searchParams.get(name) || "";
 	const setValue = (updatedValue: string) =>
