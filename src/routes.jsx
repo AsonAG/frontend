@@ -55,7 +55,8 @@ import {
 	requestExportDataDownload,
 	deleteOrganization,
 	getDivisions,
-	getCaseValues
+	getCaseValues,
+	getCurrentValues
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -96,6 +97,7 @@ import { OrganizationImport } from "./organization/Import";
 import { OrganizationSettings } from "./organization/Settings";
 import { EventTabbedView } from "./components/EventTabbedView";
 import { getEmployeeDisplayString } from "./models/Employee";
+import { DataTable } from "./components/tables/DataTable";
 
 const store = getDefaultStore();
 
@@ -193,6 +195,25 @@ function createRouteDocument(showTitle) {
 				},
 			},
 		]
+	};
+}
+
+function createRouteDataTable(path) {
+	return {
+		path,
+		Component: DataTable,
+		loader: async ({ params, request }) => {
+			const historyFieldName = getQueryParam(request, "h");
+			const historyPromise = !!historyFieldName ? getCaseValues({ ...params, caseFieldName: historyFieldName }) : Promise.resolve([]);
+			const [values, history] = await Promise.all([getCurrentValues(params), historyPromise]);
+			if (historyFieldName) {
+				const caseValue = values.find(v => v.caseFieldName === historyFieldName);
+				if (caseValue) {
+					caseValue.history = history;
+				}
+			}
+			return values;
+		}
 	};
 }
 
@@ -473,6 +494,7 @@ const routeData = [
 							}
 						})
 					},
+					createRouteDataTable("data"),
 					createRouteDocument(false),
 					createRouteCaseForm("missingdata/:caseName"),
 					{
@@ -849,6 +871,7 @@ const routeData = [
 							},
 						}),
 					},
+					createRouteDataTable("data"),
 					createRouteDocument(false),
 				],
 			},

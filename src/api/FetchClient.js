@@ -13,6 +13,7 @@ const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
 const divisionsUrl = "/tenants/:orgId/divisions";
 const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
 const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
+const timeValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values/time";
 const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
 const missingDataEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
 const lookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
@@ -290,10 +291,19 @@ export function getCaseValues(routeParams, top) {
 		.withQueryParam("orderBy", "created desc")
 		.withQueryParam("substituteLookupCodes", true)
 		.withQueryParam("top", top)
-		.withQueryParam("result", "ItemsWithCount")
+		.withQueryParam("result", !!top ? "ItemsWithCount" : undefined)
 		.withLocalization()
 		.withUser()
 		.fetchJson();
+}
+export function getCurrentValues(routeParams) {
+	const caseType = routeParams.employeeId ? "Employee" : "Company";
+	return new FetchRequestBuilder(timeValuesUrl, routeParams)
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParam("caseType", caseType)
+		.withLocalization()
+		.withUser()
+		.fetchJson()
 }
 
 export function getEmployeeCaseChanges(routeParams, search, orderBy) {

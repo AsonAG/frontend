@@ -52,7 +52,7 @@ const darkModeDesignTokens = {
     mode: "dark",
     primary: {
       main: "#4985e2",
-      hover: "rgba(73, 133, 226, 0.05)",
+      hover: "rgba(73, 133, 226, 0.075)",
       active: "rgba(73, 133, 226, 0.15)",
     },
     text: {
