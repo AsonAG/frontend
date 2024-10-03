@@ -4,7 +4,7 @@ export function ScrollToTop() {
 	const { search } = useLocation();
 
 	useEffect(() => {
-		document.body?.scrollTo(0, 0);
+		document.scrollingElement?.scrollTo(0, 0);
 	}, [search]);
 
 	return null;

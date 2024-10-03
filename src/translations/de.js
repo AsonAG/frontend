@@ -9,6 +9,7 @@ const translations = {
 		"New event": "Neues Ereignis",
 		Data: "Daten",
 		Events: "Ereignisse",
+		Event: "Ereignis",
 		Documents: "Dokumente",
 		Document: "Dokument",
 		Employee: "Mitarbeiter",
