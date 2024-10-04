@@ -24,7 +24,7 @@ import { Clear, ExpandLess, ExpandMore, MoreVert } from "@mui/icons-material";
 import { PaginatedContent } from "../PaginatedContent";
 import { useSearchParam } from "../../hooks/useSearchParam";
 import { IdType } from "../../models/IdType";
-import { createColumnHelper, useReactTable, getCoreRowModel, getExpandedRowModel, flexRender, ExpandedState } from "@tanstack/react-table";
+import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row } from "@tanstack/react-table";
 import i18next, { TFunction } from "i18next";
 
 
@@ -128,6 +128,26 @@ type EventRow = {
 	subRows?: Array<EventRow>
 }
 
+
+
+let reentry = false;
+// invert the logic so that all rows are expanded by default
+// setting expanded actually hides the row
+// we do this because having an initialState {expanded: true} only works as long as the state does not change.
+// If we change the state and load another page, all rows will be collapsed.
+// Manually managing the state will lead to more unnecessary rerenders.
+function getIsRowExpanded(row: Row<EventRow>) {
+	if (reentry)
+		// returning undefined "tricks" the table into not calling getIsRowExpanded anymore but use its builtin logic
+		return undefined;
+
+	reentry = true;
+	try {
+		return !row.getIsExpanded();
+	} finally {
+		reentry = false;
+	}
+}
 function EventTable() {
 	const { t } = useTranslation();
 	const { items: events } = useAsyncValue() as { items: Array<Event> };
@@ -148,9 +168,8 @@ function EventTable() {
 	const table = useReactTable({
 		columns: columns,
 		data: e,
-		initialState: {
-			expanded: true,
-		},
+		//@ts-ignore -- hack around table
+		getIsRowExpanded,
 		getCoreRowModel: getCoreRowModel(),
 		getRowId: originalRow => originalRow.id,
 		getSubRows: (row) => row.subRows
