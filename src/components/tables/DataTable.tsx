@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useMemo } from "react";
 import { useLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -14,7 +14,7 @@ import { formatCaseValue } from "../../utils/Format";
 import { History } from "@mui/icons-material";
 import { useSearchParam } from "../../hooks/useSearchParam";
 import { IdType } from "../../models/IdType";
-import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row } from "@tanstack/react-table";
+import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row, getSortedRowModel } from "@tanstack/react-table";
 import { TFunction } from "i18next";
 
 const columnHelper = createColumnHelper<CaseValue>();
@@ -43,13 +43,13 @@ function createColumns(t: TFunction<"translation", undefined>) {
       }),
     columnHelper.accessor("created",
       {
-        cell: created => formatDate(created.getValue(), true),
+        cell: created => <span title={formatDate(created.getValue(), true)}>{formatDate(created.getValue())}</span>,
         header: t("Created")
       }),
     columnHelper.accessor("type",
       {
         cell: attr => attr.getValue(),
-        header: t("Type")
+        header: t("Category")
       }),
   ];
 }
@@ -74,11 +74,20 @@ export function DataTable() {
   const { t } = useTranslation();
   const values = useLoaderData() as Array<CaseValue>;
   const [historyName, setHistoryName] = useSearchParam("h", { replace: true });
-  const columns = createColumns(t);
+  const columns = useMemo(() => createColumns(t), []);
   const table = useReactTable({
     columns,
     data: values,
+    initialState: {
+      sorting: [
+        {
+          id: "displayCaseFieldName",
+          desc: false
+        }
+      ]
+    },
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getSubRows: row => row.history,
     getRowId: originalRow => originalRow.id,
     getRowCanExpand: (_) => true
@@ -134,7 +143,7 @@ function renderRow(row: Row<CaseValue>, selectedCaseField: string, setSelectedCa
 
 function Row({ children }: PropsWithChildren) {
   return (
-    <Box display="grid" gridTemplateColumns="1fr 1fr 75px 75px 120px 105px 40px" gridTemplateRows="auto" alignItems="start">
+    <Box display="grid" gridTemplateColumns="1fr 1fr 75px 75px 75px 105px 40px" gridTemplateRows="auto" alignItems="start">
       {children}
     </Box>
   )

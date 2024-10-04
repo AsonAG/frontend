@@ -1,4 +1,4 @@
-import React, { Fragment, ReactNode, useMemo, useState } from "react";
+import React, { Fragment, PropsWithChildren, ReactNode, useMemo, useState } from "react";
 import { useAsyncValue } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -25,60 +25,62 @@ import { PaginatedContent } from "../PaginatedContent";
 import { useSearchParam } from "../../hooks/useSearchParam";
 import { IdType } from "../../models/IdType";
 import { createColumnHelper, useReactTable, getCoreRowModel, getExpandedRowModel, flexRender, ExpandedState } from "@tanstack/react-table";
-import i18next from "i18next";
+import i18next, { TFunction } from "i18next";
 
 
 const columnHelper = createColumnHelper<EventRow>();
 
 
-const defaultColumns = [
-	columnHelper.accessor("eventName",
+function createColumns(t: TFunction<"translation", undefined>) {
+	return [
+		columnHelper.accessor("eventName",
+			{
+				cell: name => name.getValue(),
+				header: () => i18next.t("Event")
+			}),
+		columnHelper.accessor("eventFieldName",
+			{
+				cell: name => name.getValue(),
+				header: () => i18next.t("Field")
+			}),
+		columnHelper.accessor("value",
+			{
+				cell: value => value.getValue(),
+				header: () => i18next.t("Value")
+			}),
+		columnHelper.accessor("start",
+			{
+				cell: start => formatDate(start.getValue()),
+				header: i18next.t("Start")
+			}),
+		columnHelper.accessor("end",
+			{
+				cell: end => formatDate(end.getValue()),
+				header: i18next.t("End")
+			}),
+		columnHelper.accessor("created",
+			{
+				cell: created => <span title={formatDate(created.getValue(), true)}>{formatDate(created.getValue())}</span>,
+				header: i18next.t("Created")
+			}),
+		columnHelper.accessor("type",
+			{
+				cell: attr => attr.getValue(),
+				header: i18next.t("Category")
+			}),
 		{
-			cell: name => name.getValue(),
-			header: () => i18next.t("Event")
-		}),
-	columnHelper.accessor("eventFieldName",
-		{
-			cell: name => name.getValue(),
-			header: () => i18next.t("Field")
-		}),
-	columnHelper.accessor("value",
-		{
-			cell: value => value.getValue(),
-			header: () => i18next.t("Value")
-		}),
-	columnHelper.accessor("start",
-		{
-			cell: start => formatDate(start.getValue()),
-			header: i18next.t("Start")
-		}),
-	columnHelper.accessor("end",
-		{
-			cell: end => formatDate(end.getValue()),
-			header: i18next.t("End")
-		}),
-	columnHelper.accessor("created",
-		{
-			cell: created => formatDate(created.getValue(), true),
-			header: i18next.t("Created")
-		}),
-	columnHelper.accessor("type",
-		{
-			cell: attr => attr.getValue(),
-			header: i18next.t("Type")
-		}),
-	{
-		id: "expandToggle",
-		size: 30,
-		cell: ({ row }) => {
-			return row.getCanExpand() ?
-				<IconButton onClick={row.getToggleExpandedHandler()} size="small">
-					{row.getIsExpanded() ? <ExpandLess /> : <ExpandMore />}
-				</IconButton>
-				: "";
-		}
-	},
-];
+			id: "expandToggle",
+			size: 30,
+			cell: ({ row }) => {
+				return row.getCanExpand() ?
+					<IconButton onClick={row.getToggleExpandedHandler()} size="small">
+						{row.getIsExpanded() ? <ExpandLess /> : <ExpandMore />}
+					</IconButton>
+					: "";
+			}
+		},
+	];
+}
 
 export function AsyncEventTable() {
 	const isDesktop = useMediaQuery<Theme>(theme => theme.breakpoints.up(1000));
@@ -142,56 +144,64 @@ function EventTable() {
 				end: v.end
 			}))
 	})), [events]);
-	const alternatingIds = useMemo(() => events.filter((_, index) => index % 2 === 1).map(event => event.id), [events]);
+	const columns = useMemo(() => createColumns(t), []);
 	const table = useReactTable({
-		columns: defaultColumns,
+		columns: columns,
 		data: e,
 		initialState: {
 			expanded: true,
 		},
-		// autoResetExpanded: false,
 		getCoreRowModel: getCoreRowModel(),
-		getExpandedRowModel: getExpandedRowModel(),
 		getRowId: originalRow => originalRow.id,
 		getSubRows: (row) => row.subRows
 	});
 	return (
 		<>
-			<Box display="grid" gridTemplateColumns="1fr 1fr 1fr 75px 75px 120px 105px auto" gridTemplateRows="auto">
+			<Stack>
 				{table.getHeaderGroups().map(headerGroup => (
-					<Fragment key={headerGroup.id}>
+					<Row key={headerGroup.id}>
 						{headerGroup.headers.map(header => (
-							<Typography fontWeight="bold" key={header.id} sx={{ gridRow: 1, p: 0.5 }}>
+							<Typography fontWeight="bold" key={header.id} sx={{ p: 0.5 }}>
 								{flexRender(
 									header.column.columnDef.header,
 									header.getContext())
 								}
 							</Typography>
 						))}
-					</Fragment>
+					</Row>
 				))}
-				{table.getRowModel().rows.map((row, rowIndex) => (
-					<Fragment key={row.id}>
-						{row.getVisibleCells().map((cell, index) => (
-							<Box key={cell.id} sx={{ gridRow: 2 + rowIndex, gridColumn: 1 + index, p: 0.5 }}>
-								{flexRender(cell.column.columnDef.cell, cell.getContext())}
-							</Box>
-						))}
-						{!row.parentId &&
-							<Box component="span" sx={{
-								gridRowStart: rowIndex + 2,
-								gridRowEnd: `span ${(row.getIsExpanded() ? row.subRows?.length ?? 0 : 0) + 1}`,
-								gridColumnStart: 1,
-								gridColumnEnd: "span 8",
-								backgroundColor: theme => alternatingIds.includes(row.parentId ?? row.id) ? theme.palette.primary.hover : undefined
-							}} />
-						}
-					</Fragment>
-				))}
-			</Box >
+				<Stack sx={{
+					"& > div:nth-of-type(even)": {
+						backgroundColor: theme => theme.palette.primary.hover
+					}
+				}}>
+					{table.getRowModel().rows.map((row) => (
+						<Row key={row.id}>
+							{row.getVisibleCells().map((cell) => (
+								<Box key={cell.id} sx={{ p: 0.5 }}>
+									{flexRender(cell.column.columnDef.cell, cell.getContext())}
+								</Box>
+							))}
+							{row.getIsExpanded() && row.subRows.flatMap((subRow) => subRow.getVisibleCells().map((cell) => (
+								<Box key={cell.id} sx={{ p: 0.5 }}>
+									{flexRender(cell.column.columnDef.cell, cell.getContext())}
+								</Box>
+							)))}
+						</Row>
+					))}
+				</Stack>
+			</Stack>
 			<ScrollToTop />
 		</>
 	);
+}
+
+function Row({ children }: PropsWithChildren) {
+	return (
+		<Box display="grid" gridTemplateColumns="1fr 1fr 1fr 75px 75px 75px 105px 40px" gridTemplateRows="auto" alignItems="start">
+			{children}
+		</Box>
+	)
 }
 
 
@@ -234,7 +244,7 @@ function TableSearch() {
 			<TextField
 				fullWidth
 				variant="outlined"
-				placeholder={t("Search")}
+				placeholder={t("Search in Event, Field or Value")}
 				onChange={onChange}
 				value={localSearchTerm}
 				slotProps={{
