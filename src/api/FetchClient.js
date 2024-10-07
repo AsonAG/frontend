@@ -10,6 +10,7 @@ const organizationImportUrl = "/tenants/import";
 const organizationUrl = "/tenants/:orgId";
 const payrollsUrl = "/tenants/:orgId/payrolls";
 const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
+const payrollRegulationsUrl = "/tenants/:orgId/payrolls/:payrollId/regulations";
 const divisionsUrl = "/tenants/:orgId/divisions";
 const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
 const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
@@ -224,6 +225,10 @@ export function getPayrolls(routeParams) {
 
 export function getPayroll(routeParams) {
 	return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
+}
+
+export function getRegulations(routeParams) {
+	return new FetchRequestBuilder(payrollRegulationsUrl, routeParams).fetchJson();
 }
 
 export function getDivisions(routeParams) {

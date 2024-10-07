@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "./ContentLayout";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
-import { CategoryLabel } from "./tasks/CategoryLabel";
+import { CategoryLabel } from "./CategoryLabel";
 import {
 	Link as RouterLink,
 	LinkProps as RouterLinkProps,

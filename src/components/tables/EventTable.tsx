@@ -20,12 +20,12 @@ import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { formatCaseValue } from "../../utils/Format";
 import { ScrollToTop } from "../ScrollToTop";
-import { Clear, ExpandLess, ExpandMore, MoreVert } from "@mui/icons-material";
+import { ArrowDropDown, Clear, ExpandLess, ExpandMore, MoreVert } from "@mui/icons-material";
 import { PaginatedContent } from "../PaginatedContent";
 import { useSearchParam } from "../../hooks/useSearchParam";
 import { IdType } from "../../models/IdType";
 import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row } from "@tanstack/react-table";
-import i18next, { TFunction } from "i18next";
+import { TFunction } from "i18next";
 
 
 const columnHelper = createColumnHelper<EventRow>();
@@ -36,37 +36,37 @@ function createColumns(t: TFunction<"translation", undefined>) {
 		columnHelper.accessor("eventName",
 			{
 				cell: name => name.getValue(),
-				header: () => i18next.t("Event")
+				header: () => t("Event")
 			}),
 		columnHelper.accessor("eventFieldName",
 			{
 				cell: name => name.getValue(),
-				header: () => i18next.t("Field")
+				header: () => t("Field")
 			}),
 		columnHelper.accessor("value",
 			{
 				cell: value => value.getValue(),
-				header: () => i18next.t("Value")
+				header: () => t("Value")
 			}),
 		columnHelper.accessor("start",
 			{
 				cell: start => formatDate(start.getValue()),
-				header: i18next.t("Start")
+				header: t("Start")
 			}),
 		columnHelper.accessor("end",
 			{
 				cell: end => formatDate(end.getValue()),
-				header: i18next.t("End")
+				header: t("End")
 			}),
 		columnHelper.accessor("created",
 			{
 				cell: created => <span title={formatDate(created.getValue(), true)}>{formatDate(created.getValue())}</span>,
-				header: i18next.t("Created")
+				header: () => <span title={t("Newest events first")}>{t("Created")}<ArrowDropDown fontSize="16px" /></span>
 			}),
 		columnHelper.accessor("type",
 			{
 				cell: attr => attr.getValue(),
-				header: i18next.t("Category")
+				header: t("Category")
 			}),
 		{
 			id: "expandToggle",

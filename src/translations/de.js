@@ -32,6 +32,8 @@ const translations = {
 		"Name (event field name)": "Name (Ereignisfeldname)",
 		Search: "Suchen",
 		"Search in Event, Field or Value": "Suchen in Ereignis, Feld oder Wert",
+		"Search in Field or Value": "Suchen in Feld oder Wert",
+		"Newest events first": "Neueste Ereignisse zuerst",
 		"Clear search": "Suche zurücksetzen",
 		"No data": "Keine Daten",
 		"Preview not available.": "Vorschau nicht verfügbar.",

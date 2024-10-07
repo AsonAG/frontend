@@ -1,6 +1,12 @@
-import { Chip, Typography, useTheme } from "@mui/material";
+import { Chip, SxProps, Theme, Typography, useTheme } from "@mui/material";
+import React from "react";
 
-export function CategoryLabel({ label, sx }) {
+type CategoryLabelProps = {
+	label: string,
+	sx?: SxProps<Theme> | undefined
+}
+
+export function CategoryLabel({ label, sx }: CategoryLabelProps) {
 	if (!label) return;
 	const theme = useTheme();
 	const labelComponent = (
