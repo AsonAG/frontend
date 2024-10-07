@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { formatCaseValue } from "../../utils/Format";
-import { Clear, History } from "@mui/icons-material";
+import { ArrowDropUp, Clear, History } from "@mui/icons-material";
 import { useSearchParam } from "../../hooks/useSearchParam";
 import { IdType } from "../../models/IdType";
 import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row, getSortedRowModel, getFilteredRowModel, Column, Table } from "@tanstack/react-table";
@@ -26,7 +26,7 @@ function createColumns(t: TFunction<"translation", undefined>) {
     columnHelper.accessor("displayCaseFieldName",
       {
         cell: name => name.getValue(),
-        header: () => t("Field")
+        header: () => <span>{t("Field")}<ArrowDropUp fontSize="16px" /></span>
       }),
     columnHelper.accessor("value",
       {
