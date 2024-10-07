@@ -4,7 +4,7 @@ import {
   Link as RouterLink,
   LinkProps as RouterLinkProps,
 } from "react-router-dom";
-import { CategoryLabel } from "./tasks/CategoryLabel";
+import { CategoryLabel } from "./CategoryLabel";
 
 export function CaseTask({ objectId, type, _case }) {
   const subPath = type === "C" ? "company" : `employees/${objectId}`;

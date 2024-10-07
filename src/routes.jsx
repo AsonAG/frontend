@@ -58,7 +58,8 @@ import {
 	getCaseValues,
 	getPayrollResult,
 	getWageTypes,
-	getCurrentValues
+	getCurrentValues,
+	getRegulations
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -101,6 +102,7 @@ import { OrganizationSettings } from "./organization/Settings";
 import { EventTabbedView } from "./components/EventTabbedView";
 import { getEmployeeDisplayString } from "./models/Employee";
 import { DataTable } from "./components/tables/DataTable";
+import i18next from "i18next";
 
 const store = getDefaultStore();
 
@@ -213,14 +215,27 @@ function createRouteDataTable(path) {
 		loader: async ({ params, request }) => {
 			const historyFieldName = getQueryParam(request, "h");
 			const historyPromise = !!historyFieldName ? getCaseValues({ ...params, caseFieldName: historyFieldName }) : Promise.resolve([]);
-			const [values, history] = await Promise.all([getCurrentValues(params), historyPromise]);
-			if (historyFieldName) {
-				const caseValue = values.find(v => v.caseFieldName === historyFieldName);
-				if (caseValue) {
-					caseValue.history = history;
+			const [values, history, regulations] = await Promise.all(
+				[
+					getCurrentValues(params),
+					historyPromise,
+					getRegulations(params)
+				]);
+			const tags = regulations.flatMap(r => r.attributes?.availableTagFilters).filter(Boolean);
+			try {
+				for (let tag of tags) {
+					if (!tag.tagLocalizations)
+						continue;
+					for (const [key, value] of Object.entries(tag.tagLocalizations)) {
+						i18next.addResource(key, "translation", tag.tag, value);
+					}
 				}
-			}
-			return values;
+			} catch { }
+			return {
+				values,
+				history,
+				tags
+			};
 		}
 	};
 }

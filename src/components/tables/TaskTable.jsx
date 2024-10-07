@@ -20,7 +20,7 @@ import { ContentLayout } from "../ContentLayout";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { Person, Schedule } from "@mui/icons-material";
-import { CategoryLabel } from "../tasks/CategoryLabel";
+import { CategoryLabel } from "../CategoryLabel";
 import { TaskTableFilter } from "../tasks/TaskTableFilter";
 import { TableButton } from "../buttons/TableButton";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";

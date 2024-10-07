@@ -7,7 +7,7 @@ import { Loading } from "./Loading";
 import { useTranslation } from "react-i18next";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { formatDate } from "../utils/DateUtils";
-import { CategoryLabel } from "./tasks/CategoryLabel";
+import { CategoryLabel } from "./CategoryLabel";
 import { getEmployeeDisplayString } from "../models/Employee";
 
 export function AsyncTaskView() {
