@@ -13,13 +13,20 @@ import { useCaseData } from "../../hooks/useCaseData.js";
 import { Loading } from "../../components/Loading";
 import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
 import { ErrorView } from "../../components/ErrorView";
-import { ContentLayout, PageContent } from "../../components/ContentLayout";
+import { PageContent } from "../../components/ContentLayout";
 import { toast } from "../../utils/dataAtoms";
 import { CaseFieldDetails } from "../../components/CaseFieldDetails";
 
 export const CaseFormContext = createContext();
 
+
 export function Component() {
+	const params = useParams();
+	const key = `${params.tenantId}-${params.payrollId}-${params.employeeId}-${params.caseName}`;
+	return <CaseForm key={key} />
+}
+
+function CaseForm() {
 	const navigate = useNavigate();
 	const { user, payroll } = useRouteLoaderData("root");
 	const loaderData = useLoaderData();

@@ -30,7 +30,7 @@ export function useCaseData(params, user, payroll) {
 			setLoading(false);
 		};
 		loadData();
-	}, [params?.caseName]);
+	}, []);
 
 	function getCaseChangeSetup() {
 		if (!caseData) {
