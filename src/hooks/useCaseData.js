@@ -23,6 +23,9 @@ export function useCaseData(params, user, payroll) {
 	const [caseErrors, setCaseErrors] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [fatalError, setFatalError] = useState(null);
+	const [startDate, setStartDate] = useState(null);
+	const [endDate, setEndDate] = useState(null);
+
 
 	useEffect(() => {
 		const loadData = async () => {
@@ -40,6 +43,8 @@ export function useCaseData(params, user, payroll) {
 			userId: user.id,
 			divisionId: payroll.divisionId,
 			case: mapCase(caseData, attachments),
+			start: startDate?.toISOString(),
+			end: endDate?.toISOString()
 		};
 		if (params.employeeId) {
 			caseChangeSetup.employeeId = params.employeeId;
@@ -90,6 +95,10 @@ export function useCaseData(params, user, payroll) {
 		fatalError,
 		attachments,
 		loading,
+		startDate,
+		setStartDate,
+		endDate,
+		setEndDate,
 		buildCase: _buildCase,
 		addCase: _addCase,
 	};

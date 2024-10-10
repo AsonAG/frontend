@@ -37,7 +37,7 @@ const translations = {
 		"Clear search": "Suche zurücksetzen",
 		"No data": "Keine Daten",
 		"Preview not available.": "Vorschau nicht verfügbar.",
-		"valid from": "Gültig ab",
+		"Valid from": "Gültig ab",
 		until: "bis",
 		Yes: "Ja",
 		No: "Nein",

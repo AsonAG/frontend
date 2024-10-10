@@ -12,7 +12,7 @@ const iconProps = {
 	},
 };
 
-function CaseFormButtons({ backPath, onSubmit }) {
+export function CaseFormButtons({ backPath, onSubmit }) {
 	const navigation = useNavigation();
 	const isSubmitting =
 		navigation.state === "submitting" && navigation.json?.intent === "addCase";
@@ -29,7 +29,7 @@ function CaseFormButtons({ backPath, onSubmit }) {
 	const { t } = useTranslation();
 
 	return (
-		<Stack direction="row" spacing={2} alignSelf="flex-end">
+		<Stack direction="row" spacing={2}>
 			<Button disableRipple LinkComponent={Link} to={backPath} relative="path">
 				<Typography>{t("Cancel")}</Typography>
 			</Button>
@@ -49,5 +49,3 @@ function CaseFormButtons({ backPath, onSubmit }) {
 		</Stack>
 	);
 }
-
-export { CaseFormButtons };

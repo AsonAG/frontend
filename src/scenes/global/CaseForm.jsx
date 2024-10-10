@@ -16,6 +16,8 @@ import { ErrorView } from "../../components/ErrorView";
 import { PageContent } from "../../components/ContentLayout";
 import { toast } from "../../utils/dataAtoms";
 import { CaseFieldDetails } from "../../components/CaseFieldDetails";
+import { DatePicker } from "../../components/DatePicker";
+import { useTranslation } from "react-i18next";
 
 export const CaseFormContext = createContext();
 
@@ -40,6 +42,10 @@ function CaseForm() {
 		attachments,
 		loading,
 		buildCase,
+		startDate,
+		setStartDate,
+		endDate,
+		setEndDate,
 		addCase,
 	} = useCaseData(params, user, payroll);
 	const formRef = useRef();
@@ -53,6 +59,7 @@ function CaseForm() {
 		}
 	};
 
+	const renderFieldPeriods = caseData?.periodInputMode === "Individual";
 	let content = null;
 	if (fatalError) {
 		content = <ErrorView error={fatalError} />;
@@ -60,12 +67,16 @@ function CaseForm() {
 		content = <Loading />;
 	} else {
 		content = (
-			<CaseFormContext.Provider value={{ buildCase, attachments, setCaseFieldDetails }}>
+			<CaseFormContext.Provider value={{ buildCase, attachments, setCaseFieldDetails, renderFieldPeriods }}>
 				<Form method="post" ref={formRef} id="case_form" autoComplete="off">
 					<Stack alignItems="stretch" spacing={4}>
 						{caseData && <CaseComponent _case={caseData} />}
 						<CaseErrorComponent errors={caseErrors} />
-						<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} />
+						{/* row-reverse, wrap reverse to make the items stick to the right side when wrapped*/}
+						<Stack direction="row-reverse" spacing={2} alignSelf="end" alignItems="end" flexWrap="wrap-reverse">
+							<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} />
+							<PeriodPicker inputMode={caseData.periodInputMode} startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
+						</Stack >
 						{caseFieldDetails && <CaseFieldDetails caseField={caseFieldDetails} onClose={() => setCaseFieldDetails(null)} />}
 					</Stack>
 				</Form>
@@ -78,4 +89,39 @@ function CaseForm() {
 			{content}
 		</PageContent>
 	);
+}
+
+function PeriodPicker({ inputMode, startDate, setStartDate, endDate, setEndDate }) {
+	const { t } = useTranslation();
+	if (inputMode === "Individual") {
+		return;
+	}
+	const startPicker = (
+		<DatePicker
+			label={t("Valid from")}
+			value={startDate}
+			required
+			onChange={setStartDate}
+			name="case_change_valid_from"
+		/>
+	);
+	let endPicker = undefined;
+	if (inputMode === "StartAndEnd") {
+		endPicker = (
+			<DatePicker
+				label={t("until")}
+				value={endDate}
+				required
+				onChange={setEndDate}
+				name="case_change_valid_until"
+			/>
+		)
+	}
+	return (
+		<Stack direction="row" spacing={2}>
+			{startPicker}
+			{endPicker}
+		</Stack>
+	)
+
 }
