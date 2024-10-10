@@ -178,6 +178,15 @@ const translations = {
 		Processing: "In Verarbeitung",
 
 
+		// Payruns
+		"Current period": "Aktuelle Periode",
+		"Gross": "Brutto",
+		"Net": "Netto",
+		"Paid": "Bezahlt",
+		"Open": "Offen",
+		"Payout": "auszahlen",
+		"Payslip": "Lohnabrechnung",
+
 		// Command
 		"Select event": "Ereignis auswählen",
 		"Select event context": "Kontext für Ereignis auswählen",

@@ -56,6 +56,8 @@ import {
 	deleteOrganization,
 	getDivisions,
 	getCaseValues,
+	getPayrollResult,
+	getWageTypes,
 	getCurrentValues,
 	getRegulations
 } from "./api/FetchClient";
@@ -80,6 +82,7 @@ import {
 	missingDataMapAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
+import { PayrunDashboard } from "./payrun/Dashboard";
 import { AsyncPayrunView } from "./components/payrun/PayrunView";
 import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
 import { ComplianceView } from "./components/compliance/ComplianceView";
@@ -143,7 +146,12 @@ function paginatedLoader({
 }
 
 function createRouteCaseForm(path, data) {
-	const loader = data ? () => data : undefined;
+	let loader = undefined;
+	if (data instanceof Function) {
+		loader = data;
+	} else if (!!data) {
+		loader = () => data;
+	}
 	return {
 		path,
 		loader,
@@ -605,7 +613,7 @@ const routeData = [
 				},
 			},
 			{
-				path: "hr/controlling",
+				path: "hr/missingdata",
 				Component: MissingDataView,
 				loader: () => {
 					// refresh missing data
@@ -613,12 +621,12 @@ const routeData = [
 
 					return defer({
 						data: store.get(missingDataMapAtom),
-						title: "Controlling",
+						title: "Missing data",
 					});
 				}
 			},
 			{
-				path: "hr/controlling/employee/:employeeId",
+				path: "hr/missingdata/employees/:employeeId",
 				Component: ContentLayout,
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
@@ -633,7 +641,7 @@ const routeData = [
 				],
 			},
 			{
-				path: "hr/controlling/company",
+				path: "hr/missingdata/company",
 				Component: ContentLayout,
 				loader: () => ({
 					title: "Company"
@@ -646,6 +654,72 @@ const routeData = [
 			},
 			{
 				path: "hr/payruns",
+				Component: PayrunDashboard,
+				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathName !== nextUrl.pathName,
+				loader: async ({ params }) => {
+					const employees = await getEmployees(params)
+						.withActive()
+						.withQueryParam("orderBy", `lastName asc`)
+						.fetchJson();
+					const wageTypes = await Promise.all(employees.map(async e => {
+						const result = await getPayrollResult(params, "2024-07", e.id)
+						if (result) {
+							return await getWageTypes(params, result.id);
+						}
+						else {
+							return null;
+						}
+					}));
+					const payrollControllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
+					const documentCaseValues = await Promise.all(employees.map(async e => {
+						const response = await getDocumentsOfCaseField({ ...params, employeeId: e.id }, "CH.Swissdec.EmployeeDocumentPayslip", 1);
+						if (response.count > 0)
+							return response.items[0];
+						return null;
+					}));
+					for (let i = 0; i < employees.length; i++) {
+						const employee = employees[i];
+						employee.wageTypes = wageTypes[i];
+						employee.controllingTasks = payrollControllingTasks[i];
+						const caseValue = documentCaseValues[i];
+						if (caseValue) {
+							employee.documentUrl = `employees/${employee.id}/v/${caseValue.id}/i/${caseValue.documents[0].id}`;
+						}
+					}
+					return { employees };
+				},
+				children: [
+					{
+						path: "employees/:employeeId/v/:caseValueId/i/:documentId",
+						Component: CaseValueDocumentDialog,
+						loader: ({ params }) => {
+							return defer({
+								document: getDocument(params),
+							});
+						}
+					}
+				]
+			},
+			{
+				path: "hr/payruns/employees/:employeeId",
+				Component: ContentLayout,
+				loader: async ({ params }) => {
+					const employee = await getEmployee(params);
+					return {
+						title: getEmployeeDisplayString(employee)
+					}
+				},
+				children: [
+					createRouteCaseForm(":caseName", ({ params }) => {
+						const { employeeId } = params;
+						return {
+							redirect: `../../../?e=${employeeId}`
+						};
+					})
+				]
+			},
+			{
+				path: "hr/payruns_old",
 				Component: AsyncPayrunView,
 				loader: paginatedLoader({
 					pageCount: 15,

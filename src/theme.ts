@@ -230,7 +230,7 @@ export function useDarkMode() {
 function getHashCode(s: string) {
   let hash = 0;
   for (let i = 0; i < s.length; i += 1) {
-    hash = s.charCodeAt(i) + ((hash << 5) - hash);
+    hash = s.charCodeAt(i) * 14 + ((hash << 5) - hash);
   }
   return hash;
 }

@@ -34,6 +34,10 @@ const payrunParametersUrl = "/tenants/:orgId/payruns/:payrunId/parameters";
 const payrunJobsUrl = "/tenants/:orgId/payruns/jobs";
 const payrunJobStatusUrl =
 	"/tenants/:orgId/payruns/jobs/:payrunJobId/status";
+const payrollResultsUrl =
+	"/tenants/:orgId/payrollresults";
+const wageTypesUrl =
+	"/tenants/:orgId/payrollresults/:payrollResultId/wagetypes";
 const complianceUrl = "/tenants/:orgId/payrolls/:payrollId/compliance";
 const complianceSettingsUrl =
 	"/tenants/:orgId/payrolls/:payrollId/compliance/settings";
@@ -75,6 +79,7 @@ class FetchRequestBuilder {
 	routeParams = {};
 	addUserQueryParam = false;
 	addPayrollDivision = false;
+	ignoreErrors = false;
 
 	constructor(url, routeParams) {
 		if (!url) {
@@ -157,6 +162,11 @@ class FetchRequestBuilder {
 		return this;
 	}
 
+	withIgnoreErrors() {
+		this.ignoreErrors = true;
+		return this;
+	}
+
 	withPagination(page, pageCount) {
 		return this.withQueryParam("top", pageCount)
 			.withQueryParam("skip", page * pageCount)
@@ -192,7 +202,11 @@ class FetchRequestBuilder {
 	}
 
 	async fetchJson() {
-		return (await this.fetch()).json();
+		const response = await this.fetch();
+		if (this.ignoreErrors && !response.ok) {
+			return null;
+		}
+		return response.json();
 	}
 
 	async fetchSingle() {
@@ -284,6 +298,7 @@ export function getEmployeeCases(routeParams, clusterSetName, signal) {
 		.withSignal(signal)
 		.withLocalization()
 		.withUser()
+		.withIgnoreErrors()
 		.fetchJson();
 }
 
@@ -530,6 +545,19 @@ export function deleteDocument(routeParams) {
 	return new FetchRequestBuilder(url, routeParams)
 		.withMethod("DELETE")
 		.fetch();
+}
+
+export function getPayrollResult(routeParams, period, employeeId) {
+	return new FetchRequestBuilder(payrollResultsUrl, routeParams)
+		.withQueryParam("filter", `PayrollId eq '${routeParams.payrollId}' and EmployeeId eq '${employeeId}' and PeriodName eq '${period}'`)
+		.withQueryParam("orderBy", "created desc")
+		.withQueryParam("top", 1)
+		.fetchSingle();
+}
+
+export function getWageTypes(routeParams, payrollResultId) {
+	return new FetchRequestBuilder(wageTypesUrl, { ...routeParams, payrollResultId })
+		.fetchJson();
 }
 
 export function getCompliance(routeParams) {

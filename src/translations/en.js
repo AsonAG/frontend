@@ -17,6 +17,8 @@ const translations = {
 		"PayrunJobStatus.Forecast": "Forecast",
 		"PayrunJobStatus.Abort": "Aborted",
 		"PayrunJobStatus.Cancel": "Cancelled",
+
+		payout_sum: "Payout {{amount}}"
 	},
 };
 

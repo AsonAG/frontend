@@ -5,7 +5,7 @@ import { formatDate } from "../utils/DateUtils";
 import { useTranslation } from "react-i18next";
 import { IdType } from "../models/IdType";
 import { formatCaseValue } from "../utils/Format";
-import { ContentLayout } from "./ContentLayout";
+import { Sidebar } from "./Sidebar";
 import { HtmlContent } from "./HtmlContent";
 import { Loading } from "./Loading";
 import { useIncrementallyLoadedData } from "../hooks/useIncrementallyLoadedData";
@@ -28,11 +28,9 @@ function DetailsContainer({ title, closeButton, children }) {
   const useFullScreen = useMediaQuery<Theme>(theme => theme.breakpoints.down("sm"));
   if (useSidebar) {
     return (
-      <Portal container={document.getElementById("sidebar-container")}>
-        <ContentLayout title={title} buttons={closeButton}>
-          {children}
-        </ContentLayout>
-      </Portal>
+      <Sidebar title={title} closeButton={closeButton}>
+        {children}
+      </Sidebar>
     )
   }
   return (

@@ -21,7 +21,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import SettingsIcon from '@mui/icons-material/Settings';
 import BusinessIcon from '@mui/icons-material/Business';
-import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import NotificationImportantIcon from '@mui/icons-material/NotificationImportant';
 import PaymentsIcon from '@mui/icons-material/Payments';
 
 import Logo from "../../components/Logo";
@@ -80,7 +80,7 @@ function OpenTasksBadgeIcon() {
 }
 
 function ControllingBadgeIcon() {
-	const icon = <TaskAltIcon />;
+	const icon = <NotificationImportantIcon />;
 	const count = (data) =>
 		data.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0);
 	return (
@@ -162,12 +162,12 @@ function MenuItemsPayrollAdmin() {
 				icon={<PeopleOutlinedIcon />}
 			/>
 			<NavigationItem
-				label={t("Controlling")}
-				to="hr/controlling"
+				label={t("Missing data")}
+				to="hr/missingdata"
 				icon={<ControllingBadgeIcon />}
 			/>
 			<NavigationItem
-				label={t("Payruns")}
+				label={t("Payroll")}
 				to="hr/payruns"
 				icon={<PaymentsIcon />}
 			/>

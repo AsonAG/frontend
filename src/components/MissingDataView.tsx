@@ -1,40 +1,23 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { } from "react";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "./ContentLayout";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
-import { CategoryLabel } from "./CategoryLabel";
 import {
-	Link as RouterLink,
-	LinkProps as RouterLinkProps,
 	useAsyncValue
 } from "react-router-dom";
-import { Paper, Stack, Theme, Typography, styled } from "@mui/material";
-import { Employee, getEmployeeDisplayString } from "../models/Employee";
+import { Paper, Stack, Typography } from "@mui/material";
+import { getEmployeeDisplayString } from "../models/Employee";
 import { MissingData, MissingDataCase } from "../models/MissingData";
 import { useAtomValue } from "jotai";
+import { CaseTask } from "./CaseTask";
 import { payrollAtom } from "../utils/dataAtoms";
 import { IdType } from "../models/IdType";
 import { Payroll } from "../models/Payroll";
 
-const Link = styled(
-	forwardRef<any, RouterLinkProps>((itemProps, ref) => {
-		return <RouterLink ref={ref} {...itemProps} role={undefined} />;
-	}),
-)<RouterLinkProps>(({ theme }: { theme: Theme }) => {
-	return {
-		textDecoration: "none",
-		color: theme.palette.text.primary,
-		"&:hover": {
-			color: theme.palette.primary.main,
-			backgroundColor: theme.palette.primary.hover,
-		},
-	};
-});
-
 export function MissingDataView() {
 	const { t } = useTranslation();
 	return (
-		<ContentLayout title={t("Controlling")}>
+		<ContentLayout title={t("Missing data")}>
 			<AsyncDataRoute>
 				<EmployeeTable />
 			</AsyncDataRoute>
@@ -71,7 +54,7 @@ function CompanySection({ title, data }) {
 			<Paper variant="outlined">
 				<Stack>
 					{data.cases.map((c: MissingDataCase) => (
-						<CaseTask key={c.id} objectId={data.id} _case={c} type="CCT" />
+						<CaseTask key={c.id} objectId={data.id} _case={c} type="C" />
 					))}
 				</Stack>
 			</Paper>
@@ -94,30 +77,13 @@ function EmployeeSection({ data }) {
 			<Paper variant="outlined">
 				<Stack>
 					{ect.map((c: MissingDataCase) => (
-						<CaseTask key={c.id} objectId={data.id} _case={c} type="ECT" />
+						<CaseTask key={c.id} objectId={data.id} _case={c} type="E" />
 					))}
 					{hrct.map((c: MissingDataCase) => (
-						<CaseTask key={c.id} objectId={data.id} _case={c} type="HRCT" />
+						<CaseTask key={c.id} objectId={data.id} _case={c} type="HR" />
 					))}
 				</Stack>
 			</Paper>
 		</Stack>
-	);
-}
-
-function CaseTask({ objectId, type, _case }) {
-	const subPath = type === "CCT" ? "company" : `employee/${objectId}`;
-	return (
-		<Link to={`${subPath}/${encodeURIComponent(_case.name)}`}>
-			<Stack spacing={1} flex={1} direction="row" p={1}>
-				<CategoryLabel
-					label={type}
-					sx={{ height: 21, alignSelf: "center", flex: "0 0 60px" }}
-				/>
-				<Typography>
-					{_case.displayName}
-				</Typography>
-			</Stack>
-		</Link>
 	);
 }
