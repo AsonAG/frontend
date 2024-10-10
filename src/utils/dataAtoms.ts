@@ -15,7 +15,7 @@ import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
 import { IdType } from "../models/IdType";
 import { MissingData } from "../models/MissingData";
-import { atomWithRefresh } from "jotai/utils";
+import { atomWithRefresh, atomWithStorage } from "jotai/utils";
 
 export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
@@ -153,3 +153,5 @@ export const userInformationAtom = atom((async get => {
 	}
 	return null;
 }));
+
+export const payrollDashboardFeatureAtom = atomWithStorage<boolean>("feature.payrolldashboard", false, undefined, { getOnInit: true });

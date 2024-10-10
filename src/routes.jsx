@@ -653,7 +653,7 @@ const routeData = [
 				],
 			},
 			{
-				path: "hr/payruns",
+				path: "hr/dashboard",
 				Component: PayrunDashboard,
 				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathName !== nextUrl.pathName,
 				loader: async ({ params }) => {
@@ -701,7 +701,7 @@ const routeData = [
 				]
 			},
 			{
-				path: "hr/payruns/employees/:employeeId",
+				path: "hr/dashboard/employees/:employeeId",
 				Component: ContentLayout,
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
@@ -719,7 +719,7 @@ const routeData = [
 				]
 			},
 			{
-				path: "hr/payruns_old",
+				path: "hr/payruns",
 				Component: AsyncPayrunView,
 				loader: paginatedLoader({
 					pageCount: 15,

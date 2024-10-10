@@ -28,7 +28,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { missingDataTasksAtom, openTasksAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
+import { missingDataTasksAtom, openTasksAtom, payrollDashboardFeatureAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
@@ -166,11 +166,7 @@ function MenuItemsPayrollAdmin() {
 				to="hr/missingdata"
 				icon={<ControllingBadgeIcon />}
 			/>
-			<NavigationItem
-				label={t("Payroll")}
-				to="hr/payruns"
-				icon={<PaymentsIcon />}
-			/>
+			<PayrunMenu />
 			<NavigationItem
 				label={t("Reports")}
 				to="hr/reports"
@@ -183,6 +179,15 @@ function MenuItemsPayrollAdmin() {
 			/>
 		</NavigationGroup>
 	)
+}
+
+function PayrunMenu() {
+	const { t } = useTranslation();
+	const useDashboard = useAtomValue(payrollDashboardFeatureAtom);
+	console.log("useDashboard", useDashboard);
+	const label = useDashboard ? "Payroll" : "Payruns";
+	const to = useDashboard ? "hr/dashboard" : "hr/payruns";
+	return <NavigationItem label={t(label)} to={to} icon={<PaymentsIcon />} />
 }
 
 function MenuItemsPayrollEmployee({ employee }) {
