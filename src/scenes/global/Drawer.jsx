@@ -23,12 +23,13 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import BusinessIcon from '@mui/icons-material/Business';
 import NotificationImportantIcon from '@mui/icons-material/NotificationImportant';
 import PaymentsIcon from '@mui/icons-material/Payments';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { missingDataTasksAtom, openTasksAtom, payrollDashboardFeatureAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
+import { missingDataAppearanceAtom, missingDataTasksAtom, openTasksAtom, payrollDashboardFeatureAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
@@ -79,8 +80,7 @@ function OpenTasksBadgeIcon() {
 	);
 }
 
-function ControllingBadgeIcon() {
-	const icon = <NotificationImportantIcon />;
+function ControllingBadgeIcon({ icon }) {
 	const count = (data) =>
 		data.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0);
 	return (
@@ -161,11 +161,7 @@ function MenuItemsPayrollAdmin() {
 				to="hr/employees"
 				icon={<PeopleOutlinedIcon />}
 			/>
-			<NavigationItem
-				label={t("Missing data")}
-				to="hr/missingdata"
-				icon={<ControllingBadgeIcon />}
-			/>
+			<MissingDataMenu />
 			<PayrunMenu />
 			<NavigationItem
 				label={t("Reports")}
@@ -181,10 +177,17 @@ function MenuItemsPayrollAdmin() {
 	)
 }
 
+function MissingDataMenu() {
+	const { t } = useTranslation();
+	const { label, iconIndex } = useAtomValue(missingDataAppearanceAtom);
+	const icon = iconIndex === 0 ? <NotificationImportantIcon /> : <TaskAltIcon />
+	return <NavigationItem label={t(label)} to="hr/missingdata" icon={<ControllingBadgeIcon icon={icon} />} />
+
+}
+
 function PayrunMenu() {
 	const { t } = useTranslation();
 	const useDashboard = useAtomValue(payrollDashboardFeatureAtom);
-	console.log("useDashboard", useDashboard);
 	const label = useDashboard ? "Payroll" : "Payruns";
 	const to = useDashboard ? "hr/dashboard" : "hr/payruns";
 	return <NavigationItem label={t(label)} to={to} icon={<PaymentsIcon />} />

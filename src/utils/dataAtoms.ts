@@ -155,3 +155,17 @@ export const userInformationAtom = atom((async get => {
 }));
 
 export const payrollDashboardFeatureAtom = atomWithStorage<boolean>("feature.payrolldashboard", false, undefined, { getOnInit: true });
+
+export const missingDataAppearanceAtom = atom(get => {
+	const useDashboard = get(payrollDashboardFeatureAtom);
+	if (useDashboard) {
+		return {
+			label: "Missing data",
+			icon: 0
+		};
+	}
+	return {
+		label: "Controlling",
+		icon: 1
+	};
+})

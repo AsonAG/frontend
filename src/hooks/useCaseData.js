@@ -98,6 +98,8 @@ export function useCaseData(params, user, payroll) {
 		startDate,
 		endDate,
 		setStartDate: (updatedStartDate) => {
+			// setStartDate does not immediately update startDate..
+			// so we need to update the value and trigger the rerender
 			startDate = updatedStartDate;
 			setStartDate(updatedStartDate);
 			_buildCase();
