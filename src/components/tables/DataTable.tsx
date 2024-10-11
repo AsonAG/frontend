@@ -123,10 +123,10 @@ export function DataTable() {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    filterFromLeafRows: true, // filter and search through sub-rows
     getSubRows: row => row.caseFieldName === historyName ? history : [],
     getRowId: originalRow => originalRow.id,
     getRowCanExpand: (_) => true,
+    maxLeafRowFilterDepth: 0, // only filter root level parent rows out
     globalFilterFn: "includesString"
   });
   return <>
