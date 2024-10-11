@@ -254,7 +254,7 @@ function EmployeeRow({ employee, showStatus }) {
 	const { variant, showButtons } = useContext(TableContext);
 	return (
 		<Stack direction="row" alignItems="center" sx={sx} mx={-0.5} px={0.5}>
-			<Link to={employee.id + "/data"}>
+			<Link to={employee.id}>
 				<Stack direction="row" spacing={1} flexWrap="wrap">
 					<Typography>
 						{employee.firstName} {employee.lastName}

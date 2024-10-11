@@ -23,6 +23,7 @@ export function useCaseData(params, user, payroll) {
 	const [caseErrors, setCaseErrors] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [fatalError, setFatalError] = useState(null);
+	const [submitting, setSubmitting] = useState(false);
 	let [startDate, setStartDate] = useState(null);
 	let [endDate, setEndDate] = useState(null);
 
@@ -79,13 +80,16 @@ export function useCaseData(params, user, payroll) {
 	}
 
 	async function _addCase(onCaseAdded) {
-		const caseResponse = await addCase(params, getCaseChangeSetup());
-		if (caseResponse.ok) {
-			const newCase = await caseResponse.json();
-			onCaseAdded(newCase);
-			return;
-		} else {
-			handleError(caseResponse);
+		setSubmitting(true);
+		try {
+			const caseResponse = await addCase(params, getCaseChangeSetup());
+			if (caseResponse.ok) {
+				onCaseAdded();
+			} else {
+				handleError(caseResponse);
+			}
+		} finally {
+			setSubmitting(false);
 		}
 	}
 
@@ -95,6 +99,7 @@ export function useCaseData(params, user, payroll) {
 		fatalError,
 		attachments,
 		loading,
+		submitting,
 		startDate,
 		endDate,
 		setStartDate: (updatedStartDate) => {

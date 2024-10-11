@@ -28,7 +28,7 @@ export function EventTabbedView({ title, showMissingData }: { title: ReactNode, 
   const missingDataCount = missingData?.cases?.length ?? 0;
 
   if (!outlet) {
-    let to = "events";
+    let to = "data";
     if (showMissingData && missingDataCount > 0) {
       to = "missingdata"
     }

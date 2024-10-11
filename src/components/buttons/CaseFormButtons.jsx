@@ -2,8 +2,8 @@ import SendIcon from "@mui/icons-material/Send";
 import { CircularProgress, Stack } from "@mui/material";
 import { Button, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useNavigation } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useNavigation } from "react-router-dom";
 
 const iconProps = {
 	size: "1em",
@@ -12,16 +12,12 @@ const iconProps = {
 	},
 };
 
-export function CaseFormButtons({ backPath, onSubmit }) {
+export function CaseFormButtons({ backPath, onSubmit, submitting }) {
 	const navigation = useNavigation();
-	const isSubmitting =
-		navigation.state === "submitting" && navigation.json?.intent === "addCase";
-	const isRedirecting =
-		navigation.state === "loading" &&
-		navigation.json &&
-		navigation.formAction !== navigation.location.pathname;
-	const isProcessing = isSubmitting || isRedirecting;
-	const icon = isProcessing ? (
+	const redirecting = navigation.state === "loading" && navigation.location.state === "case_added";
+	const processing = submitting || redirecting;
+	console.log("processing", processing);
+	const icon = processing ? (
 		<CircularProgress {...iconProps} />
 	) : (
 		<SendIcon {...iconProps} />
@@ -34,7 +30,7 @@ export function CaseFormButtons({ backPath, onSubmit }) {
 				<Typography>{t("Cancel")}</Typography>
 			</Button>
 			<Button
-				disabled={isProcessing}
+				disabled={processing}
 				disableRipple
 				variant="contained"
 				color="primary"

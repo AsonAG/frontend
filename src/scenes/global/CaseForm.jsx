@@ -33,7 +33,7 @@ function CaseForm() {
 	const { user, payroll } = useRouteLoaderData("root");
 	const loaderData = useLoaderData();
 	const [caseFieldDetails, setCaseFieldDetails] = useState(null);
-	const redirectPath = loaderData?.redirect || "../..";
+	const redirectPath = (loaderData?.redirect || "../..") + "/events";
 	const params = useParams();
 	const {
 		caseData,
@@ -41,6 +41,7 @@ function CaseForm() {
 		fatalError,
 		attachments,
 		loading,
+		submitting,
 		buildCase,
 		startDate,
 		setStartDate,
@@ -50,12 +51,12 @@ function CaseForm() {
 	} = useCaseData(params, user, payroll);
 	const formRef = useRef();
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (formRef?.current?.reportValidity()) {
 			addCase(() => {
 				toast("success", "Saved!");
-				navigate(redirectPath, { relative: "path" });
-			});
+				navigate(redirectPath, { relative: "path", state: "case_added" });
+			})
 		}
 	};
 
@@ -74,7 +75,7 @@ function CaseForm() {
 						<CaseErrorComponent errors={caseErrors} />
 						{/* row-reverse, wrap reverse to make the items stick to the right side when wrapped*/}
 						<Stack direction="row-reverse" spacing={2} alignSelf="end" alignItems="end" flexWrap="wrap-reverse">
-							<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} />
+							<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} submitting={submitting} />
 							<PeriodPicker inputMode={caseData.periodInputMode} startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
 						</Stack >
 						{caseFieldDetails && <CaseFieldDetails caseField={caseFieldDetails} onClose={() => setCaseFieldDetails(null)} />}
