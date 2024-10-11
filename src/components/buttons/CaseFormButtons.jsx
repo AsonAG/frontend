@@ -16,7 +16,6 @@ export function CaseFormButtons({ backPath, onSubmit, submitting }) {
 	const navigation = useNavigation();
 	const redirecting = navigation.state === "loading" && navigation.location.state === "case_added";
 	const processing = submitting || redirecting;
-	console.log("processing", processing);
 	const icon = processing ? (
 		<CircularProgress {...iconProps} />
 	) : (
