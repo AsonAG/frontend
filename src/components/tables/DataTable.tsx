@@ -103,6 +103,7 @@ export function DataTable() {
   const { values, history } = useLoaderData() as LoaderData;
   const [historyName, setHistoryName] = useSearchParam("h", { replace: true });
   const columns = useMemo(() => createColumns(t), []);
+  const providedTags = useMemo(() => [...new Set(values.flatMap(v => v.tags))], [values]);
   const [globalFilter, setGlobalFilter] = useState<string>("")
   const table = useReactTable({
     columns,
@@ -130,7 +131,7 @@ export function DataTable() {
   });
   return <>
     <TableSearch filterValue={globalFilter} setFilterValue={(value: string) => table.setGlobalFilter(value)} />
-    <CategoryFilter column={table.getColumn("category")} />
+    <CategoryFilter column={table.getColumn("category")} providedTags={providedTags} />
     <Table table={table}>
       {(row) => {
         const isExpanded = row.original.caseFieldName === historyName;
@@ -198,15 +199,16 @@ function Row({ children }: PropsWithChildren) {
 }
 
 
-function CategoryFilter({ column }: { column: Column<CaseValue, unknown> | undefined }) {
+function CategoryFilter({ column, providedTags }: { column: Column<CaseValue, unknown> | undefined, providedTags: Array<string> }) {
   const { t } = useTranslation();
   const { tags } = useLoaderData() as LoaderData;
   if (!column || tags.length === 0)
     return;
   const columnFilter = (column.getFilterValue() ?? []) as Array<string>;
+  const availableTags = useMemo(() => tags.filter(t => providedTags.indexOf(t.tag) !== -1), [tags, providedTags]);
   return (
     <Stack direction="row" spacing={1}>
-      {tags.map(tag => {
+      {availableTags.map(tag => {
         const isSelected = columnFilter.includes(tag.tag);
         return <Chip
           variant={isSelected ? "filled" : "outlined"}
