@@ -23,8 +23,8 @@ export function useCaseData(params, user, payroll) {
 	const [caseErrors, setCaseErrors] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [fatalError, setFatalError] = useState(null);
-	const [startDate, setStartDate] = useState(null);
-	const [endDate, setEndDate] = useState(null);
+	let [startDate, setStartDate] = useState(null);
+	let [endDate, setEndDate] = useState(null);
 
 
 	useEffect(() => {
@@ -96,9 +96,17 @@ export function useCaseData(params, user, payroll) {
 		attachments,
 		loading,
 		startDate,
-		setStartDate,
 		endDate,
-		setEndDate,
+		setStartDate: (updatedStartDate) => {
+			startDate = updatedStartDate;
+			setStartDate(updatedStartDate);
+			_buildCase();
+		},
+		setEndDate: (updatedEndDate) => {
+			endDate = updatedEndDate;
+			setEndDate(updatedEndDate);
+			_buildCase();
+		},
 		buildCase: _buildCase,
 		addCase: _addCase,
 	};
