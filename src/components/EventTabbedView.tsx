@@ -4,6 +4,7 @@ import {
   useOutlet,
   useLoaderData,
   useParams,
+  useLocation,
 } from "react-router-dom";
 import { ContentLayout } from "../components/ContentLayout";
 import { Stack } from "@mui/material";
@@ -23,12 +24,13 @@ export function EventTabbedView({ title, showMissingData }: { title: ReactNode, 
   const { pageTitle, missingData } = useLoaderData() as LoaderData;
   const { t } = useTranslation();
   const params = useParams();
+  const { state } = useLocation();
   const renderTitleOnly = !!params.caseName;
 
   const missingDataCount = missingData?.cases?.length ?? 0;
 
   if (!outlet) {
-    let to = "data";
+    let to = state === "dataViewFallback" ? "data" : "events";
     if (showMissingData && missingDataCount > 0) {
       to = "missingdata"
     }
