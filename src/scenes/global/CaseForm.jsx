@@ -33,7 +33,7 @@ function CaseForm() {
 	const { user, payroll } = useRouteLoaderData("root");
 	const loaderData = useLoaderData();
 	const [caseFieldDetails, setCaseFieldDetails] = useState(null);
-	const redirectPath = (loaderData?.redirect || "../..") + "/events";
+	const redirectPath = loaderData?.redirect || "../..";
 	const params = useParams();
 	const {
 		caseData,
