@@ -59,7 +59,6 @@ function CaseForm() {
 			})
 		}
 	};
-
 	const renderFieldPeriods = caseData?.periodInputMode === "Individual";
 	let content = null;
 	if (fatalError) {
@@ -76,7 +75,7 @@ function CaseForm() {
 						{/* row-reverse, wrap reverse to make the items stick to the right side when wrapped*/}
 						<Stack direction="row-reverse" spacing={2} alignSelf="end" alignItems="end" flexWrap="wrap-reverse">
 							<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} submitting={submitting} />
-							<PeriodPicker inputMode={caseData.periodInputMode} startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
+							<PeriodPicker variant={caseData.attributes?.["input.datePicker"] === "month" ? "month-short" : "standard"} inputMode={caseData.periodInputMode} startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
 						</Stack >
 						{caseFieldDetails && <CaseFieldDetails caseField={caseFieldDetails} onClose={() => setCaseFieldDetails(null)} />}
 					</Stack>
@@ -92,7 +91,7 @@ function CaseForm() {
 	);
 }
 
-function PeriodPicker({ inputMode, startDate, setStartDate, endDate, setEndDate }) {
+function PeriodPicker({ inputMode, variant, startDate, setStartDate, endDate, setEndDate }) {
 	const { t } = useTranslation();
 	if (inputMode === "Individual") {
 		return;
@@ -101,8 +100,9 @@ function PeriodPicker({ inputMode, startDate, setStartDate, endDate, setEndDate 
 		<DatePicker
 			label={t("Valid from")}
 			value={startDate}
+			variant={variant}
 			required
-			onChange={setStartDate}
+			onChange={(s => setStartDate(variant === "month-short" ? s.startOf("month") : s))}
 			name="case_change_valid_from"
 		/>
 	);
@@ -112,8 +112,9 @@ function PeriodPicker({ inputMode, startDate, setStartDate, endDate, setEndDate 
 			<DatePicker
 				label={t("until")}
 				value={endDate}
+				variant={variant}
 				required
-				onChange={setEndDate}
+				onChange={(e => setEndDate(variant === "month-short" ? e.endOf("month") : e))}
 				name="case_change_valid_until"
 			/>
 		)
