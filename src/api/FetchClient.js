@@ -321,6 +321,7 @@ export function getCurrentValues(routeParams) {
 	return new FetchRequestBuilder(timeValuesUrl, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", caseType)
+		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
 		.withUser()
 		.fetchJson()
