@@ -109,13 +109,21 @@ function createThemeSettings(mode: ThemeMode): ThemeOptions {
             },
           },
           inputRoot: ({ theme, ownerState }) => {
-            if (ownerState?.size !== "small") return;
-
-            return {
-              height: "100%",
-              paddingTop: theme.spacing(0.5) + " !important",
-              paddingBottom: theme.spacing(0.5) + " !important",
-            };
+            if (ownerState?.variant === "highlighted") {
+              return {
+                "&>.MuiOutlinedInput-notchedOutline": {
+                  borderWidth: 2,
+                  borderColor: `rgba(${theme.vars.palette.common.onBackgroundChannel} / 0.31)`
+                }
+              }
+            }
+            if (ownerState?.size === "small") {
+              return {
+                height: "100%",
+                paddingTop: theme.spacing(0.5) + " !important",
+                paddingBottom: theme.spacing(0.5) + " !important",
+              };
+            }
           },
         },
       },

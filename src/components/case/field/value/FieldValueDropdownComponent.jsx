@@ -20,10 +20,12 @@ function FieldValueDropdownComponent({ useDataHook }) {
 	}
 
 	const { getLabels: _, ...data } = useDataHook(field, onChange);
+	const variant = field.attributes["input.highlighted"] ? "highlighted" : "default";
 
 	return (
 		<Autocomplete
 			{...data}
+			variant={variant}
 			disabled={isReadonly}
 			fullWidth
 			disableClearable={field.attributes["input.disableClear"]}
