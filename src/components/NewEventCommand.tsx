@@ -1,8 +1,8 @@
 import { Command } from "cmdk";
-import React, { Dispatch, forwardRef, Suspense, useEffect, useId, useMemo, useReducer, useRef, useState } from "react";
+import React, { Dispatch, Suspense, useEffect, useMemo, useReducer, useState } from "react";
 import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogDescription, ResponsiveDialogTitle, ResponsiveDialogTrigger } from "./ResponsiveDialog";
-import { Box, Button, Card, Chip, CircularProgress, Divider, Paper, Stack, Typography } from "@mui/material";
-import { Add, Business, ChevronRight, Event, PeopleOutlined, SvgIconComponent } from "@mui/icons-material";
+import { Box, Button, Chip, CircularProgress, Stack, Typography } from "@mui/material";
+import { Add, Business, ChevronRight, Event, PeopleOutlined } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
 import { payrollAtom } from "../utils/dataAtoms";
@@ -11,6 +11,7 @@ import { Employee, getEmployeeDisplayString } from "../models/Employee";
 import { getCompanyCases, getEmployeeCases, getEmployees } from "../api/FetchClient";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { IdType } from "../models/IdType";
 
 export function NewEventCommand() {
   const params = useParams();
@@ -273,7 +274,7 @@ function getCaseKeywords(_case: AvailableCase) {
   }
   if (_case.caseFields) {
     for (const field of _case.caseFields) {
-      keywords.push(field.name);
+      keywords.push(field.displayName);
       if (field.description) {
         keywords.push(field.description);
       }
@@ -300,7 +301,6 @@ function CommandItem({ text, subtext }: CommandItemProps) {
 };
 
 function EmployeeCasesCommandGroup({ state, close, dispatch }: { state: State, close: () => void, dispatch: Dispatch<Action> }) {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const params = useParams();
   const casesState = state.initialized && state.page === "employee" ? state.cases : null;
@@ -313,7 +313,7 @@ function EmployeeCasesCommandGroup({ state, close, dispatch }: { state: State, c
     close();
   }
   const cases = useMemo(() => casesState?.map((_case) => (
-    <Command.Item key={_case.name} onSelect={() => onCaseSelected(_case)} keywords={getCaseKeywords(_case)}>
+    <Command.Item key={_case.id} onSelect={() => onCaseSelected(_case)} keywords={getCaseKeywords(_case)}>
       <CommandItem text={_case.displayName} subtext={_case.description} />
     </Command.Item>
   )), [casesState]);
@@ -331,17 +331,16 @@ function EmployeeCasesCommandGroup({ state, close, dispatch }: { state: State, c
 
 
 function CompanyCasesCommandGroup({ state, close, dispatch }: { state: State, close: () => void, dispatch: Dispatch<Action> }) {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const params = useParams();
   const casesState = state.initialized && state.page === "company" ? state.cases : null;
   function onCaseSelected(_case: AvailableCase) {
-    const path = generatePath(`/orgs/:orgId/payrolls/:payrollId/company/new/:caseName`, { orgId: params.orgId!, payrollId: params.payrollId!, caseName: _case.name });
+    const path = generatePath(`/orgs/:orgId/payrolls/:payrollId/company/new/:caseName`, { orgId: params.orgId!, payrollId: params.payrollId!, caseName: encodeURIComponent(_case.name) });
     navigate(path);
     close();
   }
   const cases = useMemo(() => casesState?.map((_case) => (
-    <Command.Item key={_case.name} onSelect={() => onCaseSelected(_case)} keywords={getCaseKeywords(_case)}>
+    <Command.Item key={_case.id} onSelect={() => onCaseSelected(_case)} keywords={getCaseKeywords(_case)}>
       <CommandItem text={_case.displayName} subtext={_case.description} />
     </Command.Item>
   )), [casesState]);
@@ -399,6 +398,7 @@ type Action = {
 }
 
 type AvailableCase = {
+  id: IdType
   name: string
   displayName: string
   nameSynonyms?: Array<string>
@@ -407,7 +407,9 @@ type AvailableCase = {
 }
 
 type AvailableCaseField = {
+  id: IdType
   name: string
+  displayName: string
   description?: string
 }
 
