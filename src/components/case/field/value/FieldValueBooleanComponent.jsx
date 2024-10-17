@@ -37,17 +37,15 @@ export function FieldValueBooleanComponent() {
 function Switch({ checked, disabled, ...props }) {
 	const { t } = useTranslation();
 	return (
-		<Box mx={1.25}>
+		<Box mx={1.25} sx={{ position: "relative" }}>
 			<LabelSwitch
 				checked={checked}
 				disabled={disabled}
 				disableRipple
 				{...props}
 			/>
-			<Box sx={disabled ? labelContainerDisabledSx : labelContainerSx}>
-				<div>{checked ? '' : t("No")}</div>
-				<div>{checked ? t("Yes") : ''}</div>
-			</Box>
+			<Box component="span" sx={getLabelSx("right", disabled)}>{checked ? '' : t("No")}</Box>
+			<Box component="span" sx={getLabelSx("left", disabled)}>{checked ? t("Yes") : ''}</Box>
 		</Box>)
 }
 
@@ -88,28 +86,14 @@ const LabelSwitch = styled(MuiSwitch)(({ theme, disabled }) => ({
 	}
 }));
 
-const labelContainerSx = {
-	"--text-color": theme => theme.palette.common.white,
-	"& > *": {
+function getLabelSx(edge, disabled) {
+	return {
+		[edge]: 0,
 		position: 'absolute',
 		px: 1,
-		width: 58,
-		display: 'flex',
-		top: '50%',
-		transform: 'translateY(-50%)',
+		lineHeight: "22px",
 		fontSize: '12px',
-		color: 'var(--text-color)',
+		color: theme => disabled ? theme.palette.action.disabled : theme.palette.common.white,
 		pointerEvents: 'none'
-	},
-	"& :first-child": {
-		justifyContent: 'end'
-	},
-	"& :last-child": {
-		justifyContent: 'start'
-	}
-};
-
-const labelContainerDisabledSx = {
-	...labelContainerSx,
-	"--text-color": theme => theme.palette.action.disabled
-};
+	};
+}
