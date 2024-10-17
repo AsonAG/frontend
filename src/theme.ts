@@ -27,6 +27,12 @@ declare module '@mui/material/Typography' {
   }
 }
 
+declare module '@mui/material/Button' {
+  interface ButtonPropsColorOverrides {
+    destructive: true
+  }
+}
+
 const lightModeDesignTokens = {
   palette: {
     mode: "light",

@@ -65,6 +65,7 @@ import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
 import { AsyncDocumentTable } from "./components/tables/DocumentTable";
+import { AsyncDocumentTable as AsyncNewDocumenTable } from "./components/tables/NewDocumentTable";
 import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
@@ -80,7 +81,8 @@ import {
 	missingDataTasksAtom,
 	orgsAtom,
 	missingDataMapAtom,
-	missingDataAppearanceAtom
+	missingDataAppearanceAtom,
+	caseDocumentsFeatureAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -170,15 +172,22 @@ function createRouteCaseForm(path, data) {
 }
 
 function createRouteDocument(showTitle) {
-	const Component = showTitle ? withPage("Documents", AsyncDocumentTable) : AsyncDocumentTable;
+	const useNewDocumentView = store.get(caseDocumentsFeatureAtom);
+	const Component = useNewDocumentView ? AsyncNewDocumenTable : AsyncDocumentTable;
+	const TitledComponent = showTitle ? withPage("Documents", Component) : Component;
+	const loader = useNewDocumentView ?
+		({ params }) => defer({
+			data: (params.employeeId ? getEmployeeCases : getCompanyCases)(params, "DOC"),
+		})
+		:
+		({ params }) => defer({
+			data: getDocumentCaseFields(params),
+
+		});
 	return {
-		Component,
+		Component: TitledComponent,
 		path: "documents",
-		loader: ({ params }) => {
-			return defer({
-				data: getDocumentCaseFields(params),
-			});
-		},
+		loader,
 		children: [
 			{
 				path: ":caseFieldName",

@@ -15,7 +15,7 @@ import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";
 import { localUserEmailAtom } from "../../auth/getUser";
-import { payrollDashboardFeatureAtom, userInformationAtom } from "../../utils/dataAtoms";
+import { caseDocumentsFeatureAtom, payrollDashboardFeatureAtom, userInformationAtom } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
 import * as Popover from '@radix-ui/react-popover';
 import { AccountCircle } from "@mui/icons-material";
@@ -121,12 +121,14 @@ function FeatureFlags() {
 		return;
 
 	const [dashboard, setDashboard] = useAtom(payrollDashboardFeatureAtom);
+	const [caseDocuments, setCaseDocuments] = useAtom(caseDocumentsFeatureAtom);
 
 	return (
 		<Stack alignSelf="stretch">
 			<Typography variant="h6">Features</Typography>
 			<FormGroup>
 				<FormControlLabel control={<Switch checked={dashboard} onChange={(_, checked) => setDashboard(checked)} />} label="Payroll Dashboard" />
+				<FormControlLabel control={<Switch checked={caseDocuments} onChange={(_, checked) => setCaseDocuments(checked)} />} label="Dokumente via Cases" />
 			</FormGroup>
 		</Stack>
 	)

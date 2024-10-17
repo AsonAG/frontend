@@ -11,7 +11,7 @@ import { Employee, getEmployeeDisplayString } from "../models/Employee";
 import { getCompanyCases, getEmployeeCases, getEmployees } from "../api/FetchClient";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { IdType } from "../models/IdType";
+import { AvailableCase } from "../models/AvailableCase";
 
 export function NewEventCommand() {
   const params = useParams();
@@ -395,22 +395,6 @@ type Action = {
 } | {
   type: "set-search",
   search: string
-}
-
-type AvailableCase = {
-  id: IdType
-  name: string
-  displayName: string
-  nameSynonyms?: Array<string>
-  description?: string
-  caseFields: Array<AvailableCaseField>
-}
-
-type AvailableCaseField = {
-  id: IdType
-  name: string
-  displayName: string
-  description?: string
 }
 
 function createInitialState(): State {
