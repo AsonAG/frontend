@@ -115,15 +115,7 @@ function createThemeSettings(mode: ThemeMode): ThemeOptions {
             },
           },
           inputRoot: ({ theme, ownerState }) => {
-            if (ownerState?.variant === "highlighted") {
-              return {
-                "&>.MuiOutlinedInput-notchedOutline": {
-                  borderWidth: 2,
-                  borderColor: `rgba(${theme.vars.palette.common.onBackgroundChannel} / 0.31)`
-                }
-              }
-            }
-            if (ownerState?.size === "small") {
+            if (ownerState?.size === "small" && ownerState?.variant !== "filled") {
               return {
                 height: "100%",
                 paddingTop: theme.spacing(0.5) + " !important",

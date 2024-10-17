@@ -20,7 +20,7 @@ function FieldValueDropdownComponent({ useDataHook }) {
 	}
 
 	const { getLabels: _, ...data } = useDataHook(field, onChange);
-	const variant = field.attributes["input.highlighted"] ? "highlighted" : "default";
+	const variant = field.attributes["input.highlighted"] ? "filled" : "outlined";
 
 	return (
 		<Autocomplete
@@ -33,6 +33,7 @@ function FieldValueDropdownComponent({ useDataHook }) {
 				<TextField
 					{...params}
 					required={required}
+					variant={variant}
 					label={displayName}
 					slotProps={{
 						input: {
