@@ -5,16 +5,13 @@ import {
 	IconButton,
 	Button,
 	Paper,
-	Collapse,
-	CircularProgress,
 	Theme,
 	SxProps,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useAsyncValue, Outlet, useSubmit, useFetcher } from "react-router-dom";
+import React from "react";
+import { Outlet, useSubmit, useLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material";
-import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
+import { Delete } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { DocumentLink } from "../DocumentLink";
 import {
@@ -29,29 +26,35 @@ import { IdType } from "../../models/IdType";
 import { AvailableCase } from "../../models/AvailableCase";
 import { AvailableCaseField } from "../../models/AvailableCaseField";
 import { CaseValue } from "../../models/CaseValue";
-import { QueryResult } from "../../models/QueryResult";
 
 export function AsyncDocumentTable() {
 	return (
-		<AsyncDataRoute>
-			<DocumentTable />
-		</AsyncDataRoute>
+		<DocumentTable />
 	);
 }
 
+type LoaderData = {
+	data: Array<AvailableCase>
+	values: Map<string, CaseValue>
+}
 function DocumentTable() {
-	const cases = useAsyncValue() as Array<AvailableCase>;
+	const { t } = useTranslation();
+	const { data, values } = useLoaderData() as LoaderData;
+
+	const casesWithValues = data.filter(_case => _case.caseFields.map(f => values[f.name].length).reduce((a, b) => a + b) > 0);
+	const noValuesAvailableText = casesWithValues.length === 0 ? <Typography>{t("No data available")}</Typography> : null;
 
 	return (
 		<>
 			<Stack spacing={3} pb={3}>
-				{cases.map((c) => (
+				{casesWithValues.map((c) => (
 					<DocumentGroupCard
 						key={c.id}
 						groupName={c.displayName}
 						fields={c.caseFields}
 					/>
 				))}
+				{noValuesAvailableText}
 			</Stack>
 			<Outlet />
 		</>
@@ -119,62 +122,21 @@ function CaseValueRow({ caseValue }: { caseValue: CaseValue }) {
 	);
 }
 
-function LoadDocumentsButton({ loading, hasMore, onClick, allLoadedText, sx }) {
-	const { t } = useTranslation();
-	const text = loading ? "Loading..." : hasMore ? "Load more" : allLoadedText;
-
-	return (
-		<Button
-			disabled={loading || !hasMore}
-			startIcon={
-				loading && (
-					<CircularProgress
-						size="1rem"
-						sx={{ color: (theme) => theme.palette.text.disabled }}
-					/>
-				)
-			}
-			onClick={onClick}
-			sx={sx}
-		>
-			{t(text)}
-		</Button>
-	);
-}
-
-const documentLoadSteps = 15;
 function DocumentGroup({ caseFieldName, displayName }) {
-	const fetcher = useFetcher<QueryResult<CaseValue>>();
 	const { t } = useTranslation();
-	const [top, setTop] = useState(documentLoadSteps);
-
-	const documents = fetcher.data;
-
-	useEffect(() => {
-		if (fetcher.state === "idle" && (!documents || (documents.items.length < top) && (documents.items.length < documents.count))) {
-			fetcher.load(`${encodeURIComponent(caseFieldName)}?top=${top}`);
-		}
-	}, [fetcher, top]);
-
-	if (!documents) {
+	const { values } = useLoaderData() as LoaderData;
+	const documents = values[caseFieldName];
+	if (!documents || documents.length === 0) {
 		return;
 	}
 
+	console.log(documents);
 	// @ts-ignore
-	const groupedDocuments = Object.groupBy(documents.items, ({ start }) => {
+	const groupedDocuments = Object.groupBy(documents, ({ start }) => {
 		const date = dayjs.utc(start);
 		return date.isValid() ? date.format("MMMM YYYY") : t("Without date");
 	});
 	const entries = Object.entries(groupedDocuments);
-	const allLoadedText =
-		documents.items.length === 0
-			? "No documents available"
-			: "Showing all documents";
-	const hasMore = documents.items.length !== documents.count;
-	function loadMore() {
-		setTop((top) => top + documentLoadSteps);
-	}
-
 	return (
 		<Stack>
 			<Typography variant="subtitle1" flex={1}>
@@ -187,20 +149,10 @@ function DocumentGroup({ caseFieldName, displayName }) {
 					))}
 				</Stack>
 			)}
-			<LoadDocumentsButton
-				loading={fetcher.state === "loading"}
-				hasMore={hasMore}
-				onClick={loadMore}
-				allLoadedText={allLoadedText}
-				sx={{ m: 1, justifyContent: "start" }}
-			/>
 		</Stack>
 	);
 }
 function DocumentGroupCard({ groupName, fields }: { groupName: string, fields: Array<AvailableCaseField> }) {
-	const [open, setOpen] = useState(false);
-
-	const onClick = () => setOpen((o) => !o);
 	return (
 		<Paper>
 			<Stack>
@@ -213,20 +165,15 @@ function DocumentGroupCard({ groupName, fields }: { groupName: string, fields: A
 					<Typography variant="h6" flex={1}>
 						{groupName}
 					</Typography>
-					<IconButton onClick={onClick}>
-						{open ? <ExpandLess /> : <ExpandMore />}
-					</IconButton>
 				</Stack>
-				<Collapse in={open} mountOnEnter>
-					<Divider />
-					{fields.length > 0 && (
-						<Stack sx={{ px: 2, pt: 2 }} spacing={1} alignItems="stretch">
-							{fields.map((field) => (
-								<DocumentGroup key={field.id} caseFieldName={field.name} displayName={field.displayName} />
-							))}
-						</Stack>
-					)}
-				</Collapse>
+				<Divider />
+				{fields.length > 0 && (
+					<Stack sx={{ p: 2 }} spacing={1} alignItems="stretch">
+						{fields.map((field) => (
+							<DocumentGroup key={field.id} caseFieldName={field.name} displayName={field.displayName} />
+						))}
+					</Stack>
+				)}
 			</Stack>
 		</Paper>
 	);

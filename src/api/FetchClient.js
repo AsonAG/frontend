@@ -13,7 +13,8 @@ const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
 const payrollRegulationsUrl = "/tenants/:orgId/payrolls/:payrollId/regulations";
 const divisionsUrl = "/tenants/:orgId/divisions";
 const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
-const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
+const caseChangeCaseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
+const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values";
 const timeValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values/time";
 const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
 const missingDataEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
@@ -302,9 +303,18 @@ export function getEmployeeCases(routeParams, clusterSetName, signal) {
 		.fetchJson();
 }
 
-export function getCaseValues(routeParams, top) {
-	const caseType = routeParams.employeeId ? "Employee" : "Company";
+export function getCaseValues(routeParams, caseFieldName, start, end) {
 	return new FetchRequestBuilder(caseValuesUrl, routeParams)
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParam("caseFieldNames", caseFieldName)
+		.withQueryParam("startDate", (start?.toISOString() ?? "1970-01-01T00:00:00.00000Z"))
+		.withQueryParam("endDate", (end?.toISOString() ?? "2345-01-01T00:00:00.00000Z"))
+		.fetchJson();
+}
+
+export function getCaseChangeCaseValues(routeParams, top) {
+	const caseType = routeParams.employeeId ? "Employee" : "Company";
+	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("filter", `CaseFieldName eq '${routeParams.caseFieldName}'`)
 		.withQueryParam("caseType", caseType)
@@ -526,7 +536,7 @@ export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", caseType)
 		.withQueryParam("orderBy", "start desc")
-		.withQueryParam("result", "ItemsWithCount")
+		.withQueryParam("result", top ? "ItemsWithCount" : undefined)
 		.withQueryParam("top", top)
 		.withQueryParam("filter", `CaseFieldName eq '${caseFieldName}' and DocumentCount gt 0`)
 		.withLocalization()

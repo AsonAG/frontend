@@ -55,11 +55,12 @@ import {
 	requestExportDataDownload,
 	deleteOrganization,
 	getDivisions,
-	getCaseValues,
+	getCaseChangeCaseValues,
 	getPayrollResult,
 	getWageTypes,
 	getCurrentValues,
-	getRegulations
+	getRegulations,
+	getCaseValues
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -164,7 +165,7 @@ function createRouteCaseForm(path, data) {
 				path: "history/:caseFieldName",
 				loader: ({ request, params }) => {
 					const top = getQueryParam(request, "top");
-					return getCaseValues(params, top);
+					return getCaseChangeCaseValues(params, top);
 				}
 			}
 		]
@@ -176,9 +177,26 @@ function createRouteDocument(showTitle) {
 	const Component = useNewDocumentView ? AsyncNewDocumenTable : AsyncDocumentTable;
 	const TitledComponent = showTitle ? withPage("Documents", Component) : Component;
 	const loader = useNewDocumentView ?
-		({ params }) => defer({
-			data: (params.employeeId ? getEmployeeCases : getCompanyCases)(params, "DOC"),
-		})
+		async ({ params }) => {
+			const documentCases = await (params.employeeId ? getEmployeeCases : getCompanyCases)(params, "DOC");
+			if (documentCases) {
+				const caseFieldNames = documentCases.flatMap(c => c.caseFields.map(cf => cf.name));
+				const caseValues = await Promise.all(caseFieldNames.map(name => getDocumentsOfCaseField(params, name)));
+				let values = {};
+				for (let i = 0; i < caseFieldNames.length; i++) {
+					values[caseFieldNames[i]] = caseValues[i];
+				}
+
+				return {
+					values,
+					data: documentCases
+				}
+			}
+			return {
+				data: documentCases,
+				values: []
+			};
+		}
 		:
 		({ params }) => defer({
 			data: getDocumentCaseFields(params),
@@ -224,7 +242,7 @@ function createRouteDataTable(path) {
 		Component: DataTable,
 		loader: async ({ params, request }) => {
 			const historyFieldName = getQueryParam(request, "h");
-			const historyPromise = !!historyFieldName ? getCaseValues({ ...params, caseFieldName: historyFieldName }) : Promise.resolve([]);
+			const historyPromise = !!historyFieldName ? getCaseChangeCaseValues({ ...params, caseFieldName: historyFieldName }) : Promise.resolve([]);
 			const [values, history, regulations] = await Promise.all(
 				[
 					getCurrentValues(params),
