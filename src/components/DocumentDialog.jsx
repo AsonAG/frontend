@@ -98,7 +98,7 @@ function DocumentDisplay({ doc, url }) {
 		case "application/xml":
 			return (
 				<Box sx={layoutSx}>
-					<XmlView xml={doc.content} />
+					<XmlView base64content={doc.content} />
 				</Box>
 			);
 		default:

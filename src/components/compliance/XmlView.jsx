@@ -1,5 +1,6 @@
 import { Typography } from "@mui/material";
 import { useMemo } from "react";
+import { base64Decode } from "../../services/converters/BinaryConverter";
 
 const codeTypographySx = {
 	whiteSpace: "pre-wrap",
@@ -7,7 +8,8 @@ const codeTypographySx = {
 	overflow: "auto",
 };
 
-export function XmlView({ title, xml, codeProps }) {
+export function XmlView({ title, base64content, codeProps }) {
+	const xml = useMemo(() => base64Decode(base64content), [base64content]);
 	const prettyXml = useMemo(() => prettifyXml(xml), [xml]);
 	return (
 		<>
