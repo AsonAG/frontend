@@ -7,11 +7,13 @@ import {
 	Paper,
 	Theme,
 	SxProps,
+	TextField,
+	InputAdornment,
 } from "@mui/material";
-import React from "react";
+import React, { ReactNode, useState } from "react";
 import { Outlet, useSubmit, useLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Delete } from "@mui/icons-material";
+import { Clear, Delete } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { DocumentLink } from "../DocumentLink";
 import {
@@ -35,19 +37,38 @@ export function AsyncDocumentTable() {
 
 type LoaderData = {
 	data: Array<AvailableCase>
-	values: Map<string, CaseValue>
+	values: Record<string, Array<CaseValue>>
 }
 function DocumentTable() {
 	const { t } = useTranslation();
 	const { data, values } = useLoaderData() as LoaderData;
+	const [search, setSearch] = useState("");
 
+	const lowerSearch = search.toLowerCase();
 	const casesWithValues = data.filter(_case => _case.caseFields.map(f => values[f.name].length).reduce((a, b) => a + b) > 0);
-	const noValuesAvailableText = casesWithValues.length === 0 ? <Typography>{t("No data available")}</Typography> : null;
+	const filteredValues = casesWithValues.filter(_case => {
+		if (_case.displayName.toLowerCase().includes(lowerSearch))
+			return true;
+		for (let i = 0; i < _case.caseFields.length; i++) {
+			const field = _case.caseFields[i];
+			if (field.displayName.toLowerCase().includes(lowerSearch)) {
+				return true;
+			}
+			const documents = values[field.name]?.flatMap(v => v.documents);
+			for (const doc of documents) {
+				if (doc.name.toLowerCase().includes(lowerSearch))
+					return true;
+			}
+		}
+		return false;
+	});
+	const noValuesAvailableText = filteredValues.length === 0 ? <Typography>{t("No data available")}</Typography> : null;
 
 	return (
 		<>
+			<DocumentSearch search={search} setSearch={setSearch} />
 			<Stack spacing={3} pb={3}>
-				{casesWithValues.map((c) => (
+				{filteredValues.map((c) => (
 					<DocumentGroupCard
 						key={c.id}
 						groupName={c.displayName}
@@ -59,6 +80,46 @@ function DocumentTable() {
 			<Outlet />
 		</>
 	);
+}
+
+function DocumentSearch({ search, setSearch }) {
+	const { t } = useTranslation();
+
+	const onChange = (event) => {
+		setSearch(event.target.value);
+	};
+
+	const onClear = () => {
+		setSearch("");
+	}
+
+
+	let clearButton: ReactNode | null = null;
+	if (search) {
+		clearButton = (
+			<InputAdornment position="end">
+				<IconButton onClick={onClear}>
+					<Clear />
+				</IconButton>
+			</InputAdornment>
+		)
+	}
+
+	return (
+		<TextField
+			fullWidth
+			variant="outlined"
+			placeholder={t("Search")}
+			onChange={onChange}
+			value={search}
+			slotProps={{
+				input: {
+					endAdornment: clearButton,
+				}
+			}}
+		/>
+	);
+
 }
 
 const itemSx: SxProps<Theme> = {
@@ -130,7 +191,6 @@ function DocumentGroup({ caseFieldName, displayName }) {
 		return;
 	}
 
-	console.log(documents);
 	// @ts-ignore
 	const groupedDocuments = Object.groupBy(documents, ({ start }) => {
 		const date = dayjs.utc(start);
