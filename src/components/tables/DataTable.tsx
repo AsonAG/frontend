@@ -151,7 +151,6 @@ function Table({ table, defaultSort, children }: { table: Table<CaseValue>, defa
   if (rows.length === 0) {
     return <Typography>{t("No data")}</Typography>;
   }
-  console.log(defaultSort);
   return (
     <Stack>
       {table.getHeaderGroups().map(headerGroup => (
