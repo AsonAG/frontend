@@ -1,14 +1,14 @@
 import React, { Fragment } from "react";
-import { Box, Button, Dialog, Divider, IconButton, Portal, Stack, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, Dialog, Divider, IconButton, Stack, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { formatDate } from "../utils/DateUtils";
 import { useTranslation } from "react-i18next";
-import { IdType } from "../models/IdType";
 import { formatCaseValue } from "../utils/Format";
 import { Sidebar } from "./Sidebar";
 import { HtmlContent } from "./HtmlContent";
 import { Loading } from "./Loading";
 import { useIncrementallyLoadedData } from "../hooks/useIncrementallyLoadedData";
+import { CaseChangeCaseValue } from "../models/CaseChangeCaseValue";
 
 export function CaseFieldDetails({ caseField, onClose }) {
   const { t } = useTranslation();
@@ -83,14 +83,6 @@ function CaseFieldDescription({ description }) {
       <HtmlContent content={description} />
     </Stack>
   )
-}
-
-type CaseChangeCaseValue = {
-  id: IdType,
-  start: Date,
-  end: Date,
-  created: Date,
-  value: string
 }
 
 function CaseFieldHistory({ caseFieldName }) {

@@ -46,8 +46,8 @@ export function EventTabbedView({ title, showMissingData }: { title: ReactNode, 
         <Stack direction="row" spacing={2} flexWrap="wrap">
           {isMobile && <TabLink title={t("New Event")} to="new" />}
           <TabLink title={t("Data")} to="data" />
-          <TabLink title={t("Events")} to="events" />
           <TabLink title={t("Documents")} to="documents" />
+          <TabLink title={t("Events")} to="events" />
           {showMissingData && missingDataCount > 0 && (
             <TabLink
               title={t("Missing data")}

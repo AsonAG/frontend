@@ -14,6 +14,7 @@ const payrollRegulationsUrl = "/tenants/:orgId/payrolls/:payrollId/regulations";
 const divisionsUrl = "/tenants/:orgId/divisions";
 const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
 const caseChangeCaseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
+const caseValueCountUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values/count";
 const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values";
 const timeValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values/time";
 const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
@@ -81,6 +82,7 @@ class FetchRequestBuilder {
 	addUserQueryParam = false;
 	addPayrollDivision = false;
 	ignoreErrors = false;
+	fallbackValue = null;
 
 	constructor(url, routeParams) {
 		if (!url) {
@@ -163,8 +165,11 @@ class FetchRequestBuilder {
 		return this;
 	}
 
-	withIgnoreErrors() {
+	withIgnoreErrors(fallbackValue) {
 		this.ignoreErrors = true;
+		if (fallbackValue !== undefined) {
+			this.fallbackValue = fallbackValue
+		}
 		return this;
 	}
 
@@ -205,7 +210,7 @@ class FetchRequestBuilder {
 	async fetchJson() {
 		const response = await this.fetch();
 		if (this.ignoreErrors && !response.ok) {
-			return null;
+			return this.fallbackValue;
 		}
 		return response.json();
 	}
@@ -299,7 +304,7 @@ export function getEmployeeCases(routeParams, clusterSetName, signal) {
 		.withSignal(signal)
 		.withLocalization()
 		.withUser()
-		.withIgnoreErrors()
+		.withIgnoreErrors([])
 		.fetchJson();
 }
 
@@ -323,6 +328,15 @@ export function getCaseChangeCaseValues(routeParams, top) {
 		.withQueryParam("top", top)
 		.withQueryParam("result", !!top ? "ItemsWithCount" : undefined)
 		.withLocalization()
+		.withUser()
+		.fetchJson();
+}
+export function getCaseValueCount(routeParams, minCount) {
+	const caseType = routeParams.employeeId ? "Employee" : "Company";
+	return new FetchRequestBuilder(caseValueCountUrl, routeParams)
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParam("caseType", caseType)
+		.withQueryParam("minCount", minCount)
 		.withUser()
 		.fetchJson();
 }
@@ -357,6 +371,7 @@ export function getCompanyCases(routeParams, clusterSetName, signal) {
 		.withSignal(signal)
 		.withLocalization()
 		.withUser()
+		.withIgnoreErrors([])
 		.fetchJson();
 }
 

@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, ReactNode, useMemo, useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import React, { Fragment, PropsWithChildren, ReactNode, useMemo, useState } from "react";
+import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   IconButton,
@@ -9,15 +9,19 @@ import {
   TextField,
   InputAdornment,
   Chip,
+  Dialog,
+  useMediaQuery,
+  Theme,
+  useTheme,
+  Divider,
 } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { formatCaseValue } from "../../utils/Format";
-import { ArrowDropUp, Clear, History } from "@mui/icons-material";
-import { useSearchParam } from "../../hooks/useSearchParam";
+import { ArrowDropUp, Clear, Close, History } from "@mui/icons-material";
 import { IdType } from "../../models/IdType";
-import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row, getSortedRowModel, getFilteredRowModel, Column, Table } from "@tanstack/react-table";
+import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row as TableRow, getSortedRowModel, getFilteredRowModel, Table, filterFns, sortingFns } from "@tanstack/react-table";
 import { TFunction } from "i18next";
-import { CategoryLabel } from "../CategoryLabel";
+import { AvailableCase } from "../../models/AvailableCase";
 
 const columnHelper = createColumnHelper<CaseValue>();
 
@@ -26,7 +30,12 @@ function createColumns(t: TFunction<"translation", undefined>) {
     columnHelper.accessor("displayCaseFieldName",
       {
         cell: name => name.getValue(),
-        header: () => <span>{t("Field")}<ArrowDropUp fontSize="16px" /></span>
+        header: () => t("Field"),
+        meta: {
+          renderSortIndicator: true
+        },
+        //@ts-ignore
+        sortingFn: "caseDataFn"
       }),
     columnHelper.accessor("value",
       {
@@ -45,28 +54,6 @@ function createColumns(t: TFunction<"translation", undefined>) {
         header: t("End"),
         enableGlobalFilter: false
       }),
-    columnHelper.accessor("created",
-      {
-        cell: created => <span title={formatDate(created.getValue(), true)}>{formatDate(created.getValue())}</span>,
-        header: t("Created"),
-        enableGlobalFilter: false
-      }),
-    columnHelper.accessor("tags",
-      {
-        id: "category",
-        cell: attr => {
-          const { tags } = useLoaderData() as LoaderData;
-          const categories = attr.getValue();
-          return (
-            <Stack spacing={0.25} direction="row" flexWrap="wrap">
-              {categories.filter(category => tags.find(x => category === x.tag)).map(category => <CategoryLabel key={category} label={t(category)} />)}
-            </Stack>
-          )
-        },
-        header: () => t("Category"),
-        enableGlobalFilter: false,
-        filterFn: "arrIncludesSome"
-      }),
   ];
 }
 
@@ -82,32 +69,29 @@ type CaseValue = {
   start: Date
   end: Date
   created?: Date,
-  tags: Array<string>
   attributes: any
-}
-
-
-type Tag = {
-  tag: string,
-  tagLocalizations: Map<string, string>
 }
 
 type LoaderData = {
   values: Array<CaseValue>
-  history: Array<CaseValue>
-  tags: Array<Tag>
+  valueCounts: Record<string, number>
+  dataCases: Array<AvailableCase>
 }
+
+const getRowId = (row: CaseValue) => row.id
 
 export function DataTable() {
   const { t } = useTranslation();
-  const { values, history } = useLoaderData() as LoaderData;
-  const [historyName, setHistoryName] = useSearchParam("h", { replace: true });
+  const { values, valueCounts } = useLoaderData() as LoaderData;
   const columns = useMemo(() => createColumns(t), []);
-  const providedTags = useMemo(() => [...new Set(values.flatMap(v => v.tags))], [values]);
-  const [globalFilter, setGlobalFilter] = useState<string>("")
+  const [search, setSearch] = useState<string>("");
+  const [selectedDataCase, setSelectedDataCase] = useState<AvailableCase>();
+  const filteredCaseFieldNames = useMemo(() => !!selectedDataCase ? new Set(selectedDataCase.caseFields.map(fields => fields.name)) : null, [selectedDataCase]);
+  const dataCaseValues = useMemo(() => !!filteredCaseFieldNames ? values.filter(value => filteredCaseFieldNames.has(value.caseFieldName)) : values, [values, filteredCaseFieldNames]);
+  const orderCaseFields = useMemo(() => !!selectedDataCase ? new Map(selectedDataCase.caseFields.map((fields, index) => [fields.name, index])) : null, [selectedDataCase]);
   const table = useReactTable({
     columns,
-    data: values,
+    data: dataCaseValues,
     initialState: {
       sorting: [
         {
@@ -117,53 +101,57 @@ export function DataTable() {
       ]
     },
     state: {
-      globalFilter
+      globalFilter: search
     },
-    onGlobalFilterChange: setGlobalFilter,
+    sortingFns: {
+      caseDataFn: (rowA, rowB, columnId) => {
+        if (orderCaseFields) {
+          const difference = (orderCaseFields.get(rowA.original.caseFieldName) ?? 0) - (orderCaseFields.get(rowB.original.caseFieldName) ?? 0);
+          return difference > 0 ? 1 : difference < 0 ? -1 : 0;
+          ;
+        }
+        return sortingFns["alphanumeric"](rowA, rowB, columnId);
+      }
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getSubRows: row => row.caseFieldName === historyName ? history : [],
-    getRowId: originalRow => originalRow.id,
-    getRowCanExpand: (_) => true,
-    maxLeafRowFilterDepth: 0, // only filter root level parent rows out
+    getRowId,
     globalFilterFn: "includesString"
   });
   return <>
-    <TableSearch filterValue={globalFilter} setFilterValue={(value: string) => table.setGlobalFilter(value)} />
-    <CategoryFilter column={table.getColumn("category")} providedTags={providedTags} />
-    <Table table={table}>
-      {(row) => {
-        const isExpanded = row.original.caseFieldName === historyName;
-        return (
-          <Row key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              <Box key={cell.id} sx={{ p: 0.5 }}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </Box>
-            ))}
-            <IconButton onClick={() => setHistoryName(isExpanded ? "" : row.original.caseFieldName)} size="small" sx={{ justifySelf: "center", alignSelf: "start" }} color={isExpanded ? "primary" : undefined}>
-              <History />
-            </IconButton>
-            {row.subRows.length > 0 && <Typography fontWeight="bold" sx={{ gridColumn: "1 / -1", p: 0.5, pt: 1 }}>{t("History")}</Typography>}
-            {row.subRows.flatMap((subRow, index) => [...subRow.getVisibleCells().map((cell) => (
-              <Box key={cell.id} sx={{ p: 0.5 }}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </Box>
-            )), <span key={"ph-" + index}></span>])}
-          </Row>
-        );
-      }}
+    <TableSearch filterValue={search} setFilterValue={setSearch} />
+    <CategoryFilter selectedDataCase={selectedDataCase} setSelectedDataCase={setSelectedDataCase} />
+    <Table table={table} defaultSort={!selectedDataCase}>
+      {(row => (
+        <Row key={row.id}>
+          {row.getVisibleCells().map((cell) => (
+            <Box key={cell.id} sx={{ p: 0.5 }}>
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </Box>
+          ))}
+          {
+            (valueCounts[row.original.caseFieldName] ?? 0) > 1 ?
+              <IconButton component={Link} to={encodeURIComponent(row.original.caseFieldName)} size="small" sx={{ justifySelf: "center", alignSelf: "start" }}>
+                <History />
+              </IconButton>
+              :
+              <span></span>
+          }
+        </Row>
+      ))}
     </Table>
+    <Outlet />
   </>;
 }
 
-function Table({ table, children }: { table: Table<CaseValue>, children: (row: Row<CaseValue>) => ReactNode }) {
+function Table({ table, defaultSort, children }: { table: Table<CaseValue>, defaultSort: boolean, children: (row: TableRow<CaseValue>) => ReactNode }) {
   const { t } = useTranslation();
   const rows = table.getRowModel().rows;
   if (rows.length === 0) {
     return <Typography>{t("No data")}</Typography>;
   }
+  console.log(defaultSort);
   return (
     <Stack>
       {table.getHeaderGroups().map(headerGroup => (
@@ -174,6 +162,7 @@ function Table({ table, children }: { table: Table<CaseValue>, children: (row: R
                 header.column.columnDef.header,
                 header.getContext())
               }
+              {header.column.columnDef.meta?.renderSortIndicator && defaultSort && <ArrowDropUp fontSize="16px" />}
             </Typography>
           ))}
           <Box></Box>
@@ -192,31 +181,31 @@ function Table({ table, children }: { table: Table<CaseValue>, children: (row: R
 
 function Row({ children }: PropsWithChildren) {
   return (
-    <Box display="grid" gridTemplateColumns="1fr 1fr 75px 75px 75px 135px 40px" gridTemplateRows="auto" alignItems="start">
+    <Box display="grid" gridTemplateColumns="1fr 1fr 75px 75px 40px" gridTemplateRows="auto" alignItems="start">
       {children}
     </Box>
   )
 }
 
 
-function CategoryFilter({ column, providedTags }: { column: Column<CaseValue, unknown> | undefined, providedTags: Array<string> }) {
+function CategoryFilter({ selectedDataCase, setSelectedDataCase }) {
   const { t } = useTranslation();
-  const { tags } = useLoaderData() as LoaderData;
-  if (!column || tags.length === 0)
+  const { values, dataCases } = useLoaderData() as LoaderData;
+  if (dataCases.length === 0)
     return;
-  const columnFilter = (column.getFilterValue() ?? []) as Array<string>;
-  const availableTags = useMemo(() => tags.filter(t => providedTags.indexOf(t.tag) !== -1), [tags, providedTags]);
+  const availableCaseFieldNames = useMemo(() => new Set(values.map(v => v.caseFieldName)), [values]);
+  const availableDataCases = useMemo(() => dataCases.filter(dataCase => dataCase.caseFields.some(caseField => availableCaseFieldNames.has(caseField.name))), [dataCases, availableCaseFieldNames]);
   return (
     <Stack direction="row" spacing={1}>
-      {availableTags.map(tag => {
-        const isSelected = columnFilter.includes(tag.tag);
+      {availableDataCases.map(dataCase => {
+        const isSelected = dataCase === selectedDataCase;
         return <Chip
           variant={isSelected ? "filled" : "outlined"}
           color="primary"
-          key={tag.tag}
-          label={t(tag.tag)}
+          key={dataCase.id}
+          label={t(dataCase.displayName)}
           size="small"
-          onClick={() => { column?.setFilterValue(isSelected ? columnFilter.filter(f => f !== tag.tag) : [...columnFilter, tag.tag]) }}
+          onClick={() => { setSelectedDataCase(isSelected ? undefined : dataCase) }}
         />;
       })}
     </Stack>
@@ -258,5 +247,59 @@ function TableSearch({ filterValue, setFilterValue }) {
         }
       }}
     />
+  );
+}
+
+
+export function DataValueHistory() {
+  const { t } = useTranslation();
+  const values = useLoaderData() as Array<CaseValue>;
+  const useFullScreen = useMediaQuery<Theme>(theme => theme.breakpoints.down("sm"));
+  const title = `${t("History")} ${values[0].displayCaseFieldName}`;
+  const navigate = useNavigate();
+  return (
+    <Dialog fullScreen={useFullScreen} open fullWidth maxWidth="xl" onClose={() => navigate("..")}>
+      <DialogHeader title={title} />
+      <Divider />
+      <Box display="grid" gridTemplateColumns="1fr 75px 75px 75px" columnGap="8px" p={2}>
+        <Typography fontWeight="bold">{t("Value")}</Typography>
+        <Typography fontWeight="bold">{t("Start")}</Typography>
+        <Typography fontWeight="bold">{t("End")}</Typography>
+        <Typography fontWeight="bold">{t("Created")}</Typography>
+        {
+          values.map(cv => {
+            const caseValueFormatted = formatCaseValue(cv, t);
+            return (
+              <Fragment key={cv.id}>
+                <Typography noWrap title={caseValueFormatted}>{caseValueFormatted}</Typography>
+                <Typography>{formatDate(cv.start)}</Typography>
+                <Typography>{formatDate(cv.end)}</Typography>
+                <Typography title={formatDate(cv.created, true)}>{formatDate(cv.created)}</Typography>
+              </Fragment>
+            )
+          })
+        }
+      </Box>
+    </Dialog>
+  )
+}
+
+function DialogHeader({ title }) {
+  const theme = useTheme();
+  return (
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={2}
+      px={2}
+      sx={theme.mixins.toolbar}
+    >
+      <Typography variant="h6" sx={{ flex: 1 }}>
+        {title}
+      </Typography>
+      <IconButton component={Link} to=".." size="small">
+        <Close />
+      </IconButton>
+    </Stack>
   );
 }

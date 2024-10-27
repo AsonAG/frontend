@@ -59,8 +59,7 @@ import {
 	getPayrollResult,
 	getWageTypes,
 	getCurrentValues,
-	getRegulations,
-	getCaseValues
+	getCaseValueCount
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -105,8 +104,7 @@ import { OrganizationImport } from "./organization/Import";
 import { OrganizationSettings } from "./organization/Settings";
 import { EventTabbedView } from "./components/EventTabbedView";
 import { getEmployeeDisplayString } from "./models/Employee";
-import { DataTable } from "./components/tables/DataTable";
-import i18next from "i18next";
+import { DataTable, DataValueHistory } from "./components/tables/DataTable";
 
 const store = getDefaultStore();
 
@@ -240,31 +238,25 @@ function createRouteDataTable(path) {
 	return {
 		path,
 		Component: DataTable,
-		loader: async ({ params, request }) => {
-			const historyFieldName = getQueryParam(request, "h");
-			const historyPromise = !!historyFieldName ? getCaseChangeCaseValues({ ...params, caseFieldName: historyFieldName }) : Promise.resolve([]);
-			const [values, history, regulations] = await Promise.all(
-				[
-					getCurrentValues(params),
-					historyPromise,
-					getRegulations(params)
-				]);
-			const tags = regulations.flatMap(r => r.attributes?.availableTagFilters).filter(Boolean);
-			try {
-				for (let tag of tags) {
-					if (!tag.tagLocalizations)
-						continue;
-					for (const [key, value] of Object.entries(tag.tagLocalizations)) {
-						i18next.addResource(key, "translation", tag.tag, value);
-					}
-				}
-			} catch { }
+		loader: async ({ params }) => {
+			const dataCasesPromise = (params.employeeId ? getEmployeeCases(params, "ED") : getCompanyCases(params, "CD"));
+			const [values, valueCounts, dataCases] = await Promise.all([getCurrentValues(params), getCaseValueCount(params, 2), dataCasesPromise])
 			return {
 				values,
-				history,
-				tags
+				valueCounts,
+				dataCases,
+				random: Math.random()
 			};
-		}
+		},
+		children: [
+			{
+				path: ":caseFieldName",
+				Component: DataValueHistory,
+				loader: ({ params }) => {
+					return getCaseChangeCaseValues(params);
+				}
+			}
+		]
 	};
 }
 
