@@ -140,7 +140,7 @@ function DialogHeader({ title, onClose }) {
 					<ArrowBack />
 				</IconButton>
 			)}
-			<Typography variant="h6" sx={{ flex: 1 }}>
+			<Typography variant="h6" sx={{ flex: 1 }} noWrap>
 				{title}
 			</Typography>
 		</Stack>

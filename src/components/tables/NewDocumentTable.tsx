@@ -1,16 +1,16 @@
 import {
-	Divider,
 	Stack,
 	Typography,
 	IconButton,
 	Button,
-	Paper,
 	Theme,
 	SxProps,
 	TextField,
 	InputAdornment,
+	Chip,
+	Box,
 } from "@mui/material";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import { Outlet, useSubmit, useLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Clear, Delete } from "@mui/icons-material";
@@ -43,43 +43,153 @@ function DocumentTable() {
 	const { t } = useTranslation();
 	const { data, values } = useLoaderData() as LoaderData;
 	const [search, setSearch] = useState("");
+	const [selectedDocCase, setSelectedDocCase] = useState<AvailableCase>();
 
+	const caseFieldMap = useMemo(() => {
+		let result: Record<string, AvailableCaseField> = {};
+		for (const caseField of data.flatMap(_case => _case.caseFields)) {
+			result[caseField.name] = caseField;
+		}
+		return result;
+	}, [data]);
 	const lowerSearch = search.toLowerCase();
-	const casesWithValues = data.filter(_case => _case.caseFields.map(f => values[f.name].length).reduce((a, b) => a + b) > 0);
-	const filteredValues = casesWithValues.filter(_case => {
-		if (_case.displayName.toLowerCase().includes(lowerSearch))
-			return true;
-		for (let i = 0; i < _case.caseFields.length; i++) {
-			const field = _case.caseFields[i];
-			if (field.displayName.toLowerCase().includes(lowerSearch)) {
-				return true;
+	const filteredValues = useMemo(() => {
+		let result: Record<string, Array<CaseValue>> = {};
+		for (const [fieldName, caseValues] of Object.entries(values)) {
+			const fieldDisplayName = caseFieldMap[fieldName]?.displayName.toLowerCase() ?? "";
+			if (fieldDisplayName.includes(lowerSearch)) {
+				result[fieldName] = caseValues;
 			}
-			const documents = values[field.name]?.flatMap(v => v.documents);
-			for (const doc of documents) {
-				if (doc.name.toLowerCase().includes(lowerSearch))
-					return true;
+			else {
+				let filteredCaseValues: Array<CaseValue> = []
+				for (const caseValue of caseValues) {
+					const documents = caseValue.documents.filter(doc => doc.name.toLowerCase().includes(lowerSearch));
+					if (documents.length > 0) {
+						filteredCaseValues.push({ id: caseValue.id, documents });
+					}
+				}
+				if (filteredCaseValues.length > 0) {
+					result[fieldName] = filteredCaseValues;
+				}
 			}
 		}
-		return false;
-	});
-	const noValuesAvailableText = filteredValues.length === 0 ? <Typography>{t("No data available")}</Typography> : null;
+		return result;
+	}, [values, caseFieldMap, lowerSearch]);
+	const caseFields = selectedDocCase ? selectedDocCase.caseFields : data.flatMap(_case => _case.caseFields);
+	const noValuesAvailableText = caseFields.every(field => (filteredValues[field.name]?.length ?? 0) === 0) ? <Typography>{t("No data available")}</Typography> : null;
 
 	return (
 		<>
 			<DocumentSearch search={search} setSearch={setSearch} />
-			<Stack spacing={3} pb={3}>
-				{filteredValues.map((c) => (
-					<DocumentGroupCard
-						key={c.id}
-						groupName={c.displayName}
-						fields={c.caseFields}
-					/>
-				))}
+			<CategoryFilter selectedDocCase={selectedDocCase} setSelectedDocCase={setSelectedDocCase} />
+			<Stack spacing={1} pb={2}>
+				{caseFields.map(field => <CaseFieldDocumentTable key={field.id} displayName={field.displayName} values={filteredValues[field.name]} displayRecentOnly={false} />)}
 				{noValuesAvailableText}
 			</Stack>
 			<Outlet />
 		</>
 	);
+}
+
+function CategoryFilter({ selectedDocCase, setSelectedDocCase }) {
+	const { t } = useTranslation();
+	const { data, values } = useLoaderData() as LoaderData;
+	if (data.length === 0)
+		return;
+	const availableDocCases = useMemo(() => data.filter(_case => _case.caseFields.map(f => values[f.name].length).reduce((a, b) => a + b) > 0), [data, values]);
+	return (
+		<Stack direction="row" spacing={1} flexWrap="wrap">
+			{availableDocCases.map(docCase => {
+				const isSelected = docCase === selectedDocCase;
+				return <Chip
+					variant={isSelected ? "filled" : "outlined"}
+					color="primary"
+					key={docCase.id}
+					label={t(docCase.displayName)}
+					size="small"
+					onClick={() => { setSelectedDocCase(isSelected ? undefined : docCase) }}
+				/>;
+			})}
+		</Stack>
+	);
+}
+
+function CaseFieldDocumentTable({ displayName, values, displayRecentOnly }) {
+	const { t } = useTranslation();
+	if (!values || values.length === 0) {
+		return null;
+	}
+	const groupedDocuments = Object.groupBy(values, ({ start }) => {
+		const date = dayjs.utc(start);
+		return date.isValid() ? date.format("MMM YYYY") : t("Without date");
+	});
+	let entries = Object.entries(groupedDocuments);
+	if (displayRecentOnly) {
+		entries = entries.slice(0, 2);
+	}
+	return (
+		<Stack spacing={0.5}>
+			<Typography variant="h6" flex={1}>
+				{displayName}
+			</Typography>
+			<Stack>
+				{
+					entries.map(([key, values]) => <MonthGroup key={key} month={key} values={values} />)
+				}
+			</Stack>
+		</Stack>
+	);
+}
+
+function MonthGroup({ month, values }: { month: string, values: Array<CaseValue> }) {
+	const { t } = useTranslation();
+	const submit = useSubmit();
+	const onDelete = (caseValueId: IdType, documentId: IdType) => {
+		submit(null, {
+			method: "delete",
+			action: `${caseValueId}/i/${documentId}`
+		});
+	};
+	const isProviderRole = useRole("provider");
+	const isMobile = useIsMobile();
+	return (
+		<Box display="grid" gridTemplateColumns="90px 1fr" gridTemplateRows="auto" alignItems="start">
+			<Typography lineHeight="28px">{month}</Typography>
+			<Stack overflow="hidden">
+				{values.flatMap(caseValue => caseValue.documents.map(document => (
+					<Stack direction="row" alignItems="center" sx={itemSx} key={document.id}>
+						<DocumentLink
+							name={document.name}
+							to={`${caseValue.id}/i/${document.id}`}
+							sx={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}
+						/>
+						{isProviderRole && !isMobile &&
+							<ResponsiveDialog>
+								<ResponsiveDialogTrigger>
+									<IconButton size="small">
+										<Delete fontSize="small" />
+									</IconButton>
+								</ResponsiveDialogTrigger>
+								<ResponsiveDialogContent>
+									<Typography variant="h6">{t("Delete document")}</Typography>
+									<Typography>{t("delete_document_text", { documentName: document.name })}</Typography>
+									<Stack direction="row" justifyContent="end" spacing={1}>
+										<ResponsiveDialogClose>
+											<Button>{t("Cancel")}</Button>
+										</ResponsiveDialogClose>
+										<ResponsiveDialogClose>
+											<Button variant="contained" color="destructive" onClick={() => onDelete(caseValue.id, document.id)}>{t("Delete")}</Button>
+										</ResponsiveDialogClose>
+									</Stack>
+								</ResponsiveDialogContent>
+							</ResponsiveDialog>
+						}
+					</Stack>
+				)))}
+			</Stack>
+		</Box>
+
+	)
 }
 
 function DocumentSearch({ search, setSearch }) {
@@ -135,117 +245,3 @@ const itemSx: SxProps<Theme> = {
 		}
 	}
 };
-
-function CaseValueRow({ caseValue }: { caseValue: CaseValue }) {
-	const { t } = useTranslation();
-	const submit = useSubmit();
-	const onDelete = (documentId: IdType) => {
-		submit(null, {
-			method: "delete",
-			action: `${caseValue.id}/i/${documentId}`
-		});
-	};
-	const isProviderRole = useRole("provider");
-	const isMobile = useIsMobile();
-	return (
-		<Stack>
-			{caseValue.documents.map((document) => (
-				<Stack direction="row" alignItems="center" sx={itemSx} key={document.id}>
-					<DocumentLink
-						name={document.name}
-						to={`${caseValue.id}/i/${document.id}`}
-						sx={{ flex: 1 }}
-					/>
-					{isProviderRole && !isMobile &&
-						<ResponsiveDialog>
-							<ResponsiveDialogTrigger>
-								<IconButton size="small">
-									<Delete fontSize="small" />
-								</IconButton>
-							</ResponsiveDialogTrigger>
-							<ResponsiveDialogContent>
-								<Typography variant="h6">{t("Delete document")}</Typography>
-								<Typography>{t("delete_document_text", { documentName: document.name })}</Typography>
-								<Stack direction="row" justifyContent="end" spacing={1}>
-									<ResponsiveDialogClose>
-										<Button>{t("Cancel")}</Button>
-									</ResponsiveDialogClose>
-									<ResponsiveDialogClose>
-										<Button variant="contained" color="destructive" onClick={() => onDelete(document.id)}>{t("Delete")}</Button>
-									</ResponsiveDialogClose>
-								</Stack>
-							</ResponsiveDialogContent>
-						</ResponsiveDialog>
-					}
-				</Stack>
-			))}
-		</Stack>
-	);
-}
-
-function DocumentGroup({ caseFieldName, displayName }) {
-	const { t } = useTranslation();
-	const { values } = useLoaderData() as LoaderData;
-	const documents = values[caseFieldName];
-	if (!documents || documents.length === 0) {
-		return;
-	}
-
-	// @ts-ignore
-	const groupedDocuments = Object.groupBy(documents, ({ start }) => {
-		const date = dayjs.utc(start);
-		return date.isValid() ? date.format("MMMM YYYY") : t("Without date");
-	});
-	const entries = Object.entries(groupedDocuments);
-	return (
-		<Stack>
-			<Typography variant="subtitle1" flex={1}>
-				{displayName}
-			</Typography>
-			{entries.length > 0 && (
-				<Stack sx={{ px: 2, pt: 2 }} spacing={1} alignItems="start">
-					{entries.map(([key, values]) => (
-						<DocumentMonthGroup key={key} month={key} items={values as Array<CaseValue>} />
-					))}
-				</Stack>
-			)}
-		</Stack>
-	);
-}
-function DocumentGroupCard({ groupName, fields }: { groupName: string, fields: Array<AvailableCaseField> }) {
-	return (
-		<Paper>
-			<Stack>
-				<Stack
-					direction="row"
-					alignItems="center"
-					sx={{ pl: 2, pr: 1, py: 1 }}
-					spacing={2}
-				>
-					<Typography variant="h6" flex={1}>
-						{groupName}
-					</Typography>
-				</Stack>
-				<Divider />
-				{fields.length > 0 && (
-					<Stack sx={{ p: 2 }} spacing={1} alignItems="stretch">
-						{fields.map((field) => (
-							<DocumentGroup key={field.id} caseFieldName={field.name} displayName={field.displayName} />
-						))}
-					</Stack>
-				)}
-			</Stack>
-		</Paper>
-	);
-}
-
-function DocumentMonthGroup({ month, items }: { month: string, items: Array<CaseValue> }) {
-	return (
-		<Stack alignSelf="stretch">
-			<Typography variant="subtitle2">{month}</Typography>
-			{items.map((caseValue) => (
-				<CaseValueRow key={caseValue.id} caseValue={caseValue} />
-			))}
-		</Stack>
-	);
-}

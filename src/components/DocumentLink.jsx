@@ -12,7 +12,7 @@ export function DocumentLink({ name, ...linkProps }) {
 		>
 			<Stack direction="row" alignItems="center" spacing={0.75}>
 				<Attachment fontSize="small" />
-				<Typography>{name}</Typography>
+				<Typography noWrap>{name}</Typography>
 			</Stack>
 		</Link>
 	);
