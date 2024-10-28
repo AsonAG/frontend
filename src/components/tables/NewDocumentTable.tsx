@@ -9,11 +9,17 @@ import {
 	InputAdornment,
 	Chip,
 	Box,
+	Popover,
+	List,
+	ListItem,
+	ListItemButton,
+	ListItemIcon,
+	ListItemText,
 } from "@mui/material";
 import React, { ReactNode, useMemo, useState } from "react";
 import { Outlet, useSubmit, useLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Clear, Delete } from "@mui/icons-material";
+import { Clear, Delete, Schedule, Subject } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { DocumentLink } from "../DocumentLink";
 import {
@@ -28,6 +34,8 @@ import { IdType } from "../../models/IdType";
 import { AvailableCase } from "../../models/AvailableCase";
 import { AvailableCaseField } from "../../models/AvailableCaseField";
 import { CaseValue } from "../../models/CaseValue";
+import { useAtom } from "jotai";
+import { documentRecentSettingAtom } from "../../utils/dataAtoms";
 
 export function AsyncDocumentTable() {
 	return (
@@ -44,6 +52,7 @@ function DocumentTable() {
 	const { data, values } = useLoaderData() as LoaderData;
 	const [search, setSearch] = useState("");
 	const [selectedDocCase, setSelectedDocCase] = useState<AvailableCase>();
+	const [showRecentValuesOnly, setShowRecentValuesOnly] = useAtom(documentRecentSettingAtom);
 
 	const caseFieldMap = useMemo(() => {
 		let result: Record<string, AvailableCaseField> = {};
@@ -56,16 +65,24 @@ function DocumentTable() {
 	const filteredValues = useMemo(() => {
 		let result: Record<string, Array<CaseValue>> = {};
 		for (const [fieldName, caseValues] of Object.entries(values)) {
+			let recentValues = caseValues;
+			if (showRecentValuesOnly) {
+				const grouped = Object.groupBy(caseValues, ({ start }) => {
+					const date = dayjs.utc(start);
+					return date.isValid() ? date.format("MMM YYYY") : t("Without date");
+				})
+				recentValues = Object.entries(grouped).slice(0, 3).flatMap(([_, values]) => values) as Array<CaseValue>;
+			}
 			const fieldDisplayName = caseFieldMap[fieldName]?.displayName.toLowerCase() ?? "";
 			if (fieldDisplayName.includes(lowerSearch)) {
-				result[fieldName] = caseValues;
+				result[fieldName] = recentValues;
 			}
 			else {
 				let filteredCaseValues: Array<CaseValue> = []
-				for (const caseValue of caseValues) {
+				for (const caseValue of recentValues) {
 					const documents = caseValue.documents.filter(doc => doc.name.toLowerCase().includes(lowerSearch));
 					if (documents.length > 0) {
-						filteredCaseValues.push({ id: caseValue.id, documents });
+						filteredCaseValues.push({ ...caseValue, documents });
 					}
 				}
 				if (filteredCaseValues.length > 0) {
@@ -74,21 +91,93 @@ function DocumentTable() {
 			}
 		}
 		return result;
-	}, [values, caseFieldMap, lowerSearch]);
+	}, [values, caseFieldMap, lowerSearch, showRecentValuesOnly]);
 	const caseFields = selectedDocCase ? selectedDocCase.caseFields : data.flatMap(_case => _case.caseFields);
 	const noValuesAvailableText = caseFields.every(field => (filteredValues[field.name]?.length ?? 0) === 0) ? <Typography>{t("No data available")}</Typography> : null;
 
 	return (
 		<>
 			<DocumentSearch search={search} setSearch={setSearch} />
-			<CategoryFilter selectedDocCase={selectedDocCase} setSelectedDocCase={setSelectedDocCase} />
+			<Stack direction="row" flexWrap="wrap" spacing={2} alignItems="start">
+				<CategoryFilter selectedDocCase={selectedDocCase} setSelectedDocCase={setSelectedDocCase} />
+				<RecentFilter recentValues={showRecentValuesOnly} setRecentValues={setShowRecentValuesOnly} />
+			</Stack>
 			<Stack spacing={1} pb={2}>
-				{caseFields.map(field => <CaseFieldDocumentTable key={field.id} displayName={field.displayName} values={filteredValues[field.name]} displayRecentOnly={false} />)}
+				{caseFields.map(field =>
+					<CaseFieldDocumentTable
+						key={field.id}
+						displayName={field.displayName}
+						values={filteredValues[field.name]}
+					/>)}
 				{noValuesAvailableText}
 			</Stack>
 			<Outlet />
 		</>
 	);
+}
+
+function RecentFilter({ recentValues, setRecentValues }) {
+	const { t } = useTranslation();
+	const icon = recentValues ? <Schedule /> : <Subject />;
+	const onlyRecentText = t("Only recent");
+	const allText = t("All");
+	const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	const handleSetValue = (value) => {
+		setRecentValues(value);
+		handleClose();
+	}
+
+	const open = Boolean(anchorEl);
+	const id = open ? 'recent-values-popover' : undefined;
+	const listIconSx = { minWidth: 34 };
+	return <>
+		<Button startIcon={icon} onClick={handleClick} disableRipple>
+			<Typography variant="button" lineHeight={1}>{recentValues ? onlyRecentText : allText}</Typography>
+		</Button>
+		<Popover
+			id={id}
+			open={open}
+			anchorEl={anchorEl}
+			onClose={handleClose}
+			anchorOrigin={{
+				vertical: 'bottom',
+				horizontal: 'right',
+			}}
+			transformOrigin={{
+				vertical: 'top',
+				horizontal: 'right',
+			}}
+			sx={{ mt: 1 }}
+		>
+			<List dense>
+				<ListItem disablePadding>
+					<ListItemButton onClick={() => handleSetValue(true)}>
+						<ListItemIcon sx={listIconSx}>
+							<Schedule />
+						</ListItemIcon>
+						<ListItemText primary={onlyRecentText} />
+					</ListItemButton>
+				</ListItem>
+				<ListItem disablePadding>
+					<ListItemButton onClick={() => handleSetValue(false)}>
+						<ListItemIcon sx={listIconSx}>
+							<Subject />
+						</ListItemIcon>
+						<ListItemText primary={allText} />
+					</ListItemButton>
+				</ListItem>
+			</List>
+		</Popover>
+	</>
 }
 
 function CategoryFilter({ selectedDocCase, setSelectedDocCase }) {
@@ -98,7 +187,7 @@ function CategoryFilter({ selectedDocCase, setSelectedDocCase }) {
 		return;
 	const availableDocCases = useMemo(() => data.filter(_case => _case.caseFields.map(f => values[f.name].length).reduce((a, b) => a + b) > 0), [data, values]);
 	return (
-		<Stack direction="row" spacing={1} flexWrap="wrap">
+		<Stack direction="row" spacing={1} flexWrap="wrap" flex={1}>
 			{availableDocCases.map(docCase => {
 				const isSelected = docCase === selectedDocCase;
 				return <Chip
@@ -114,7 +203,7 @@ function CategoryFilter({ selectedDocCase, setSelectedDocCase }) {
 	);
 }
 
-function CaseFieldDocumentTable({ displayName, values, displayRecentOnly }) {
+function CaseFieldDocumentTable({ displayName, values }) {
 	const { t } = useTranslation();
 	if (!values || values.length === 0) {
 		return null;
@@ -124,9 +213,6 @@ function CaseFieldDocumentTable({ displayName, values, displayRecentOnly }) {
 		return date.isValid() ? date.format("MMM YYYY") : t("Without date");
 	});
 	let entries = Object.entries(groupedDocuments);
-	if (displayRecentOnly) {
-		entries = entries.slice(0, 2);
-	}
 	return (
 		<Stack spacing={0.5}>
 			<Typography variant="h6" flex={1}>

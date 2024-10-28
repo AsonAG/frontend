@@ -9,5 +9,8 @@ export type CaseDocument = {
 
 export type CaseValue = {
   id: IdType
+  start: Date
+  end: Date
+  created: Date
   documents: Array<CaseDocument>
 }

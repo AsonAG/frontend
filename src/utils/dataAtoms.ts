@@ -156,6 +156,7 @@ export const userInformationAtom = atom((async get => {
 
 export const payrollDashboardFeatureAtom = atomWithStorage<boolean>("feature.payrolldashboard", false, undefined, { getOnInit: true });
 export const caseDocumentsFeatureAtom = atomWithStorage<boolean>("feature.casedocuments", false, undefined, { getOnInit: true });
+export const documentRecentSettingAtom = atomWithStorage<boolean>("setting.document.recent", true, undefined, { getOnInit: true });
 
 export const missingDataAppearanceAtom = atom(get => {
 	const useDashboard = get(payrollDashboardFeatureAtom);

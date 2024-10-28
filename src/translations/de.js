@@ -72,6 +72,8 @@ const translations = {
 		"Task accepted": "Aufgabe akzeptiert",
 		"Comment saved": "Kommentar gespeichert",
 		"New task": "Neue Aufgabe",
+		All: "Alle",
+		"Only recent": "Nur Neueste",
 		selected: "ausgewählt",
 		no_employees_selected: "Keine Mitarbeiter $t(selected)",
 		all_employees_selected: "Alle Mitarbeiter $t(selected)",
