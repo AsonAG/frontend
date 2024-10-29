@@ -156,7 +156,7 @@ function createInitialState({ groups, values }: { groups: Array<AvailableCase>, 
         field => {
           const values = fieldMap.get(field.name);
           if (!values) return [];
-          let searchValues = values.flatMap(value => value.value.toLowerCase());
+          let searchValues = values.flatMap(value => formatCaseValue(value.value).toLowerCase());
           searchValues.push(field.displayName.toLowerCase())
           return searchValues;
         }
