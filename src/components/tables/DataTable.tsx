@@ -1,4 +1,4 @@
-import React, { Dispatch, Fragment, PropsWithChildren, ReactNode, useMemo, useReducer } from "react";
+import React, { Dispatch, Fragment, PropsWithChildren, useMemo, useReducer, useRef } from "react";
 import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -6,18 +6,18 @@ import {
   Stack,
   Typography,
   Box,
-  TextField,
-  InputAdornment,
   Chip,
   Dialog,
   useMediaQuery,
   Theme,
   useTheme,
   Divider,
+  styled,
+  SxProps,
 } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { formatCaseValue } from "../../utils/Format";
-import { Clear, Close, History } from "@mui/icons-material";
+import { Close, History, Search } from "@mui/icons-material";
 import { IdType } from "../../models/IdType";
 import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, getSortedRowModel, getFilteredRowModel } from "@tanstack/react-table";
 import { TFunction } from "i18next";
@@ -106,7 +106,6 @@ export function DataTable() {
   );
   const { selectedGroup } = state;
   return <>
-    <TableSearch state={state} dispatch={dispatch} />
     <GroupFilter state={state} dispatch={dispatch} />
     {
       selectedGroup ?
@@ -255,12 +254,69 @@ function Row({ children }: PropsWithChildren) {
   )
 }
 
+const ChipInput = styled("input")(({ theme }) => ({
+  color: theme.palette.primary.main,
+  backgroundColor: "inherit",
+  border: "none",
+  outline: "none",
+  ...theme.typography.body2,
+  fontSize: "0.7rem"
+}));
+
+const chipSx: SxProps<Theme> = {
+  "& .MuiChip-icon": {
+    mx: 0.325
+  },
+  "&.MuiChip-root.Mui-focusVisible": {
+    backgroundColor: "inherit"
+  },
+  "& .MuiChip-label": {
+    display: "inline-block",
+    width: 0,
+    visibility: "hidden",
+    transition: "visibility 0s, width 0.25s",
+    px: 0
+  },
+  "& .MuiChip-deleteIcon": {
+    display: "none"
+  },
+  "&:hover, &:focus-within, &:has(input:valid)": {
+    "& .MuiChip-label": {
+      width: 140,
+      visibility: "visible"
+    },
+    "& .MuiChip-deleteIcon": {
+      display: "unset",
+      visibility: "hidden"
+    },
+  },
+  "&:has(input:valid)": {
+    "& .MuiChip-deleteIcon": {
+      visibility: "visible"
+    }
+  }
+}
 
 function GroupFilter({ state, dispatch }: { state: State, dispatch: Dispatch<Action> }) {
   const { t } = useTranslation();
-  const { selectedGroup, filteredGroups } = state;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { search, selectedGroup, filteredGroups } = state;
+  const onChange = (event) => dispatch({ type: "set_search", search: event.target.value });
+  const onClear = () => {
+    dispatch({ type: "set_search", search: "" });
+    inputRef.current?.focus();
+  };
+  const searchField =
+    <ChipInput
+      ref={inputRef}
+      required
+      value={search}
+      onChange={onChange}
+      spellCheck={false}
+    />;
   return (
     <Stack direction="row" spacing={1} flexWrap="wrap">
+      <Chip variant="outlined" color="primary" size="small" icon={<Search />} onDelete={onClear} label={searchField} sx={chipSx} />
       {filteredGroups.map(group => {
         const isSelected = group === selectedGroup;
         return <Chip
@@ -275,46 +331,6 @@ function GroupFilter({ state, dispatch }: { state: State, dispatch: Dispatch<Act
     </Stack>
   );
 }
-function TableSearch({ state, dispatch }: { state: State, dispatch: Dispatch<Action> }) {
-  const { t } = useTranslation();
-  const { search } = state;
-
-  const onChange = (event) => {
-    const updatedValue = event.target.value;
-    dispatch({ type: "set_search", search: updatedValue })
-  };
-
-  const onClear = () => {
-    dispatch({ type: "set_search", search: "" })
-  }
-
-  let clearButton: ReactNode | null = null;
-  if (search) {
-    clearButton = (
-      <InputAdornment position="end">
-        <IconButton onClick={onClear}>
-          <Clear />
-        </IconButton>
-      </InputAdornment>
-    )
-  }
-
-  return (
-    <TextField
-      fullWidth
-      variant="outlined"
-      placeholder={t("Search in Field or Value")}
-      onChange={onChange}
-      value={search}
-      slotProps={{
-        input: {
-          endAdornment: clearButton,
-        }
-      }}
-    />
-  );
-}
-
 
 export function DataValueHistory() {
   const { t } = useTranslation();
