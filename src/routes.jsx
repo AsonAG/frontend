@@ -25,7 +25,6 @@ import {
 	getEmployeeCaseChanges,
 	getCompanyCases,
 	getCompanyCaseChanges,
-	getDocumentCaseFields,
 	getPayrunJobs,
 	getDraftPayrunJobs,
 	getTasks,
@@ -64,7 +63,6 @@ import {
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
-import { AsyncDocumentTable } from "./components/tables/DocumentTable";
 import { AsyncDocumentTable as AsyncNewDocumenTable } from "./components/tables/NewDocumentTable";
 import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
@@ -171,10 +169,8 @@ function createRouteCaseForm(path, data) {
 }
 
 function createRouteDocument(showTitle) {
-	const useNewDocumentView = store.get(caseDocumentsFeatureAtom);
-	const Component = useNewDocumentView ? AsyncNewDocumenTable : AsyncDocumentTable;
-	const TitledComponent = showTitle ? withPage("Documents", Component) : Component;
-	const loader = useNewDocumentView ?
+	const Component = showTitle ? withPage("Documents", AsyncNewDocumenTable) : AsyncNewDocumenTable;
+	const loader =
 		async ({ params }) => {
 			const documentCases = await (params.employeeId ? getEmployeeCases : getCompanyCases)(params, "DOC");
 			if (documentCases) {
@@ -194,14 +190,9 @@ function createRouteDocument(showTitle) {
 				data: documentCases,
 				values: []
 			};
-		}
-		:
-		({ params }) => defer({
-			data: getDocumentCaseFields(params),
-
-		});
+		};
 	return {
-		Component: TitledComponent,
+		Component,
 		path: "documents",
 		loader,
 		children: [
