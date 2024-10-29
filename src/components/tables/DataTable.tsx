@@ -260,7 +260,9 @@ const ChipInput = styled("input")(({ theme }) => ({
   border: "none",
   outline: "none",
   ...theme.typography.body2,
-  fontSize: "0.7rem"
+  fontSize: "0.7rem",
+  lineHeight: 1,
+  marginTop: "1px"
 }));
 
 const chipSx: SxProps<Theme> = {
@@ -311,6 +313,7 @@ function GroupFilter({ state, dispatch }: { state: State, dispatch: Dispatch<Act
       ref={inputRef}
       required
       value={search}
+      placeholder={t("Filter groups...")}
       onChange={onChange}
       spellCheck={false}
     />;

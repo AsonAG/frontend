@@ -33,6 +33,7 @@ const translations = {
 		Search: "Suchen",
 		"Search in Event, Field or Value": "Suchen in Ereignis, Feld oder Wert",
 		"Search in Field or Value": "Suchen in Feld oder Wert",
+		"Filter groups...": "Gruppen filtern...",
 		"Newest events first": "Neueste Ereignisse zuerst",
 		"Clear search": "Suche zurücksetzen",
 		"No data": "Keine Daten",
