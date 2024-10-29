@@ -125,7 +125,7 @@ function reducer(state: State, action: Action): State {
     };
   }
   if (action.type === "set_search") {
-    const lowerSearch = action.search;
+    const lowerSearch = action.search.toLowerCase();
     let selectedGroup = state.selectedGroup;
     const filtered = state.groups.filter(group => state.searchMap.get(group.name)!.some(searchValue => searchValue.includes(lowerSearch)));
     if (filtered.length > 0 && (state.selectedGroup === null || !filtered.includes(state.selectedGroup))) {
