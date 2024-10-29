@@ -101,7 +101,7 @@ export function DataTable() {
   const { values, dataCases: dataGroups } = useLoaderData() as LoaderData;
   const [state, dispatch] = useReducer(
     reducer,
-    { groups: dataGroups, values },
+    { groups: dataGroups, values, t },
     createInitialState
   );
   const { selectedGroup } = state;
@@ -144,7 +144,7 @@ function reducer(state: State, action: Action): State {
   throw new Error("unknown action type");
 }
 
-function createInitialState({ groups, values }: { groups: Array<AvailableCase>, values: Array<CaseValue> }): State {
+function createInitialState({ groups, values, t }: { groups: Array<AvailableCase>, values: Array<CaseValue>, t: TFunction }): State {
   const fieldMap = Map.groupBy(values, (value: CaseValue) => value.caseFieldName) as Map<string, Array<CaseValue>>;
   const availableGroups = groups.filter(group => group.caseFields.some(caseField => fieldMap.has(caseField.name)));
   const ordered = availableGroups.sort(((a, b) => a.attributes?.["tag.order"] - b.attributes?.["tag.order"]));
@@ -156,7 +156,10 @@ function createInitialState({ groups, values }: { groups: Array<AvailableCase>, 
         field => {
           const values = fieldMap.get(field.name);
           if (!values) return [];
-          let searchValues = values.flatMap(value => formatCaseValue(value.value).toLowerCase());
+          let searchValues = values.flatMap(value => (
+            value.valueType == "WebResource" ?
+              value.value :
+              formatCaseValue(value, t) ?? "").toLowerCase());
           searchValues.push(field.displayName.toLowerCase())
           return searchValues;
         }
