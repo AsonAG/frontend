@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, ReactNode, useMemo, useState } from "react";
+import React, { Dispatch, Fragment, PropsWithChildren, ReactNode, useMemo, useReducer } from "react";
 import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -17,9 +17,9 @@ import {
 } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { formatCaseValue } from "../../utils/Format";
-import { ArrowDropUp, Clear, Close, History } from "@mui/icons-material";
+import { Clear, Close, History } from "@mui/icons-material";
 import { IdType } from "../../models/IdType";
-import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row as TableRow, getSortedRowModel, getFilteredRowModel, Table, filterFns, sortingFns } from "@tanstack/react-table";
+import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, getSortedRowModel, getFilteredRowModel } from "@tanstack/react-table";
 import { TFunction } from "i18next";
 import { AvailableCase } from "../../models/AvailableCase";
 
@@ -80,73 +80,124 @@ type LoaderData = {
 
 const getRowId = (row: CaseValue) => row.id
 
+type State = {
+  searchMap: Map<string, Array<string>>
+  groups: Array<AvailableCase>
+  filteredGroups: Array<AvailableCase>
+  selectedGroup: AvailableCase | null
+  search: string
+}
+
+type Action = {
+  type: "select_group",
+  group: AvailableCase
+} | {
+  type: "set_search"
+  search: string
+}
+
 export function DataTable() {
+  const { t } = useTranslation();
+  const { values, dataCases: dataGroups } = useLoaderData() as LoaderData;
+  const [state, dispatch] = useReducer(
+    reducer,
+    { groups: dataGroups, values },
+    createInitialState
+  );
+  const { selectedGroup } = state;
+  return <>
+    <TableSearch state={state} dispatch={dispatch} />
+    <GroupFilter state={state} dispatch={dispatch} />
+    {
+      selectedGroup ?
+        <Table state={state} /> :
+        <Typography>{t("No data available")}</Typography>
+    }
+    <Outlet />
+  </>;
+}
+
+function reducer(state: State, action: Action): State {
+  if (action.type === "select_group") {
+    return {
+      ...state,
+      selectedGroup: action.group
+    };
+  }
+  if (action.type === "set_search") {
+    const lowerSearch = action.search;
+    let selectedGroup = state.selectedGroup;
+    const filtered = state.groups.filter(group => state.searchMap.get(group.name)!.some(searchValue => searchValue.includes(lowerSearch)));
+    if (filtered.length > 0 && (state.selectedGroup === null || !filtered.includes(state.selectedGroup))) {
+      selectedGroup = filtered[0];
+    }
+    if (filtered.length === 0) {
+      selectedGroup = null;
+    }
+    return {
+      ...state,
+      selectedGroup,
+      filteredGroups: filtered,
+      search: action.search
+    }
+  }
+  throw new Error("unknown action type");
+}
+
+function createInitialState({ groups, values }: { groups: Array<AvailableCase>, values: Array<CaseValue> }): State {
+  const fieldMap = Map.groupBy(values, (value: CaseValue) => value.caseFieldName) as Map<string, Array<CaseValue>>;
+  const availableGroups = groups.filter(group => group.caseFields.some(caseField => fieldMap.has(caseField.name)));
+  const ordered = availableGroups.sort(((a, b) => a.attributes?.["tag.order"] - b.attributes?.["tag.order"]));
+  const searchMap = new Map();
+  for (const group of availableGroups) {
+    searchMap.set(
+      group.name,
+      group.caseFields.flatMap(
+        field => {
+          const values = fieldMap.get(field.name);
+          if (!values) return [];
+          let searchValues = values.flatMap(value => value.value.toLowerCase());
+          searchValues.push(field.displayName.toLowerCase())
+          return searchValues;
+        }
+      )
+    );
+  }
+  return {
+    searchMap,
+    groups: ordered,
+    filteredGroups: ordered,
+    selectedGroup: ordered[0],
+    search: ""
+  };
+}
+
+function Table({ state }: { state: State }) {
   const { t } = useTranslation();
   const { values, valueCounts } = useLoaderData() as LoaderData;
   const columns = useMemo(() => createColumns(t), []);
-  const [search, setSearch] = useState<string>("");
-  const [selectedDataCase, setSelectedDataCase] = useState<AvailableCase>();
-  const filteredCaseFieldNames = useMemo(() => !!selectedDataCase ? new Set(selectedDataCase.caseFields.map(fields => fields.name)) : null, [selectedDataCase]);
-  const dataCaseValues = useMemo(() => !!filteredCaseFieldNames ? values.filter(value => filteredCaseFieldNames.has(value.caseFieldName)) : values, [values, filteredCaseFieldNames]);
-  const orderCaseFields = useMemo(() => !!selectedDataCase ? new Map(selectedDataCase.caseFields.map((fields, index) => [fields.name, index])) : null, [selectedDataCase]);
+  const { selectedGroup } = state;
+  const selectedGroupFieldNames = useMemo(() => new Set(selectedGroup!.caseFields.map(fields => fields.name)), [selectedGroup]);
+  const dataCaseValues = useMemo(() => values.filter(value => selectedGroupFieldNames.has(value.caseFieldName)), [values, selectedGroupFieldNames]);
+  const orderCaseFields = useMemo(() => new Map(selectedGroup!.caseFields.map((fields, index) => [fields.name, index])), [selectedGroup]);
   const table = useReactTable({
     columns,
     data: dataCaseValues,
-    initialState: {
-      sorting: [
-        {
-          id: "displayCaseFieldName",
-          desc: false
-        }
-      ]
-    },
-    state: {
-      globalFilter: search
-    },
     sortingFns: {
-      caseDataFn: (rowA, rowB, columnId) => {
+      caseDataFn: (rowA, rowB) => {
         if (orderCaseFields) {
           const difference = (orderCaseFields.get(rowA.original.caseFieldName) ?? 0) - (orderCaseFields.get(rowB.original.caseFieldName) ?? 0);
           return difference > 0 ? 1 : difference < 0 ? -1 : 0;
           ;
         }
-        return sortingFns["alphanumeric"](rowA, rowB, columnId);
+        return 0;
       }
     },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getRowId,
-    globalFilterFn: "includesString"
+    getRowId
   });
-  return <>
-    <TableSearch filterValue={search} setFilterValue={setSearch} />
-    <CategoryFilter selectedDataCase={selectedDataCase} setSelectedDataCase={setSelectedDataCase} />
-    <Table table={table} defaultSort={!selectedDataCase}>
-      {(row => (
-        <Row key={row.id}>
-          {row.getVisibleCells().map((cell) => (
-            <Box key={cell.id} sx={{ p: 0.5 }}>
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </Box>
-          ))}
-          {
-            (valueCounts[row.original.caseFieldName] ?? 0) > 1 ?
-              <IconButton component={Link} to={encodeURIComponent(row.original.caseFieldName)} size="small" sx={{ justifySelf: "center", alignSelf: "start" }}>
-                <History />
-              </IconButton>
-              :
-              <span></span>
-          }
-        </Row>
-      ))}
-    </Table>
-    <Outlet />
-  </>;
-}
-
-function Table({ table, defaultSort, children }: { table: Table<CaseValue>, defaultSort: boolean, children: (row: TableRow<CaseValue>) => ReactNode }) {
-  const { t } = useTranslation();
   const rows = table.getRowModel().rows;
   if (rows.length === 0) {
     return <Typography>{t("No data")}</Typography>;
@@ -161,7 +212,6 @@ function Table({ table, defaultSort, children }: { table: Table<CaseValue>, defa
                 header.column.columnDef.header,
                 header.getContext())
               }
-              {header.column.columnDef.meta?.renderSortIndicator && defaultSort && <ArrowDropUp fontSize="16px" />}
             </Typography>
           ))}
           <Box></Box>
@@ -172,7 +222,23 @@ function Table({ table, defaultSort, children }: { table: Table<CaseValue>, defa
           backgroundColor: theme => theme.palette.primary.hover
         }
       }}>
-        {rows.map(children)}
+        {rows.map(row => (
+          <Row key={row.id}>
+            {row.getVisibleCells().map((cell) => (
+              <Box key={cell.id} sx={{ p: 0.5 }}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </Box>
+            ))}
+            {
+              (valueCounts[row.original.caseFieldName] ?? 0) > 1 ?
+                <IconButton component={Link} to={encodeURIComponent(row.original.caseFieldName)} size="small" sx={{ justifySelf: "center", alignSelf: "start" }}>
+                  <History />
+                </IconButton>
+                :
+                <span></span>
+            }
+          </Row>
+        ))}
       </Stack>
     </Stack>
   );
@@ -187,43 +253,40 @@ function Row({ children }: PropsWithChildren) {
 }
 
 
-function CategoryFilter({ selectedDataCase, setSelectedDataCase }) {
+function GroupFilter({ state, dispatch }: { state: State, dispatch: Dispatch<Action> }) {
   const { t } = useTranslation();
-  const { values, dataCases } = useLoaderData() as LoaderData;
-  if (dataCases.length === 0)
-    return;
-  const availableCaseFieldNames = useMemo(() => new Set(values.map(v => v.caseFieldName)), [values]);
-  const availableDataCases = useMemo(() => dataCases.filter(dataCase => dataCase.caseFields.some(caseField => availableCaseFieldNames.has(caseField.name))), [dataCases, availableCaseFieldNames]);
+  const { selectedGroup, filteredGroups } = state;
   return (
-    <Stack direction="row" spacing={1}>
-      {availableDataCases.map(dataCase => {
-        const isSelected = dataCase === selectedDataCase;
+    <Stack direction="row" spacing={1} flexWrap="wrap">
+      {filteredGroups.map(group => {
+        const isSelected = group === selectedGroup;
         return <Chip
           variant={isSelected ? "filled" : "outlined"}
           color="primary"
-          key={dataCase.id}
-          label={t(dataCase.displayName)}
+          key={group.id}
+          label={t(group.displayName)}
           size="small"
-          onClick={() => { setSelectedDataCase(isSelected ? undefined : dataCase) }}
+          onClick={() => { dispatch({ type: "select_group", group }) }}
         />;
       })}
     </Stack>
   );
 }
-function TableSearch({ filterValue, setFilterValue }) {
+function TableSearch({ state, dispatch }: { state: State, dispatch: Dispatch<Action> }) {
   const { t } = useTranslation();
+  const { search } = state;
 
   const onChange = (event) => {
     const updatedValue = event.target.value;
-    setFilterValue(updatedValue);
+    dispatch({ type: "set_search", search: updatedValue })
   };
 
   const onClear = () => {
-    setFilterValue("");
+    dispatch({ type: "set_search", search: "" })
   }
 
   let clearButton: ReactNode | null = null;
-  if (filterValue) {
+  if (search) {
     clearButton = (
       <InputAdornment position="end">
         <IconButton onClick={onClear}>
@@ -239,7 +302,7 @@ function TableSearch({ filterValue, setFilterValue }) {
       variant="outlined"
       placeholder={t("Search in Field or Value")}
       onChange={onChange}
-      value={filterValue}
+      value={search}
       slotProps={{
         input: {
           endAdornment: clearButton,
