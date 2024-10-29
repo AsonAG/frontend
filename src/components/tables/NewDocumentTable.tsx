@@ -37,17 +37,11 @@ import { CaseValue } from "../../models/CaseValue";
 import { useAtom } from "jotai";
 import { documentRecentSettingAtom } from "../../utils/dataAtoms";
 
-export function AsyncDocumentTable() {
-	return (
-		<DocumentTable />
-	);
-}
-
 type LoaderData = {
 	data: Array<AvailableCase>
 	values: Record<string, Array<CaseValue>>
 }
-function DocumentTable() {
+export function DocumentTable() {
 	const { t } = useTranslation();
 	const { data, values } = useLoaderData() as LoaderData;
 	const [search, setSearch] = useState("");

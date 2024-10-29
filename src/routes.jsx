@@ -63,7 +63,7 @@ import {
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
 import { AsyncTaskTable } from "./components/tables/TaskTable";
-import { AsyncDocumentTable as AsyncNewDocumenTable } from "./components/tables/NewDocumentTable";
+import { DocumentTable } from "./components/tables/NewDocumentTable";
 import { CaseValueDocumentDialog } from "./components/DocumentDialog";
 import { AsyncTaskView } from "./components/TaskView";
 import { getDefaultStore } from "jotai";
@@ -79,8 +79,7 @@ import {
 	missingDataTasksAtom,
 	orgsAtom,
 	missingDataMapAtom,
-	missingDataAppearanceAtom,
-	caseDocumentsFeatureAtom
+	missingDataAppearanceAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -169,28 +168,27 @@ function createRouteCaseForm(path, data) {
 }
 
 function createRouteDocument(showTitle) {
-	const Component = showTitle ? withPage("Documents", AsyncNewDocumenTable) : AsyncNewDocumenTable;
-	const loader =
-		async ({ params }) => {
-			const documentCases = await (params.employeeId ? getEmployeeCases : getCompanyCases)(params, "DOC");
-			if (documentCases) {
-				const caseFieldNames = documentCases.flatMap(c => c.caseFields.map(cf => cf.name));
-				const caseValues = await Promise.all(caseFieldNames.map(name => getDocumentsOfCaseField(params, name)));
-				let values = {};
-				for (let i = 0; i < caseFieldNames.length; i++) {
-					values[caseFieldNames[i]] = caseValues[i];
-				}
-
-				return {
-					values,
-					data: documentCases
-				}
+	const Component = showTitle ? withPage("Documents", DocumentTable) : DocumentTable;
+	const loader = async ({ params }) => {
+		const documentCases = await (params.employeeId ? getEmployeeCases : getCompanyCases)(params, "DOC");
+		if (documentCases) {
+			const caseFieldNames = documentCases.flatMap(c => c.caseFields.map(cf => cf.name));
+			const caseValues = await Promise.all(caseFieldNames.map(name => getDocumentsOfCaseField(params, name)));
+			let values = {};
+			for (let i = 0; i < caseFieldNames.length; i++) {
+				values[caseFieldNames[i]] = caseValues[i];
 			}
+
 			return {
-				data: documentCases,
-				values: []
-			};
+				values,
+				data: documentCases
+			}
+		}
+		return {
+			data: documentCases,
+			values: []
 		};
+	};
 	return {
 		Component,
 		path: "documents",
@@ -235,8 +233,7 @@ function createRouteDataTable(path) {
 			return {
 				values,
 				valueCounts,
-				dataCases,
-				random: Math.random()
+				dataCases
 			};
 		},
 		children: [
