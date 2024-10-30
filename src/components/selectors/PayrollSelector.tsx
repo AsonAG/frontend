@@ -52,7 +52,7 @@ export function PayrollSelector() {
 				</Typography>
 			</Button>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-				{isAdmin && <MenuItem component={Link} to={`/orgs/${org.id}`} onClick={handleClose}>{adminTitle}</MenuItem>}
+				{isAdmin && <MenuItem component={Link} to={`/orgs/${org.id}/employees`} onClick={handleClose}>{adminTitle}</MenuItem>}
 				{
 					payrolls.map(payroll => (
 						<MenuItem key={payroll.id} component={Link} to={`/orgs/${org.id}/payrolls/${payroll.id}`} onClick={handleClose}>

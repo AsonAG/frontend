@@ -403,10 +403,10 @@ const routeData = [
 			{
 				index: true,
 				loader: async () => {
-					const { user } = await getOrganizationData();
-					const isAdmin = user?.attributes.roles?.includes("admin");
-					if (isAdmin)
-						return redirect("employees");
+					// const { user } = await getOrganizationData();
+					// const isAdmin = user?.attributes.roles?.includes("admin");
+					// if (isAdmin)
+					// 	return redirect("employees");
 					return redirect("payrolls");
 
 				}
