@@ -101,7 +101,7 @@ import { OrganizationImport } from "./organization/Import";
 import { OrganizationSettings } from "./organization/Settings";
 import { EventTabbedView } from "./components/EventTabbedView";
 import { getEmployeeDisplayString } from "./models/Employee";
-import { DataTable, DataValueHistory } from "./components/tables/DataTable";
+import { DataValueHistory } from "./components/tables/DataTable";
 import { DataView } from "./components/DataView";
 
 const store = getDefaultStore();

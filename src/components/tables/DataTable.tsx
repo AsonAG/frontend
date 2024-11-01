@@ -25,15 +25,18 @@ import { AvailableCase } from "../../models/AvailableCase";
 
 const columnHelper = createColumnHelper<CaseValue>();
 
+const renderPeriod = (caseValue: CaseValue, part: "start" | "end") => {
+  if (caseValue.valueType === "Date" || caseValue.valueType === "DateTime")
+    return "";
+  return formatDate(caseValue[part]);
+}
+
 function createColumns(t: TFunction<"translation", undefined>) {
   return [
     columnHelper.accessor("displayCaseFieldName",
       {
         cell: name => name.getValue(),
         header: () => t("Field"),
-        meta: {
-          renderSortIndicator: true
-        },
         //@ts-ignore
         sortingFn: "caseDataFn"
       }),
@@ -44,15 +47,13 @@ function createColumns(t: TFunction<"translation", undefined>) {
       }),
     columnHelper.accessor("start",
       {
-        cell: start => formatDate(start.getValue()),
-        header: t("Start"),
-        enableGlobalFilter: false
+        cell: value => renderPeriod(value.row.original, "start"),
+        header: t("Start")
       }),
     columnHelper.accessor("end",
       {
-        cell: end => formatDate(end.getValue()),
-        header: t("End"),
-        enableGlobalFilter: false
+        cell: value => renderPeriod(value.row.original, "end"),
+        header: t("End")
       }),
   ];
 }

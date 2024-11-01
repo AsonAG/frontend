@@ -34,7 +34,7 @@ function MissingDataButtons() {
       </Tooltip>
       <Stack direction="row" flexWrap="wrap" spacing={1}>
         {missingData.cases?.map(_case => (
-          <Button component={Link} to={`../missingData/${encodeURIComponent(_case.name)}`} variant="outlined" color="warning" size="small">{_case.displayName}</Button>
+          <Button key={_case.id} component={Link} to={`../missingData/${encodeURIComponent(_case.name)}`} variant="outlined" color="warning" size="small">{_case.displayName}</Button>
         ))}
       </Stack>
     </Stack>
