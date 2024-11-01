@@ -63,11 +63,6 @@ function createColumns(t: TFunction<"translation", undefined>) {
 				cell: created => <span title={formatDate(created.getValue(), true)}>{formatDate(created.getValue())}</span>,
 				header: () => <span title={t("Newest events first")}>{t("Created")}<ArrowDropDown fontSize="16px" /></span>
 			}),
-		columnHelper.accessor("type",
-			{
-				cell: attr => attr.getValue(),
-				header: t("Category")
-			}),
 		{
 			id: "expandToggle",
 			size: 30,
@@ -217,7 +212,7 @@ function EventTable() {
 
 function Row({ children }: PropsWithChildren) {
 	return (
-		<Box display="grid" gridTemplateColumns="1fr 1fr 1fr 75px 75px 75px 105px 40px" gridTemplateRows="auto" alignItems="start">
+		<Box display="grid" gridTemplateColumns="1fr 1fr 1fr 75px 75px 75px 40px" gridTemplateRows="auto" alignItems="start">
 			{children}
 		</Box>
 	)
