@@ -30,7 +30,7 @@ function MissingDataButtons() {
   return (
     <Stack direction="row" spacing={1}>
       <Tooltip title={t("Missing data")}>
-        <Warning color="warning" sx={{ height: 28 }} />
+        <Warning color="warning" sx={{ height: 28, mr: 0.5 }} />
       </Tooltip>
       <Stack direction="row" flexWrap="wrap" spacing={1}>
         {missingData.cases?.map(_case => (
