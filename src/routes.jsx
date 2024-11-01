@@ -173,6 +173,7 @@ function createRouteDocument(showTitle) {
 	const loader = async ({ params }) => {
 		const documentCases = await (params.employeeId ? getEmployeeCases : getCompanyCases)(params, "DOC");
 		if (documentCases) {
+			documentCases.sort(((a, b) => a.attributes?.["tag.order"] - b.attributes?.["tag.order"]));
 			const caseFieldNames = documentCases.flatMap(c => c.caseFields.map(cf => cf.name));
 			const caseValues = await Promise.all(caseFieldNames.map(name => getDocumentsOfCaseField(params, name)));
 			let values = {};
