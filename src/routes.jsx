@@ -102,6 +102,7 @@ import { OrganizationSettings } from "./organization/Settings";
 import { EventTabbedView } from "./components/EventTabbedView";
 import { getEmployeeDisplayString } from "./models/Employee";
 import { DataTable, DataValueHistory } from "./components/tables/DataTable";
+import { DataView } from "./components/DataView";
 
 const store = getDefaultStore();
 
@@ -223,10 +224,10 @@ function createRouteDocument(showTitle) {
 	};
 }
 
-function createRouteDataTable(path) {
+function createRouteDataView(path) {
 	return {
 		path,
-		Component: DataTable,
+		Component: DataView,
 		loader: async ({ params }) => {
 			const dataCasesPromise = (params.employeeId ? getEmployeeCases(params, "ED") : getCompanyCases(params, "CD"));
 			const [values, valueCounts, dataCases] = await Promise.all([getCurrentValues(params), getCaseValueCount(params, 2), dataCasesPromise])
@@ -485,7 +486,7 @@ const routeData = [
 				},
 			},
 			createRouteEmployeeTable("hr/employees"),
-			createRouteEmployeeNew("hr/employees/new", employeeId => `../hr/employees/${employeeId}/missingdata`),
+			createRouteEmployeeNew("hr/employees/new", employeeId => `../hr/employees/${employeeId}/data`),
 			createRouteEmployeeEdit("hr/employees/:employeeId/edit", employeeId => `../hr/employees/${employeeId}`),
 			{
 				path: "hr/employees/:employeeId",
@@ -525,7 +526,7 @@ const routeData = [
 							}
 						})
 					},
-					createRouteDataTable("data"),
+					createRouteDataView("data"),
 					createRouteDocument(false),
 					createRouteCaseForm("missingdata/:caseName"),
 					{
@@ -970,7 +971,7 @@ const routeData = [
 							},
 						}),
 					},
-					createRouteDataTable("data"),
+					createRouteDataView("data"),
 					createRouteDocument(false),
 				],
 			},

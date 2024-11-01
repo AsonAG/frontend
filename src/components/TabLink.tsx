@@ -48,7 +48,7 @@ const Link = styled(
 
 export function TabLink({ to, title, badgeCount }: { to: string, title: string, badgeCount?: number }) {
   return (
-    <Badge badgeContent={badgeCount} color="primary" variant="oob">
+    <Badge badgeContent={badgeCount} color="warning" variant="oob">
       <Link to={to}>
         <Typography>{title}</Typography>
       </Link>

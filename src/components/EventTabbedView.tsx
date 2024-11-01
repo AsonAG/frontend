@@ -3,8 +3,7 @@ import {
   Navigate,
   useOutlet,
   useLoaderData,
-  useParams,
-  useLocation,
+  useParams
 } from "react-router-dom";
 import { ContentLayout } from "../components/ContentLayout";
 import { Stack } from "@mui/material";
@@ -24,19 +23,12 @@ export function EventTabbedView({ title, showMissingData }: { title: ReactNode, 
   const { pageTitle, missingData } = useLoaderData() as LoaderData;
   const { t } = useTranslation();
   const params = useParams();
-  const { state } = useLocation();
   const renderTitleOnly = !!params.caseName;
 
   const missingDataCount = missingData?.cases?.length ?? 0;
 
   if (!outlet) {
-    let to = state === "dataViewFallback" ? "data" : "events";
-    if (showMissingData && missingDataCount > 0) {
-      to = "missingdata"
-    }
-    else if (isMobile) {
-      to = "new"
-    }
+    let to = isMobile ? "new" : "data";
     return <Navigate to={to} replace />;
   }
   return (
@@ -44,17 +36,10 @@ export function EventTabbedView({ title, showMissingData }: { title: ReactNode, 
       {
         !renderTitleOnly &&
         <Stack direction="row" spacing={2} flexWrap="wrap">
-          {isMobile && <TabLink title={t("New Event")} to="new" />}
-          <TabLink title={t("Data")} to="data" />
+          {isMobile && <TabLink title={t("New event")} to="new" />}
+          <TabLink title={t("Data")} to="data" badgeCount={showMissingData ? missingDataCount : undefined} />
           <TabLink title={t("Documents")} to="documents" />
           <TabLink title={t("Events")} to="events" />
-          {showMissingData && missingDataCount > 0 && (
-            <TabLink
-              title={t("Missing data")}
-              to="missingdata"
-              badgeCount={missingDataCount}
-            />
-          )}
         </Stack>
       }
       {outlet}

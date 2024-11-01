@@ -22,7 +22,7 @@ import styled from "@emotion/styled";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
+import WorkOutlinetIcon from "@mui/icons-material/WorkOutline";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { ContentLayout } from "../ContentLayout";
 import { Search } from "@mui/icons-material";
@@ -254,7 +254,7 @@ function EmployeeRow({ employee, showStatus }) {
 	const { variant, showButtons } = useContext(TableContext);
 	return (
 		<Stack direction="row" alignItems="center" sx={sx} mx={-0.5} px={0.5}>
-			<Link to={employee.id} state="dataViewFallback">
+			<Link to={employee.id}>
 				<Stack direction="row" spacing={1} flexWrap="wrap">
 					<Typography>
 						{employee.firstName} {employee.lastName}
@@ -276,16 +276,16 @@ function EmployeeRow({ employee, showStatus }) {
 function EmployeeButtons({ employee }) {
 	const { t } = useTranslation();
 	const variant = "dense";
-	const isActive = employee.status === "Active";
 	const missingDataCount = useMissingDataCount(employee.id);
 
 	return (
 		<Stack direction="row" spacing={2} py={0.5}>
 			<TableButton
-				title={t("Events")}
-				to={employee.id + "/events"}
+				title={t("Data")}
+				to={employee.id + "/data"}
 				variant={variant}
-				icon={<WorkHistoryOutlinedIcon />}
+				icon={<WorkOutlinetIcon sx={{ fontSize: "1.2rem" }} />}
+				badgeCount={missingDataCount}
 			/>
 			<TableButton
 				title={t("Documents")}
@@ -294,12 +294,10 @@ function EmployeeButtons({ employee }) {
 				icon={<DescriptionOutlinedIcon />}
 			/>
 			<TableButton
-				title={t("Missing data")}
-				to={employee.id + "/missingdata"}
+				title={t("Events")}
+				to={employee.id + "/events"}
 				variant={variant}
-				icon={<NotificationImportantIcon />}
-				badgeCount={missingDataCount}
-				disabled={!isActive || !missingDataCount}
+				icon={<WorkHistoryOutlinedIcon />}
 			/>
 		</Stack>
 	);

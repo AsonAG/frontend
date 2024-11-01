@@ -313,7 +313,7 @@ function GroupFilter({ state, dispatch }: { state: State, dispatch: Dispatch<Act
       ref={inputRef}
       required
       value={search}
-      placeholder={t("Filter groups...")}
+      placeholder={t("Find in groups...")}
       onChange={onChange}
       spellCheck={false}
     />;
