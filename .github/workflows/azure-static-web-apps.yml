@@ -31,6 +31,6 @@ jobs:
           VITE_AUTHORITY_URL: "https://login.asonpayroll.com"
           VITE_AUTHORITY_SETTINGS_URL: "https://login.asonpayroll.com/ui/console/"          
           VITE_API_URL: ${{ vars.API_URL }}
-          VITE_REDIRECT_URL: ${{ vars.API_URL }}
+          VITE_REDIRECT_URL: ${{ vars.REDIRECT_URL }}
           VITE_PROJECT_ID: ${{ vars.PROJECT_ID }}
           VITE_CLIENT_ID: ${{ vars.CLIENT_ID }}
