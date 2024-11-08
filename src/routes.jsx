@@ -674,7 +674,7 @@ const routeData = [
 						.withQueryParam("orderBy", `lastName asc`)
 						.fetchJson();
 					const wageTypes = await Promise.all(employees.map(async e => {
-						const result = await getPayrollResult(params, "2024-07", e.id)
+						const result = await getPayrollResult(params, "2024-11", e.id)
 						if (result) {
 							return await getWageTypes(params, result.id);
 						}

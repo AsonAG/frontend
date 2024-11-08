@@ -103,7 +103,7 @@ function PeriodSection() {
   return (
     <Stack direction="row" spacing={1} alignItems="center">
       <Typography>{t("Current period")}:</Typography>
-      <Typography fontWeight="bold">Juli 2024</Typography>
+      <Typography fontWeight="bold">November 2024</Typography>
       <IconButton size="small"><CalendarMonth /></IconButton>
     </Stack>
   );
