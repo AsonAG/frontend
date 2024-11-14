@@ -32,7 +32,8 @@ const companyDocumentUrl =
 const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
 const payrunsUrl = "/tenants/:orgId/payruns";
-const payrunParametersUrl = "/tenants/:orgId/payruns/:payrunId/parameters";
+const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period";
+const closePayrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriod/close";
 const payrunJobsUrl = "/tenants/:orgId/payruns/jobs";
 const payrunJobStatusUrl =
 	"/tenants/:orgId/payruns/jobs/:payrunJobId/status";
@@ -429,10 +430,37 @@ export function updateTask(routeParams, task) {
 		.fetch();
 }
 
-export function getPayruns(routeParams) {
+export function getPayrun(routeParams) {
 	return new FetchRequestBuilder(payrunsUrl, routeParams)
 		.withQueryParam("filter", `payrollId eq '${routeParams.payrollId}'`)
+		.fetchSingle();
+}
+
+export function getPayrunPeriod(routeParams, period) {
+	return new FetchRequestBuilder(payrunPeriodUrl, routeParams)
+		.withQueryParam("period", period)
 		.fetchJson();
+}
+
+export function calculatePayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodUrl + "/calculate", routeParams)
+		.withMethod("POST")
+		.withUser()
+		.fetch();
+}
+
+export function closePayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(closePayrunPeriodUrl, routeParams)
+		.withMethod("POST")
+		.withUser()
+		.fetch();
+}
+
+export function createOpenPayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodUrl + "/open", routeParams)
+		.withMethod("POST")
+		.withUser()
+		.fetch();
 }
 
 export function getDraftPayrunJobs(routeParams) {
@@ -451,10 +479,6 @@ export function getPayrunJobs(routeParams) {
 			`payrollId eq '${routeParams.payrollId}' and payrunId eq '${routeParams.payrunId}' and jobStatus ne 'Draft'`,
 		)
 		.withQueryParam("orderBy", "periodStart desc");
-}
-
-export function getPayrunParameters(routeParams) {
-	return new FetchRequestBuilder(payrunParametersUrl, routeParams).fetchJson();
 }
 
 export function startPayrunJob(routeParams, jobInvocation) {

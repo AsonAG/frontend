@@ -189,6 +189,7 @@ const translations = {
 		"Open": "Offen",
 		"Payout": "auszahlen",
 		"Payslip": "Lohnabrechnung",
+		"This employee has blockers": "Dieser Mitarbeiter hat Blocker",
 
 		// Command
 		"Select event": "Ereignis auswählen",

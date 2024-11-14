@@ -55,10 +55,13 @@ import {
 	deleteOrganization,
 	getDivisions,
 	getCaseChangeCaseValues,
-	getPayrollResult,
-	getWageTypes,
 	getCurrentValues,
-	getCaseValueCount
+	getCaseValueCount,
+	getPayrunPeriod,
+	getPayrun,
+	calculatePayrunPeriod,
+	closePayrunPeriod,
+	createOpenPayrunPeriod
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -667,38 +670,31 @@ const routeData = [
 			{
 				path: "hr/dashboard",
 				Component: PayrunDashboard,
-				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathName !== nextUrl.pathName,
 				loader: async ({ params }) => {
 					const employees = await getEmployees(params)
 						.withActive()
 						.withQueryParam("orderBy", `lastName asc`)
 						.fetchJson();
-					const wageTypes = await Promise.all(employees.map(async e => {
-						const result = await getPayrollResult(params, "2024-11", e.id)
-						if (result) {
-							return await getWageTypes(params, result.id);
-						}
-						else {
-							return null;
-						}
-					}));
-					const payrollControllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
-					const documentCaseValues = await Promise.all(employees.map(async e => {
-						const response = await getDocumentsOfCaseField({ ...params, employeeId: e.id }, "CH.Swissdec.EmployeeDocumentPayslip", 1);
-						if (response.count > 0)
-							return response.items[0];
-						return null;
-					}));
-					for (let i = 0; i < employees.length; i++) {
-						const employee = employees[i];
-						employee.wageTypes = wageTypes[i];
-						employee.controllingTasks = payrollControllingTasks[i];
-						const caseValue = documentCaseValues[i];
-						if (caseValue) {
-							employee.documentUrl = `employees/${employee.id}/v/${caseValue.id}/i/${caseValue.documents[0].id}`;
-						}
+					const payrun = await getPayrun(params);
+					const payrunPeriod = await getPayrunPeriod({ ...params, payrunId: payrun.id });
+					return { employees, payrunPeriod };
+				},
+				action: async ({ params, request }) => {
+					const formData = await request.formData();
+					const intent = formData.get("intent");
+					const payrun = await store.get(payrunAtom);
+					if (intent === "calculate") {
+						await calculatePayrunPeriod({ ...params, payrunId: payrun.id });
 					}
-					return { employees };
+					else if (intent === "close") {
+						const payrunPeriod = formData.get("payrunPeriodId");
+						const closePeriodResponse = await closePayrunPeriod({ ...params, payrunId: payrun.id, payrunPeriod });
+						if (closePeriodResponse.ok) {
+							await createOpenPayrunPeriod({ ...params, payrunId: payrun.id });
+						}
+						toast("success", "Payrun period closed");
+					}
+					return null;
 				},
 				children: [
 					{

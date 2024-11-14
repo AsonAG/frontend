@@ -4,7 +4,7 @@ import {
 	getOrganization,
 	getUser,
 	getEmployeeByIdentifier,
-	getPayruns,
+	getPayrun,
 	getEmployeeMissingData,
 	getOrganizations,
 	getCompanyMissingDataCases,
@@ -61,9 +61,8 @@ export const selfServiceEmployeeAtom = atom((get) => {
 export const payrunAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return [];
-	const payruns = await getPayruns({ orgId, payrollId });
-	return payruns[0] || null;
+	if (orgId === null || payrollId === null) return null;
+	return await getPayrun({ orgId, payrollId });
 });
 
 export const openTasksAtom = atomWithRefresh(async (get) => {
