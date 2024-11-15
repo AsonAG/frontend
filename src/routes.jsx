@@ -61,7 +61,9 @@ import {
 	getPayrun,
 	calculatePayrunPeriod,
 	closePayrunPeriod,
-	createOpenPayrunPeriod
+	createOpenPayrunPeriod,
+	getPayrunPeriodDocument,
+	getPayrunPeriodDocuments
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -677,7 +679,8 @@ const routeData = [
 						.fetchJson();
 					const payrun = await getPayrun(params);
 					const payrunPeriod = await getPayrunPeriod({ ...params, payrunId: payrun.id });
-					return { employees, payrunPeriod };
+					const documents = await getPayrunPeriodDocuments({ ...params, payrunId: payrun.id, payrunPeriodId: payrunPeriod.id });
+					return { employees, payrunPeriod, documents };
 				},
 				action: async ({ params, request }) => {
 					const formData = await request.formData();
@@ -687,8 +690,8 @@ const routeData = [
 						await calculatePayrunPeriod({ ...params, payrunId: payrun.id });
 					}
 					else if (intent === "close") {
-						const payrunPeriod = formData.get("payrunPeriodId");
-						const closePeriodResponse = await closePayrunPeriod({ ...params, payrunId: payrun.id, payrunPeriod });
+						const payrunPeriodId = formData.get("payrunPeriodId");
+						const closePeriodResponse = await closePayrunPeriod({ ...params, payrunId: payrun.id, payrunPeriodId });
 						if (closePeriodResponse.ok) {
 							await createOpenPayrunPeriod({ ...params, payrunId: payrun.id });
 						}
@@ -698,7 +701,17 @@ const routeData = [
 				},
 				children: [
 					{
-						path: "employees/:employeeId/v/:caseValueId/i/:documentId",
+						path: ":payrunPeriodId/doc/:documentId",
+						Component: CaseValueDocumentDialog,
+						loader: async ({ params }) => {
+							const payrun = await store.get(payrunAtom);
+							return defer({
+								document: getPayrunPeriodDocument({ ...params, payrunId: payrun.id }),
+							});
+						}
+					},
+					{
+						path: ":payrunPeriodId/entries/:payrunPeriodEntryId/doc/:documentId",
 						Component: CaseValueDocumentDialog,
 						loader: ({ params }) => {
 							return defer({

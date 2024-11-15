@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useMemo, useReducer } from "react";
 import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
 import { Stack, Typography, IconButton, Tooltip, Paper, Button, Checkbox, SxProps, Theme, Chip, Box } from "@mui/material";
-import { CalendarMonth, Check, CheckCircle, Error, FilterList, Refresh } from "@mui/icons-material";
+import { Attachment, CalendarMonth, Check, CheckCircle, Error, FilterList, Refresh } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { useSearchParam } from "../hooks/useSearchParam";
@@ -109,19 +109,23 @@ function EmployeeTable() {
   )
 }
 
-function PeriodSection({ payrunPeriod, periodStart }: { payrunPeriod: IdType, periodStart: Date }) {
+function PeriodSection() {
   const { t } = useTranslation();
-  const periodDate = dayjs.utc(periodStart).format("MMM YYYY");
+  const { payrunPeriod, documents } = useLoaderData() as LoaderData;
+  const periodDate = dayjs.utc(payrunPeriod.periodStart).format("MMM YYYY");
   return (
     <Stack direction="row" spacing={1} alignItems="center">
       <Typography>{t("Current period")}: </Typography>
       <Typography fontWeight="bold">{periodDate}</Typography>
       <IconButton size="small"><CalendarMonth /></IconButton>
       <Form method="post">
-        <input type="hidden" name="payrunPeriodId" value={payrunPeriod} />
+        <input type="hidden" name="payrunPeriodId" value={payrunPeriod.id} />
         <IconButton type="submit" color="primary" size="small" name="intent" value="calculate"><Refresh /></IconButton>
         <IconButton type="submit" color="primary" size="small" name="intent" value="close"><CheckCircle /></IconButton>
       </Form>
+      {documents.map(doc => (
+        <IconButton key={doc.id} component={Link} to={`${payrunPeriod.id}/doc/${doc.id}`} ><Attachment /></IconButton>
+      ))}
     </Stack>
   );
 }

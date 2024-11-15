@@ -32,8 +32,10 @@ const companyDocumentUrl =
 const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
 const payrunsUrl = "/tenants/:orgId/payruns";
-const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period";
-const closePayrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriod/close";
+const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period";
+const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/close";
+const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/documents";
+const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/documents/:documentId";
 const payrunJobsUrl = "/tenants/:orgId/payruns/jobs";
 const payrunJobStatusUrl =
 	"/tenants/:orgId/payruns/jobs/:payrunJobId/status";
@@ -437,31 +439,40 @@ export function getPayrun(routeParams) {
 }
 
 export function getPayrunPeriod(routeParams, period) {
-	return new FetchRequestBuilder(payrunPeriodUrl, routeParams)
+	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
 		.withQueryParam("period", period)
 		.fetchJson();
 }
 
 export function calculatePayrunPeriod(routeParams) {
-	return new FetchRequestBuilder(payrunPeriodUrl + "/calculate", routeParams)
+	return new FetchRequestBuilder(payrunPeriodsUrl + "/calculate", routeParams)
 		.withMethod("POST")
 		.withUser()
 		.fetch();
 }
 
 export function closePayrunPeriod(routeParams) {
-	return new FetchRequestBuilder(closePayrunPeriodUrl, routeParams)
+	return new FetchRequestBuilder(payrunPeriodCloseUrl, routeParams)
 		.withMethod("POST")
 		.withUser()
 		.fetch();
 }
 
 export function createOpenPayrunPeriod(routeParams) {
-	return new FetchRequestBuilder(payrunPeriodUrl + "/open", routeParams)
+	return new FetchRequestBuilder(payrunPeriodsUrl + "/open", routeParams)
 		.withMethod("POST")
 		.withUser()
 		.fetch();
 }
+
+export function getPayrunPeriodDocuments(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodDocumentsUrl, routeParams).fetchJson();
+}
+
+export function getPayrunPeriodDocument(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodDocumentUrl, routeParams).fetchJson();
+}
+
 
 export function getDraftPayrunJobs(routeParams) {
 	return new FetchRequestBuilder(payrunJobsUrl, routeParams)
