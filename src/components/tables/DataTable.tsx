@@ -19,7 +19,7 @@ import { formatDate } from "../../utils/DateUtils";
 import { formatCaseValue } from "../../utils/Format";
 import { Close, History, Search } from "@mui/icons-material";
 import { IdType } from "../../models/IdType";
-import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, getSortedRowModel, getFilteredRowModel } from "@tanstack/react-table";
+import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, getFilteredRowModel } from "@tanstack/react-table";
 import { TFunction } from "i18next";
 import { AvailableCase } from "../../models/AvailableCase";
 
@@ -36,9 +36,7 @@ function createColumns(t: TFunction<"translation", undefined>) {
     columnHelper.accessor("displayCaseFieldName",
       {
         cell: name => name.getValue(),
-        header: () => t("Field"),
-        //@ts-ignore
-        sortingFn: "caseDataFn"
+        header: () => t("Field")
       }),
     columnHelper.accessor("value",
       {
@@ -181,24 +179,22 @@ function Table({ state }: { state: State }) {
   const columns = useMemo(() => createColumns(t), []);
   const { selectedGroup } = state;
   const selectedGroupFieldNames = useMemo(() => new Set(selectedGroup!.caseFields.map(fields => fields.name)), [selectedGroup]);
-  const dataCaseValues = useMemo(() => values.filter(value => selectedGroupFieldNames.has(value.caseFieldName)), [values, selectedGroupFieldNames]);
   const orderCaseFields = useMemo(() => new Map(selectedGroup!.caseFields.map((fields, index) => [fields.name, index])), [selectedGroup]);
+  const orderFn = (caseValueA: CaseValue, caseValueB: CaseValue) => {
+    if (orderCaseFields) {
+      const difference = (orderCaseFields.get(caseValueA.caseFieldName) ?? 0) - (orderCaseFields.get(caseValueB.caseFieldName) ?? 0);
+      return difference > 0 ? 1 : difference < 0 ? -1 : 0;
+      ;
+    }
+    return 0;
+  };
+  const dataCaseValues = useMemo(() => values.filter(value => selectedGroupFieldNames.has(value.caseFieldName)).sort(orderFn), [values, selectedGroupFieldNames]);
   const table = useReactTable({
     columns,
     data: dataCaseValues,
-    sortingFns: {
-      caseDataFn: (rowA, rowB) => {
-        if (orderCaseFields) {
-          const difference = (orderCaseFields.get(rowA.original.caseFieldName) ?? 0) - (orderCaseFields.get(rowB.original.caseFieldName) ?? 0);
-          return difference > 0 ? 1 : difference < 0 ? -1 : 0;
-          ;
-        }
-        return 0;
-      }
-    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    manualSorting: true,
     getRowId
   });
   const rows = table.getRowModel().rows;
