@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useMemo, useReducer } from "react";
 import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, Checkbox, SxProps, Theme, Chip, Box } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box } from "@mui/material";
 import { Attachment, CalendarMonth, Check, CheckCircle, Error, FilterList, Refresh } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
@@ -8,9 +8,8 @@ import { useSearchParam } from "../hooks/useSearchParam";
 import { CaseTask } from "../components/CaseTask";
 import { Employee } from "../models/Employee";
 import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
-import { PayrunPeriod } from "../models/PayrunPeriod";
+import { PayrunPeriod, PayrunPeriodEntry } from "../models/PayrunPeriod";
 import dayjs from "dayjs";
-import { IdType } from "../models/IdType";
 
 export function PayrunDashboard() {
   const { t } = useTranslation();
@@ -76,7 +75,7 @@ function EmployeeTable() {
     <Stack spacing={1} >
       <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
         <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
-          <PeriodSection payrunPeriod={payrunPeriod.id} periodStart={payrunPeriod.periodStart} />
+          <PeriodSection />
           <Chip icon={<FilterList />} sx={chipSx} onClick={() => { dispatch({ type: "reset_mode" }) }} color="primary" variant="outlined" />
           <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL", employees: sl }) }} color="primary" />
           <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML", employees: ml }) }} color="primary" />
@@ -102,7 +101,7 @@ function EmployeeTable() {
       </Stack>
       <EmployeeHeaderRow />
       {filtered.map(e => {
-        const onSelected = (event) => dispatch({ type: "set_employee_selection", checked: event.target.checked, employee: e });
+        const onSelected = () => dispatch({ type: "toggle_employee_selection", employee: e });
         return <EmployeeRow key={e.id} employee={e} selected={selected.includes(e)} toggleSelected={onSelected} payrunEntry={entriesMap.get(e.id)} />;
       })}
     </Stack>
@@ -111,7 +110,7 @@ function EmployeeTable() {
 
 function PeriodSection() {
   const { t } = useTranslation();
-  const { payrunPeriod, documents } = useLoaderData() as LoaderData;
+  const { payrunPeriod } = useLoaderData() as LoaderData;
   const periodDate = dayjs.utc(payrunPeriod.periodStart).format("MMM YYYY");
   return (
     <Stack direction="row" spacing={1} alignItems="center">
@@ -123,7 +122,7 @@ function PeriodSection() {
         <IconButton type="submit" color="primary" size="small" name="intent" value="calculate"><Refresh /></IconButton>
         <IconButton type="submit" color="primary" size="small" name="intent" value="close"><CheckCircle /></IconButton>
       </Form>
-      {documents.map(doc => (
+      {payrunPeriod?.documents?.map(doc => (
         <IconButton key={doc.id} component={Link} to={`${payrunPeriod.id}/doc/${doc.id}`} ><Attachment /></IconButton>
       ))}
     </Stack>
@@ -145,8 +144,16 @@ function EmployeeHeaderRow() {
   );
 }
 
-function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }) {
-  const { t } = useTranslation();
+type EmployeeRowParams = {
+  employee: Employee
+  selected: boolean
+  toggleSelected: () => void,
+  payrunEntry: PayrunPeriodEntry | undefined
+}
+
+const stopPropagation = (event) => event?.stopPropagation();
+
+function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }: EmployeeRowParams) {
   const grossWage = payrunEntry?.grossWage;
   const netWage = payrunEntry?.netWage;
   const advancePayment = payrunEntry?.paidOut;
@@ -155,7 +162,12 @@ function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }) {
   const possiblePayout = !!netWage ? netWage - (advancePayment ?? 0) : null;
   let stackSx: SxProps<Theme> = {
     borderRadius: 1,
-    p: 0.5
+    p: 0.5,
+    userSelect: "none",
+    "&:hover": {
+      backgroundColor: (theme: Theme) => theme.palette.primary.hover,
+      cursor: "pointer"
+    }
   };
   const isExpanded = expanded === employee.id;
   const hasTasks = hasControllingTasks(employee);
@@ -163,13 +175,15 @@ function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }) {
   if (selected) {
     stackSx.backgroundColor = (theme: Theme) => theme.palette.primary.hover;
   };
+  const onClick = (event) => {
+    console.log(event);
+    event.preventDefault();
+    toggleSelected();
+  }
 
   return (
     <Stack component={Paper} elevation={elevation}>
-      <Stack direction="row" spacing={2} sx={stackSx}>
-        <Forbidden isForbidden={hasTasks} forbiddenText={t("This employee has blockers")}>
-          <Checkbox sx={{ py: 0.625, mx: 0, width: 30, cursor: hasTasks ? "not-allowed" : undefined }} size="small" disableRipple checked={selected} onChange={toggleSelected} disabled={hasTasks} />
-        </Forbidden>
+      <Stack direction="row" spacing={2} sx={stackSx} onClick={onClick}>
         <Typography flex={1} noWrap sx={{ py: 0.625 }}><Tooltip title={employee.identifier} placement="right"><span>{employee.lastName} {employee.firstName}</span></Tooltip></Typography>
         <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(grossWage)}</Typography>
         <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(netWage)}</Typography>
@@ -183,9 +197,13 @@ function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }) {
           }
         </Stack>
         <Stack direction="row" sx={{ width: 30, justifyContent: "center" }}>
-          <Tooltip title={t("Payslip")} placement="left">
-            <IconButton size="small" component={Link} to={employee.documentUrl}><FilePresentRoundedIcon /></IconButton>
-          </Tooltip>
+          {
+            payrunEntry?.documents?.map(doc => (
+              <Tooltip key={doc.id} title={doc.name} placement="left">
+                <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
+              </Tooltip>
+            ))
+          }
         </Stack>
       </Stack>
       {isExpanded && hasTasks &&
@@ -231,9 +249,8 @@ type Action = {
   mode: "ML" | "SL"
   employees: Array<Employee>
 } | {
-  type: "set_employee_selection"
+  type: "toggle_employee_selection"
   employee: Employee
-  checked: boolean
 }
 
 function reducer(state: State, action: Action): State {
@@ -257,10 +274,14 @@ function reducer(state: State, action: Action): State {
         filtered: action.employees
       }
     }
-    case "set_employee_selection":
+    case "toggle_employee_selection":
+      let selected = state.selected.filter(e => e !== action.employee);
+      if (selected.length === state.selected.length) {
+        selected = [...selected, action.employee];
+      }
       return {
         ...state,
-        selected: action.checked ? [action.employee, ...state.selected] : state.selected.filter(e => e !== action.employee)
+        selected
       };
   }
 }

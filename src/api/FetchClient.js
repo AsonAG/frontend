@@ -469,8 +469,10 @@ export function getPayrunPeriodDocuments(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodDocumentsUrl, routeParams).fetchJson();
 }
 
-export function getPayrunPeriodDocument(routeParams) {
-	return new FetchRequestBuilder(payrunPeriodDocumentUrl, routeParams).fetchJson();
+export function getPayrunPeriodDocument(routeParams, viewer) {
+	return new FetchRequestBuilder(payrunPeriodDocumentUrl, routeParams)
+		.withQueryParam("viewer", viewer)
+		.fetchJson();
 }
 
 

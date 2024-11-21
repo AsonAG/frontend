@@ -62,8 +62,7 @@ import {
 	calculatePayrunPeriod,
 	closePayrunPeriod,
 	createOpenPayrunPeriod,
-	getPayrunPeriodDocument,
-	getPayrunPeriodDocuments
+	getPayrunPeriodDocument
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -679,8 +678,7 @@ const routeData = [
 						.fetchJson();
 					const payrun = await getPayrun(params);
 					const payrunPeriod = await getPayrunPeriod({ ...params, payrunId: payrun.id });
-					const documents = await getPayrunPeriodDocuments({ ...params, payrunId: payrun.id, payrunPeriodId: payrunPeriod.id });
-					return { employees, payrunPeriod, documents };
+					return { employees, payrunPeriod };
 				},
 				action: async ({ params, request }) => {
 					const formData = await request.formData();
@@ -703,10 +701,11 @@ const routeData = [
 					{
 						path: ":payrunPeriodId/doc/:documentId",
 						Component: CaseValueDocumentDialog,
-						loader: async ({ params }) => {
+						loader: async ({ params, request }) => {
+							const viewer = getQueryParam(request, "viewer")
 							const payrun = await store.get(payrunAtom);
 							return defer({
-								document: getPayrunPeriodDocument({ ...params, payrunId: payrun.id }),
+								document: getPayrunPeriodDocument({ ...params, payrunId: payrun.id }, viewer),
 							});
 						}
 					},

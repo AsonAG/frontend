@@ -1,6 +1,7 @@
 import { IdType } from "./IdType"
 
 export type PayrunPeriodEntry = {
+  id: IdType
   employeeId: IdType
   payrunJobId: IdType
   netWage: number | null
@@ -8,6 +9,7 @@ export type PayrunPeriodEntry = {
   grossWage: number | null
   previousGrossWage: number | null
   paidOut: number | null
+  documents: Array<PayrunDocument> | null
 }
 
 export type PayrunPeriod = {
@@ -15,4 +17,12 @@ export type PayrunPeriod = {
   entries: Array<PayrunPeriodEntry>
   periodStart: Date
   periodStatus: "open" | "closed"
+  documents: Array<PayrunDocument> | null
+}
+
+export type PayrunDocument = {
+  id: IdType,
+  name: string,
+  contentType: string,
+  attributes: Record<string, string>
 }
