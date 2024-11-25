@@ -459,6 +459,7 @@ export function getOpenPayrunPeriod(routeParams) {
 export function calculatePayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl + "/calculate", routeParams)
 		.withMethod("POST")
+		.withTimout(10 * 60 * 1000)
 		.withUser()
 		.fetch();
 }
