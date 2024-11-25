@@ -33,6 +33,7 @@ const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
 const payrunsUrl = "/tenants/:orgId/payruns";
 const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period";
+const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId";
 const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/close";
 const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/documents";
 const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/documents/:documentId";
@@ -438,10 +439,21 @@ export function getPayrun(routeParams) {
 		.fetchSingle();
 }
 
-export function getPayrunPeriod(routeParams, period) {
+export function getClosedPayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
-		.withQueryParam("period", period)
+		.withQueryParam("orderBy", "created desc")
+		.withQueryParam("filter", `periodStatus ne 'Open'`);
+}
+
+export function getPayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodUrl, routeParams)
 		.fetchJson();
+}
+export function getOpenPayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
+		.withQueryParam("filter", "PeriodStatus eq 'Open'")
+		.withQueryParam("loadRelated", "true")
+		.fetchSingle();
 }
 
 export function calculatePayrunPeriod(routeParams) {
@@ -469,9 +481,10 @@ export function getPayrunPeriodDocuments(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodDocumentsUrl, routeParams).fetchJson();
 }
 
-export function getPayrunPeriodDocument(routeParams, viewer) {
+export function getPayrunPeriodDocument(routeParams, report, variant) {
 	return new FetchRequestBuilder(payrunPeriodDocumentUrl, routeParams)
-		.withQueryParam("viewer", viewer)
+		.withQueryParam("report", report)
+		.withQueryParam("variant", variant)
 		.fetchJson();
 }
 

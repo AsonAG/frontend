@@ -190,6 +190,14 @@ const translations = {
 		"Payout": "auszahlen",
 		"Payslip": "Lohnabrechnung",
 		"This employee has blockers": "Dieser Mitarbeiter hat Blocker",
+		"Review period": "Periode kontrollieren",
+		"Close period": "Periode schliessen",
+		"Upon closing the period, these documents will be sent to swissdec.": "Nach Abschluss der Periode, werden diese Dokumente swissdec übermittelt.",
+		"A closed period cannot be reopened.": "Eine geschlossene Periode kann nicht mehr geöffnet werden.",
+		"Wage statements": "Lohnausweise",
+		"Closed periods": "Abgeschlossene Perioden",
+		"Payrun period closed": "Periode geschlossen",
+		"Could not close period": "Periode konnte nicht geschlossen werden",
 
 		// Command
 		"Select event": "Ereignis auswählen",

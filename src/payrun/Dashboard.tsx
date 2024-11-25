@@ -1,8 +1,8 @@
 import React, { PropsWithChildren, useMemo, useReducer } from "react";
-import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
+import { Form, Link, Outlet, useRouteLoaderData } from "react-router-dom";
 import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box } from "@mui/material";
-import { Attachment, CalendarMonth, Check, CheckCircle, Error, FilterList, Refresh } from "@mui/icons-material";
-import { ContentLayout } from "../components/ContentLayout";
+import { Check, ChevronLeft, Error, FilterList, Refresh } from "@mui/icons-material";
+import { ContentLayout, PageHeaderTitle } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { useSearchParam } from "../hooks/useSearchParam";
 import { CaseTask } from "../components/CaseTask";
@@ -12,10 +12,9 @@ import { PayrunPeriod, PayrunPeriodEntry } from "../models/PayrunPeriod";
 import dayjs from "dayjs";
 
 export function PayrunDashboard() {
-  const { t } = useTranslation();
   return (
     <>
-      <ContentLayout title={t("Payroll")}>
+      <ContentLayout title={<PeriodSection />}>
         <EmployeeTable />
       </ContentLayout>
       <Outlet />
@@ -37,7 +36,8 @@ type LoaderData = {
 
 function EmployeeTable() {
   const { t } = useTranslation();
-  const { employees, payrunPeriod } = useLoaderData() as LoaderData;
+  const { employees, payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const isOpen = payrunPeriod.periodStatus === "Open";
   const [ml, sl] = useMemo(() => {
     const ml: Array<Employee> = [];
     const sl: Array<Employee> = [];
@@ -52,30 +52,30 @@ function EmployeeTable() {
   }, [employees])
   const [state, dispatch] = useReducer(
     reducer,
-    employees,
+    { employees, isOpen },
     createInitialState
   );
   const { filtered, selected, mode } = state;
-  const entriesMap = useMemo(() => new Map(payrunPeriod.entries.map(e => [e.employeeId, e])), [payrunPeriod.entries]);
+  // const employeeToEntryMap = useMemo(() => new Map(payrunPeriod.entries.map(e => [e.employeeId, e])), [payrunPeriod]);
+  const employeeToEntryMap = new Map(payrunPeriod.entries.map(e => [e.employeeId, e]));
 
   const [totalGross, totalNetto, totalAdvancePayments, totalOpen] = useMemo(() => {
     let totalGross = 0;
     let totalNetto = 0;
     let totalAdvancePayments = 0;
     for (let se of selected) {
-      const entry = entriesMap.get(se.id);
+      const entry = employeeToEntryMap.get(se.id);
       totalGross += entry?.grossWage ?? 0;
       totalNetto += entry?.netWage ?? 0;
       totalAdvancePayments += entry?.paidOut ?? 0;
     }
 
     return [totalGross, totalNetto, totalAdvancePayments, totalNetto - totalAdvancePayments];
-  }, [selected, entriesMap]);
+  }, [selected, employeeToEntryMap]);
   return (
     <Stack spacing={1} >
       <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
         <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
-          <PeriodSection />
           <Chip icon={<FilterList />} sx={chipSx} onClick={() => { dispatch({ type: "reset_mode" }) }} color="primary" variant="outlined" />
           <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL", employees: sl }) }} color="primary" />
           <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML", employees: ml }) }} color="primary" />
@@ -99,10 +99,11 @@ function EmployeeTable() {
         </Stack>
         <Stack sx={{ width: 30 }}></Stack>
       </Stack>
-      <EmployeeHeaderRow />
+      <EmployeeHeaderRow isOpen={isOpen} />
       {filtered.map(e => {
         const onSelected = () => dispatch({ type: "toggle_employee_selection", employee: e });
-        return <EmployeeRow key={e.id} employee={e} selected={selected.includes(e)} toggleSelected={onSelected} payrunEntry={entriesMap.get(e.id)} />;
+        console.log(`employee ${e.identifier} id: ${e.id}`, employeeToEntryMap.get(e.id), payrunPeriod.entries.find(entry => entry.employeeId == e.id));
+        return <EmployeeRow key={e.id} isOpen={isOpen} employee={e} selected={selected.includes(e)} toggleSelected={onSelected} payrunEntry={payrunPeriod.entries.find(entry => entry.employeeId == e.id)} />;
       })}
     </Stack>
   )
@@ -110,26 +111,28 @@ function EmployeeTable() {
 
 function PeriodSection() {
   const { t } = useTranslation();
-  const { payrunPeriod } = useLoaderData() as LoaderData;
-  const periodDate = dayjs.utc(payrunPeriod.periodStart).format("MMM YYYY");
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const periodDate = dayjs.utc(payrunPeriod.periodStart).format("MMMM YYYY");
+  const openPeriodPart = payrunPeriod.periodStatus === "Open" && <>
+    <Chip color="success" size="small" label={t("Offen")} />
+    <Form method="post">
+      <input type="hidden" name="payrunPeriodId" value={payrunPeriod.id} />
+      <IconButton type="submit" color="primary" size="small" name="intent" value="calculate"><Refresh /></IconButton>
+    </Form>
+    <Button variant="contained" component={Link} to="review" >{t("Review period")}</Button>
+  </>;
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
-      <Typography>{t("Current period")}: </Typography>
-      <Typography fontWeight="bold">{periodDate}</Typography>
-      <IconButton size="small"><CalendarMonth /></IconButton>
-      <Form method="post">
-        <input type="hidden" name="payrunPeriodId" value={payrunPeriod.id} />
-        <IconButton type="submit" color="primary" size="small" name="intent" value="calculate"><Refresh /></IconButton>
-        <IconButton type="submit" color="primary" size="small" name="intent" value="close"><CheckCircle /></IconButton>
-      </Form>
-      {payrunPeriod?.documents?.map(doc => (
-        <IconButton key={doc.id} component={Link} to={`${payrunPeriod.id}/doc/${doc.id}`} ><Attachment /></IconButton>
-      ))}
+    <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={0.5} alignItems="center">
+        <IconButton component={Link} to="../list" relative="path"><ChevronLeft /></IconButton>
+        <PageHeaderTitle title={periodDate} />
+      </Stack>
+      {openPeriodPart}
     </Stack>
   );
 }
 
-function EmployeeHeaderRow() {
+function EmployeeHeaderRow({ isOpen }) {
   const { t } = useTranslation();
   return (
     <Stack direction="row" spacing={2} sx={{ p: 0.5 }}>
@@ -137,14 +140,18 @@ function EmployeeHeaderRow() {
       <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Gross")}</Typography>
       <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Net")}</Typography>
       <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Paid")}</Typography>
-      <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Open")}</Typography>
-      <Typography variant="h6" textAlign="center" sx={{ width: 70, py: 0.625 }} >{t("Blocker")}</Typography>
+      {isOpen && <>
+        <Typography variant="h6" textAlign="right" sx={{ width: 100, py: 0.625 }} >{t("Open")}</Typography>
+        <Typography variant="h6" textAlign="center" sx={{ width: 70, py: 0.625 }} >{t("Blocker")}</Typography>
+      </>
+      }
       <Typography variant="h6" textAlign="right" sx={{ width: 30, py: 0.625 }} ></Typography>
     </Stack>
   );
 }
 
 type EmployeeRowParams = {
+  isOpen: boolean
   employee: Employee
   selected: boolean
   toggleSelected: () => void,
@@ -153,7 +160,7 @@ type EmployeeRowParams = {
 
 const stopPropagation = (event) => event?.stopPropagation();
 
-function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }: EmployeeRowParams) {
+function EmployeeRow({ isOpen, employee, selected, toggleSelected, payrunEntry }: EmployeeRowParams) {
   const grossWage = payrunEntry?.grossWage;
   const netWage = payrunEntry?.netWage;
   const advancePayment = payrunEntry?.paidOut;
@@ -163,23 +170,24 @@ function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }: Employ
   let stackSx: SxProps<Theme> = {
     borderRadius: 1,
     p: 0.5,
-    userSelect: "none",
-    "&:hover": {
+    userSelect: "none"
+  };
+  if (isOpen) {
+    stackSx["&:hover"] = {
       backgroundColor: (theme: Theme) => theme.palette.primary.hover,
       cursor: "pointer"
-    }
-  };
+    };
+    if (selected) {
+      stackSx.backgroundColor = (theme: Theme) => theme.palette.primary.hover;
+    };
+  }
   const isExpanded = expanded === employee.id;
   const hasTasks = hasControllingTasks(employee);
   const elevation = isExpanded && hasTasks ? 1 : 0;
-  if (selected) {
-    stackSx.backgroundColor = (theme: Theme) => theme.palette.primary.hover;
-  };
-  const onClick = (event) => {
-    console.log(event);
+  const onClick = isOpen ? (event) => {
     event.preventDefault();
     toggleSelected();
-  }
+  } : undefined;
 
   return (
     <Stack component={Paper} elevation={elevation}>
@@ -188,17 +196,20 @@ function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }: Employ
         <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(grossWage)}</Typography>
         <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(netWage)}</Typography>
         <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(advancePayment)}</Typography>
-        <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(possiblePayout)}</Typography>
-        <Stack direction="row" sx={{ width: 70, justifyContent: "center" }}>
-          {
-            hasTasks ?
-              <IconButton color="warning" size="small" onClick={() => setExpanded(isExpanded ? "" : employee.id)}><Error /></IconButton> :
-              <IconButton color="success" size="small" disabled><Check /></IconButton>
-          }
-        </Stack>
+        {isOpen && <>
+          <Typography textAlign="right" sx={{ width: 100, py: 0.625 }}>{formatValue(possiblePayout)}</Typography>
+          <Stack direction="row" sx={{ width: 70, justifyContent: "center" }}>
+            {
+              hasTasks ?
+                <IconButton color="warning" size="small" onClick={() => setExpanded(isExpanded ? "" : employee.id)}><Error /></IconButton> :
+                <IconButton color="success" size="small" disabled><Check /></IconButton>
+            }
+          </Stack>
+        </>
+        }
         <Stack direction="row" sx={{ width: 30, justifyContent: "center" }}>
           {
-            payrunEntry?.documents?.map(doc => (
+            payrunEntry?.documents?.filter(doc => !doc.attributes?.review).map(doc => (
               <Tooltip key={doc.id} title={doc.name} placement="left">
                 <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
               </Tooltip>
@@ -206,7 +217,7 @@ function EmployeeRow({ employee, selected, toggleSelected, payrunEntry }: Employ
           }
         </Stack>
       </Stack>
-      {isExpanded && hasTasks &&
+      {!isOpen && isExpanded && hasTasks &&
         <Stack>
           {employee.controllingTasks?.map(task => <CaseTask key={task.name} _case={task} objectId={employee.id} type="P" />)}
         </Stack>
@@ -240,6 +251,7 @@ type State = {
   filtered: Array<Employee>
   selected: Array<Employee>
   mode: FilterMode
+  isOpen: boolean
 }
 
 type Action = {
@@ -270,11 +282,13 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         mode: action.mode,
-        selected: action.employees.filter(e => !hasControllingTasks(e)),
+        selected: state.isOpen ? action.employees.filter(e => !hasControllingTasks(e)) : [],
         filtered: action.employees
       }
     }
     case "toggle_employee_selection":
+      if (!state.isOpen)
+        return state;
       let selected = state.selected.filter(e => e !== action.employee);
       if (selected.length === state.selected.length) {
         selected = [...selected, action.employee];
@@ -286,9 +300,10 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-function createInitialState(employees: Array<Employee>): State {
+function createInitialState({ employees, isOpen }: { employees: Array<Employee>, isOpen: boolean }): State {
   return {
     employees,
+    isOpen,
     filtered: employees,
     selected: [],
     mode: "All"

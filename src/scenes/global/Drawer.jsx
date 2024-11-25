@@ -189,7 +189,7 @@ function PayrunMenu() {
 	const { t } = useTranslation();
 	const useDashboard = useAtomValue(payrollDashboardFeatureAtom);
 	const label = useDashboard ? "Payroll" : "Payruns";
-	const to = useDashboard ? "hr/dashboard" : "hr/payruns";
+	const to = useDashboard ? "payrunperiod" : "hr/payruns";
 	return <NavigationItem label={t(label)} to={to} icon={<PaymentsIcon />} />
 }
 

@@ -57,12 +57,14 @@ import {
 	getCaseChangeCaseValues,
 	getCurrentValues,
 	getCaseValueCount,
-	getPayrunPeriod,
+	getClosedPayrunPeriod,
+	getOpenPayrunPeriod,
 	getPayrun,
 	calculatePayrunPeriod,
 	closePayrunPeriod,
 	createOpenPayrunPeriod,
-	getPayrunPeriodDocument
+	getPayrunPeriodDocument,
+	getPayrunPeriod
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -108,6 +110,8 @@ import { getEmployeeDisplayString } from "./models/Employee";
 import { DataValueHistory } from "./components/tables/DataTable";
 import { DataView } from "./components/DataView";
 
+import { PayrunPeriodList } from "./payrun/List";
+import { ReviewOpenPeriod } from "./payrun/ReviewOpenPeriod";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -345,6 +349,21 @@ function createRouteEmployeeNew(path, createUrlRedirect) {
 			return null;
 		},
 	};
+}
+
+function createRoutePayrunPeriodDocument() {
+	return {
+		path: ":payrunPeriodId/doc/:documentId",
+		Component: CaseValueDocumentDialog,
+		loader: async ({ params, request }) => {
+			const report = getQueryParam(request, "report")
+			const variant = getQueryParam(request, "variant")
+			const payrun = await store.get(payrunAtom);
+			return defer({
+				document: getPayrunPeriodDocument({ ...params, payrunId: payrun.id }, report, variant),
+			});
+		}
+	}
 }
 
 const routeData = [
@@ -669,53 +688,69 @@ const routeData = [
 				],
 			},
 			{
-				path: "hr/dashboard",
-				Component: PayrunDashboard,
+				path: "payrunperiod",
+				loader: () => redirect("open")
+			},
+			{
+				path: "payrunperiod/list",
+				Component: PayrunPeriodList,
+				loader: paginatedLoader({
+					pageCount: 15,
+					name: "closedPayrunPeriods",
+					getRequestBuilder: async ({ params }) => {
+						const payrun = await store.get(payrunAtom);
+						return getClosedPayrunPeriod({ ...params, payrunId: payrun.id });
+					},
+					getLoaderData: async ({ params }) => {
+						const payrun = await store.get(payrunAtom);
+						return ({
+							openPayrunPeriod: getOpenPayrunPeriod({ ...params, payrunId: payrun.id }),
+						})
+					},
+				}),
+			},
+			{
+				path: "payrunperiod/:payrunPeriodId",
+				id: "payrunperiod",
 				loader: async ({ params }) => {
 					const employees = await getEmployees(params)
 						.withActive()
 						.withQueryParam("orderBy", `lastName asc`)
 						.fetchJson();
 					const payrun = await getPayrun(params);
-					const payrunPeriod = await getPayrunPeriod({ ...params, payrunId: payrun.id });
+					const payrunPeriod = params.payrunPeriodId === "open" ?
+						await getOpenPayrunPeriod({ ...params, payrunId: payrun.id }) :
+						await getPayrunPeriod({ ...params, payrunId: payrun.id });
 					return { employees, payrunPeriod };
-				},
-				action: async ({ params, request }) => {
-					const formData = await request.formData();
-					const intent = formData.get("intent");
-					const payrun = await store.get(payrunAtom);
-					if (intent === "calculate") {
-						await calculatePayrunPeriod({ ...params, payrunId: payrun.id });
-					}
-					else if (intent === "close") {
-						const payrunPeriodId = formData.get("payrunPeriodId");
-						const closePeriodResponse = await closePayrunPeriod({ ...params, payrunId: payrun.id, payrunPeriodId });
-						if (closePeriodResponse.ok) {
-							await createOpenPayrunPeriod({ ...params, payrunId: payrun.id });
-						}
-						toast("success", "Payrun period closed");
-					}
-					return null;
 				},
 				children: [
 					{
-						path: ":payrunPeriodId/doc/:documentId",
-						Component: CaseValueDocumentDialog,
-						loader: async ({ params, request }) => {
-							const viewer = getQueryParam(request, "viewer")
+						index: true,
+						Component: PayrunDashboard,
+						action: async ({ params }) => {
 							const payrun = await store.get(payrunAtom);
-							return defer({
-								document: getPayrunPeriodDocument({ ...params, payrunId: payrun.id }, viewer),
-							});
+							await calculatePayrunPeriod({ ...params, payrunId: payrun.id });
+							return null;
 						}
 					},
+					createRoutePayrunPeriodDocument(),
 					{
-						path: ":payrunPeriodId/entries/:payrunPeriodEntryId/doc/:documentId",
-						Component: CaseValueDocumentDialog,
-						loader: ({ params }) => {
-							return defer({
-								document: getDocument(params),
-							});
+						path: "review",
+						Component: ReviewOpenPeriod,
+						children: [
+							createRoutePayrunPeriodDocument(),
+						],
+						action: async ({ params, request }) => {
+							const formData = await request.formData();
+							const payrunPeriodId = formData.get("payrunPeriodId");
+							const payrun = await store.get(payrunAtom);
+							const closePeriodResponse = await closePayrunPeriod({ ...params, payrunId: payrun.id, payrunPeriodId });
+							if (closePeriodResponse.ok) {
+								await createOpenPayrunPeriod({ ...params, payrunId: payrun.id });
+								toast("success", "Payrun period closed");
+								return redirect("..");
+							}
+							toast("error", "Could not close period");
 						}
 					}
 				]

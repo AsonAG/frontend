@@ -16,7 +16,7 @@ export type PayrunPeriod = {
   id: IdType
   entries: Array<PayrunPeriodEntry>
   periodStart: Date
-  periodStatus: "open" | "closed"
+  periodStatus: "Open" | "Closed"
   documents: Array<PayrunDocument> | null
 }
 
@@ -24,5 +24,9 @@ export type PayrunDocument = {
   id: IdType,
   name: string,
   contentType: string,
-  attributes: Record<string, string>
+  attributes: Record<string, string> | Record<"reports", DocumentReportDefinition>
+}
+type DocumentReportDefinition = {
+  Name: string
+  Variants: Array<string>
 }

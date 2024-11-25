@@ -33,6 +33,13 @@ declare module '@mui/material/Button' {
   }
 }
 
+declare module '@mui/material/Chip' {
+  interface ChipPropsColorOverrides {
+    blueviolet: true
+    pdfred: true
+  }
+}
+
 const lightModeDesignTokens = {
   palette: {
     mode: "light",
@@ -48,6 +55,14 @@ const lightModeDesignTokens = {
     inputBorder: "rgba(0, 0, 0, 0.23)",
     destructive: {
       main: "#d32f2f",
+      contrastText: "#fff"
+    },
+    blueviolet: {
+      main: "#8A2BE2",
+      contrastText: "#fff"
+    },
+    pdfred: {
+      main: "#FF0000",
       contrastText: "#fff"
     }
   },
@@ -68,6 +83,14 @@ const darkModeDesignTokens = {
     inputBorder: "rgba(255, 255, 255, 0.23)",
     destructive: {
       main: "#d32f2f",
+      contrastText: "#fff"
+    },
+    blueviolet: {
+      main: "#8A2BE2",
+      contrastText: "#fff"
+    },
+    pdfred: {
+      main: "#FF0000",
       contrastText: "#fff"
     }
   },
