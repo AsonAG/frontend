@@ -4,10 +4,7 @@ import {
 	ButtonGroup,
 	Button,
 	TextField,
-	IconButton,
-	FormGroup,
-	FormControlLabel,
-	Switch
+	IconButton
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
@@ -15,7 +12,7 @@ import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";
 import { localUserEmailAtom } from "../../auth/getUser";
-import { payrollDashboardFeatureAtom, userInformationAtom } from "../../utils/dataAtoms";
+import { userInformationAtom } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
 import * as Popover from '@radix-ui/react-popover';
 import { AccountCircle } from "@mui/icons-material";
@@ -120,16 +117,16 @@ function FeatureFlags() {
 	if (import.meta.env.PROD)
 		return;
 
-	const [dashboard, setDashboard] = useAtom(payrollDashboardFeatureAtom);
+	// const [dashboard, setDashboard] = useAtom(payrollDashboardFeatureAtom);
 
-	return (
-		<Stack alignSelf="stretch">
-			<Typography variant="h6">Features</Typography>
-			<FormGroup>
-				<FormControlLabel control={<Switch checked={dashboard} onChange={(_, checked) => setDashboard(checked)} />} label="Payroll Dashboard" />
-			</FormGroup>
-		</Stack>
-	)
+	// return (
+	// 	<Stack alignSelf="stretch">
+	// 		<Typography variant="h6">Features</Typography>
+	// 		<FormGroup>
+	// 			<FormControlLabel control={<Switch checked={dashboard} onChange={(_, checked) => setDashboard(checked)} />} label="Payroll Dashboard" />
+	// 		</FormGroup>
+	// 	</Stack>
+	// )
 }
 
 const popoverSx = {

@@ -56,8 +56,7 @@ function EmployeeTable() {
     createInitialState
   );
   const { filtered, selected, mode } = state;
-  // const employeeToEntryMap = useMemo(() => new Map(payrunPeriod.entries.map(e => [e.employeeId, e])), [payrunPeriod]);
-  const employeeToEntryMap = new Map(payrunPeriod.entries.map(e => [e.employeeId, e]));
+  const employeeToEntryMap = useMemo(() => new Map(payrunPeriod.entries.map(e => [e.employeeId, e])), [payrunPeriod]);
 
   const [totalGross, totalNetto, totalAdvancePayments, totalOpen] = useMemo(() => {
     let totalGross = 0;
@@ -102,8 +101,7 @@ function EmployeeTable() {
       <EmployeeHeaderRow isOpen={isOpen} />
       {filtered.map(e => {
         const onSelected = () => dispatch({ type: "toggle_employee_selection", employee: e });
-        console.log(`employee ${e.identifier} id: ${e.id}`, employeeToEntryMap.get(e.id), payrunPeriod.entries.find(entry => entry.employeeId == e.id));
-        return <EmployeeRow key={e.id} isOpen={isOpen} employee={e} selected={selected.includes(e)} toggleSelected={onSelected} payrunEntry={payrunPeriod.entries.find(entry => entry.employeeId == e.id)} />;
+        return <EmployeeRow key={e.id} isOpen={isOpen} employee={e} selected={selected.includes(e)} toggleSelected={onSelected} payrunEntry={employeeToEntryMap.get(e.id)} />;
       })}
     </Stack>
   )

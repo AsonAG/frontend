@@ -23,13 +23,12 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import BusinessIcon from '@mui/icons-material/Business';
 import NotificationImportantIcon from '@mui/icons-material/NotificationImportant';
 import PaymentsIcon from '@mui/icons-material/Payments';
-import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { missingDataAppearanceAtom, missingDataTasksAtom, openTasksAtom, payrollDashboardFeatureAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
+import { missingDataTasksAtom, openTasksAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
@@ -161,8 +160,15 @@ function MenuItemsPayrollAdmin() {
 				to="hr/employees"
 				icon={<PeopleOutlinedIcon />}
 			/>
-			<MissingDataMenu />
-			<PayrunMenu />
+			<NavigationItem
+				label={t("Missing data")}
+				to="hr/missingdata"
+				icon={<ControllingBadgeIcon icon={<NotificationImportantIcon />} />}
+			/>
+			<NavigationItem
+				label={t("Payroll")}
+				to="payrunperiod"
+				icon={<PaymentsIcon />} />
 			<NavigationItem
 				label={t("Reports")}
 				to="hr/reports"
@@ -175,22 +181,6 @@ function MenuItemsPayrollAdmin() {
 			/>
 		</NavigationGroup>
 	)
-}
-
-function MissingDataMenu() {
-	const { t } = useTranslation();
-	const { label, iconIndex } = useAtomValue(missingDataAppearanceAtom);
-	const icon = iconIndex === 0 ? <NotificationImportantIcon /> : <TaskAltIcon />
-	return <NavigationItem label={t(label)} to="hr/missingdata" icon={<ControllingBadgeIcon icon={icon} />} />
-
-}
-
-function PayrunMenu() {
-	const { t } = useTranslation();
-	const useDashboard = useAtomValue(payrollDashboardFeatureAtom);
-	const label = useDashboard ? "Payroll" : "Payruns";
-	const to = useDashboard ? "payrunperiod" : "hr/payruns";
-	return <NavigationItem label={t(label)} to={to} icon={<PaymentsIcon />} />
 }
 
 function MenuItemsPayrollEmployee({ employee }) {

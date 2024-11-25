@@ -84,8 +84,7 @@ import {
 	payrollAtom,
 	missingDataTasksAtom,
 	orgsAtom,
-	missingDataMapAtom,
-	missingDataAppearanceAtom
+	missingDataMapAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -652,11 +651,9 @@ const routeData = [
 					// refresh missing data
 					store.set(missingDataTasksAtom);
 
-					const { label } = store.get(missingDataAppearanceAtom);
-
 					return defer({
 						data: store.get(missingDataMapAtom),
-						title: label,
+						title: "Missing Data",
 					});
 				}
 			},
