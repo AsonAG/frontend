@@ -727,7 +727,7 @@ const routeData = [
 						action: async ({ params }) => {
 							const payrun = await store.get(payrunAtom);
 							await calculatePayrunPeriod({ ...params, payrunId: payrun.id });
-							return null;
+							return redirect("..");
 						}
 					},
 					createRoutePayrunPeriodDocument(),
