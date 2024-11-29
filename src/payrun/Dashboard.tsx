@@ -55,7 +55,7 @@ const columnHelper = createColumnHelper<EntryRow>();
 
 function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatch<Action>) {
   return [
-    columnHelper.accessor(row => `${row.firstName} ${row.lastName}`,
+    columnHelper.accessor(row => `${row.lastName} ${row.firstName}`,
       {
         id: "employeeName",
         cell: (props) => {
