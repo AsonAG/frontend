@@ -4,7 +4,7 @@ import {
 	getOrganization,
 	getUser,
 	getEmployeeByIdentifier,
-	getPayruns,
+	getPayrun,
 	getEmployeeMissingData,
 	getOrganizations,
 	getCompanyMissingDataCases,
@@ -15,7 +15,9 @@ import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
 import { IdType } from "../models/IdType";
 import { MissingData } from "../models/MissingData";
-import { atomWithRefresh, atomWithStorage } from "jotai/utils";
+import { atomWithRefresh, atomWithStorage, createJSONStorage } from "jotai/utils";
+import { ExpandedState } from "@tanstack/react-table";
+import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 
 export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
@@ -61,9 +63,8 @@ export const selfServiceEmployeeAtom = atom((get) => {
 export const payrunAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return [];
-	const payruns = await getPayruns({ orgId, payrollId });
-	return payruns[0] || null;
+	if (orgId === null || payrollId === null) return null;
+	return await getPayrun({ orgId, payrollId });
 });
 
 export const openTasksAtom = atomWithRefresh(async (get) => {
@@ -154,19 +155,6 @@ export const userInformationAtom = atom((async get => {
 	return null;
 }));
 
-export const payrollDashboardFeatureAtom = atomWithStorage<boolean>("feature.payrolldashboard", false, undefined, { getOnInit: true });
+const jsonSessionStorage = createJSONStorage(() => sessionStorage) as SyncStorage<ExpandedState>;
 export const documentRecentSettingAtom = atomWithStorage<boolean>("setting.document.recent", true, undefined, { getOnInit: true });
-
-export const missingDataAppearanceAtom = atom(get => {
-	const useDashboard = get(payrollDashboardFeatureAtom);
-	if (useDashboard) {
-		return {
-			label: "Missing data",
-			icon: 0
-		};
-	}
-	return {
-		label: "Controlling",
-		icon: 1
-	};
-})
+export const expandedControllingTasks = atomWithStorage<ExpandedState>("config.payrolldasboard.expanded", {}, jsonSessionStorage, { getOnInit: true });

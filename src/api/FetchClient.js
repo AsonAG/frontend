@@ -32,7 +32,11 @@ const companyDocumentUrl =
 const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
 const payrunsUrl = "/tenants/:orgId/payruns";
-const payrunParametersUrl = "/tenants/:orgId/payruns/:payrunId/parameters";
+const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period";
+const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId";
+const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/close";
+const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/documents";
+const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/documents/:documentId";
 const payrunJobsUrl = "/tenants/:orgId/payruns/jobs";
 const payrunJobStatusUrl =
 	"/tenants/:orgId/payruns/jobs/:payrunJobId/status";
@@ -429,11 +433,62 @@ export function updateTask(routeParams, task) {
 		.fetch();
 }
 
-export function getPayruns(routeParams) {
+export function getPayrun(routeParams) {
 	return new FetchRequestBuilder(payrunsUrl, routeParams)
 		.withQueryParam("filter", `payrollId eq '${routeParams.payrollId}'`)
+		.fetchSingle();
+}
+
+export function getClosedPayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
+		.withQueryParam("orderBy", "periodStart desc")
+		.withQueryParam("filter", `periodStatus ne 'Open'`);
+}
+
+export function getPayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodUrl, routeParams)
 		.fetchJson();
 }
+export function getOpenPayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
+		.withQueryParam("filter", "PeriodStatus eq 'Open'")
+		.withQueryParam("loadRelated", "true")
+		.fetchSingle();
+}
+
+export function calculatePayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodsUrl + "/calculate", routeParams)
+		.withMethod("POST")
+		.withTimout(10 * 60 * 1000)
+		.withUser()
+		.fetch();
+}
+
+export function closePayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodCloseUrl, routeParams)
+		.withMethod("POST")
+		.withUser()
+		.fetch();
+}
+
+export function createOpenPayrunPeriod(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodsUrl + "/open", routeParams)
+		.withMethod("POST")
+		.withUser()
+		.fetch();
+}
+
+export function getPayrunPeriodDocuments(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodDocumentsUrl, routeParams).fetchJson();
+}
+
+export function getPayrunPeriodDocument(routeParams, report, variant) {
+	return new FetchRequestBuilder(payrunPeriodDocumentUrl, routeParams)
+		.withQueryParam("report", report)
+		.withQueryParam("variant", variant)
+		.fetchJson();
+}
+
 
 export function getDraftPayrunJobs(routeParams) {
 	return new FetchRequestBuilder(payrunJobsUrl, routeParams)
@@ -451,10 +506,6 @@ export function getPayrunJobs(routeParams) {
 			`payrollId eq '${routeParams.payrollId}' and payrunId eq '${routeParams.payrunId}' and jobStatus ne 'Draft'`,
 		)
 		.withQueryParam("orderBy", "periodStart desc");
-}
-
-export function getPayrunParameters(routeParams) {
-	return new FetchRequestBuilder(payrunParametersUrl, routeParams).fetchJson();
 }
 
 export function startPayrunJob(routeParams, jobInvocation) {
