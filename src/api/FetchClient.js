@@ -441,7 +441,7 @@ export function getPayrun(routeParams) {
 
 export function getClosedPayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
-		.withQueryParam("orderBy", "created desc")
+		.withQueryParam("orderBy", "periodStart desc")
 		.withQueryParam("filter", `periodStatus ne 'Open'`);
 }
 

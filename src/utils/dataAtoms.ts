@@ -15,7 +15,9 @@ import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
 import { IdType } from "../models/IdType";
 import { MissingData } from "../models/MissingData";
-import { atomWithRefresh, atomWithStorage } from "jotai/utils";
+import { atomWithRefresh, atomWithStorage, createJSONStorage } from "jotai/utils";
+import { ExpandedState } from "@tanstack/react-table";
+import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 
 export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
@@ -152,4 +154,7 @@ export const userInformationAtom = atom((async get => {
 	}
 	return null;
 }));
+
+const jsonSessionStorage = createJSONStorage(() => sessionStorage) as SyncStorage<ExpandedState>;
 export const documentRecentSettingAtom = atomWithStorage<boolean>("setting.document.recent", true, undefined, { getOnInit: true });
+export const expandedControllingTasks = atomWithStorage<ExpandedState>("config.payrolldasboard.expanded", {}, jsonSessionStorage, { getOnInit: true });

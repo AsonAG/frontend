@@ -111,6 +111,7 @@ import { DataView } from "./components/DataView";
 
 import { PayrunPeriodList } from "./payrun/List";
 import { ReviewOpenPeriod } from "./payrun/ReviewOpenPeriod";
+import { Payouts } from "./payrun/Payouts";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -715,9 +716,13 @@ const routeData = [
 						.withQueryParam("orderBy", `lastName asc`)
 						.fetchJson();
 					const payrun = await getPayrun(params);
-					const payrunPeriod = params.payrunPeriodId === "open" ?
-						await getOpenPayrunPeriod({ ...params, payrunId: payrun.id }) :
-						await getPayrunPeriod({ ...params, payrunId: payrun.id });
+					if (params.payrunPeriodId === "open") {
+						const payrunPeriod = await getOpenPayrunPeriod({ ...params, payrunId: payrun.id })
+						const previousPayrunPeriod = await getClosedPayrunPeriod({ ...params, payrunId: payrun.id }).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
+						const controllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
+						return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks };
+					}
+					const payrunPeriod = await getPayrunPeriod({ ...params, payrunId: payrun.id });
 					return { employees, payrunPeriod };
 				},
 				children: [
@@ -727,7 +732,7 @@ const routeData = [
 						action: async ({ params }) => {
 							const payrun = await store.get(payrunAtom);
 							await calculatePayrunPeriod({ ...params, payrunId: payrun.id });
-							return redirect("..");
+							return redirect(".");
 						}
 					},
 					createRoutePayrunPeriodDocument(),
@@ -749,11 +754,27 @@ const routeData = [
 							}
 							toast("error", "Could not close period");
 						}
+					},
+					{
+						path: "payouts",
+						Component: Payouts,
+						action: async ({ params, request }) => {
+							const formData = await request.formData();
+							const payrunPeriodId = formData.get("payrunPeriodId");
+							const payrun = await store.get(payrunAtom);
+							const closePeriodResponse = await closePayrunPeriod({ ...params, payrunId: payrun.id, payrunPeriodId });
+							if (closePeriodResponse.ok) {
+								await createOpenPayrunPeriod({ ...params, payrunId: payrun.id });
+								toast("success", "Payrun period closed");
+								return redirect("..");
+							}
+							toast("error", "Could not close period");
+						}
 					}
 				]
 			},
 			{
-				path: "hr/dashboard/employees/:employeeId",
+				path: "payrunperiod/open/employees/:employeeId",
 				Component: ContentLayout,
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
@@ -762,10 +783,9 @@ const routeData = [
 					}
 				},
 				children: [
-					createRouteCaseForm(":caseName", ({ params }) => {
-						const { employeeId } = params;
+					createRouteCaseForm(":caseName", () => {
 						return {
-							redirect: `../../../?e=${employeeId}`
+							redirect: `../../../`
 						};
 					})
 				]

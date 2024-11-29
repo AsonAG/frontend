@@ -27,7 +27,7 @@ export function ReviewOpenPeriod() {
         {payrunPeriod.documents?.map(doc => (
           <DocumentSection key={doc.id} payrunPeriodId={payrunPeriod.id} document={doc} />
         ))}
-        <WageStatementSection />
+        {/*<WageStatementSection />*/}
         <Stack direction="row" justifyContent="end">
           <ResponsiveDialog>
             <ResponsiveDialogTrigger>
@@ -79,6 +79,7 @@ function PeriodSection() {
 function WageStatementSection() {
   const { t } = useTranslation();
   const { payrunPeriod, employees } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const [open, setOpen] = useState(false);
   const entriesMap = useMemo(() => new Map(payrunPeriod.entries.map(e => [e.employeeId, e])), [payrunPeriod.entries]);
   const wageStatements = employees.map(employee => {
     const entry = entriesMap.get(employee.id);
@@ -88,7 +89,6 @@ function WageStatementSection() {
   if (wageStatements.length === 0)
     return;
 
-  const [open, setOpen] = useState(false);
   return (
     <Stack>
       <Stack direction="row" spacing={2}>
