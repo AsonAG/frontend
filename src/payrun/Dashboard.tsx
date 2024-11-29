@@ -23,7 +23,6 @@ import {
   ResponsiveDialogTrigger,
 } from "../components/ResponsiveDialog";
 import { DatePicker } from "../components/DatePicker";
-import { useSearchParam } from "../hooks/useSearchParam";
 import { useAtom } from "jotai";
 import { expandedControllingTasks } from "../utils/dataAtoms";
 
@@ -201,6 +200,7 @@ function EmployeeTable() {
   const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks } = useRouteLoaderData("payrunperiod") as LoaderData;
   const payouts = useMemo(() => getPayouts(payrunPeriod.id).flatMap(p => p.entries), [payrunPeriod.id]);
   const [expanded, setExpanded] = useAtom(expandedControllingTasks);
+  const isOpen = payrunPeriod.periodStatus === "Open";
   const employeeRows: Array<EntryRow> = useMemo(() => {
     function mapEmployee(employee: Employee, index: number): EntryRow {
       var paidOut = payouts.filter(p => p.employeeId === employee.id).reduce((a, b) => a + b.amount, 0);
@@ -217,7 +217,7 @@ function EmployeeTable() {
         previousEntry: previousPayrunPeriod?.entries?.find(entry => entry.employeeId == employee.id),
         open: (entry?.netWage ?? 0) - paidOut,
         amount: (entry?.netWage ?? 0) - paidOut,
-        controllingTasks: controllingTasks[index]
+        controllingTasks: isOpen ? controllingTasks[index] : []
       }
     }
     return employees.map(mapEmployee);
@@ -230,14 +230,18 @@ function EmployeeTable() {
     createInitialState
   );
   const { filtered, filter: mode } = state;
-  const columns = useMemo(() => createColumns(t, dispatch, setExpanded), [dispatch]);
+  const columns = useMemo(() => createColumns(t, dispatch), [dispatch]);
   const table = useReactTable({
     columns: columns,
     data: filtered,
     state: {
       expanded,
       rowSelection: state.selected,
-      columnVisibility: state.columnVisibility,
+      columnVisibility: isOpen ? state.columnVisibility : {
+        "open": false,
+        "amount": false,
+        "blocker": false
+      },
     },
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
