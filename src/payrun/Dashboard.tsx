@@ -1,9 +1,9 @@
 import React, { Dispatch, MouseEventHandler, PropsWithChildren, useMemo, useReducer } from "react";
-import { Form, Link, Outlet, useNavigate, useRouteLoaderData } from "react-router-dom";
+import { Link, Outlet, useNavigate, useRouteLoaderData } from "react-router-dom";
 import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField } from "@mui/material";
-import { Check, ChevronLeft, Error as ErrorIcon, FilterList, NextPlan, PriceCheck, Refresh, TrendingDown, TrendingUp } from "@mui/icons-material";
+import { Check, Error as ErrorIcon, FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import { ContentLayout, PageHeaderTitle } from "../components/ContentLayout";
+import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { CaseTask } from "../components/CaseTask";
 import { Employee } from "../models/Employee";
@@ -11,7 +11,7 @@ import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
 import { PayrunPeriod, PayrunPeriodEntry } from "../models/PayrunPeriod";
 import dayjs from "dayjs";
 import { createPayout, getPayouts } from "./Payouts";
-import { createColumnHelper, ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, Row, RowSelectionState, Updater, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { createColumnHelper, ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { TFunction } from "i18next";
 import { AvailableCase } from "../models/AvailableCase";
 import { IdType } from "../models/IdType";
@@ -25,6 +25,7 @@ import {
 import { DatePicker } from "../components/DatePicker";
 import { useAtom } from "jotai";
 import { expandedControllingTasks } from "../utils/dataAtoms";
+import { DashboardHeader } from "./DashboardHeader";
 
 declare module '@tanstack/react-table' {
   //@ts-ignore -
@@ -36,7 +37,7 @@ declare module '@tanstack/react-table' {
 export function PayrunDashboard() {
   return (
     <>
-      <ContentLayout title={<PeriodSection />}>
+      <ContentLayout title={<DashboardHeader backlinkPath="../list" />}>
         <EmployeeTable />
       </ContentLayout>
       <Outlet />
@@ -148,7 +149,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
         return (
           <Stack direction="row" sx={{ width: 30, justifyContent: "center" }}>
             {
-              payrunEntry?.documents?.filter(doc => !doc.attributes?.review).map(doc => (
+              payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => (
                 <Tooltip key={doc.id} title={doc.name} placement="left">
                   <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
                 </Tooltip>
@@ -245,9 +246,9 @@ function EmployeeTable() {
     },
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: (row) => hasControllingTasks(row.original),
+    getRowCanExpand: (row) => isOpen && hasControllingTasks(row.original),
     onExpandedChange: setExpanded,
-    enableRowSelection: (row) => isRowSelectionEnabled(row.original),
+    enableRowSelection: (row) => isOpen && isRowSelectionEnabled(row.original),
     getRowId: originalRow => originalRow.id,
   });
 
@@ -333,34 +334,6 @@ function EmployeeTable() {
   )
 }
 
-function PeriodSection() {
-  const { t } = useTranslation();
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
-  const periodDate = dayjs.utc(payrunPeriod.periodStart).format("MMMM YYYY");
-  const openPeriodPart = payrunPeriod.periodStatus === "Open" && <>
-    <Chip color="success" size="small" label={t("Offen")} />
-    <Form method="post">
-      <input type="hidden" name="payrunPeriodId" value={payrunPeriod.id} />
-      <IconButton type="submit" color="primary" size="small" name="intent" value="calculate"><Refresh /></IconButton>
-    </Form>
-    <Box sx={{ flex: 1 }} />
-    <Tooltip title={t("Payouts")}>
-      <IconButton component={Link} to="payouts"><PriceCheck /></IconButton>
-    </Tooltip>
-    <Tooltip title={t("Go to period completion...")}>
-      <IconButton component={Link} to="review" color="primary"><NextPlan /></IconButton>
-    </Tooltip>
-  </>;
-  return (
-    <Stack direction="row" spacing={1} alignItems="center" width="100%">
-      <Stack direction="row" spacing={0.5} alignItems="center">
-        <IconButton component={Link} to="../list" relative="path"><ChevronLeft /></IconButton>
-        <PageHeaderTitle title={periodDate} />
-      </Stack>
-      {openPeriodPart}
-    </Stack>
-  );
-}
 
 
 type DashboardRowProps = {

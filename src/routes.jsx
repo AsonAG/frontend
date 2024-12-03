@@ -112,6 +112,7 @@ import { DataView } from "./components/DataView";
 import { PayrunPeriodList } from "./payrun/List";
 import { ReviewOpenPeriod } from "./payrun/ReviewOpenPeriod";
 import { Payouts } from "./payrun/Payouts";
+import { ClosedPeriodDocuments } from "./payrun/ClosedPeriodDocuments";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -737,6 +738,7 @@ const routeData = [
 					},
 					createRoutePayrunPeriodDocument(),
 					{
+						id: "payrunperiodreview",
 						path: "review",
 						Component: ReviewOpenPeriod,
 						children: [
@@ -770,6 +772,14 @@ const routeData = [
 							}
 							toast("error", "Could not close period");
 						}
+					},
+					{
+						id: "payrunperioddocuments",
+						path: "documents",
+						Component: ClosedPeriodDocuments,
+						children: [
+							createRoutePayrunPeriodDocument(),
+						]
 					}
 				]
 			},
