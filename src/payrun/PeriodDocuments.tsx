@@ -48,19 +48,14 @@ function WageStatementSection() {
 }
 function WageStatements({ wageStatements }) {
   return (
-    <Stack direction="row" flexWrap="wrap" spacing={1}>
+    <Stack spacing={1}>
       {
         wageStatements.map(([label, entryId, doc]) => (
-          <Chip
-            key={doc.id}
-            variant="outlined"
-            component={Link}
-            to={`${entryId}/doc/${doc.id}?report=${encodeURIComponent(doc.attributes?.reports[0].Name)}`}
-            label={label}
-            size="small"
-            icon={<PictureAsPdf fontSize="small" />}
-            onClick={noop}
-            color="pdfred" />
+          <Stack direction="row" spacing={1}>
+            <Typography>{label}</Typography>
+            <XmlChip to={`${entryId}/doc/${doc.id}`} />
+            <PdfChip to={`${entryId}/doc/${doc.id}?report=${encodeURIComponent(doc.attributes?.reports[0].Name)}`} />
+          </Stack>
         ))
       }
     </Stack>
@@ -73,45 +68,57 @@ function DocumentSection({ payrunPeriodId, document }) {
     <Stack spacing={1}>
       <Typography variant="h6">{document.name}</Typography>
       <Stack direction="row" spacing={1} flexWrap="wrap">
-        <Chip
-          component={Link}
-          variant="outlined"
-          to={`${payrunPeriodId}/doc/${document.id}`}
-          label="XML"
-          size="small"
-          icon={<Code fontSize="small" />}
-          onClick={noop}
-          color="blueviolet" />
+        <XmlChip to={`${payrunPeriodId}/doc/${document.id}`} />
         {document.attributes?.reports?.flatMap(report => {
           if (report.Variants) {
             return report.Variants.map(variant => (
-              <Chip
+              <PdfChip
                 key={variant}
-                variant="outlined"
-                component={Link}
-                to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}&variant=${encodeURIComponent(variant)}`}
                 label={report.Name.split(".").pop() + " " + variant}
-                size="small"
-                icon={<PictureAsPdf fontSize="small" />}
-                onClick={noop}
-                color="pdfred" />
+                to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}&variant=${encodeURIComponent(variant)}`}
+              />
             ));
           }
           return (
-            <Chip
+              <PdfChip
               key={report.Name}
-              variant="outlined"
-              component={Link}
-              to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}`}
               label={report.Name.split(".").pop()}
-              size="small"
-              icon={<PictureAsPdf fontSize="small" />}
-              onClick={noop}
-              color="pdfred" />
+              to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}`}
+              />
           )
         }
         )}
       </Stack>
     </Stack >
+  )
+}
+
+
+function XmlChip({ to }: { to: string }) {
+  return (
+    <Chip
+      component={Link}
+      variant="outlined"
+      to={to}
+      label="XML"
+      size="small"
+      icon={<Code fontSize="small" />}
+      onClick={noop}
+      color="blueviolet" />
+  )
+}
+
+function PdfChip({ to, label }: { to: string, label?: string }) {
+  label ??= "PDF";
+  return (
+    <Chip
+      variant="outlined"
+      component={Link}
+      to={to}
+      label={label}
+      size="small"
+      icon={<PictureAsPdf fontSize="small" />}
+      onClick={noop}
+      color="pdfred" />
   )
 }

@@ -3,7 +3,7 @@ import { Employee } from "../models/Employee";
 import { PayrunPeriod } from "../models/PayrunPeriod";
 import { AvailableCase } from "../models/AvailableCase";
 import dayjs from "dayjs";
-import React from "react";
+import React, { ReactNode } from "react";
 import { Box, Chip, IconButton, Stack, Tooltip } from "@mui/material";
 import { PageHeaderTitle } from "../components/ContentLayout";
 import { ChevronLeft, NextPlan, PriceCheck, Receipt, Refresh } from "@mui/icons-material";
@@ -18,6 +18,7 @@ type LoaderData = {
 
 type DashboardHeaderProps = {
   backlinkPath: string
+  actions?: ReactNode
 }
 
 export function DashboardHeader({ backlinkPath }: DashboardHeaderProps) {
