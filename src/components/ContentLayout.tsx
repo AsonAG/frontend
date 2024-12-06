@@ -91,12 +91,14 @@ export function PageContent({ children, disableInset = false, ...sxProps }) {
 	);
 }
 
-export function withPage<T>(header: ReactNode | string, Component: FC<T>) {
+export function withPage<T>(header: ReactNode | string, Component: FC<T>, renderOutlet: boolean) {
 	return function withPageHOC(props: T) {
+		const outlet = useOutlet();
+		{/* @ts-ignore */ }
+		const content = renderOutlet && outlet ? outlet : <Component {...props} />;
 		return (
 			<ContentLayout title={header}>
-				{/* @ts-ignore */}
-				<Component {...props} />
+				{content}
 			</ContentLayout>
 		);
 	};

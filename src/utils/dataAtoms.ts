@@ -8,6 +8,7 @@ import {
 	getEmployeeMissingData,
 	getOrganizations,
 	getCompanyMissingDataCases,
+	getEmployeeCases,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
@@ -114,6 +115,15 @@ export const missingDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async 
 		map.set(data.id, data);
 	}
 	return map;
+});
+
+export const employeeMissingDataAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
+	const orgId = get(orgIdAtom);
+	const payrollId = get(payrollIdAtom);
+	const selfServiceEmployee = await get(selfServiceEmployeeAtom);
+	if (orgId === null || payrollId === null || selfServiceEmployee === null) return [];
+
+	return getEmployeeCases({ orgId, payrollId, employeeId: selfServiceEmployee.id }, "ECT")
 });
 
 type ToastSeverity = 'error' | 'info' | 'success' | 'warning';

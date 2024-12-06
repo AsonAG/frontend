@@ -17,3 +17,19 @@ export function useRole(role: Role): Boolean {
 
 	return false;
 }
+
+export function useIsESS(): Boolean {
+	const user = useAtomValue(userAtom);
+	const authUserRoles = useAtomValue(authUserRolesAtom);
+	const excludeRoles: Array<Role> = ["provider", "admin", "onboarding", "hr"];
+	if (authUserRoles.some(role => excludeRoles.includes(role))) {
+		return false;
+	}
+
+	if (user?.attributes?.roles && excludeRoles.some(role => user.attributes.roles.includes(role))) {
+		return false;
+	}
+
+	return true;
+
+}

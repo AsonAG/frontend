@@ -28,7 +28,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { missingDataTasksAtom, openTasksAtom, showOrgSelectionAtom } from "../../utils/dataAtoms";
+import { missingDataTasksAtom, openTasksAtom, showOrgSelectionAtom, employeeMissingDataAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
@@ -89,6 +89,20 @@ function ControllingBadgeIcon({ icon }) {
 			</AtomBadge>
 		</Suspense>
 	);
+}
+
+function EmployeeMissingDataBadge({ icon }) {
+	const count = (cases) => {
+		return cases?.length ?? 0;
+	};
+	return (
+		<Suspense fallback={icon}>
+			<AtomBadge atom={employeeMissingDataAtom} countFunc={count}>
+				{icon}
+			</AtomBadge>
+		</Suspense>
+	);
+
 }
 
 function defaultCount(data) {
@@ -193,9 +207,9 @@ function MenuItemsPayrollEmployee({ employee }) {
 				icon={<AddOutlinedIcon />}
 			/>
 			<NavigationItem
-				label={t("Tasks")}
-				to={`employees/${employee.id}/tasks`}
-				icon={<FormatListBulletedIcon />}
+				label={t("Missing data")}
+				to={`employees/${employee.id}/missingdata`}
+				icon={<EmployeeMissingDataBadge employeeId={employee.id} icon={<NotificationImportantIcon />} />}
 			/>
 			<NavigationItem
 				label={t("Documents")}

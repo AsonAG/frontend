@@ -84,7 +84,8 @@ import {
 	payrollAtom,
 	missingDataTasksAtom,
 	orgsAtom,
-	missingDataMapAtom
+	missingDataMapAtom,
+	employeeMissingDataAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -1051,24 +1052,31 @@ const routeData = [
 				children: [
 					{
 						path: "new",
-						Component: withPage("New event", AsyncCaseTable),
+						Component: withPage("New event", AsyncCaseTable, true),
 						loader: ({ params }) => {
 							return defer({
 								data: getEmployeeCases(params, "ESS"),
 							});
 						},
+						children: [
+							createRouteCaseForm(":caseName", { redirect: ".." }),
+						]
 					},
-					createRouteCaseForm("new/:caseName"),
 					{
-						path: "tasks",
-						Component: withPage("Tasks", AsyncCaseTable),
-						loader: ({ params }) => {
+						path: "missingdata",
+						shouldRevalidate: () => true,
+						Component: withPage("Missing data", AsyncCaseTable, true),
+						loader: () => {
+							// refresh missing data
+							store.set(employeeMissingDataAtom);
 							return defer({
-								data: getEmployeeCases(params, "ECT"),
+								data: store.get(employeeMissingDataAtom),
 							});
 						},
+						children: [
+							createRouteCaseForm(":caseName", { redirect: ".." }),
+						]
 					},
-					createRouteCaseForm("tasks/:caseName"),
 					createRouteDocument(true),
 				],
 			},

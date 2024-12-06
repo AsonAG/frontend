@@ -12,11 +12,13 @@ import { getCompanyCases, getEmployeeCases, getEmployees } from "../api/FetchCli
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { AvailableCase } from "../models/AvailableCase";
+import { useIsESS } from "../hooks/useRole";
 
 export function NewEventCommand() {
   const params = useParams();
   const isMobile = useIsMobile();
-  if (!params.orgId || !params.payrollId || isMobile) {
+  const isESS = useIsESS();
+  if (!params.orgId || !params.payrollId || isMobile || isESS) {
     return;
   }
   return <InternalNewEventCommand />;
