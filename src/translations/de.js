@@ -139,47 +139,6 @@ const translations = {
 		"Organization could not be deleted": "Die Organisation konnte nicht gelöscht werden",
 		"No features available for this user": "Keine Funktionen verfügbar für diesen User",
 
-		// compliance
-		Submit: "Übermitteln",
-		"Submit as test case": "Als Testcase übermitteln",
-		"Display PDF": "PDF anzeigen",
-		"Submission url": "Übermittlungsurl",
-		"Transmitter Certificate": "Transmitterzertifikat",
-		"Enterprise Certificate": "Unternehmenszertifikat",
-		"Default certificate": "Standard Zertifikat",
-		"No certificate": "Kein Zertifikat",
-		"Click to select certificate": "Zum Auswählen von Zertifikat klicken",
-		"Select certificate": "Zertifikat auswählen",
-		"Upload new certificate": "Neues Zertifikat hochladen",
-		"Second Operand": "Zweiter Operant",
-		"Settings saved!": "Einstellungen gespeichert!",
-		"Error while saving settings!": "Fehler beim Speichern der Einstellungen!",
-		"Submission was unsuccessful!": "Übermittlung war nicht erfolgreich!",
-		"Submission was successful!": "Übermittlung war erfolgreich!",
-		"CheckInteroperability successful!": "CheckInteroperability erfolgreich!",
-		"Ping successful!": "Ping erfolgreich!",
-		"Contact your IT administrator to resolve this problem.":
-			"Kontaktieren Sie Ihren IT Administrator, um dieses Problem zu lösen.",
-		Submissions: "Übermittlungen",
-		Messages: "Nachrichten",
-		Request: "Anfrage",
-		Response: "Antwort",
-		"Encrypted request": "Verschlüsselte Anfrage",
-		"Encrypted response": "Verschlüsselte Antwort",
-		"Drop the files here ...": "Datein hier fallenlassen ...",
-		"Drag and drop your compliance documents here, or click to select files":
-			"Ziehen Sie Ihre Compliance Dokumente hier hin, oder klick um Datein auszuwählen",
-		"Upload document": "Dokument hochladen",
-		"Generate document": "Dokument generieren",
-		"New document": "Neues Dokument",
-		"Document ready!": "Dokument bereit!",
-		"Unable to save document!": "Dokument konnte nicht gespeichert werden!",
-		Generate: "Generieren",
-		OR: "ODER",
-
-		Failed: "Fehlgeschlagen",
-		Processing: "In Verarbeitung",
-
 
 		// Payruns
 		"Current period": "Aktuelle Periode",
