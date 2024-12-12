@@ -42,16 +42,11 @@ function OpenPeriodHeaderParts() {
   const matches = useMatches();
   const isReview = matches.some(m => m.id === "payrunperiodreview");
   const { t } = useTranslation();
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
   return (
     <>
       <Chip color="success" size="small" label={t("Offen")} />
       {
         !isReview && <>
-          <Form method="post">
-            <input type="hidden" name="payrunPeriodId" value={payrunPeriod.id} />
-            <IconButton type="submit" color="primary" size="small" name="intent" value="calculate"><Refresh /></IconButton>
-          </Form>
           <Box sx={{ flex: 1 }} />
           <Tooltip title={t("Payouts")}>
             <IconButton component={Link} to="payouts"><PriceCheck /></IconButton>

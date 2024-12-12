@@ -60,7 +60,6 @@ import {
 	getClosedPayrunPeriod,
 	getOpenPayrunPeriod,
 	getPayrun,
-	calculatePayrunPeriod,
 	closePayrunPeriod,
 	createOpenPayrunPeriod,
 	getPayrunPeriodDocument,
@@ -731,11 +730,6 @@ const routeData = [
 					{
 						index: true,
 						Component: PayrunDashboard,
-						action: async ({ params }) => {
-							const payrun = await store.get(payrunAtom);
-							await calculatePayrunPeriod({ ...params, payrunId: payrun.id });
-							return redirect(".");
-						}
 					},
 					createRoutePayrunPeriodDocument(),
 					{
