@@ -181,7 +181,7 @@ function MenuItemsPayrollAdmin() {
 			/>
 			<NavigationItem
 				label={t("Payroll")}
-				to="payrunperiod"
+				to="payrunperiods"
 				icon={<PaymentsIcon />} />
 			<NavigationItem
 				label={t("Reports")}

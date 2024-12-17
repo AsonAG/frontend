@@ -687,43 +687,38 @@ const routeData = [
 				],
 			},
 			{
-				path: "payrunperiod",
+				path: "payrunperiods",
 				loader: () => redirect("open")
 			},
 			{
-				path: "payrunperiod/list",
+				path: "payrunperiods/list",
 				Component: PayrunPeriodList,
 				loader: paginatedLoader({
 					pageCount: 15,
 					name: "closedPayrunPeriods",
-					getRequestBuilder: async ({ params }) => {
-						const payrun = await store.get(payrunAtom);
-						return getClosedPayrunPeriod({ ...params, payrunId: payrun.id });
-					},
+					getRequestBuilder: async ({ params }) => getClosedPayrunPeriod(params),
 					getLoaderData: async ({ params }) => {
-						const payrun = await store.get(payrunAtom);
 						return ({
-							openPayrunPeriod: getOpenPayrunPeriod({ ...params, payrunId: payrun.id }),
+							openPayrunPeriod: getOpenPayrunPeriod(params),
 						})
 					},
 				}),
 			},
 			{
-				path: "payrunperiod/:payrunPeriodId",
+				path: "payrunperiods/:payrunPeriodId",
 				id: "payrunperiod",
 				loader: async ({ params }) => {
 					const employees = await getEmployees(params)
 						.withActive()
 						.withQueryParam("orderBy", `lastName asc`)
 						.fetchJson();
-					const payrun = await getPayrun(params);
 					if (params.payrunPeriodId === "open") {
-						const payrunPeriod = await getOpenPayrunPeriod({ ...params, payrunId: payrun.id })
-						const previousPayrunPeriod = await getClosedPayrunPeriod({ ...params, payrunId: payrun.id }).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
+						const payrunPeriod = await getOpenPayrunPeriod(params)
+						const previousPayrunPeriod = await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
 						const controllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
 						return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks };
 					}
-					const payrunPeriod = await getPayrunPeriod({ ...params, payrunId: payrun.id });
+					const payrunPeriod = await getPayrunPeriod(params);
 					return { employees, payrunPeriod };
 				},
 				children: [
@@ -742,10 +737,8 @@ const routeData = [
 						action: async ({ params, request }) => {
 							const formData = await request.formData();
 							const payrunPeriodId = formData.get("payrunPeriodId");
-							const payrun = await store.get(payrunAtom);
-							const closePeriodResponse = await closePayrunPeriod({ ...params, payrunId: payrun.id, payrunPeriodId });
+							const closePeriodResponse = await closePayrunPeriod({ ...params, payrunPeriodId });
 							if (closePeriodResponse.ok) {
-								await createOpenPayrunPeriod({ ...params, payrunId: payrun.id });
 								toast("success", "Payrun period closed");
 								return redirect("..");
 							}

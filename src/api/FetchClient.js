@@ -32,11 +32,11 @@ const companyDocumentUrl =
 const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
 const payrunsUrl = "/tenants/:orgId/payruns";
-const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period";
-const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId";
-const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/close";
-const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/documents";
-const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrun/:payrunId/period/:payrunPeriodId/documents/:documentId";
+const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods";
+const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId";
+const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/close";
+const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents";
+const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
 const payrunJobsUrl = "/tenants/:orgId/payruns/jobs";
 const payrunJobStatusUrl =
 	"/tenants/:orgId/payruns/jobs/:payrunJobId/status";
