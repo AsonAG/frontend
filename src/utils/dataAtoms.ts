@@ -168,3 +168,4 @@ export const userInformationAtom = atom((async get => {
 const jsonSessionStorage = createJSONStorage(() => sessionStorage) as SyncStorage<ExpandedState>;
 export const documentRecentSettingAtom = atomWithStorage<boolean>("setting.document.recent", true, undefined, { getOnInit: true });
 export const expandedControllingTasks = atomWithStorage<ExpandedState>("config.payrolldasboard.expanded", {}, jsonSessionStorage, { getOnInit: true });
+export const hideReportsFeatureAtom = atomWithStorage<boolean>("feature.reports.hide", false, undefined, { getOnInit: true });

@@ -4,7 +4,10 @@ import {
 	ButtonGroup,
 	Button,
 	TextField,
-	IconButton
+	IconButton,
+	FormGroup,
+	FormControlLabel,
+	Switch
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
@@ -12,7 +15,7 @@ import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";
 import { localUserEmailAtom } from "../../auth/getUser";
-import { userInformationAtom } from "../../utils/dataAtoms";
+import { hideReportsFeatureAtom, userInformationAtom } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
 import * as Popover from '@radix-ui/react-popover';
 import { AccountCircle } from "@mui/icons-material";
@@ -117,16 +120,16 @@ function FeatureFlags() {
 	if (import.meta.env.PROD)
 		return;
 
-	// const [dashboard, setDashboard] = useAtom(payrollDashboardFeatureAtom);
+	const [hideReports, setHideReports] = useAtom(hideReportsFeatureAtom);
 
-	// return (
-	// 	<Stack alignSelf="stretch">
-	// 		<Typography variant="h6">Features</Typography>
-	// 		<FormGroup>
-	// 			<FormControlLabel control={<Switch checked={dashboard} onChange={(_, checked) => setDashboard(checked)} />} label="Payroll Dashboard" />
-	// 		</FormGroup>
-	// 	</Stack>
-	// )
+	return (
+		<Stack alignSelf="stretch">
+			<Typography variant="h6">Features</Typography>
+			<FormGroup>
+				<FormControlLabel control={<Switch checked={hideReports} onChange={(_, checked) => setHideReports(checked)} />} label="Reports ausblenden" />
+			</FormGroup>
+		</Stack>
+	)
 }
 
 const popoverSx = {
