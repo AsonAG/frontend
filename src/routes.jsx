@@ -59,7 +59,6 @@ import {
 	getCaseValueCount,
 	getClosedPayrunPeriod,
 	getOpenPayrunPeriod,
-	getPayrun,
 	closePayrunPeriod,
 	createOpenPayrunPeriod,
 	getPayrunPeriodDocument,
@@ -772,7 +771,7 @@ const routeData = [
 				]
 			},
 			{
-				path: "payrunperiod/open/employees/:employeeId",
+				path: "payrunperiods/open/employees/:employeeId",
 				Component: ContentLayout,
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
