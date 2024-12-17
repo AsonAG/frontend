@@ -259,7 +259,7 @@ function EmployeeTable() {
 
   const rowContainerProps = getRowGridProps(table.getVisibleFlatColumns().map(col => col.getSize()));
   return (
-    <Stack spacing={1} >
+    <Stack>
       <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
         <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
           <Chip icon={<FilterList />} sx={chipSx} onClick={() => { dispatch({ type: "reset_mode" }) }} color="primary" variant="outlined" />
