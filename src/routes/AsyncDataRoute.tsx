@@ -10,6 +10,7 @@ type AsyncDataRouteProps = {
 	loadingElement?: ReactNode,
 	skipDataCheck?: boolean,
 	noDataAvailableText?: string
+	children?: ReactNode | undefined
 } & PropsWithChildren;
 
 export function AsyncDataRoute({

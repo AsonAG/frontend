@@ -1,5 +1,5 @@
 import React, { Fragment, PropsWithChildren, ReactNode, useMemo, useState } from "react";
-import { useAsyncValue } from "react-router-dom";
+import { useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
 	Card,
@@ -14,7 +14,8 @@ import {
 	Box,
 	TooltipProps,
 	useMediaQuery,
-	Theme
+	Theme,
+	Button
 } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
@@ -26,6 +27,7 @@ import { useSearchParam } from "../../hooks/useSearchParam";
 import { IdType } from "../../models/IdType";
 import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row } from "@tanstack/react-table";
 import { TFunction } from "i18next";
+import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent } from "../ResponsiveDialog";
 
 
 const columnHelper = createColumnHelper<EventRow>();
@@ -78,16 +80,21 @@ function createColumns(t: TFunction<"translation", undefined>) {
 }
 
 export function AsyncEventTable() {
-	const isDesktop = useMediaQuery<Theme>(theme => theme.breakpoints.up(1000));
-	const Content = isDesktop ? EventTable : EventCards;
 	return <>
 		<TableSearch />
 		<AsyncDataRoute>
 			<PaginatedContent>
-				<Content />
+				<AwaitedEventTable />
 			</PaginatedContent>
 		</AsyncDataRoute>
 	</>;
+}
+
+function AwaitedEventTable() {
+	const { items } = useAsyncValue() as { items: Array<Event> };
+	const isDesktop = useMediaQuery<Theme>(theme => theme.breakpoints.up(1000));
+	const Content = isDesktop ? EventTable : EventCards;
+	return <Content items={items} />
 }
 
 
@@ -143,9 +150,33 @@ function getIsRowExpanded(row: Row<EventRow>) {
 		reentry = false;
 	}
 }
-function EventTable() {
+
+type EventDisplayProps = {
+	items: Array<Event>
+}
+
+export function EventTableDialog() {
 	const { t } = useTranslation();
-	const { items: events } = useAsyncValue() as { items: Array<Event> };
+	const items = useLoaderData() as Array<Event>;
+	const navigate = useNavigate();
+	const onClose = () => navigate("..");
+	return (
+		<ResponsiveDialog open onOpenChange={onClose}>
+			<ResponsiveDialogContent containerWidth>
+				<Typography variant="h6">{t("Events in open period")}</Typography>
+				<EventTable items={items} />
+				<Stack direction="row" justifyContent="end">
+					<ResponsiveDialogClose>
+						<Button variant="outlined">{t("Close")}</Button>
+					</ResponsiveDialogClose>
+				</Stack>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
+	)
+}
+
+export function EventTable({ items: events }: EventDisplayProps) {
+	const { t } = useTranslation();
 	const e: Array<EventRow> = useMemo(() => events.map(event => ({
 		id: event.id,
 		eventName: event.caseName,
@@ -272,8 +303,7 @@ function TableSearch() {
 }
 
 
-function EventCards() {
-	const { items: events } = useAsyncValue();
+function EventCards({ items: events }: EventDisplayProps) {
 	return (
 		<>
 			<Stack spacing={3}>

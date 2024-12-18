@@ -355,14 +355,11 @@ export function getCurrentValues(routeParams) {
 		.fetchJson()
 }
 
-export function getEmployeeCaseChanges(routeParams, search, orderBy) {
+export function getEmployeeCaseChanges(routeParams) {
 	const url = payrollUrl + "/changes";
 	return new FetchRequestBuilder(url, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", "Employee")
-		.withQueryParam("searchTerm", search)
-		.withQueryParam("orderBy", orderBy)
-		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
 		.withUser();
 }

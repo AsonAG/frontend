@@ -206,6 +206,7 @@ const translations = {
 		"Bank account": "Bankkonto",
 		"Value date": "Valutadatum",
 		"Employee number": "Mitarbeiteranzahl",
+		"Events in open period": "Ereignisse in der offenen Periode",
 
 		// Command
 		"Select event": "Ereignis auswählen",

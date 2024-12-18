@@ -1,6 +1,6 @@
 import React, { Dispatch, MouseEventHandler, PropsWithChildren, useMemo, useReducer } from "react";
 import { Link, Outlet, useNavigate, useRouteLoaderData } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Badge } from "@mui/material";
 import { Check, Error as ErrorIcon, FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { ContentLayout } from "../components/ContentLayout";
@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { CaseTask } from "../components/CaseTask";
 import { Employee } from "../models/Employee";
 import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
+import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import { PayrunPeriod, PayrunPeriodEntry } from "../models/PayrunPeriod";
 import dayjs from "dayjs";
 import { createPayout, getPayouts } from "./Payouts";
@@ -47,9 +48,13 @@ export function PayrunDashboard() {
 
 const chipSx = {
   "& .MuiChip-label": {
-    p: 0.75
+    display: "none"
+  },
+  "& .MuiChip-icon": {
+    ml: 0.75,
+    mr: 0.625
   }
-};
+}
 
 const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
 const columnHelper = createColumnHelper<EntryRow>();
@@ -123,7 +128,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
           return <AmountInput employee={props.row.original} dispatch={dispatch} onClick={onClick} />;
         },
         header: t("Amount"),
-        size: 116,
+        size: 162,
         meta: {
           alignment: "right"
         }
@@ -159,6 +164,24 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
         )
       },
       size: 30
+    }),
+    columnHelper.display({
+      id: "events",
+      cell: (props) => {
+        const { entry, caseChangeCount } = props.row.original;
+        if (!entry || caseChangeCount === 0)
+          return <div></div>;
+        return (
+          <Stack direction="row" sx={{ width: 30, justifyContent: "center" }}>
+            <Tooltip title={t("Events")} placement="left">
+              <Badge badgeContent={caseChangeCount} color="info">
+                <IconButton size="small" component={Link} to={`employees/${entry.employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
+              </Badge>
+            </Tooltip>
+          </Stack>
+        )
+      },
+      size: 30
     })
   ];
 }
@@ -168,6 +191,7 @@ type LoaderData = {
   payrunPeriod: PayrunPeriod
   previousPayrunPeriod: PayrunPeriod | undefined
   controllingTasks: Array<Array<AvailableCase>>
+  caseChangeCounts: Array<number>
 }
 
 type EntryRow = Employee & {
@@ -176,6 +200,7 @@ type EntryRow = Employee & {
   open: number | undefined
   amount: number | undefined
   controllingTasks: Array<AvailableCase> | undefined
+  caseChangeCount: number
 }
 
 function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL") {
@@ -198,7 +223,7 @@ function createRowClickHandler(row: Row<EntryRow>, state: State, dispatch: Dispa
 function EmployeeTable() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseChangeCounts } = useRouteLoaderData("payrunperiod") as LoaderData;
   const payouts = useMemo(() => getPayouts(payrunPeriod.id).flatMap(p => p.entries), [payrunPeriod.id]);
   const [expanded, setExpanded] = useAtom(expandedControllingTasks);
   const isOpen = payrunPeriod.periodStatus === "Open";
@@ -218,7 +243,8 @@ function EmployeeTable() {
         previousEntry: previousPayrunPeriod?.entries?.find(entry => entry.employeeId == employee.id),
         open: (entry?.netWage ?? 0) - paidOut,
         amount: (entry?.netWage ?? 0) - paidOut,
-        controllingTasks: isOpen ? controllingTasks[index] : []
+        controllingTasks: isOpen ? controllingTasks[index] : [],
+        caseChangeCount: caseChangeCounts[index]
       }
     }
     return employees.map(mapEmployee);
@@ -557,7 +583,8 @@ function reducer(state: State, action: Action): State {
   stateAfterAction.mode = Object.values(stateAfterAction.selected).some(s => s) ? "payout" : "view";
   stateAfterAction.columnVisibility = stateAfterAction.mode === "view" ? { "amount": false } : {
     "blocker": false,
-    "documents": false
+    "documents": false,
+    "events": false
   }
   return stateAfterAction;
 }
