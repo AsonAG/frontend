@@ -12,7 +12,7 @@ import { OrganizationList } from "./organization/List";
 import Dashboard from "./scenes/dashboard";
 import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
-import { AsyncEventTable, EventTableDialog } from "./components/tables/EventTable";
+import { AsyncEventTable } from "./components/tables/EventTable";
 import dayjs from "dayjs";
 
 import { App } from "./App";
@@ -62,7 +62,8 @@ import {
 	closePayrunPeriod,
 	createOpenPayrunPeriod,
 	getPayrunPeriodDocument,
-	getPayrunPeriod
+	getPayrunPeriod,
+	getPayrunPeriodCaseValues
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -112,6 +113,7 @@ import { PayrunPeriodList } from "./payrun/List";
 import { ReviewOpenPeriod } from "./payrun/ReviewOpenPeriod";
 import { Payouts } from "./payrun/Payouts";
 import { ClosedPeriodDocuments } from "./payrun/ClosedPeriodDocuments";
+import { PeriodCaseValueDialog } from "./payrun/PeriodCaseValueDialog";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -718,13 +720,8 @@ const routeData = [
 						const payrunPeriod = await getOpenPayrunPeriod(params)
 						const previousPayrunPeriod = await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
 						const controllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
-						const caseChangeCounts = await Promise.all(employees.map(e => {
-							return getEmployeeCaseChanges({ ...params, employeeId: e.id })
-								.withQueryParam("filter", `created gt '${payrunPeriod.periodStart}' and created le '${payrunPeriod.periodEnd}'`)
-								.withQueryParam("result", "Count")
-								.fetchJson();
-						}));
-						return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseChangeCounts };
+						const caseValueCounts = await Promise.all(employees.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.id }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true)));
+						return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts };
 					}
 					const payrunPeriod = await getPayrunPeriod(params);
 					return { employees, payrunPeriod };
@@ -778,15 +775,11 @@ const routeData = [
 					},
 					{
 						path: "employees/:employeeId/events",
-						Component: EventTableDialog,
+						Component: PeriodCaseValueDialog,
 						loader: async ({ params }) => {
 							const fetcher = params.payrunPeriodId === "open" ? getOpenPayrunPeriod : getPayrunPeriod;
 							const payrunPeriod = await fetcher(params);
-							return getEmployeeCaseChanges(params)
-								.withQueryParam("filter", `created gt '${payrunPeriod.periodStart}' and created le '${payrunPeriod.periodEnd}'`)
-								.withQueryParam("orderBy", "created desc, id")
-								.withQueryParam("substituteLookupCodes", true)
-								.fetchJson();
+							return getPayrunPeriodCaseValues(params, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd);
 						}
 					}
 				]

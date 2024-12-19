@@ -1,5 +1,5 @@
-import React, { Fragment, PropsWithChildren, ReactNode, useMemo, useState } from "react";
-import { useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
+import React, { PropsWithChildren, ReactNode, useMemo, useState } from "react";
+import { useAsyncValue } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
 	Card,
@@ -14,8 +14,7 @@ import {
 	Box,
 	TooltipProps,
 	useMediaQuery,
-	Theme,
-	Button
+	Theme
 } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
@@ -27,7 +26,6 @@ import { useSearchParam } from "../../hooks/useSearchParam";
 import { IdType } from "../../models/IdType";
 import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row } from "@tanstack/react-table";
 import { TFunction } from "i18next";
-import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent } from "../ResponsiveDialog";
 
 
 const columnHelper = createColumnHelper<EventRow>();
@@ -153,26 +151,6 @@ function getIsRowExpanded(row: Row<EventRow>) {
 
 type EventDisplayProps = {
 	items: Array<Event>
-}
-
-export function EventTableDialog() {
-	const { t } = useTranslation();
-	const items = useLoaderData() as Array<Event>;
-	const navigate = useNavigate();
-	const onClose = () => navigate("..");
-	return (
-		<ResponsiveDialog open onOpenChange={onClose}>
-			<ResponsiveDialogContent containerWidth>
-				<Typography variant="h6">{t("Events in open period")}</Typography>
-				<EventTable items={items} />
-				<Stack direction="row" justifyContent="end">
-					<ResponsiveDialogClose>
-						<Button variant="outlined">{t("Close")}</Button>
-					</ResponsiveDialogClose>
-				</Stack>
-			</ResponsiveDialogContent>
-		</ResponsiveDialog>
-	)
 }
 
 export function EventTable({ items: events }: EventDisplayProps) {

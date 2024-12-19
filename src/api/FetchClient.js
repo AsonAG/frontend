@@ -321,6 +321,19 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 		.fetchJson();
 }
 
+export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodStart, payrunPeriodEnd, asCount = false) {
+	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
+		.withQueryParam("caseType", "Employee")
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParam("filter", `(created gt '${payrunPeriodOpened}' and start le '${payrunPeriodEnd}') or (start gt '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')`)
+		.withQueryParam("orderBy", "created desc")
+		.withQueryParam("substituteLookupCodes", !asCount)
+		.withQueryParam("result", asCount ? "Count" : undefined)
+		.withLocalization()
+		.withUser()
+		.fetchJson()
+}
+
 export function getCaseChangeCaseValues(routeParams, top) {
 	const caseType = routeParams.employeeId ? "Employee" : "Company";
 	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)

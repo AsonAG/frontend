@@ -168,13 +168,13 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
     columnHelper.display({
       id: "events",
       cell: (props) => {
-        const { entry, caseChangeCount } = props.row.original;
-        if (!entry || caseChangeCount === 0)
+        const { entry, caseValueCount } = props.row.original;
+        if (!entry || caseValueCount === 0)
           return <div></div>;
         return (
           <Stack direction="row" sx={{ width: 30, justifyContent: "center" }}>
             <Tooltip title={t("Events")} placement="left">
-              <Badge badgeContent={caseChangeCount} color="info">
+              <Badge badgeContent={caseValueCount} color="info">
                 <IconButton size="small" component={Link} to={`employees/${entry.employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
               </Badge>
             </Tooltip>
@@ -191,7 +191,7 @@ type LoaderData = {
   payrunPeriod: PayrunPeriod
   previousPayrunPeriod: PayrunPeriod | undefined
   controllingTasks: Array<Array<AvailableCase>>
-  caseChangeCounts: Array<number>
+  caseValueCounts: Array<number>
 }
 
 type EntryRow = Employee & {
@@ -200,7 +200,7 @@ type EntryRow = Employee & {
   open: number | undefined
   amount: number | undefined
   controllingTasks: Array<AvailableCase> | undefined
-  caseChangeCount: number
+  caseValueCount: number
 }
 
 function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL") {
@@ -223,7 +223,7 @@ function createRowClickHandler(row: Row<EntryRow>, state: State, dispatch: Dispa
 function EmployeeTable() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseChangeCounts } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts } = useRouteLoaderData("payrunperiod") as LoaderData;
   const payouts = useMemo(() => getPayouts(payrunPeriod.id).flatMap(p => p.entries), [payrunPeriod.id]);
   const [expanded, setExpanded] = useAtom(expandedControllingTasks);
   const isOpen = payrunPeriod.periodStatus === "Open";
@@ -244,7 +244,7 @@ function EmployeeTable() {
         open: (entry?.netWage ?? 0) - paidOut,
         amount: (entry?.netWage ?? 0) - paidOut,
         controllingTasks: isOpen ? controllingTasks[index] : [],
-        caseChangeCount: caseChangeCounts[index]
+        caseValueCount: caseValueCounts[index]
       }
     }
     return employees.map(mapEmployee);
