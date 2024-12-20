@@ -226,7 +226,7 @@ function EmployeeTable() {
 	const [showAll] = useSearchParam("showAll");
 	return (
 		<>
-			<Stack spacing={0.25} divider={<Divider />}>
+			<Stack>
 				{employees.map((employee) => (
 					<EmployeeRow
 						key={employee.id}
