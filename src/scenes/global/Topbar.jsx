@@ -6,11 +6,6 @@ import {
 import { UserAccountComponent } from "./UserAccountComponent";
 import { Suspense } from "react";
 import { NewEventCommand } from "../../components/NewEventCommand";
-import { useTranslation } from "react-i18next";
-import { payrollAtom } from "../../utils/dataAtoms";
-import { useAtomValue } from "jotai";
-import { DatePicker } from "../../components/DatePicker";
-import dayjs from "dayjs";
 
 function Topbar({ children }) {
 	return (
@@ -31,7 +26,9 @@ function Topbar({ children }) {
 				<Stack sx={{ flexGrow: 1 }} alignItems="center" justifyContent="center" direction="row">
 				</Stack>
 				<Stack direction="row" spacing={2.5} alignItems="center">
-					<NewEventCommand />
+					<Suspense>
+						<NewEventCommand />
+					</Suspense>
 					<Suspense>
 						<UserAccountComponent />
 					</Suspense>
