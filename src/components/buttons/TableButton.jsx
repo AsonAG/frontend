@@ -15,8 +15,8 @@ export function TableButton({
 		return (
 			<Tooltip title={title} placement="top" arrow size="sm">
 				<div>
-					<IconButton color="primary" {...buttonProps}>
-						<Badge badgeContent={badgeCount} color="primary">
+					<IconButton color="primary" {...buttonProps} size="small">
+						<Badge badgeContent={badgeCount} color="primary" >
 							{icon}
 						</Badge>
 					</IconButton>

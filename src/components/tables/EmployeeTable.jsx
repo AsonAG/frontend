@@ -226,7 +226,7 @@ function EmployeeTable() {
 	const [showAll] = useSearchParam("showAll");
 	return (
 		<>
-			<Stack spacing={1} divider={<Divider />}>
+			<Stack spacing={0.25} divider={<Divider />}>
 				{employees.map((employee) => (
 					<EmployeeRow
 						key={employee.id}
@@ -240,7 +240,6 @@ function EmployeeTable() {
 }
 
 const sx = {
-	height: 45,
 	borderRadius: (theme) => theme.spacing(1),
 	"&:hover": {
 		backgroundColor: (theme) => theme.palette.primary.hover,
