@@ -26,7 +26,6 @@ export function Payouts() {
   const onDelete = (payoutsId: IdType) => {
     return () => {
       const key = `payout_${payrunPeriod.id}_${payoutsId}`;
-      console.log(key)
       localStorage.removeItem(key)
       rerender();
     }

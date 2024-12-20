@@ -9,7 +9,7 @@ import { payrollAtom } from "../utils/dataAtoms";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
 import { getCompanyCases, getEmployeeCases, getEmployees } from "../api/FetchClient";
-import { generatePath, useNavigate, useParams } from "react-router-dom";
+import { generatePath, useMatches, useNavigate, useParams } from "react-router-dom";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { AvailableCase } from "../models/AvailableCase";
 import { useIsESS } from "../hooks/useRole";
@@ -305,12 +305,13 @@ function CommandItem({ text, subtext }: CommandItemProps) {
 function EmployeeCasesCommandGroup({ state, close, dispatch }: { state: State, close: () => void, dispatch: Dispatch<Action> }) {
   const navigate = useNavigate();
   const params = useParams();
+  const basePath = useCaseFormBasePath("/orgs/:orgId/payrolls/:payrollId/hr");
   const casesState = state.initialized && state.page === "employee" ? state.cases : null;
   function onCaseSelected(_case: AvailableCase) {
     const employee = state.initialized && state.page === "employee" && state.employee;
     if (!employee)
       throw new Error("no employee found"); // this should never happen
-    const path = generatePath(`/orgs/:orgId/payrolls/:payrollId/hr/employees/:employeeId/new/:caseName`, { orgId: params.orgId!, payrollId: params.payrollId!, employeeId: employee.id, caseName: encodeURIComponent(_case.name) });
+    const path = generatePath(basePath + "/employees/:employeeId/new/:caseName", { ...params, employeeId: employee.id, caseName: encodeURIComponent(_case.name) });
     navigate(path);
     close();
   }
@@ -336,8 +337,9 @@ function CompanyCasesCommandGroup({ state, close, dispatch }: { state: State, cl
   const navigate = useNavigate();
   const params = useParams();
   const casesState = state.initialized && state.page === "company" ? state.cases : null;
+  const basePath = useCaseFormBasePath("/orgs/:orgId/payrolls/:payrollId");
   function onCaseSelected(_case: AvailableCase) {
-    const path = generatePath(`/orgs/:orgId/payrolls/:payrollId/company/new/:caseName`, { orgId: params.orgId!, payrollId: params.payrollId!, caseName: encodeURIComponent(_case.name) });
+    const path = generatePath(basePath + "/company/new/:caseName", { ...params, caseName: encodeURIComponent(_case.name) });
     navigate(path);
     close();
   }
@@ -480,3 +482,13 @@ function reducer(state: State, action: Action): State {
 }
 
 
+function useCaseFormBasePath(defaultPath: string) {
+  const matches = useMatches();
+  const eventMatches = matches.filter(m => m.handle?.newEventRoot);
+  if (eventMatches.length > 0) {
+    return eventMatches.pop()!.pathname
+  }
+
+  return defaultPath;
+
+}

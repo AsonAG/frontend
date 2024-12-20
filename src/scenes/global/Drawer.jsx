@@ -64,7 +64,6 @@ function NavigationItem(props) {
 	const matches = useMatches();
 	let active = false;
 	if (activeOn) {
-		console.log(matches);
 		active = matches.some(match => match.id === activeOn);
 	}
 

@@ -688,6 +688,9 @@ const routeData = [
 					{
 						path: ":payrunPeriodId",
 						id: "payrunperiod",
+						handle: {
+							newEventRoot: true
+						},
 						loader: async ({ params }) => {
 							const employees = await getEmployees(params)
 								.withActive()
@@ -771,25 +774,37 @@ const routeData = [
 									}
 								]
 							},
-							{
-								path: "employees/:employeeId",
-								Component: ContentLayout,
-								loader: async ({ params }) => {
-									const employee = await getEmployee(params);
-									return {
-										title: getEmployeeDisplayString(employee)
-									}
-								},
-								children: [
-									createRouteCaseForm(":caseName", () => {
-										return {
-											redirect: `../../../`
-										};
-									})
-								]
-							}
 						]
 					},
+				]
+			},
+			{
+				path: "payrunperiods/:payrunPeriodId/employees/:employeeId",
+				Component: ContentLayout,
+				loader: async ({ params }) => {
+					const employee = await getEmployee(params);
+					return {
+						title: getEmployeeDisplayString(employee)
+					}
+				},
+				children: [
+					createRouteCaseForm("new/:caseName", () => {
+						return {
+							redirect: `../../../../`
+						};
+					})
+				]
+			},
+			{
+				path: "payrunperiods/:payrunPeriodId/company",
+				Component: ContentLayout,
+				loader: () => ({ title: "Company" }),
+				children: [
+					createRouteCaseForm("new/:caseName", () => {
+						return {
+							redirect: `../../../`
+						};
+					}),
 				]
 			},
 			{
