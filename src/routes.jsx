@@ -659,7 +659,7 @@ const routeData = [
 
 					return defer({
 						data: store.get(missingDataMapAtom),
-						title: "Missing Data",
+						title: "Missing data",
 					});
 				}
 			},
