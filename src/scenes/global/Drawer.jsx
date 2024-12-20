@@ -11,6 +11,8 @@ import {
 	NavLink as RouterLink,
 	useLoaderData,
 	useLocation,
+	useMatch,
+	useMatches,
 	useParams,
 } from "react-router-dom";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -58,10 +60,16 @@ const Link = styled(
 });
 
 function NavigationItem(props) {
-	const { icon, label, to, end } = props;
+	const { icon, label, to, end, activeOn } = props;
+	const matches = useMatches();
+	let active = false;
+	if (activeOn) {
+		console.log(matches);
+		active = matches.some(match => match.id === activeOn);
+	}
 
 	return (
-		<Link to={to} end={end}>
+		<Link to={to} end={end} className={active ? "active" : undefined}>
 			<Stack direction="row" spacing={1}>
 				{icon}
 				<Typography sx={{ flexGrow: 1 }}>{label}</Typography>
@@ -182,7 +190,8 @@ function MenuItemsPayrollAdmin() {
 			/>
 			<NavigationItem
 				label={t("Payroll")}
-				to="payrunperiods"
+				to="payrunperiods/open"
+				activeOn="payrunperiods-root"
 				icon={<PaymentsIcon />} />
 			{!hideReports &&
 				<NavigationItem

@@ -66,7 +66,7 @@ function OpenPayrunPeriod() {
     <Paper variant="outlined">
       <Row
         title={periodDate}
-        to="../open"
+        to="open"
       />
     </Paper>
   );
@@ -83,7 +83,7 @@ function ClosedPayrunPeriods() {
         <Stack divider={<Divider flexItem />}>
           {payrunPeriods.items.map((period) => {
             const periodDate = dayjs.utc(period.periodStart).format("MMMM YYYY");
-            return <Row key={period.id} title={periodDate} to={"../" + period.id} />
+            return <Row key={period.id} title={periodDate} to={period.id} />
           })}
         </Stack>
       </Paper>

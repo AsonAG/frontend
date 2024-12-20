@@ -29,8 +29,8 @@ import { expandedControllingTasks } from "../utils/dataAtoms";
 import { DashboardHeader } from "./DashboardHeader";
 
 declare module '@tanstack/react-table' {
-  //@ts-ignore -
-  interface ColumnMeta<TData extends RowData, TValue> {
+  // @ts-ignore
+  interface ColumnMeta<_TData extends RowData, TValue> {
     alignment: "left" | "center" | "right"
   }
 }
@@ -38,7 +38,7 @@ declare module '@tanstack/react-table' {
 export function PayrunDashboard() {
   return (
     <>
-      <ContentLayout title={<DashboardHeader backlinkPath="../list" />}>
+      <ContentLayout title={<DashboardHeader backlinkPath=".." />}>
         <EmployeeTable />
       </ContentLayout>
       <Outlet />
@@ -244,7 +244,7 @@ function EmployeeTable() {
         open: (entry?.netWage ?? 0) - paidOut,
         amount: (entry?.netWage ?? 0) - paidOut,
         controllingTasks: isOpen ? controllingTasks[index] : [],
-        caseValueCount: caseValueCounts[index]
+        caseValueCount: isOpen ? caseValueCounts[index] : 0
       }
     }
     return employees.map(mapEmployee);
@@ -295,7 +295,7 @@ function EmployeeTable() {
         <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{formatValue(state.totals.gross)}</Typography>
         <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{formatValue(state.totals.net)}</Typography>
         <Typography fontWeight="bold" textAlign="right" sx={{ width: 100, py: 0.625 }} >{formatValue(state.totals.paidOut)}</Typography>
-        <Stack sx={{ width: 232 }} alignItems="end">
+        <Stack sx={{ width: 278 }} alignItems="end">
           {state.totals.open > 0 &&
             <ResponsiveDialog>
               <ResponsiveDialogTrigger>
