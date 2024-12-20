@@ -174,7 +174,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
         return (
           <Stack direction="row" sx={{ width: 30, justifyContent: "center" }}>
             <Tooltip title={t("Events")} placement="left">
-              <Badge badgeContent={caseValueCount} color="info">
+              <Badge badgeContent={caseValueCount} color="info" overlap="circular">
                 <IconButton size="small" component={Link} to={`employees/${entry.employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
               </Badge>
             </Tooltip>

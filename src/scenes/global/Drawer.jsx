@@ -112,7 +112,7 @@ function AtomBadge({ atom, countFunc = defaultCount, children }) {
 	const data = useAtomValue(atom);
 	const count = countFunc(data);
 	return (
-		<Badge badgeContent={count} color="primary">
+		<Badge badgeContent={count} color="primary" overlap="circular">
 			{children}
 		</Badge>
 	);

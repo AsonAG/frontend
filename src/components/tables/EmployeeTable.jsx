@@ -283,7 +283,7 @@ function EmployeeButtons({ employee }) {
 				title={t("Data")}
 				to={employee.id + "/data"}
 				variant={variant}
-				icon={<WorkOutlinetIcon sx={{ fontSize: "1.2rem" }} />}
+				icon={<WorkOutlinetIcon />}
 				badgeCount={missingDataCount}
 			/>
 			<TableButton
