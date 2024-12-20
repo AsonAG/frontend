@@ -20,7 +20,7 @@ import { useMemo, Suspense } from "react";
 import { ArrowBack, Download } from "@mui/icons-material";
 import { Centered } from "./Centered";
 import { getDataUrl } from "../utils/DocumentUtils";
-import { XmlView } from "./compliance/XmlView";
+import { XmlView } from "./XmlView";
 import { Loading } from "./Loading";
 
 export function CaseValueDocumentDialog() {
@@ -116,6 +116,7 @@ function GeneralPreview({ url }) {
 				border: "none",
 				objectFit: "contain",
 				...layoutSx,
+				p: 0
 			}}
 		>
 			<Centered>

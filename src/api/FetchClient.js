@@ -37,34 +37,10 @@ const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payr
 const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/close";
 const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents";
 const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
-const payrunJobsUrl = "/tenants/:orgId/payruns/jobs";
-const payrunJobStatusUrl =
-	"/tenants/:orgId/payruns/jobs/:payrunJobId/status";
 const payrollResultsUrl =
 	"/tenants/:orgId/payrollresults";
 const wageTypesUrl =
 	"/tenants/:orgId/payrollresults/:payrollResultId/wagetypes";
-const complianceUrl = "/tenants/:orgId/payrolls/:payrollId/compliance";
-const complianceSettingsUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/settings";
-const complianceCertificatesUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/certificates";
-const complianceDocumentsUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/documents";
-const generateComplianceDocumentUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/documents/generate";
-const complianceDocumentUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/documents/:documentId";
-const complianceSubmissionsUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/submissions";
-const complianceSubmissionUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/submissions/:submissionId";
-const complianceMessagesUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/messages";
-const compliancePingUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/ping";
-const complianceCheckInteroperabilityUrl =
-	"/tenants/:orgId/payrolls/:payrollId/compliance/checkinteroperability";
 const reportsUrl = "/tenants/:orgId/payrolls/:payrollId/reports";
 const buildReportUrl =
 	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/build";
@@ -491,41 +467,6 @@ export function getPayrunPeriodDocument(routeParams, report, variant) {
 		.fetchJson();
 }
 
-
-export function getDraftPayrunJobs(routeParams) {
-	return new FetchRequestBuilder(payrunJobsUrl, routeParams)
-		.withQueryParam(
-			"filter",
-			`payrollId eq '${routeParams.payrollId}' and jobStatus eq 'Draft'`,
-		)
-		.fetchJson();
-}
-
-export function getPayrunJobs(routeParams) {
-	return new FetchRequestBuilder(payrunJobsUrl, routeParams)
-		.withQueryParam(
-			"filter",
-			`payrollId eq '${routeParams.payrollId}' and payrunId eq '${routeParams.payrunId}' and jobStatus ne 'Draft'`,
-		)
-		.withQueryParam("orderBy", "periodStart desc");
-}
-
-export function startPayrunJob(routeParams, jobInvocation) {
-	return new FetchRequestBuilder(payrunJobsUrl, routeParams)
-		.withMethod("POST")
-		.withBody(jobInvocation)
-		.withTimout(10 * 60 * 1000)
-		.fetch();
-}
-
-export function changePayrunJobStatus(routeParams, newStatus) {
-	return new FetchRequestBuilder(payrunJobStatusUrl, routeParams)
-		.withMethod("POST")
-		.withQueryParam("patchMode", "true")
-		.withBody(newStatus)
-		.fetch();
-}
-
 export function getReports(routeParams, clusterSet) {
 	return new FetchRequestBuilder(reportsUrl, routeParams)
 		.withQueryParam("clusterSetName", clusterSet)
@@ -636,105 +577,6 @@ export function getPayrollResult(routeParams, period, employeeId) {
 
 export function getWageTypes(routeParams, payrollResultId) {
 	return new FetchRequestBuilder(wageTypesUrl, { ...routeParams, payrollResultId })
-		.fetchJson();
-}
-
-export function getCompliance(routeParams) {
-	return new FetchRequestBuilder(complianceUrl, routeParams)
-		.withLocalization()
-		.fetchJson();
-}
-
-export function getComplianceSettings(routeParams) {
-	return new FetchRequestBuilder(
-		complianceSettingsUrl,
-		routeParams,
-	).fetchJson();
-}
-
-export function setComplianceSettings(routeParams, settings) {
-	return new FetchRequestBuilder(complianceSettingsUrl, routeParams)
-		.withMethod("POST")
-		.withBody(settings)
-		.fetch();
-}
-
-export function getComplianceCertificates(routeParams, type) {
-	return new FetchRequestBuilder(complianceCertificatesUrl, routeParams)
-		.withQueryParam("filter", `certificateType eq '${type}'`)
-		.fetchJson();
-}
-
-export function getComplianceDocuments(routeParams) {
-	return new FetchRequestBuilder(
-		complianceDocumentsUrl,
-		routeParams,
-	).fetchJson();
-}
-
-export function getComplianceDocument(routeParams, asPdf) {
-	return new FetchRequestBuilder(complianceDocumentUrl, routeParams)
-		.withQueryParam("asPdf", asPdf)
-		.fetchJson();
-}
-
-export function uploadComplianceDocument(routeParams, document) {
-	return new FetchRequestBuilder(complianceDocumentsUrl, routeParams)
-		.withMethod("POST")
-		.withBody(document)
-		.fetch();
-}
-
-export function generateComplianceDocument(routeParams, reportRequest) {
-	return new FetchRequestBuilder(generateComplianceDocumentUrl, routeParams)
-		.withMethod("POST")
-		.withBody(reportRequest)
-		.fetch();
-}
-
-export function pingCompliance(routeParams) {
-	return new FetchRequestBuilder(compliancePingUrl, routeParams).fetchJson();
-}
-
-export function checkInteroperabilityCompliance(routeParams, secondOperand) {
-	return new FetchRequestBuilder(
-		complianceCheckInteroperabilityUrl,
-		routeParams,
-	)
-		.withQueryParam("secondOperand", secondOperand)
-		.fetchJson();
-}
-
-export function getSubmissions(routeParams) {
-	return new FetchRequestBuilder(complianceSubmissionsUrl, routeParams)
-		.withQueryParam("orderBy", "created desc")
-		.withLocalization()
-		.fetchJson();
-}
-
-export function getSubmission(routeParams) {
-	return new FetchRequestBuilder(complianceSubmissionUrl, routeParams)
-		.withLocalization()
-		.fetchJson();
-}
-
-export function createSubmission(routeParams, isTestCase) {
-	return new FetchRequestBuilder(complianceSubmissionsUrl, routeParams)
-		.withMethod("POST")
-		.withQueryParam("isTestCase", isTestCase)
-		.withQueryParam("documentId", routeParams.documentId)
-		.fetchJson();
-}
-
-export function getComplianceMessages(routeParams) {
-	const submissionFilter = routeParams.submissionId
-		? `submissionId eq '${routeParams.submissionId}'`
-		: null;
-	return new FetchRequestBuilder(complianceMessagesUrl, routeParams)
-		.withQueryParam("filter", submissionFilter)
-		.withQueryParam("orderBy", "created desc")
-		.withQueryParam("top", "7")
-		.withLocalization()
 		.fetchJson();
 }
 

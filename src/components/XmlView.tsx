@@ -1,20 +1,26 @@
-import { Typography } from "@mui/material";
+import { SxProps, Theme, Typography } from "@mui/material";
 import { useMemo } from "react";
-import { base64Decode } from "../../services/converters/BinaryConverter";
+import { base64Decode } from "../services/converters/BinaryConverter";
+import React from "react";
 
-const codeTypographySx = {
+const codeTypographySx: SxProps<Theme> = {
 	whiteSpace: "pre-wrap",
 	wordBreak: "break-word",
 	overflow: "auto",
 };
 
-export function XmlView({ title, base64content, codeProps }) {
+type XmlViewProps = {
+	title?: string
+	base64content: string
+}
+
+export function XmlView({ title, base64content }: XmlViewProps) {
 	const xml = useMemo(() => base64Decode(base64content), [base64content]);
 	const prettyXml = useMemo(() => prettifyXml(xml), [xml]);
 	return (
 		<>
 			{title && <Typography variant="h6">{title}</Typography>}
-			<Typography variant="code" sx={{ ...codeProps, ...codeTypographySx }}>
+			<Typography variant="code" sx={codeTypographySx}>
 				{prettyXml}
 			</Typography>
 		</>
@@ -32,7 +38,7 @@ const xlstTemplate = `
   </xsl:template>
 </xsl:stylesheet>`;
 
-function prettifyXml(sourceXml) {
+function prettifyXml(sourceXml: string) {
 	if (!sourceXml) {
 		return "";
 	}

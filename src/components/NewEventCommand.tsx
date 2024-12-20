@@ -86,7 +86,7 @@ function NewEventDialogContent({ close }: { close: () => void }) {
 
         const employeePromise = getEmployees(params).withActive().withSignal(controller.signal).fetchJson();
         if (params.employeeId) {
-          const casesPromise = getEmployeeCases(params, "NewEvent", controller.signal);
+          const casesPromise = getEmployeeCases(params, "", controller.signal);
           const [employees, cases]: [Array<Employee>, Array<any>] = await Promise.all([employeePromise, casesPromise]);
           const employee = employees.find(x => x.id === params.employeeId);
           // if employee does not exists, the employee could not be found or is inactive

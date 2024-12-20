@@ -25,25 +25,10 @@ import {
 	getEmployeeCaseChanges,
 	getCompanyCases,
 	getCompanyCaseChanges,
-	getPayrunJobs,
-	getDraftPayrunJobs,
 	getTasks,
 	getTask,
 	updateTask,
-	startPayrunJob,
-	changePayrunJobStatus,
-	getComplianceDocuments,
-	getComplianceDocument,
-	uploadComplianceDocument,
-	createSubmission,
-	getSubmissions,
-	getSubmission,
-	getComplianceMessages,
 	getDocument,
-	getComplianceSettings,
-	setComplianceSettings,
-	getComplianceCertificates,
-	generateComplianceDocument,
 	getReports,
 	createEmployee,
 	updateEmployee,
@@ -88,16 +73,8 @@ import {
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
-import { AsyncPayrunView } from "./components/payrun/PayrunView";
-import { AsyncNewPayrunView } from "./components/payrun/NewPayrunView";
-import { ComplianceView } from "./components/compliance/ComplianceView";
-import { AsyncComplianceSettingsView } from "./components/compliance/ComplianceSettingsView";
-import { CreateComplianceDocumentView } from "./components/compliance/CreateComplianceDocumentView";
-import { AsyncComplianceDocumentView } from "./components/compliance/ComplianceDocumentView";
-import { AsyncComplianceSubmissionView } from "./components/compliance/ComplianceSubmissionView";
 import { AsyncReportsView } from "./components/ReportsView";
 import { AsyncReportView } from "./components/ReportView";
-import { CompletionView } from "./components/compliance/CompletionView";
 import { MissingDataView } from "./components/MissingDataView";
 import { EmployeeForm } from "./components/EmployeeForm";
 import { ContentLayout, withPage, withSuspense } from "./components/ContentLayout";
@@ -800,190 +777,6 @@ const routeData = [
 						};
 					})
 				]
-			},
-			{
-				path: "hr/payruns",
-				Component: AsyncPayrunView,
-				loader: paginatedLoader({
-					pageCount: 15,
-					name: "payrunJobs",
-					getRequestBuilder: async ({ params }) => {
-						const payrun = await store.get(payrunAtom);
-						return getPayrunJobs({ ...params, payrunId: payrun.id });
-					},
-					getLoaderData: ({ params }) => ({
-						draftPayrunJobs: getDraftPayrunJobs(params),
-					}),
-				}),
-				action: async ({ params, request }) => {
-					const action = await request.json();
-					const payrun = await store.get(payrunAtom);
-					if (action.type === "change_status") {
-						// TODO AJO what to do
-						await changePayrunJobStatus(
-							{ ...params, payrunId: payrun.id, payrunJobId: action.jobId },
-							action.status,
-						);
-					}
-					return null;
-				},
-				children: [
-					{
-						path: "new",
-						Component: AsyncNewPayrunView,
-						loader: async ({ params }) => {
-							const payrun = await store.get(payrunAtom);
-							return defer({
-								payrun,
-								data: getEmployees(params).withActive().fetchJson(),
-							});
-						},
-						action: async ({ params, request }) => {
-							const invocation = await request.json();
-							const response = await startPayrunJob(params, invocation);
-							if (response.status === 201) {
-								const job = await response.json();
-								if (job.jobStatus === "Abort") {
-									return job.message;
-								}
-								return redirect(`..`);
-							}
-							if (response.status === 400) {
-								try {
-									const errorJson = await response.json();
-									return errorJson.errors.Reason[0];
-								} catch (e) { }
-							}
-							return null;
-						},
-					},
-				],
-			},
-			,
-			{
-				path: "hr/compliance",
-				Component: ComplianceView,
-				loader: ({ params }) => {
-					return defer({
-						documents: getComplianceDocuments(params),
-						submissions: getSubmissions(params),
-						messages: getComplianceMessages(params),
-					});
-				},
-			},
-			{
-				path: "hr/compliance/settings",
-				Component: AsyncComplianceSettingsView,
-				loader: ({ params }) => {
-					return defer({
-						data: getComplianceSettings(params),
-					});
-				},
-				action: async ({ request, params }) => {
-					const settings = await request.json();
-					const response = await setComplianceSettings(params, settings);
-					if (response.ok) {
-						toast("success", "Settings saved!");
-					} else {
-						toast("error", "Error while saving settings!");
-					}
-					return response;
-				},
-				children: [
-					{
-						path: "transmittercertificates",
-						loader: ({ params }) => {
-							return getComplianceCertificates(params, "Transmitter");
-						},
-					},
-					{
-						path: "enterprisecertificates",
-						loader: ({ params }) => {
-							return getComplianceCertificates(params, "Enterprise");
-						},
-					},
-				],
-			},
-			{
-				path: "hr/compliance/documents",
-				loader: ({ params }) => {
-					return getComplianceDocuments(params);
-				},
-			},
-			{
-				path: "hr/compliance/documents/:documentId",
-				Component: AsyncComplianceDocumentView,
-				loader: ({ params }) => {
-					return defer({
-						data: getComplianceDocument(params),
-						pdfPromise: getComplianceDocument(params, true),
-					});
-				},
-				action: async ({ request, params }) => {
-					const { isTestCase } = await request.json();
-					const submission = await createSubmission(params, isTestCase);
-					if (submission.errors) {
-						toast("error", "Submission was unsuccessful!");
-					} else {
-						toast("success", "Submission was successful!");
-					}
-					return redirect(`../hr/compliance/submissions/${submission.id}`);
-				},
-			},
-			{
-				path: "hr/compliance/documents/new",
-				Component: CreateComplianceDocumentView,
-				action: async ({ params, request }) => {
-					const data = await request.json();
-					let response = null;
-					switch (data.type) {
-						case "upload":
-							response = await uploadComplianceDocument(params, data.document);
-							break;
-						case "generate":
-							response = await generateComplianceDocument(
-								params,
-								data.reportRequest,
-							);
-							break;
-						default:
-							throw new Error("invalid action");
-					}
-					if (response.ok) {
-						toast("success", "Document ready!");
-						const document = await response.json();
-						return redirect(`../hr/compliance/documents/${document.id}`);
-					} else {
-						toast("error", "Unable to save document!");
-						return null;
-					}
-				},
-			},
-			{
-				path: "hr/compliance/submissions",
-				loader: ({ params }) => {
-					return getSubmissions(params);
-				},
-			},
-			{
-				path: "hr/compliance/submissions/:submissionId",
-				Component: AsyncComplianceSubmissionView,
-				loader: ({ params }) => {
-					return defer({
-						submission: getSubmission(params),
-						messages: getComplianceMessages(params),
-					});
-				},
-			},
-			{
-				path: "hr/compliance/submissions/:submissionId/tasks/:taskId",
-				Component: CompletionView,
-				loader: ({ params }) => {
-					return defer({
-						submission: getSubmission(params),
-						messages: getComplianceMessages(params),
-					});
-				},
 			},
 			{
 				path: "hr/reports",
