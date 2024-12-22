@@ -176,7 +176,7 @@ function createInitialState({ groups, values, t }: { groups: Array<AvailableCase
 function Table({ state }: { state: State }) {
   const { t } = useTranslation();
   const { values, valueCounts } = useLoaderData() as LoaderData;
-  const columns = useMemo(() => createColumns(t), []);
+  const columns = useMemo(() => createColumns(t), [t]);
   const { selectedGroup } = state;
   const selectedGroupFieldNames = useMemo(() => new Set(selectedGroup!.caseFields.map(fields => fields.name)), [selectedGroup]);
   const orderCaseFields = useMemo(() => new Map(selectedGroup!.caseFields.map((fields, index) => [fields.name, index])), [selectedGroup]);

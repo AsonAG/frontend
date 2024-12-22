@@ -9,7 +9,7 @@ import { CategoryLabel } from "./CategoryLabel";
 export function CaseTask({ objectId, type, _case }) {
   const subPath = type === "C" ? "company" : `employees/${objectId}`;
   return (
-    <Link to={`${subPath}/${encodeURIComponent(_case.name)}`}>
+    <Link to={`${subPath}/new/${encodeURIComponent(_case.name)}`}>
       <Stack spacing={1} flex={1} direction="row" p={1}>
         <CategoryLabel
           label={type}

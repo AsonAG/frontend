@@ -186,8 +186,12 @@ const translations = {
 		"Current period": "Aktuelle Periode",
 		"Gross": "Brutto",
 		"Net": "Netto",
+		"Offsetting": "Verrechnung",
 		"Paid": "Bezahlt",
 		"Open": "Offen",
+		"Open previous period": "Offen Vorperiode",
+		"Open PP": "Offen VP",
+		"Open from previous period": "Offen aus Vorperioden",
 		"Payout": "Auszahlen",
 		"Payouts": "Auszahlungen",
 		"Payslip": "Lohnabrechnung",
@@ -207,6 +211,10 @@ const translations = {
 		"Value date": "Valutadatum",
 		"Employee number": "Mitarbeiteranzahl",
 		"New relevant values in open period": "Neue relevante Werte in der offenen Periode",
+		"payrun_period_controlling": "Lohnkontrolle",
+		"payrun_period_ready": "Auszahlungsbereit",
+		"payrun_period_paid_out": "Ausbezahlt",
+		"payrun_period_without_occupation": "Ohne Beschäftigung",
 
 		// Command
 		"Select event": "Ereignis auswählen",

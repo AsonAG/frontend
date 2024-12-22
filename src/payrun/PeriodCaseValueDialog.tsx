@@ -98,7 +98,7 @@ function Table() {
     end: v.end,
     created: v.created
   })), [items]);
-  const columns = useMemo(() => createColumns(t), []);
+  const columns = useMemo(() => createColumns(t), [t]);
   const table = useReactTable({
     columns: columns,
     data: e,

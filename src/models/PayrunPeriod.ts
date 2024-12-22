@@ -5,9 +5,8 @@ export type PayrunPeriodEntry = {
   employeeId: IdType
   payrunJobId: IdType
   netWage: number | null
-  previousNetWage: number | null
   grossWage: number | null
-  previousGrossWage: number | null
+  offsetting: number | null
   paidOut: number | null
   documents: Array<PayrunDocument> | null
 }

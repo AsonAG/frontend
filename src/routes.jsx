@@ -345,6 +345,39 @@ function createRoutePayrunPeriodDocument() {
 	}
 }
 
+
+function createRouteCaseForms(path) {
+	return [
+		{
+			path: `${path}/employees/:employeeId`,
+			Component: ContentLayout,
+			loader: async ({ params }) => {
+				const employee = await getEmployee(params);
+				return {
+					title: getEmployeeDisplayString(employee)
+				};
+			},
+			children: [
+				createRouteCaseForm("new/:caseName", {
+					redirect: "../../../.."
+				})
+			],
+		},
+		{
+			path: `${path}/company`,
+			Component: ContentLayout,
+			loader: () => ({
+				title: "Company"
+			}),
+			children: [
+				createRouteCaseForm("new/:caseName", {
+					redirect: "../../.."
+				})
+			],
+		},
+	]
+}
+
 const routeData = [
 	{
 		path: "/",
@@ -640,33 +673,7 @@ const routeData = [
 					});
 				}
 			},
-			{
-				path: "hr/missingdata/employees/:employeeId",
-				Component: ContentLayout,
-				loader: async ({ params }) => {
-					const employee = await getEmployee(params);
-					return {
-						title: getEmployeeDisplayString(employee)
-					};
-				},
-				children: [
-					createRouteCaseForm(":caseName", {
-						redirect: "../../.."
-					})
-				],
-			},
-			{
-				path: "hr/missingdata/company",
-				Component: ContentLayout,
-				loader: () => ({
-					title: "Company"
-				}),
-				children: [
-					createRouteCaseForm(":caseName", {
-						redirect: "../.."
-					})
-				],
-			},
+			...createRouteCaseForms("hr/missingdata"),
 			{
 				path: "payrunperiods",
 				id: "payrunperiods-root",
@@ -778,35 +785,7 @@ const routeData = [
 					},
 				]
 			},
-			{
-				path: "payrunperiods/:payrunPeriodId/employees/:employeeId",
-				Component: ContentLayout,
-				loader: async ({ params }) => {
-					const employee = await getEmployee(params);
-					return {
-						title: getEmployeeDisplayString(employee)
-					}
-				},
-				children: [
-					createRouteCaseForm("new/:caseName", () => {
-						return {
-							redirect: `../../../../`
-						};
-					})
-				]
-			},
-			{
-				path: "payrunperiods/:payrunPeriodId/company",
-				Component: ContentLayout,
-				loader: () => ({ title: "Company" }),
-				children: [
-					createRouteCaseForm("new/:caseName", () => {
-						return {
-							redirect: `../../../`
-						};
-					}),
-				]
-			},
+			...createRouteCaseForms("payrunperiods/:payrunPeriodId"),
 			{
 				path: "hr/reports",
 				Component: AsyncReportsView,

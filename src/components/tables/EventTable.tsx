@@ -168,7 +168,7 @@ export function EventTable({ items: events }: EventDisplayProps) {
 				end: v.end
 			}))
 	})), [events]);
-	const columns = useMemo(() => createColumns(t), []);
+	const columns = useMemo(() => createColumns(t), [t]);
 	const table = useReactTable({
 		columns: columns,
 		data: e,
