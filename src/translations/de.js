@@ -211,6 +211,7 @@ const translations = {
 		"Value date": "Valutadatum",
 		"Employee number": "Mitarbeiteranzahl",
 		"New relevant values in open period": "Neue relevante Werte in der offenen Periode",
+		"payrun_period_calculating": "Wird berechnet...",
 		"payrun_period_controlling": "Lohnkontrolle",
 		"payrun_period_ready": "Auszahlungsbereit",
 		"payrun_period_paid_out": "Ausbezahlt",

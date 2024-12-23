@@ -209,7 +209,7 @@ type EntryRow = Employee & {
 
 function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL" | "Payable") {
   if (type === "Payable") {
-    return employees.filter(e => (e.open ?? 0) > 0);
+    return employees.filter(e => ((e.open ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0);
   }
   const predicate = (_: any, i: number) => [1, 3, 5, 6, employees.length - 1].includes(i);
   const inverted = (_: any, i: number) => !predicate(_, i);
@@ -431,19 +431,25 @@ type RowGroup = {
 
 function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
   function groupingFn(row: Row<EntryRow>) {
+    if (!row.original.entry?.payrunJobId) {
+      return "payrun_period_calculating";
+    }
     if ((row.original.controllingTasks?.length ?? 0) > 0) {
-      return "payrun_period_controlling"
+      return "payrun_period_controlling";
     }
     if (!!row.original.open) {
-      return "payrun_period_ready"
+      return "payrun_period_ready";
     }
     if (row.original.open === 0 && ((row.original.entry?.netWage ?? 0) > 0) && ((row.original.entry?.grossWage ?? 0) > 0)) {
-      return "payrun_period_paid_out"
+      return "payrun_period_paid_out";
     }
     return "payrun_period_without_occupation";
   }
   const grouping = Object.groupBy(rows, groupingFn) as Record<string, Array<Row<EntryRow>>>;
   const result: Array<RowGroup> = [];
+  if (grouping["payrun_period_calculating"]) {
+    result.push({ name: "payrun_period_calculating", rows: grouping["payrun_period_calculating"] });
+  }
   if (grouping["payrun_period_controlling"]) {
     result.push({ name: "payrun_period_controlling", rows: grouping["payrun_period_controlling"] });
   }
