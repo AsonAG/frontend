@@ -215,6 +215,7 @@ const translations = {
 		"payrun_period_ready": "Auszahlungsbereit",
 		"payrun_period_paid_out": "Ausbezahlt",
 		"payrun_period_without_occupation": "Ohne Beschäftigung",
+		"OT": "VR",
 
 		// Command
 		"Select event": "Ereignis auswählen",

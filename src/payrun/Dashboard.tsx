@@ -1,6 +1,6 @@
-import React, { Dispatch, MouseEventHandler, useMemo, useReducer } from "react";
+import React, { Dispatch, Fragment, MouseEventHandler, useMemo, useReducer } from "react";
 import { Link, Outlet, useNavigate, useRouteLoaderData } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Badge, Divider } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { ContentLayout } from "../components/ContentLayout";
@@ -97,7 +97,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
     columnHelper.accessor("entry.offsetting",
       {
         cell: (props) => <Wage name="offsetting" entry={props.row.original} t={t} />,
-        header: t("Offsetting"),
+        header: _ => <Tooltip title={t("Offsetting")}><span>{t("OT")}</span></Tooltip>,
         size: 100,
         meta: {
           alignment: "right"
@@ -228,9 +228,10 @@ function createRowClickHandler(row: Row<EntryRow>, state: State, dispatch: Dispa
   return noop;
 }
 
-function getStickySx(top: number): SxProps<Theme> {
+
+function getStickySx(position: { top?: number, bottom?: number }): SxProps<Theme> {
   return {
-    top,
+    ...position,
     position: "sticky",
     backgroundColor: theme => theme.palette.background.default,
     zIndex: 2
@@ -310,7 +311,7 @@ function EmployeeTable() {
   const rowContainerProps = getRowGridProps(table.getVisibleFlatColumns().map(col => col.getSize()));
   return (
     <Stack>
-      <Stack sx={getStickySx(149)}>
+      <Stack sx={getStickySx({top: 149})}>
         <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
           <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
             <Chip icon={<FilterList />} sx={chipSx} onClick={() => { dispatch({ type: "reset_mode" }) }} color="primary" variant="outlined" />
@@ -333,9 +334,8 @@ function EmployeeTable() {
       </Stack>
       {
         groupedRows.map(group => (
-          <>
-            <Divider sx={getStickySx(227)}>
-              <Chip label={t(group.name)} size="small" />
+          <Fragment key={group.name}>
+            <Divider textAlign="left" sx={getStickySx({ top: 227 })}>{t(group.name)}
             </Divider>
             {group.rows.map(row =>
               <EmployeeRow
@@ -344,7 +344,7 @@ function EmployeeTable() {
                 onClick={createRowClickHandler(row, state, dispatch)}
                 containerProps={rowContainerProps}
               />)}
-          </>
+          </Fragment>
         ))
       }
       <TotalsRow state={state} onPayout={onPayout} containerProps={rowContainerProps} />
@@ -361,14 +361,11 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
     <Stack
       spacing={2}
       sx={{
-        position: "sticky",
-        bottom: 0,
+        ...getStickySx({ bottom: 0 }),
         pl: 0.5,
         py: 2,
-        backgroundColor: theme => theme.palette.background.default,
         borderTop: 1,
-        borderColor: theme => theme.palette.divider,
-        zIndex: 2
+        borderColor: theme => theme.palette.divider
       }}
     >
       <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} {...containerProps} >

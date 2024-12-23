@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material";
+import { Stack, SxProps, Theme, Typography } from "@mui/material";
 import React, { FC, PropsWithChildren, ReactNode, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { useLoaderData, useOutlet } from "react-router-dom";
@@ -38,18 +38,15 @@ type LoaderData = {
 	title: string
 };
 
-const stickyHeaderProps = {
-	zIndex: 2,
-	sx: {
-		backgroundColor: theme => theme.palette.background.default,
-		position: "sticky",
-		top: "var(--header-height)"
-	}
+const stickyHeaderSx: SxProps<Theme> = {
+	backgroundColor: theme => theme.palette.background.default,
+	position: "sticky",
+	top: "var(--header-height)",
+	zIndex: 2
 }
 
 export function PageHeader({ title, buttons, sticky }) {
 	const { t } = useTranslation();
-	console.log(sticky);
 	const loaderData = useLoaderData() as LoaderData;
 	let headerTitle = title;
 	if (typeof title === "string" || !title) {
@@ -64,7 +61,7 @@ export function PageHeader({ title, buttons, sticky }) {
 			alignItems="start"
 			px="var(--content-inset)"
 			py={3}
-			{...(sticky ? stickyHeaderProps : {})}
+			sx={sticky ? stickyHeaderSx : {}}
 		>
 			{headerTitle}
 			{buttons}
