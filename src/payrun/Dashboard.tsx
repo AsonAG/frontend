@@ -207,7 +207,10 @@ type EntryRow = Employee & {
   caseValueCount: number
 }
 
-function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL") {
+function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL" | "Payable") {
+  if (type === "Payable") {
+    return employees.filter(e => (e.open ?? 0) > 0);
+  }
   const predicate = (_: any, i: number) => [1, 3, 5, 6, employees.length - 1].includes(i);
   const inverted = (_: any, i: number) => !predicate(_, i);
   const filterPredicate = type === "SL" ? predicate : inverted;
@@ -290,7 +293,6 @@ function EmployeeTable() {
       columnVisibility: isOpen ? state.columnVisibility : {
         "open": false,
         "amount": false,
-        "blocker": false
       },
     },
     getCoreRowModel: getCoreRowModel(),
@@ -311,10 +313,10 @@ function EmployeeTable() {
   const rowContainerProps = getRowGridProps(table.getVisibleFlatColumns().map(col => col.getSize()));
   return (
     <Stack>
-      <Stack sx={getStickySx({top: 149})}>
+      <Stack sx={getStickySx({ top: 149 })}>
         <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
           <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
-            <Chip icon={<FilterList />} sx={chipSx} onClick={() => { dispatch({ type: "reset_mode" }) }} color="primary" variant="outlined" />
+            <Chip icon={<FilterList />} variant={mode === "Payable" ? "filled" : "outlined"} sx={chipSx} onClick={() => { dispatch({ type: "toggle_mode", mode: "Payable" }) }} color="primary" />
             <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL" }) }} color="primary" />
             <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML" }) }} color="primary" />
           </Stack>
@@ -571,7 +573,7 @@ function getWageTypeStyling(name: string, entry: EntryRow) {
   return {}
 }
 
-type FilterMode = "All" | "ML" | "SL";
+type FilterMode = "All" | "ML" | "SL" | "Payable";
 
 type State = {
   employees: Array<EntryRow>
@@ -596,7 +598,7 @@ type Action = {
   type: "reset_mode"
 } | {
   type: "toggle_mode"
-  mode: "ML" | "SL"
+  mode: "ML" | "SL" | "Payable"
 } | {
   type: "set_selected"
   id: IdType
@@ -664,7 +666,6 @@ function reducer(state: State, action: Action): State {
   stateAfterAction.totals = getTotals(stateAfterAction.employees, stateAfterAction.selected);
   stateAfterAction.mode = Object.values(stateAfterAction.selected).some(s => s) ? "payout" : "view";
   stateAfterAction.columnVisibility = stateAfterAction.mode === "view" ? { "amount": false } : {
-    "blocker": false,
     "documents": false,
     "events": false
   }
