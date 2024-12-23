@@ -7,6 +7,7 @@ export type PayrunPeriodEntry = {
   netWage: number | null
   grossWage: number | null
   offsetting: number | null
+  employerCost: number | null
   paidOut: number | null
   documents: Array<PayrunDocument> | null
 }

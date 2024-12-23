@@ -217,6 +217,8 @@ const translations = {
 		"payrun_period_paid_out": "Ausbezahlt",
 		"payrun_period_without_occupation": "Ohne Beschäftigung",
 		"OT": "VR",
+		"Total cost": "Totalkosten",
+		"Gross wage plus employer cost": "Brutto plus Arbeitergeberkosten",
 
 		// Command
 		"Select event": "Ereignis auswählen",

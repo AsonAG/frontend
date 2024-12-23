@@ -76,6 +76,15 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
         header: t("Employee"),
         size: Number.MAX_SAFE_INTEGER
       }),
+    columnHelper.accessor("entry.employerCost",
+      {
+        cell: (props) => <Wage name="employerCost" entry={props.row.original} t={t} />,
+        header: _ => <Tooltip title={t("Gross wage plus employer cost")}><span>{t("Total cost")}</span></Tooltip>,
+        size: 100,
+        meta: {
+          alignment: "right"
+        }
+      }),
     columnHelper.accessor("entry.grossWage",
       {
         cell: (props) => <Wage name="grossWage" entry={props.row.original} t={t} />,
