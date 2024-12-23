@@ -1,6 +1,6 @@
 import React, { Dispatch, MouseEventHandler, useMemo, useReducer } from "react";
 import { Link, Outlet, useNavigate, useRouteLoaderData } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Badge } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Badge, Divider } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { ContentLayout } from "../components/ContentLayout";
@@ -38,7 +38,7 @@ declare module '@tanstack/react-table' {
 export function PayrunDashboard() {
   return (
     <>
-      <ContentLayout title={<DashboardHeader backlinkPath=".." />}>
+      <ContentLayout title={<DashboardHeader backlinkPath=".." />} stickyHeader>
         <EmployeeTable />
       </ContentLayout>
       <Outlet />
@@ -179,9 +179,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             <Tooltip title={t("Events")} placement="left">
-              <Badge badgeContent={caseValueCount} color="info" overlap="circular">
-                <IconButton size="small" component={Link} to={`employees/${entry.employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
-              </Badge>
+              <IconButton size="small" component={Link} to={`employees/${entry.employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
             </Tooltip>
           </Stack>
         )
@@ -228,6 +226,15 @@ function createRowClickHandler(row: Row<EntryRow>, state: State, dispatch: Dispa
     };
   }
   return noop;
+}
+
+function getStickySx(top: number): SxProps<Theme> {
+  return {
+    top,
+    position: "sticky",
+    backgroundColor: theme => theme.palette.background.default,
+    zIndex: 2
+  }
 }
 
 function EmployeeTable() {
@@ -303,29 +310,33 @@ function EmployeeTable() {
   const rowContainerProps = getRowGridProps(table.getVisibleFlatColumns().map(col => col.getSize()));
   return (
     <Stack>
-      <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
-        <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
-          <Chip icon={<FilterList />} sx={chipSx} onClick={() => { dispatch({ type: "reset_mode" }) }} color="primary" variant="outlined" />
-          <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL" }) }} color="primary" />
-          <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML" }) }} color="primary" />
+      <Stack sx={getStickySx(149)}>
+        <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
+          <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
+            <Chip icon={<FilterList />} sx={chipSx} onClick={() => { dispatch({ type: "reset_mode" }) }} color="primary" variant="outlined" />
+            <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL" }) }} color="primary" />
+            <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML" }) }} color="primary" />
+          </Stack>
         </Stack>
+        {table.getHeaderGroups().map(headerGroup => (
+          <Box key={headerGroup.id} component="div" {...rowContainerProps} sx={{ px: 0.5, py: 1.125 }}>
+            {headerGroup.headers.map(header => {
+              const alignment = header.column.columnDef.meta?.alignment ?? "left";
+              return <Typography key={header.id} variant="h6" textAlign={alignment}>
+                {flexRender(
+                  header.column.columnDef.header,
+                  header.getContext())}
+              </Typography>;
+            })}
+          </Box>
+        ))}
       </Stack>
-      {table.getHeaderGroups().map(headerGroup => (
-        <Box key={headerGroup.id} component="div" {...rowContainerProps} sx={{ px: 0.5, py: 1.125 }}>
-          {headerGroup.headers.map(header => {
-            const alignment = header.column.columnDef.meta?.alignment ?? "left";
-            return <Typography key={header.id} variant="h6" textAlign={alignment}>
-              {flexRender(
-                header.column.columnDef.header,
-                header.getContext())}
-            </Typography>;
-          })}
-        </Box>
-      ))}
       {
         groupedRows.map(group => (
           <>
-            <Typography variant="subtitle2" p={0.5} sx={{ backgroundColor: "rgba(0, 0, 0, 0.03)" }}>{t(group.name)}</Typography>
+            <Divider sx={getStickySx(227)}>
+              <Chip label={t(group.name)} size="small" />
+            </Divider>
             {group.rows.map(row =>
               <EmployeeRow
                 key={row.id}
@@ -347,7 +358,19 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
     return;
   }
   return (
-    <Stack sx={{ position: "sticky", bottom: 0, pl: 0.5, py: 2, backgroundColor: theme => theme.palette.background.default, borderTop: 1, borderColor: theme => theme.palette.divider }} spacing={2}>
+    <Stack
+      spacing={2}
+      sx={{
+        position: "sticky",
+        bottom: 0,
+        pl: 0.5,
+        py: 2,
+        backgroundColor: theme => theme.palette.background.default,
+        borderTop: 1,
+        borderColor: theme => theme.palette.divider,
+        zIndex: 2
+      }}
+    >
       <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} {...containerProps} >
         <Typography fontWeight="bold" >{t("Total")}</Typography>
         <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.gross)}</Typography>

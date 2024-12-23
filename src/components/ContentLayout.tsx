@@ -7,6 +7,7 @@ type ContentLayoutProps = {
 	title: ReactNode | string,
 	disableInset?: boolean,
 	buttons?: ReactNode
+	stickyHeader?: boolean,
 } & PropsWithChildren;
 
 export function ContentLayout({
@@ -14,12 +15,12 @@ export function ContentLayout({
 	disableInset,
 	children,
 	buttons,
+	stickyHeader = false,
 	...sxProps
 }: ContentLayoutProps) {
 	return (
 		<Stack
-			py={3}
-			spacing={3}
+			pb={3}
 			sx={{
 				minHeight: "100%",
 				width: "100%",
@@ -27,7 +28,7 @@ export function ContentLayout({
 				...sxProps,
 			}}
 		>
-			<PageHeader title={defaultTitle} buttons={buttons} />
+			<PageHeader title={defaultTitle} buttons={buttons} sticky={stickyHeader} />
 			<PageContent disableInset={disableInset}>{children}</PageContent>
 		</Stack>
 	);
@@ -37,8 +38,18 @@ type LoaderData = {
 	title: string
 };
 
-export function PageHeader({ title, buttons }) {
+const stickyHeaderProps = {
+	zIndex: 2,
+	sx: {
+		backgroundColor: theme => theme.palette.background.default,
+		position: "sticky",
+		top: "var(--header-height)"
+	}
+}
+
+export function PageHeader({ title, buttons, sticky }) {
 	const { t } = useTranslation();
+	console.log(sticky);
 	const loaderData = useLoaderData() as LoaderData;
 	let headerTitle = title;
 	if (typeof title === "string" || !title) {
@@ -52,6 +63,8 @@ export function PageHeader({ title, buttons }) {
 			spacing={2}
 			alignItems="start"
 			px="var(--content-inset)"
+			py={3}
+			{...(sticky ? stickyHeaderProps : {})}
 		>
 			{headerTitle}
 			{buttons}
