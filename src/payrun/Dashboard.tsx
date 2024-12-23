@@ -349,7 +349,7 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
   return (
     <Stack sx={{ position: "sticky", bottom: 0, pl: 0.5, py: 2, backgroundColor: theme => theme.palette.background.default, borderTop: 1, borderColor: theme => theme.palette.divider }} spacing={2}>
       <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} {...containerProps} >
-        <Typography fontWeight="bold" >{t("Totals")}</Typography>
+        <Typography fontWeight="bold" >{t("Total")}</Typography>
         <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.gross)}</Typography>
         <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.net)}</Typography>
         <Typography fontWeight="bold" textAlign="right" ></Typography>
@@ -361,7 +361,7 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
       <Stack direction="row" justifyContent="end">
         <ResponsiveDialog>
           <ResponsiveDialogTrigger>
-            <Button variant="contained" sx={{ px: 1 }} disabled={state.totals.payingOut === 0}>
+            <Button variant="contained" disabled={state.totals.payingOut === 0}>
               <Stack direction="row">
                 <span>{t("Payout")}:&nbsp;</span>
                 <span>{formatValue(state.totals.payingOut)}</span>
@@ -415,7 +415,7 @@ function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
     if (!!row.original.open) {
       return "payrun_period_ready"
     }
-    if (row.original.open === 0) {
+    if (row.original.open === 0 && ((row.original.entry?.netWage ?? 0) > 0) && ((row.original.entry?.grossWage ?? 0) > 0)) {
       return "payrun_period_paid_out"
     }
     return "payrun_period_without_occupation";
