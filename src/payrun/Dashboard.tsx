@@ -1,6 +1,6 @@
 import React, { Dispatch, Fragment, MouseEventHandler, useMemo, useReducer } from "react";
 import { Link, Outlet, useNavigate, useRouteLoaderData } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider, TypographyProps } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { ContentLayout } from "../components/ContentLayout";
@@ -78,7 +78,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
       }),
     columnHelper.accessor("entry.employerCost",
       {
-        cell: (props) => <Wage name="employerCost" entry={props.row.original} t={t} />,
+        cell: (props) => <Wage name="employerCost" entry={props.row.original} isOpen={props.table.options.meta.isOpen} t={t} />,
         header: _ => <Tooltip title={t("Gross wage plus employer cost")}><span>{t("Total cost")}</span></Tooltip>,
         size: 100,
         meta: {
@@ -87,7 +87,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
       }),
     columnHelper.accessor("entry.grossWage",
       {
-        cell: (props) => <Wage name="grossWage" entry={props.row.original} t={t} />,
+        cell: (props) => <HighlightedWageType name="grossWage" entry={props.row.original} isOpen={props.table.options.meta.isOpen} t={t} />,
         header: t("Gross"),
         size: 100,
         meta: {
@@ -96,7 +96,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
       }),
     columnHelper.accessor("entry.netWage",
       {
-        cell: (props) => <Wage name="netWage" entry={props.row.original} t={t} />,
+        cell: (props) => <Wage name="netWage" entry={props.row.original} isOpen={props.table.options.meta.isOpen} t={t} />,
         header: t("Net"),
         size: 100,
         meta: {
@@ -105,7 +105,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
       }),
     columnHelper.accessor("entry.offsetting",
       {
-        cell: (props) => <Wage name="offsetting" entry={props.row.original} t={t} />,
+        cell: (props) => <Wage name="offsetting" entry={props.row.original} isOpen={props.table.options.meta.isOpen} t={t} />,
         header: _ => <Tooltip title={t("Offsetting")}><span>{t("OT")}</span></Tooltip>,
         size: 100,
         meta: {
@@ -296,6 +296,9 @@ function EmployeeTable() {
   const table = useReactTable({
     columns: columns,
     data: filtered,
+    meta: {
+      isOpen
+    },
     state: {
       expanded,
       rowSelection: state.selected,
@@ -344,18 +347,28 @@ function EmployeeTable() {
         ))}
       </Stack>
       {
-        groupedRows.map(group => (
-          <Fragment key={group.name}>
-            <Divider textAlign="left" sx={getStickySx({ top: 227 })}>{t(group.name)}</Divider>
-            {group.rows.map(row =>
-              <EmployeeRow
-                key={row.id}
-                row={row}
-                onClick={createRowClickHandler(row, state, dispatch)}
-                containerProps={rowContainerProps}
-              />)}
-          </Fragment>
-        ))
+        isOpen ?
+          groupRows(table.getRowModel().rows).map(group => (
+            <Fragment key={group.name}>
+              <Divider textAlign="left" sx={getStickySx({ top: 227 })}>{t(group.name)}</Divider>
+              {group.rows.map(row =>
+                <EmployeeRow
+                  key={row.id}
+                  row={row}
+                  onClick={createRowClickHandler(row, state, dispatch)}
+                  containerProps={rowContainerProps}
+                />)}
+            </Fragment>
+          ))
+          :
+          table.getRowModel().rows.map(row => (
+            <EmployeeRow
+              key={row.id}
+              row={row}
+              onClick={createRowClickHandler(row, state, dispatch)}
+              containerProps={rowContainerProps}
+            />
+          ))
       }
       <TotalsRow state={state} onPayout={onPayout} containerProps={rowContainerProps} />
     </Stack>
@@ -540,51 +553,39 @@ export function getRowGridProps(columnSizes: Array<number>) {
 type WageProps = {
   name: string
   entry: EntryRow
+  isOpen: boolean,
   t: TFunction<"translation", undefined>
+  typoSx?: SxProps<Theme>
+  icon?: React.ReactNode
 }
-function Wage({ name, entry, t }: WageProps) {
-  const styling = getWageTypeStyling(name, entry);
-  var typo = (
-    <Typography
-      sx={{ color: styling.textColor, display: "flex", alignItems: "center", justifyContent: "right", gap: 1 }}>
-      {styling.icon}{formatValue(entry.entry?.[name])}
-    </Typography>
-  )
-  if (!styling.value)
-    return typo;
+function Wage({ name, entry, isOpen, typoSx, icon, t }: WageProps) {
+  const sx = { ...typoSx, display: "flex", alignItems: "center", justifyContent: "right", gap: 1 };
+  const wage = formatValue(entry.entry?.[name]);
+  if (!isOpen) {
+    return <Typography sx={sx}>{icon}{wage}</Typography>;
+  }
+  const previousWage = formatValue(entry.previousEntry?.[name]);
+
   return (
-    <Tooltip title={`${t("Value from previous period")} ${formatValue(styling.value)}`}>
-      {typo}
+    <Tooltip title={`${t("Value from previous period")} ${previousWage ?? "-"}`}>
+      <Typography sx={sx}>{icon}{wage}</Typography>
     </Tooltip>
   )
 }
-function getWageTypeStyling(name: string, entry: EntryRow) {
+
+function HighlightedWageType(props: WageProps) {
+  const { name, entry } = props;
   const wage = entry.entry?.[name];
-  if (!wage) {
-    return {};
-  }
   const previousWage = entry.previousEntry?.[name];
-  if (!previousWage) {
-    return {};
+  if (!props.isOpen || !wage || wage === previousWage) {
+    // no highlight
+    return <Wage {...props} />
   }
-  if (wage === previousWage) {
-    return {};
-  }
-  if (wage > previousWage) {
-    return {
-      textColor: "green",
-      icon: <TrendingUp fontSize="small" />,
-      value: previousWage
-    }
-  }
-  if (wage < previousWage) {
-    return {
-      textColor: "red",
-      icon: <TrendingDown fontSize="small" />,
-      value: previousWage
-    }
-  }
-  return {}
+  const trendingUp = !previousWage || (wage > previousWage);
+
+  const Icon = trendingUp ? TrendingUp : TrendingDown;
+  const color = trendingUp ? "green" : "red";
+  return <Wage {...props} icon={<Icon fontSize="small" />} typoSx={{ color }} />;
 }
 
 type FilterMode = "All" | "ML" | "SL" | "Payable";
