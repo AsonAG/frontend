@@ -346,8 +346,7 @@ function EmployeeTable() {
       {
         groupedRows.map(group => (
           <Fragment key={group.name}>
-            <Divider textAlign="left" sx={getStickySx({ top: 227 })}>{t(group.name)}
-            </Divider>
+            <Divider textAlign="left" sx={getStickySx({ top: 227 })}>{t(group.name)}</Divider>
             {group.rows.map(row =>
               <EmployeeRow
                 key={row.id}
@@ -506,7 +505,7 @@ function EmployeeRow({ row, onClick, containerProps }: DashboardRowProps) {
       stackSx.backgroundColor = (theme: Theme) => `rgba(${theme.palette.warning.mainChannel} / 0.05) !important`;
     };
   }
-  const elevation = row.getIsExpanded() ? 1 : 0;
+  const elevation = row.getCanExpand() && row.getIsExpanded() ? 1 : 0;
   const visibleCells = row.getVisibleCells();
   return (
     <Stack component={Paper} elevation={elevation} sx={{ transition: "none" }}>
