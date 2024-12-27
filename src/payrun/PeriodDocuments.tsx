@@ -4,7 +4,7 @@ import { Link, Outlet, useRouteLoaderData } from "react-router-dom";
 import { Chip, IconButton, Stack, Typography } from "@mui/material";
 import { ArrowDropDown, ArrowDropUp, Code, PictureAsPdf } from "@mui/icons-material";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
-import { PayrunPeriod } from "../models/PayrunPeriod";
+import { PayrunDocument, PayrunPeriod } from "../models/PayrunPeriod";
 
 type LoaderData = {
   employees: Array<Employee>
@@ -68,7 +68,7 @@ function DocumentSection({ payrunPeriodId, document }) {
     <Stack spacing={1}>
       <Typography variant="h6">{document.name}</Typography>
       <Stack direction="row" spacing={1} flexWrap="wrap">
-        <XmlChip to={`${payrunPeriodId}/doc/${document.id}`} />
+        <DocumentChip doc={document} to={`${payrunPeriodId}/doc/${document.id}`} />
         {document.attributes?.reports?.flatMap(report => {
           if (report.Variants) {
             return report.Variants.map(variant => (
@@ -80,11 +80,11 @@ function DocumentSection({ payrunPeriodId, document }) {
             ));
           }
           return (
-              <PdfChip
+            <PdfChip
               key={report.Name}
               label={report.Name.split(".").pop()}
               to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}`}
-              />
+            />
           )
         }
         )}
@@ -93,14 +93,30 @@ function DocumentSection({ payrunPeriodId, document }) {
   )
 }
 
+type ChipProps = {
+  to: string,
+  label?: string
+}
 
-function XmlChip({ to }: { to: string }) {
+
+
+function DocumentChip({ doc, ...chipProps }: { doc: PayrunDocument } & ChipProps) {
+  switch (doc.contentType) {
+    case "application/xml":
+      return <XmlChip {...chipProps} />
+    case "application/pdf":
+      return <PdfChip {...chipProps} />
+  }
+}
+
+function XmlChip({ to, label }: ChipProps) {
+  label ??= "XML";
   return (
     <Chip
       component={Link}
       variant="outlined"
       to={to}
-      label="XML"
+      label={label}
       size="small"
       icon={<Code fontSize="small" />}
       onClick={noop}
@@ -108,7 +124,7 @@ function XmlChip({ to }: { to: string }) {
   )
 }
 
-function PdfChip({ to, label }: { to: string, label?: string }) {
+function PdfChip({ to, label }: ChipProps) {
   label ??= "PDF";
   return (
     <Chip
