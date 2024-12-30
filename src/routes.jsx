@@ -698,6 +698,7 @@ const routeData = [
 						handle: {
 							newEventRoot: true
 						},
+						shouldRevalidate: ({nextUrl}) => nextUrl.pathname.endsWith("payrunperiods/open"),
 						loader: async ({ params }) => {
 							const employees = await getEmployees(params)
 								.withActive()
@@ -726,11 +727,13 @@ const routeData = [
 								children: [
 									createRoutePayrunPeriodDocument(),
 								],
-								loader: ({ params }) => {
+								loader: async ({ params }) => {
 									if (!params.payrunPeriodId === "open") {
 										return redirect("..");
 									}
-									return null;
+									return {
+										payrunPeriod: await getOpenPayrunPeriod(params)
+									};
 								},
 								action: async ({ params, request }) => {
 									const formData = await request.formData();

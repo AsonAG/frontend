@@ -1,7 +1,7 @@
 import React from "react";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
-import { Form, useRouteLoaderData } from "react-router-dom";
+import { Form, useLoaderData } from "react-router-dom";
 import { Button, Stack, Typography } from "@mui/material";
 import { PayrunPeriod } from "../models/PayrunPeriod";
 import { Employee } from "../models/Employee";
@@ -17,7 +17,7 @@ import { PeriodDocuments } from "./PeriodDocuments";
 
 export function ReviewOpenPeriod() {
   const { t } = useTranslation();
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { payrunPeriod } = useLoaderData() as LoaderData;
   return (
     <>
       <ContentLayout title={<DashboardHeader backlinkPath=".." />}>

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, Outlet, useRouteLoaderData } from "react-router-dom";
+import { Link, Outlet, useLoaderData, useRouteLoaderData } from "react-router-dom";
 import { Chip, IconButton, Stack, Typography } from "@mui/material";
 import { ArrowDropDown, ArrowDropUp, Code, PictureAsPdf } from "@mui/icons-material";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
@@ -12,7 +12,7 @@ type LoaderData = {
 }
 
 export function PeriodDocuments() {
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { payrunPeriod } = useLoaderData() as LoaderData;
   return (
     <>
       {payrunPeriod.documents?.map(doc => (
@@ -25,7 +25,8 @@ export function PeriodDocuments() {
 }
 function WageStatementSection() {
   const { t } = useTranslation();
-  const { payrunPeriod, employees } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { employees } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { payrunPeriod } = useLoaderData() as LoaderData;
   const [open, setOpen] = useState(false);
   const entriesMap = useMemo(() => new Map(payrunPeriod.entries.map(e => [e.employeeId, e])), [payrunPeriod.entries]);
   const wageStatements = employees.map(employee => {
