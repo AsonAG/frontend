@@ -206,7 +206,7 @@ const translations = {
 		"Could not close period": "Periode konnte nicht geschlossen werden",
 		"Value from previous period": "Wert aus Vorperiode",
 		"Go to period completion...": "Gehe zu Periodenabschluss...",
-		"Amount": "Betrag",
+		"dashboard_payout_header": "Auszahlung",
 		"Bank account": "Bankkonto",
 		"Value date": "Valutadatum",
 		"Employee number": "Mitarbeiteranzahl",
@@ -216,7 +216,7 @@ const translations = {
 		"payrun_period_ready": "Auszahlungsbereit",
 		"payrun_period_paid_out": "Ausbezahlt",
 		"payrun_period_without_occupation": "Ohne Beschäftigung",
-		"OT": "VR",
+		"OT": "Ver.",
 		"Total cost": "Totalkosten",
 		"Gross wage plus employer cost": "Brutto plus Arbeitergeberkosten",
 

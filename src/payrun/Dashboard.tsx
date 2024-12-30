@@ -155,7 +155,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
           }
           return <AmountInput employee={props.row.original} dispatch={dispatch} onClick={onClick} />;
         },
-        header: t("Amount"),
+        header: t("dashboard_payout_header"),
         size: 86,
         meta: {
           alignment: "right"
@@ -320,8 +320,6 @@ function EmployeeTable() {
     navigate("payouts");
   };
 
-  const groupedRows = groupRows(table.getRowModel().rows);
-
   const rowContainerProps = getRowGridProps(table.getVisibleFlatColumns().map(col => col.getSize()));
   return (
     <Stack>
@@ -393,6 +391,7 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
     >
       <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} {...containerProps} >
         <Typography fontWeight="bold" >{t("Total")}</Typography>
+        <Typography fontWeight="bold" textAlign="right" ></Typography>
         <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.gross)}</Typography>
         <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.net)}</Typography>
         <Typography fontWeight="bold" textAlign="right" ></Typography>

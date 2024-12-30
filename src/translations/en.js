@@ -23,7 +23,8 @@ const translations = {
 		"payrun_period_controlling": "Wage controlling",
 		"payrun_period_ready": "Ready to pay out",
 		"payrun_period_paid_out": "Paid out",
-		"payrun_period_without_occupation": "Without occupation"
+		"payrun_period_without_occupation": "Without occupation",
+		"dashboard_payout_header": "Payout"
 	},
 };
 
