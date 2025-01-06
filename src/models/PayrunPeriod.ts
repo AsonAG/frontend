@@ -9,6 +9,7 @@ export type PayrunPeriodEntry = {
   offsetting: number | null
   employerCost: number | null
   paidOut: number | null
+  open: number | null
   documents: Array<PayrunDocument> | null
 }
 

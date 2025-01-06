@@ -219,6 +219,7 @@ const translations = {
 		"OT": "Ver.",
 		"Total cost": "Totalkosten",
 		"Gross wage plus employer cost": "Brutto plus Arbeitergeberkosten",
+		"Amount": "Betrag",
 
 		// Command
 		"Select event": "Ereignis auswählen",

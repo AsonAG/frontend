@@ -1,5 +1,5 @@
 import React, { Dispatch, Fragment, MouseEventHandler, useMemo, useReducer } from "react";
-import { Link, Outlet, useNavigate, useRouteLoaderData } from "react-router-dom";
+import { Link, Outlet, useNavigate, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider, TypographyProps } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -11,7 +11,7 @@ import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import { PayrunPeriod, PayrunPeriodEntry } from "../models/PayrunPeriod";
 import dayjs from "dayjs";
-import { createPayout, getPayouts } from "./Payouts";
+import { Payout } from "./Payouts";
 import { createColumnHelper, ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { TFunction } from "i18next";
 import { AvailableCase } from "../models/AvailableCase";
@@ -131,7 +131,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
           alignment: "right"
         }
       }),
-    columnHelper.accessor("open",
+    columnHelper.accessor("entry.open",
       {
         id: "open",
         cell: open => <Typography textAlign="right">{formatValue(open.getValue())}</Typography>,
@@ -209,7 +209,6 @@ type LoaderData = {
 type EntryRow = Employee & {
   entry: PayrunPeriodEntry | undefined
   previousEntry: PayrunPeriodEntry | undefined
-  open: number | undefined
   openPrevious: number | undefined
   amount: number | undefined
   controllingTasks: Array<AvailableCase> | undefined
@@ -218,7 +217,7 @@ type EntryRow = Employee & {
 
 function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL" | "Payable") {
   if (type === "Payable") {
-    return employees.filter(e => ((e.open ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0);
+    return employees.filter(e => ((e.entry?.open ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0);
   }
   const predicate = (_: any, i: number) => [1, 3, 5, 6, employees.length - 1].includes(i);
   const inverted = (_: any, i: number) => !predicate(_, i);
@@ -252,29 +251,17 @@ function getStickySx(position: { top?: number, bottom?: number }): SxProps<Theme
 
 function EmployeeTable() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts } = useRouteLoaderData("payrunperiod") as LoaderData;
-  const payouts = useMemo(() => getPayouts(payrunPeriod.id).flatMap(p => p.entries), [payrunPeriod.id]);
   const [expanded, setExpanded] = useAtom(expandedControllingTasks);
   const isOpen = payrunPeriod.periodStatus === "Open";
   const employeeRows: Array<EntryRow> = useMemo(() => {
     function mapEmployee(employee: Employee, index: number): EntryRow {
-      var paidOut = payouts.filter(p => p.employeeId === employee.id).reduce((a, b) => a + b.amount, 0);
-      let entry = payrunPeriod?.entries?.find(entry => entry.employeeId === employee.id);
-      if (entry) {
-        entry = {
-          ...entry,
-          paidOut
-        };
-      }
-      const netWage = entry?.netWage ?? 0;
-      const offsetting = entry?.offsetting ?? 0;
-      const open = netWage + offsetting - paidOut;
+      const entry = payrunPeriod?.entries?.find(entry => entry.employeeId === employee.id);
+      const open = entry?.open ?? 0;
 
       return {
         ...employee,
         entry,
-        open,
         openPrevious: 0,
         amount: open,
         previousEntry: previousPayrunPeriod?.entries?.find(entry => entry.employeeId == employee.id),
@@ -315,9 +302,19 @@ function EmployeeTable() {
     getRowId: originalRow => originalRow.id,
   });
 
-  const onPayout = () => {
-    createPayout(payrunPeriod.id, state.employees.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 })));
-    navigate("payouts");
+  const submit = useSubmit();
+
+  const onPayout = async () => {
+    const entries = state.employees.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 }));
+    const payout: Payout = {
+      entries,
+      accountIban: "CH93 0076 2011 6238 5295 7",
+      valueDate: "2025-01-07"
+    }
+    const formData = new FormData();
+    formData.set("payrunPeriodId", payrunPeriod.id);
+    formData.set("payout", JSON.stringify(payout));
+    submit(formData, { method: "post" });
   };
 
   const rowContainerProps = getRowGridProps(table.getVisibleFlatColumns().map(col => col.getSize()));
@@ -457,10 +454,10 @@ function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
     if ((row.original.controllingTasks?.length ?? 0) > 0) {
       return "payrun_period_controlling";
     }
-    if (!!row.original.open) {
+    if (!!row.original.entry?.open) {
       return "payrun_period_ready";
     }
-    if (row.original.open === 0 && ((row.original.entry?.netWage ?? 0) > 0) && ((row.original.entry?.grossWage ?? 0) > 0)) {
+    if (row.original.entry?.open === 0 && ((row.original.entry?.netWage ?? 0) > 0) && ((row.original.entry?.grossWage ?? 0) > 0)) {
       return "payrun_period_paid_out";
     }
     return "payrun_period_without_occupation";
@@ -704,9 +701,9 @@ function getTotals(employees: Array<EntryRow>, selected: RowSelectionState) {
     totals.gross += entry?.grossWage ?? 0;
     totals.net += entry?.netWage ?? 0;
     totals.paidOut += entry?.paidOut ?? 0;
+    totals.open += entry?.open ?? 0;
     totals.payingOut += employee.amount ?? 0;
   }
-  totals.open = totals.net - totals.paidOut;
   return totals;
 
 }
@@ -745,7 +742,7 @@ type AmountInputProps = {
 }
 
 export function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
-  if (!employee.open)
+  if (!employee.entry?.open)
     return;
 
   const handleChange = ({ floatValue }) => {
@@ -766,7 +763,7 @@ export function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
       size="small"
       isAllowed={(values) => {
         const { floatValue } = values;
-        return (floatValue ?? 0) <= (employee.open ?? 0);
+        return (floatValue ?? 0) <= (employee.entry?.open ?? 0);
       }}
       slotProps={{
         htmlInput: {

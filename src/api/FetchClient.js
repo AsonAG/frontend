@@ -37,6 +37,8 @@ const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payr
 const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/close";
 const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents";
 const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
+const payoutsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts";
+const payoutUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
 const payrollResultsUrl =
 	"/tenants/:orgId/payrollresults";
 const wageTypesUrl =
@@ -578,6 +580,25 @@ export function getPayrollResult(routeParams, period, employeeId) {
 export function getWageTypes(routeParams, payrollResultId) {
 	return new FetchRequestBuilder(wageTypesUrl, { ...routeParams, payrollResultId })
 		.fetchJson();
+}
+
+export function getPayouts(routeParams) {
+	return new FetchRequestBuilder(payoutsUrl, routeParams)
+		.withQueryParam("orderBy", "status asc, created desc")
+		.fetchJson();
+}
+
+export function createPayout(routeParams, payoutSet) {
+	return new FetchRequestBuilder(payoutsUrl, routeParams)
+		.withMethod("POST")
+		.withBody(payoutSet)
+		.fetch();
+}
+
+export function cancelPayout(routeParams) {
+	return new FetchRequestBuilder(payoutUrl, routeParams)
+		.withMethod("POST")
+		.fetch();
 }
 
 export async function requestExportDataDownload(routeParams, name) {

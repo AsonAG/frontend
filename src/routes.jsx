@@ -45,10 +45,12 @@ import {
 	getClosedPayrunPeriod,
 	getOpenPayrunPeriod,
 	closePayrunPeriod,
-	createOpenPayrunPeriod,
 	getPayrunPeriodDocument,
 	getPayrunPeriod,
-	getPayrunPeriodCaseValues
+	getPayrunPeriodCaseValues,
+	getPayouts,
+	createPayout,
+	cancelPayout
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -698,7 +700,7 @@ const routeData = [
 						handle: {
 							newEventRoot: true
 						},
-						shouldRevalidate: ({nextUrl}) => nextUrl.pathname.endsWith("payrunperiods/open"),
+						shouldRevalidate: ({ nextUrl }) => nextUrl.pathname.endsWith("payrunperiods/open"),
 						loader: async ({ params }) => {
 							const employees = await getEmployees(params)
 								.withActive()
@@ -717,7 +719,18 @@ const routeData = [
 						children: [
 							{
 								index: true,
-								Component: PayrunDashboard
+								Component: PayrunDashboard,
+								action: async ({ params, request }) => {
+									const formData = await request.formData();
+									const payrunPeriodId = formData.get("payrunPeriodId");
+									const payout = JSON.parse(formData.get("payout"));
+									const response = await createPayout({ ...params, payrunPeriodId }, payout);
+									if (response.ok) {
+										toast("success", "")
+										return redirect("payouts");
+									}
+									toast("error", "Error while creating the payout");
+								}
 							},
 							createRoutePayrunPeriodDocument(),
 							{
@@ -749,16 +762,24 @@ const routeData = [
 							{
 								path: "payouts",
 								Component: Payouts,
+								loader: async ({ params }) => {
+									if (params.payrunPeriodId === "open") {
+										const openPayrunPeriod = await getOpenPayrunPeriod(params);
+										params.payrunPeriodId = openPayrunPeriod.id;
+									}
+									return getPayouts(params);
+								},
 								action: async ({ params, request }) => {
 									const formData = await request.formData();
 									const payrunPeriodId = formData.get("payrunPeriodId");
-									const closePeriodResponse = await closePayrunPeriod({ ...params, payrunPeriodId });
-									if (closePeriodResponse.ok) {
-										await createOpenPayrunPeriod({ ...params, payrunId: payrun.id });
-										toast("success", "Payrun period closed");
-										return redirect("..");
+									const payoutId = formData.get("payoutId");
+									const response = await cancelPayout({ ...params, payrunPeriodId, payoutId });
+									if (response.ok) {
+										toast("success", "Cancelled payout")
+									} else {
+										toast("error", "Error while cancelling the payout");
 									}
-									toast("error", "Could not close period");
+									return null;
 								}
 							},
 							{
