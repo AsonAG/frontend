@@ -1,4 +1,4 @@
-import React, { Dispatch, Fragment, MouseEventHandler, useMemo, useReducer } from "react";
+import React, { Dispatch, Fragment, MouseEventHandler, useMemo, useReducer, useState } from "react";
 import { Link, Outlet, useNavigate, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider, TypographyProps } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
@@ -10,7 +10,7 @@ import { Employee } from "../models/Employee";
 import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import { PayrunPeriod, PayrunPeriodEntry } from "../models/PayrunPeriod";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { Payout } from "./Payouts";
 import { createColumnHelper, ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { TFunction } from "i18next";
@@ -304,12 +304,13 @@ function EmployeeTable() {
 
   const submit = useSubmit();
 
-  const onPayout = async () => {
+  const onPayout = async (valueDate: string) => {
     const entries = state.employees.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 }));
     const payout: Payout = {
+      // @ts-ignore
+      valueDate,
       entries,
-      accountIban: "CH93 0076 2011 6238 5295 7",
-      valueDate: "2025-01-07"
+      accountIban: "CH93 0076 2011 6238 5295 7"
     }
     const formData = new FormData();
     formData.set("payrunPeriodId", payrunPeriod.id);
@@ -370,8 +371,9 @@ function EmployeeTable() {
   )
 }
 
-function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout: () => void, containerProps: Object }) {
+function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout: (valutaDate: string) => void, containerProps: Object }) {
   const { t } = useTranslation();
+  const [valutaDate, setValutaDate] = useState<Dayjs | null>(dayjs());
   if (!(state.totals.open > 0)) {
     return;
   }
@@ -424,14 +426,14 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
             </Box>
             <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
               <Typography>{t("Value date")}</Typography>
-              <DatePicker variant="standard" defaultValue={dayjs()}></DatePicker>
+              <DatePicker variant="standard" value={valutaDate} onChange={(v) => setValutaDate(v)}></DatePicker>
             </Box>
             <Stack direction="row" justifyContent="end" spacing={2}>
               <ResponsiveDialogClose>
                 <Button>{t("Cancel")}</Button>
               </ResponsiveDialogClose>
               <ResponsiveDialogClose>
-                <Button component="a" href="" download={`PainFile_${dayjs().format("YYYYMMDD")}.xml`} variant="contained" onClick={onPayout}>{t("Confirm")}</Button>
+                <Button disabled={!valutaDate} variant="contained" onClick={() => onPayout(valutaDate!.toISOString())}>{t("Confirm")}</Button>
               </ResponsiveDialogClose>
             </Stack>
           </ResponsiveDialogContent>
@@ -761,10 +763,10 @@ export function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
       customInput={TextField}
       type="numeric"
       size="small"
-      isAllowed={(values) => {
-        const { floatValue } = values;
-        return (floatValue ?? 0) <= (employee.entry?.open ?? 0);
-      }}
+      // isAllowed={(values) => {
+      //   const { floatValue } = values;
+      //   return (floatValue ?? 0) <= (employee.entry?.open ?? 0);
+      // }}
       slotProps={{
         htmlInput: {
           style: {

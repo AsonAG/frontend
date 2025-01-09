@@ -1,7 +1,7 @@
 import React from "react";
 import { ContentLayout, PageHeaderTitle } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
-import { Link, Navigate, useLoaderData, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { Link, useLoaderData, useParams, useRouteLoaderData, useSubmit } from "react-router-dom";
 import dayjs from "dayjs";
 import { Box, Chip, IconButton, Stack, SxProps, Theme, Tooltip, Typography } from "@mui/material";
 import { Cancel, ChevronLeft, Download } from "@mui/icons-material";
@@ -9,6 +9,7 @@ import { PayrunPeriod } from "../models/PayrunPeriod";
 import { Employee } from "../models/Employee";
 import { IdType } from "../models/IdType";
 import { getRowGridProps } from "./Dashboard";
+import { requestPainFileDownload } from "../api/FetchClient";
 
 export type Payout = {
   id: IdType
@@ -65,7 +66,12 @@ const inactiveSx: SxProps<Theme> = {
 
 function PayoutSection({ payout, onCancel }: { payout: Payout, onCancel: () => void }) {
   const { t } = useTranslation();
+  const params = useParams();
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as RouteLoaderData;
   const total = payout.entries.reduce((a, b) => a + b.amount, 0);
+  const download = async () => {
+    await requestPainFileDownload({ ...params, payrunPeriodId: payrunPeriod.id, payoutId: payout.id }, getPayoutFileName(payout));
+  }
   const isCancelled = payout.status === "Inactive";
   const sx = isCancelled ? inactiveSx : {};
   return (
@@ -77,7 +83,7 @@ function PayoutSection({ payout, onCancel }: { payout: Payout, onCancel: () => v
         <Typography variant="subtitle1">{dayjs(payout.valueDate).format("L")}</Typography>
         {!isCancelled &&
           <Stack direction="row" spacing={0.5}>
-            <IconButton component="a" href={payout.id} download={`PainFile_${dayjs().format("YYYYMMDD")}.xml`}><Download /></IconButton>
+            <IconButton onClick={download}><Download /></IconButton>
             <IconButton onClick={onCancel}><Cancel /></IconButton>
           </Stack>
         }
@@ -110,4 +116,8 @@ function PeriodSection() {
       <Chip color="success" size="small" label={t("Offen")} />
     </Stack>
   );
+}
+
+export function getPayoutFileName(payout: Payout) {
+  return `PainFile_${dayjs(payout.valueDate).format("YYYYMMDD")}_${payout.id.substring(0, 8)}.xml`;
 }

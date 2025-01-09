@@ -50,7 +50,8 @@ import {
 	getPayrunPeriodCaseValues,
 	getPayouts,
 	createPayout,
-	cancelPayout
+	cancelPayout,
+	downloadData
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -90,9 +91,10 @@ import { DataView } from "./components/DataView";
 
 import { PayrunPeriodList } from "./payrun/List";
 import { ReviewOpenPeriod } from "./payrun/ReviewOpenPeriod";
-import { Payouts } from "./payrun/Payouts";
+import { getPayoutFileName, Payouts } from "./payrun/Payouts";
 import { ClosedPeriodDocuments } from "./payrun/ClosedPeriodDocuments";
 import { PeriodCaseValueDialog } from "./payrun/PeriodCaseValueDialog";
+import { base64ToBytes } from "./services/converters/BinaryConverter";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -724,9 +726,14 @@ const routeData = [
 									const formData = await request.formData();
 									const payrunPeriodId = formData.get("payrunPeriodId");
 									const payout = JSON.parse(formData.get("payout"));
-									const response = await createPayout({ ...params, payrunPeriodId }, payout);
-									if (response.ok) {
+									const response1 = await createPayout({ ...params, payrunPeriodId }, payout);
+									// const [response1, response2] = await Promise.all([createPayout({ ...params, payrunPeriodId }, payout), createPayout({ ...params, payrunPeriodId }, payout)]);
+									if (response1.ok) {
 										toast("success", "")
+										const createdPayout = await response1.json();
+										const bytes = base64ToBytes(createdPayout.painFile.content);
+										const blob = new Blob([bytes], { type: createdPayout.painFile.contentType })
+										await downloadData(blob, getPayoutFileName(createdPayout));
 										return redirect("payouts");
 									}
 									toast("error", "Error while creating the payout");

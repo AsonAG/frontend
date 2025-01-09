@@ -39,6 +39,7 @@ const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperi
 const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
 const payoutsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts";
 const payoutUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
+const payoutDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId/document";
 const payrollResultsUrl =
 	"/tenants/:orgId/payrollresults";
 const wageTypesUrl =
@@ -110,6 +111,11 @@ class FetchRequestBuilder {
 			this.body = body;
 			this.headers.delete("Content-Type");
 		}
+		return this;
+	}
+
+	withDefaultAcceptHeader() {
+		this.headers.delete("Accept");
 		return this;
 	}
 
@@ -608,14 +614,31 @@ export async function requestExportDataDownload(routeParams, name) {
 	);
 	const response = await builder.withTimout(600000).fetch();
 	const blob = await response.blob();
+	await downloadData(blob, name);
+}
+
+export async function downloadData(blob, name) {
 	let objectUrl = window.URL.createObjectURL(blob);
 	let anchor = document.createElement("a");
 	try {
 		anchor.href = objectUrl;
-		anchor.download = name;
+		if (name)
+			anchor.download = name;
 		anchor.click();
 	} finally {
 		window.URL.revokeObjectURL(objectUrl);
 		anchor.remove();
 	}
+
+}
+
+export async function requestPainFileDownload(routeParams, name) {
+	const builder = new FetchRequestBuilder(
+		payoutDocumentUrl,
+		routeParams,
+	)
+		.withDefaultAcceptHeader();
+	const response = await builder.fetch();
+	const blob = await response.blob();
+	await downloadData(blob, name);
 }
