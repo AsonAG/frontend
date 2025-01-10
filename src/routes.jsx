@@ -51,7 +51,8 @@ import {
 	getPayouts,
 	createPayout,
 	cancelPayout,
-	downloadData
+	downloadData,
+	getCompanyBankDetails as getCompanyBankAccountDetails
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -713,7 +714,8 @@ const routeData = [
 								const previousPayrunPeriod = await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
 								const controllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
 								const caseValueCounts = await Promise.all(employees.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.id }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true)));
-								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts };
+								const bankAccountDetails = await getCompanyBankAccountDetails(params);
+								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
 							}
 							const payrunPeriod = await getPayrunPeriod(params);
 							return { employees, payrunPeriod };

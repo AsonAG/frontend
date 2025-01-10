@@ -1,6 +1,6 @@
 import React, { Dispatch, Fragment, MouseEventHandler, useMemo, useReducer, useState } from "react";
-import { Link, Outlet, useNavigate, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider, TypographyProps, Dialog, DialogTitle, DialogContent } from "@mui/material";
+import { Link, Outlet, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider, Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { ContentLayout } from "../components/ContentLayout";
@@ -17,12 +17,6 @@ import { TFunction } from "i18next";
 import { AvailableCase } from "../models/AvailableCase";
 import { IdType } from "../models/IdType";
 import { NumericFormat } from "react-number-format";
-import {
-  ResponsiveDialog,
-  ResponsiveDialogClose,
-  ResponsiveDialogContent,
-  ResponsiveDialogTrigger,
-} from "../components/ResponsiveDialog";
 import { DatePicker } from "../components/DatePicker";
 import { useAtom } from "jotai";
 import { expandedControllingTasks } from "../utils/dataAtoms";
@@ -198,12 +192,18 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
   ];
 }
 
+type BankAccountDetails = {
+  iban: string | undefined
+  accountName: string | undefined
+}
+
 type LoaderData = {
   employees: Array<Employee>
   payrunPeriod: PayrunPeriod
   previousPayrunPeriod: PayrunPeriod | undefined
   controllingTasks: Array<Array<AvailableCase>>
   caseValueCounts: Array<number>
+  bankAccountDetails: BankAccountDetails
 }
 
 type EntryRow = Employee & {
@@ -302,13 +302,13 @@ function EmployeeTable() {
 
   const submit = useSubmit();
 
-  const onPayout = async (valueDate: string) => {
+  const onPayout = async (valueDate: string, accountIban: string) => {
     const entries = state.employees.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 }));
     const payout: Payout = {
       // @ts-ignore
       valueDate,
       entries,
-      accountIban: "CH93 0076 2011 6238 5295 7"
+      accountIban
     }
     const formData = new FormData();
     formData.set("payrunPeriodId", payrunPeriod.id);
@@ -369,7 +369,7 @@ function EmployeeTable() {
   )
 }
 
-function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout: (valutaDate: string) => void, containerProps: Object }) {
+function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout: (valutaDate: string, accountIban: string) => void, containerProps: Object }) {
   const { t } = useTranslation();
   if (!(state.totals.open > 0)) {
     return;
@@ -408,12 +408,13 @@ type RowGroup = {
   rows: Array<Row<EntryRow>>
 }
 
-
-function PayoutDialog({ state, onPayout }: { state: State, onPayout: (valutaDate: string) => void }) {
+function PayoutDialog({ state, onPayout }: { state: State, onPayout: (valutaDate: string, accountIban: string) => void }) {
   const { t } = useTranslation();
+  const { bankAccountDetails } = useRouteLoaderData("payrunperiod") as LoaderData;
   const [open, setOpen] = useState<boolean>(false);
   const [valueDate, setValueDate] = useState<Dayjs | null>(dayjs());
   const [valueDateValid, setValueDateValid] = useState<boolean>(true);
+  const [bankAccount, setBankAccount] = useState<BankAccountDetails>(bankAccountDetails)
 
   const handleOpen = () => {
     setOpen(true);
@@ -446,7 +447,7 @@ function PayoutDialog({ state, onPayout }: { state: State, onPayout: (valutaDate
             </Box>
             <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
               <Typography>{t("Bank account")}</Typography>
-              <BankAccountSelector />
+              <BankAccountSelector bankAccount={bankAccount} />
             </Box>
             <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
               <Typography>{t("Value date")}</Typography>
@@ -454,7 +455,7 @@ function PayoutDialog({ state, onPayout }: { state: State, onPayout: (valutaDate
             </Box>
             <Stack direction="row" justifyContent="end" spacing={2}>
               <Button onClick={handleClose}>{t("Cancel")}</Button>
-              <Button disabled={!valueDate || !valueDateValid} variant="contained" onClick={() => onPayout(valueDate!.toISOString())}>{t("Confirm")}</Button>
+              <Button disabled={!valueDate || !valueDateValid || !bankAccount?.iban} variant="contained" onClick={() => onPayout(valueDate!.toISOString(), bankAccount.iban!)}>{t("Confirm")}</Button>
             </Stack>
           </Stack>
         </DialogContent>
@@ -794,24 +795,24 @@ export function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
   );
 }
 
-function BankAccountSelector() {
+function BankAccountSelector({ bankAccount }: { bankAccount: BankAccountDetails }) {
   return (
     <Stack direction="row" alignItems="center" spacing={1} sx={{
       userSelect: "none",
       px: 1,
-      cursor: "pointer",
       borderStyle: "solid",
       borderWidth: 1,
       borderRadius: 1,
       borderColor: theme => `rgba(${theme.vars.palette.common.onBackgroundChannel} / 0.23)`,
-      "&:hover": {
-        borderColor: theme => theme.palette.text.primary
-      }
+      // cursor: "pointer",
+      // "&:hover": {
+      //   borderColor: theme => theme.palette.text.primary
+      // }
     }}>
       <AccountBalanceIcon />
       <Stack>
-        <Typography variant="subtitle2">UBS Lohnkonto</Typography>
-        <Typography variant="body2">CH93 0076 2011 6238 5295 7</Typography>
+        <Typography variant="subtitle2">{bankAccount.accountName}</Typography>
+        <Typography variant="body2">{bankAccount.iban}</Typography>
       </Stack>
     </Stack>
   )

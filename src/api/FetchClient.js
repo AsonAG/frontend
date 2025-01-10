@@ -126,6 +126,13 @@ class FetchRequestBuilder {
 		return this;
 	}
 
+	withQueryParams(key, value) {
+		if (value) {
+			this.searchParams.append(key, value);
+		}
+		return this;
+	}
+
 	withActive() {
 		this.searchParams.set("status", "Active");
 		return this;
@@ -389,6 +396,25 @@ export function getCompanyMissingDataCases(routeParams) {
 		.withLocalization()
 		.withUser()
 		.fetchJson();
+}
+
+export async function getCompanyBankDetails(routeParams) {
+	const ibanFieldName = "CH.Swissdec.CompanyBankIban";
+	const accountFieldName = "CH.Swissdec.CompanyBankName";
+	const values = await new FetchRequestBuilder(timeValuesUrl, routeParams)
+		.withQueryParam("caseType", "Company")
+		.withQueryParams("caseFieldNames", ibanFieldName)
+		.withQueryParams("caseFieldNames", accountFieldName)
+		.withUser()
+		.fetchJson();
+
+	const iban = values.find(v => v.caseFieldName === ibanFieldName)?.value;
+	const accountName = values.find(v => v.caseFieldName === accountFieldName)?.value;
+
+	return {
+		iban,
+		accountName
+	};
 }
 
 export function getEmployeeMissingData(routeParams) {
