@@ -1,6 +1,6 @@
 import React, { Dispatch, Fragment, MouseEventHandler, useMemo, useReducer, useState } from "react";
 import { Link, Outlet, useNavigate, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider, TypographyProps } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider, TypographyProps, Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { ContentLayout } from "../components/ContentLayout";
@@ -261,7 +261,6 @@ function EmployeeTable() {
       return {
         ...employee,
         entry,
-        openPrevious: 0,
         amount: open,
         previousEntry: previousPayrunPeriod?.entries?.find(entry => entry.employeeId == employee.id),
         controllingTasks: isOpen ? controllingTasks[index] : [],
@@ -372,7 +371,6 @@ function EmployeeTable() {
 
 function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout: (valutaDate: string) => void, containerProps: Object }) {
   const { t } = useTranslation();
-  const [valutaDate, setValutaDate] = useState<Dayjs | null>(dayjs());
   if (!(state.totals.open > 0)) {
     return;
   }
@@ -399,18 +397,45 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
         <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.payingOut)}</Typography>
       </Stack>
       <Stack direction="row" justifyContent="end">
-        <ResponsiveDialog>
-          <ResponsiveDialogTrigger>
-            <Button variant="contained" disabled={state.totals.payingOut === 0}>
-              <Stack direction="row">
-                <span>{t("Payout")}:&nbsp;</span>
-                <span>{formatValue(state.totals.payingOut)}</span>
-                <span>&nbsp;CHF</span>
-              </Stack>
-            </Button>
-          </ResponsiveDialogTrigger>
-          <ResponsiveDialogContent>
-            <Typography variant="h6">{t("Auszahlen")}</Typography>
+        <PayoutDialog state={state} onPayout={onPayout} />
+      </Stack>
+    </Stack>
+  )
+}
+
+type RowGroup = {
+  name: string
+  rows: Array<Row<EntryRow>>
+}
+
+
+function PayoutDialog({ state, onPayout }: { state: State, onPayout: (valutaDate: string) => void }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState<boolean>(false);
+  const [valueDate, setValueDate] = useState<Dayjs | null>(dayjs());
+  const [valueDateValid, setValueDateValid] = useState<boolean>(true);
+
+  const handleOpen = () => {
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setOpen(false);
+  }
+
+  return (
+    <>
+      <Button variant="contained" disabled={state.totals.payingOut === 0} onClick={handleOpen}>
+        <Stack direction="row">
+          <span>{t("Payout")}:&nbsp;</span>
+          <span>{formatValue(state.totals.payingOut)}</span>
+          <span>&nbsp;CHF</span>
+        </Stack>
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>{t("Payout")}</DialogTitle>
+        <DialogContent sx={{ width: "90vw", maxWidth: 500 }}>
+          <Stack spacing={2}>
             <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
               <Typography>{t("Employee number")}</Typography>
               <Typography fontWeight="bold">{Object.values(state.selected).filter(Boolean).length}</Typography>
@@ -425,26 +450,17 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
             </Box>
             <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
               <Typography>{t("Value date")}</Typography>
-              <DatePicker variant="standard" value={valutaDate} onChange={(v) => setValutaDate(v)}></DatePicker>
+              <DatePicker variant="standard" disablePast value={valueDate} onChange={(v) => setValueDate(v)} onError={(e) => setValueDateValid(!e)}></DatePicker>
             </Box>
             <Stack direction="row" justifyContent="end" spacing={2}>
-              <ResponsiveDialogClose>
-                <Button>{t("Cancel")}</Button>
-              </ResponsiveDialogClose>
-              <ResponsiveDialogClose>
-                <Button disabled={!valutaDate} variant="contained" onClick={() => onPayout(valutaDate!.toISOString())}>{t("Confirm")}</Button>
-              </ResponsiveDialogClose>
+              <Button onClick={handleClose}>{t("Cancel")}</Button>
+              <Button disabled={!valueDate || !valueDateValid} variant="contained" onClick={() => onPayout(valueDate!.toISOString())}>{t("Confirm")}</Button>
             </Stack>
-          </ResponsiveDialogContent>
-        </ResponsiveDialog>
-      </Stack>
-    </Stack>
+          </Stack>
+        </DialogContent>
+      </Dialog>
+    </>
   )
-}
-
-type RowGroup = {
-  name: string
-  rows: Array<Row<EntryRow>>
 }
 
 function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
