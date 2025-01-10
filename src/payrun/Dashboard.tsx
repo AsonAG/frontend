@@ -779,10 +779,10 @@ export function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
       customInput={TextField}
       type="numeric"
       size="small"
-      // isAllowed={(values) => {
-      //   const { floatValue } = values;
-      //   return (floatValue ?? 0) <= (employee.entry?.open ?? 0);
-      // }}
+      isAllowed={(values) => {
+        const { floatValue } = values;
+        return (floatValue ?? 0) <= (employee.entry?.open ?? 0);
+      }}
       slotProps={{
         htmlInput: {
           style: {
