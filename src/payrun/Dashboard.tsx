@@ -112,7 +112,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
           alignment: "right"
         }
       }),
-    columnHelper.accessor("openPrevious",
+    columnHelper.accessor("entry.openBalancePreviousPeriod",
       {
         id: "openPrevious",
         cell: open => <Typography textAlign="right">{formatValue(open.getValue())}</Typography>,
@@ -209,7 +209,6 @@ type LoaderData = {
 type EntryRow = Employee & {
   entry: PayrunPeriodEntry | undefined
   previousEntry: PayrunPeriodEntry | undefined
-  openPrevious: number | undefined
   amount: number | undefined
   controllingTasks: Array<AvailableCase> | undefined
   caseValueCount: number
