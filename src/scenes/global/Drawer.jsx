@@ -11,7 +11,6 @@ import {
 	NavLink as RouterLink,
 	useLoaderData,
 	useLocation,
-	useMatch,
 	useMatches,
 	useParams,
 } from "react-router-dom";
@@ -91,7 +90,7 @@ function ControllingBadgeIcon({ icon }) {
 		data.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0);
 	return (
 		<Suspense fallback={icon}>
-			<AtomBadge atom={missingDataTasksAtom} countFunc={count}>
+			<AtomBadge atom={missingDataTasksAtom} color="warning" countFunc={count}>
 				{icon}
 			</AtomBadge>
 		</Suspense>
@@ -104,7 +103,7 @@ function EmployeeMissingDataBadge({ icon }) {
 	};
 	return (
 		<Suspense fallback={icon}>
-			<AtomBadge atom={employeeMissingDataAtom} countFunc={count}>
+			<AtomBadge atom={employeeMissingDataAtom} color="warning" countFunc={count}>
 				{icon}
 			</AtomBadge>
 		</Suspense>
@@ -115,13 +114,13 @@ function EmployeeMissingDataBadge({ icon }) {
 function defaultCount(data) {
 	return data.count;
 }
-function AtomBadge({ atom, countFunc = defaultCount, children }) {
+function AtomBadge({ atom, color = "primary", countFunc = defaultCount, children }) {
 	const data = useAtomValue(atom);
 	const count = countFunc(data);
 	return (
-		<Badge badgeContent={count} color="primary" overlap="circular">
+		<Badge badgeContent={count} color={color} overlap="circular">
 			{children}
-		</Badge>
+		</Badge >
 	);
 }
 
