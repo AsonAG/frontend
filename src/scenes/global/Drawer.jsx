@@ -80,7 +80,7 @@ function OpenTasksBadgeIcon() {
 	const icon = <FormatListBulletedIcon />;
 	return (
 		<Suspense fallback={icon}>
-			<AtomBadge atom={openTasksAtom}>{icon}</AtomBadge>
+			<AtomBadge atom={openTasksAtom} color="warning">{icon}</AtomBadge>
 		</Suspense>
 	);
 }

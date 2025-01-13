@@ -517,7 +517,7 @@ const routeData = [
 					const { user } = await getOrganizationData();
 					const isHrUser = user?.attributes.roles?.includes("hr");
 					if (isHrUser) {
-						return redirect("hr/tasks");
+						return redirect("hr/employees");
 					}
 					const employee = await store.get(selfServiceEmployeeAtom);
 					if (employee !== null) {
