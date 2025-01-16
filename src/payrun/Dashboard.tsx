@@ -1,6 +1,6 @@
 import React, { Dispatch, Fragment, MouseEventHandler, PropsWithChildren, useMemo, useReducer } from "react";
 import { Link, Outlet, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, SxProps, Theme, Chip, Box, TextField, Divider, styled, TypographyProps, TypographyVariant, BoxProps, Button } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, SxProps, Theme, Chip, Box, TextField, Divider, Button } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
@@ -28,8 +28,15 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
     alignment?: "left" | "center" | "right",
     flex?: number,
-    tooltip?: (context: CellContext<TData, TValue>) => string | null,
-    headerTooltip?: string
+    tooltip?: (context: CellContext<TData, TValue>, t: TFunction<"translation", undefined>) => string | null,
+    headerTooltip?: (t: TFunction<"translation", undefined>) => string | null
+  }
+  interface CellContext<TData, TValue> {
+    dispatch: Dispatch<Action>
+    t: TFunction<"translation", undefined>
+  }
+  interface HeaderContext<TData, TValue> {
+    t: TFunction<"translation", undefined>
   }
 
   interface TableMeta<TData> {
@@ -66,22 +73,23 @@ const chipSx = {
 const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
 const columnHelper = createColumnHelper<EntryRow>();
 
-function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatch<Action>) {
-  function getWageTypeTooltipForPreviousValue(wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
-    if (!context.table.options.meta?.isOpen)
-      return null;
-    if (previousValueColumnName && context.table.getState().columnVisibility[previousValueColumnName])
-      return null;
-    const previousValue = formatValue(context.row.original.previousEntry?.[wageType]);
-    return `${t("Value from previous period")} ${previousValue ?? "-"}`;
-  }
+function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefined>, wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
+  if (!context.table.options.meta?.isOpen)
+    return null;
+  if (previousValueColumnName && context.table.getState().columnVisibility[previousValueColumnName])
+    return null;
+  const previousValue = formatValue(context.row.original.previousEntry?.[wageType]);
+  return `${t("Value from previous period")} ${previousValue ?? "-"}`;
+}
+
+function createColumns() {
   return [
     columnHelper.accessor("identifier",
       {
         id: "identifier",
         cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-        header: t("Id"),
-        footer: t("Total"),
+        header: ({ t }) => t("Id"),
+        footer: ({ t }) => t("Total"),
         size: 150,
         meta: {
           flex: 1,
@@ -92,8 +100,8 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
       {
         id: "employee",
         cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-        header: t("Name"),
-        footer: context => !context.table.getState().columnVisibility.identifier ? t("Total") : null,
+        header: ({ t }) => t("Name"),
+        footer: ({ table, t }) => !table.getState().columnVisibility.identifier ? t("Total") : null,
         size: 150,
         meta: {
           flex: 1,
@@ -104,34 +112,34 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
       {
         id: "employerCost",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("Total cost"),
+        header: ({ t }) => t("Total cost"),
         size: 110,
         meta: {
           alignment: "right",
-          tooltip: (context) => getWageTypeTooltipForPreviousValue("employerCost", context),
-          headerTooltip: t("Gross wage plus employer cost")
+          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "employerCost", context),
+          headerTooltip: t => t("Gross wage plus employer cost")
         }
       }),
     columnHelper.accessor("previousEntry.grossWage",
       {
         id: "grossPreviousPeriod",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("Gross PP"),
+        header: ({ t }) => t("Gross PP"),
         size: 110,
         meta: {
           alignment: "right",
-          headerTooltip: t("Difference gross to previous period")
+          headerTooltip: t => t("Difference gross to previous period")
         }
       }),
     columnHelper.accessor(row => formatValue((row.entry?.grossWage ?? 0) - (row.previousEntry?.grossWage ?? 0)),
       {
         id: "grossDiff",
         cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-        header: t("Diff. gross"),
+        header: ({ t }) => t("Diff. gross"),
         size: 110,
         meta: {
           alignment: "right",
-          headerTooltip: t("Difference gross to previous period")
+          headerTooltip: t => t("Difference gross to previous period")
         }
       }),
     columnHelper.accessor("entry.grossWage",
@@ -156,72 +164,72 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
             </>
           )
         },
-        header: t("Gross"),
+        header: ({ t }) => t("Gross"),
         size: 110,
         meta: {
           alignment: "right",
-          tooltip: (context) => getWageTypeTooltipForPreviousValue("grossWage", context, "grossPreviousPeriod")
+          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "grossWage", context, "grossPreviousPeriod")
         }
       }),
     columnHelper.accessor("entry.netWage",
       {
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("Net"),
+        header: ({ t }) => t("Net"),
         size: 110,
         meta: {
           alignment: "right",
-          tooltip: (context) => getWageTypeTooltipForPreviousValue("netWage", context)
+          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "netWage", context)
         }
       }),
     columnHelper.accessor("entry.offsetting",
       {
         id: "offsetting",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("OT"),
+        header: ({ t }) => t("OT"),
         size: 110,
         meta: {
           alignment: "right",
-          tooltip: (context) => getWageTypeTooltipForPreviousValue("offsetting", context),
-          headerTooltip: t("Offsetting")
+          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "offsetting", context),
+          headerTooltip: t => t("Offsetting")
         }
       }),
     columnHelper.accessor("entry.retro",
       {
         id: "retro",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("Retro"),
+        header: ({ t }) => t("Retro"),
         size: 110,
         meta: {
           alignment: "right",
-          tooltip: (context) => getWageTypeTooltipForPreviousValue("retro", context)
+          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "retro", context)
         }
       }),
     columnHelper.accessor("entry.openGarnishmentPreviousPeriod",
       {
         id: "openGarnishmentPreviousPeriod",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("GPP"),
+        header: ({ t }) => t("GPP"),
         size: 110,
         meta: {
           alignment: "right",
-          headerTooltip: t("Garnishment from previous period")
+          headerTooltip: t => t("Garnishment from previous period")
         }
       }),
     columnHelper.accessor("entry.openBalancePreviousPeriod",
       {
         id: "openPreviousPeriod",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("OPP"),
+        header: ({ t }) => t("OPP"),
         size: 110,
         meta: {
           alignment: "right",
-          headerTooltip: t("Open from previous period")
+          headerTooltip: t => t("Open from previous period")
         }
       }),
     columnHelper.accessor("entry.paidOut",
       {
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("Paid"),
+        header: ({ t }) => t("Paid"),
         size: 110,
         meta: {
           alignment: "right"
@@ -231,7 +239,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
       {
         id: "garnishment",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: t("Garnishment"),
+        header: ({ t }) => t("Garnishment"),
         size: 110,
         meta: {
           alignment: "right"
@@ -253,7 +261,7 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
             </>
           )
         },
-        header: t("Open"),
+        header: ({ t }) => t("Open"),
         footer: (props) => formatValue(props.table.getState().totals.open),
         size: 110,
         meta: {
@@ -263,18 +271,18 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
     columnHelper.accessor("amount",
       {
         id: "amount",
-        cell: function(props) {
-          if (props.row.getCanExpand()) {
+        cell: function({ row, dispatch }) {
+          if (row.getCanExpand()) {
             return;
           }
           const onClick: MouseEventHandler = (event) => {
-            if (props.row.getIsSelected()) {
+            if (row.getIsSelected()) {
               event.stopPropagation();
             }
           }
-          return <AmountInput employee={props.row.original} dispatch={dispatch} onClick={onClick} />;
+          return <AmountInput employee={row.original} dispatch={dispatch} onClick={onClick} />;
         },
-        header: t("dashboard_payout_header"),
+        header: ({ t }) => t("dashboard_payout_header"),
         footer: (props) => formatValue(props.table.getState().totals.payingOut),
         size: 110,
         meta: {
@@ -304,8 +312,8 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
     }),
     columnHelper.display({
       id: "events",
-      cell: (props) => {
-        const { entry, caseValueCount } = props.row.original;
+      cell: ({ row, t }) => {
+        const { entry, caseValueCount } = row.original;
         if (!entry || caseValueCount === 0)
           return <div></div>;
         return (
@@ -324,6 +332,8 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
     })
   ];
 }
+
+const columns = createColumns();
 
 
 export type EntryRow = Employee & {
@@ -434,7 +444,6 @@ function PayrunPeriodTable() {
     createInitialState
   );
   const { filtered, filter: mode } = state;
-  const columns = useMemo(() => createColumns(t, dispatch), [dispatch, t]);
   const configuredColumnVisibility = useAtomValue(columnVisibilityAtom);
   const columnVisibility: VisibilityState = { ...configuredColumnVisibility, ...state.columnVisibility }
   if (!isOpen) {
@@ -511,10 +520,11 @@ function PayrunPeriodTable() {
             }>
             {headerGroup.headers.map(header => {
               const { headerTooltip, alignment } = (header.column.columnDef.meta || {});
+              const context = { ...header.getContext(), t };
               return (
-                <Cell key={header.id} tooltip={headerTooltip} align={alignment} sx={getColumnStickySx(header.column)}>
+                <Cell key={header.id} tooltip={headerTooltip?.(t)} align={alignment} sx={getColumnStickySx(header.column)}>
                   <Typography variant="h6" noWrap>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {flexRender(header.column.columnDef.header, context)}
                   </Typography>
                 </Cell>
               );
@@ -533,6 +543,7 @@ function PayrunPeriodTable() {
                     onClick={createRowClickHandler(row, state, dispatch)}
                     minWidth={minWidth}
                     containerSx={rowContainerSx}
+                    dispatch={dispatch}
                   />)}
               </Fragment>
             ))
@@ -543,38 +554,40 @@ function PayrunPeriodTable() {
                 row={row}
                 minWidth={minWidth}
                 containerSx={rowContainerSx}
+                dispatch={dispatch}
               />
             ))
         }
-        <Totals state={state} onPayout={onPayout} minWidth={minWidth}>
+        <PayoutFooter state={state} onPayout={onPayout} minWidth={minWidth}>
           {table.getFooterGroups().map(footerGroup => (
             <Box key={footerGroup.id} component="div" sx={{ py: 1.125, ...rowContainerSx }}>
               {footerGroup.headers.map(footer => {
                 const alignment = footer.column.columnDef.meta?.alignment;
                 const stickySx = getColumnStickySx(footer.column);
+                const context = { ...footer.getContext(), t };
                 return (
                   <Cell key={footer.id} align={alignment} sx={stickySx}>
                     <Typography fontWeight="bold">
-                      {flexRender(footer.column.columnDef.footer, footer.getContext())}
+                      {flexRender(footer.column.columnDef.footer, context)}
                     </Typography>
                   </Cell>
                 );
               })}
             </Box>
           ))}
-        </Totals>
+        </PayoutFooter>
       </Stack>
     </Stack >
   )
 }
 
-type TotalsProps = {
+type PayoutFooterProps = {
   state: State,
   onPayout: (valutaDate: string, accountIban: string) => void,
   minWidth?: number
 } & PropsWithChildren
 
-function Totals({ state, onPayout, minWidth, children }: TotalsProps) {
+function PayoutFooter({ state, onPayout, minWidth, children }: PayoutFooterProps) {
   const { t } = useTranslation();
   if (!(state.totals.open > 0)) {
     return;
@@ -657,10 +670,12 @@ type DashboardRowProps = {
   row: Row<EntryRow>
   onClick?: () => void
   containerSx: SxProps<Theme>
-  minWidth?: number
+  minWidth?: number,
+  dispatch: Dispatch<Action>
 }
 
-function EmployeeRow({ row, onClick, containerSx, minWidth }: DashboardRowProps) {
+function EmployeeRow({ row, onClick, containerSx, minWidth, dispatch }: DashboardRowProps) {
+  const { t } = useTranslation();
   let stackSx: SxProps<Theme> = {
     userSelect: "none",
     height: 40,
@@ -695,8 +710,8 @@ function EmployeeRow({ row, onClick, containerSx, minWidth }: DashboardRowProps)
           const cellContext = cell.getContext();
           const stickySx = getColumnStickySx(cell.column);
           return (
-            <Cell key={cell.id} tooltip={tooltip?.(cellContext)} align={alignment} sx={stickySx}>
-              {flexRender(cell.column.columnDef.cell, cellContext)}
+            <Cell key={cell.id} tooltip={tooltip?.(cellContext, t)} align={alignment} sx={stickySx}>
+              {flexRender(cell.column.columnDef.cell, { ...cellContext, dispatch, t })}
             </Cell>
           );
         })}
