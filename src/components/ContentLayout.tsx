@@ -7,7 +7,7 @@ type ContentLayoutProps = {
 	title: ReactNode | string,
 	disableInset?: boolean,
 	buttons?: ReactNode
-	stickyHeader?: boolean,
+	maxHeightContent?: boolean,
 } & PropsWithChildren;
 
 export function ContentLayout({
@@ -15,7 +15,7 @@ export function ContentLayout({
 	disableInset,
 	children,
 	buttons,
-	stickyHeader = false,
+	maxHeightContent = false,
 	...sxProps
 }: ContentLayoutProps) {
 	return (
@@ -28,8 +28,8 @@ export function ContentLayout({
 				...sxProps,
 			}}
 		>
-			<PageHeader title={defaultTitle} buttons={buttons} sticky={stickyHeader} />
-			<PageContent disableInset={disableInset}>{children}</PageContent>
+			<PageHeader title={defaultTitle} buttons={buttons} />
+			<PageContent disableInset={disableInset} maxHeightContent={maxHeightContent}>{children}</PageContent>
 		</Stack>
 	);
 }
@@ -38,14 +38,7 @@ type LoaderData = {
 	title: string
 };
 
-const stickyHeaderSx: SxProps<Theme> = {
-	backgroundColor: theme => theme.palette.background.default,
-	position: "sticky",
-	top: "var(--header-height)",
-	zIndex: 2
-}
-
-export function PageHeader({ title, buttons, sticky }) {
+export function PageHeader({ title, buttons }) {
 	const { t } = useTranslation();
 	const loaderData = useLoaderData() as LoaderData;
 	let headerTitle = title;
@@ -61,7 +54,6 @@ export function PageHeader({ title, buttons, sticky }) {
 			alignItems="start"
 			px="var(--content-inset)"
 			py={3}
-			sx={sticky ? stickyHeaderSx : {}}
 		>
 			{headerTitle}
 			{buttons}
@@ -82,7 +74,7 @@ export function PageHeaderTitle({ title, flex = undefined }: PageHeaderTitleProp
 	);
 }
 
-export function PageContent({ children, disableInset = false, ...sxProps }) {
+export function PageContent({ children, disableInset = false, maxHeightContent = false, ...sxProps }) {
 	const px = disableInset ? undefined : "var(--content-inset)";
 	const outlet = useOutlet();
 	return (
@@ -93,6 +85,7 @@ export function PageContent({ children, disableInset = false, ...sxProps }) {
 				minHeight: "100%",
 				width: "100%",
 				boxSizing: "border-box",
+				flex: maxHeightContent ? 1 : undefined,
 				...sxProps,
 			}}
 		>

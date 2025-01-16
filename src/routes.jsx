@@ -723,6 +723,7 @@ const routeData = [
 						children: [
 							{
 								index: true,
+								id: "payrunperiodview",
 								Component: PayrunDashboard,
 								action: async ({ params, request }) => {
 									const formData = await request.formData();

@@ -1,7 +1,19 @@
 import { useMemo } from "react";
 import { ThemeOptions, createTheme } from "@mui/material/styles";
 import { useLocalStorage } from "usehooks-ts";
-import { useMediaQuery } from "@mui/material";
+import { darken, lighten, useMediaQuery } from "@mui/material";
+
+declare module '@mui/material/styles' {
+  interface Palette {
+    selection: Palette['primary'];
+    selectionAttention: Palette['primary'];
+  }
+
+  interface PaletteOptions {
+    selection?: PaletteOptions['primary'];
+    selectionAttention: Palette['primary'];
+  }
+}
 
 declare module '@mui/material/Badge' {
   interface BadgePropsVariantOverrides {
@@ -48,6 +60,16 @@ const lightModeDesignTokens = {
       hover: "rgba(70, 30, 183, 0.05)",
       active: "rgba(70, 30, 183, 0.15)",
     },
+    selection: {
+      main: "#e3ddf4",
+      light: lighten("#e3ddf4", 0.3),
+      dark: darken("#e3ddf4", 0.05),
+    },
+    selectionAttention: {
+      main: "#fdf0e5",
+      light: lighten("#fdf0e5", 0.3),
+      dark: darken("#fdf0e5", 0.01),
+    },
     text: {
       secondary: "rgba(0, 0, 0, 0.4)",
       tertiary: "rgba(0, 0, 0, 0.3)"
@@ -75,6 +97,16 @@ const darkModeDesignTokens = {
       main: "#4985e2",
       hover: "rgba(73, 133, 226, 0.075)",
       active: "rgba(73, 133, 226, 0.15)",
+    },
+    selection: {
+      main: "#1a2331",
+      light: lighten("#1a2331", 0.05),
+      dark: darken("#1a2331", 0.15),
+    },
+    selectionAttention: {
+      main: "#352c1f",
+      light: lighten("#352c1f", 0.05),
+      dark: darken("#352c1f", 0.25),
     },
     text: {
       secondary: "rgba(255, 255, 255, 0.4)",
@@ -263,5 +295,3 @@ function getHashCode(s: string) {
   }
   return hash;
 }
-
-

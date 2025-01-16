@@ -10,6 +10,7 @@ export type PayrunPeriodEntry = {
   employerCost: number | null
   paidOut: number | null
   garnishment: number
+  retro: number
   open: number | null
   openBalancePreviousPeriod: number
   openGarnishmentPreviousPeriod: number

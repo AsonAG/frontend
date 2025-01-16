@@ -1,39 +1,52 @@
-import React, { Dispatch, Fragment, MouseEventHandler, useMemo, useReducer, useState } from "react";
+import React, { Dispatch, Fragment, MouseEventHandler, PropsWithChildren, useMemo, useReducer } from "react";
 import { Link, Outlet, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, Button, SxProps, Theme, Chip, Box, TextField, Divider, Dialog, DialogTitle, DialogContent } from "@mui/material";
+import { Stack, Typography, IconButton, Tooltip, Paper, SxProps, Theme, Chip, Box, TextField, Divider, styled, TypographyProps, TypographyVariant, BoxProps, Button } from "@mui/material";
 import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { CaseTask } from "../components/CaseTask";
 import { Employee } from "../models/Employee";
 import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
-import { PayrunPeriod, PayrunPeriodEntry } from "../models/PayrunPeriod";
-import dayjs, { Dayjs } from "dayjs";
+import { PayrunPeriodEntry } from "../models/PayrunPeriod";
 import { Payout } from "./Payouts";
-import { createColumnHelper, ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { CellContext, Column, createColumnHelper, ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { TFunction } from "i18next";
 import { AvailableCase } from "../models/AvailableCase";
 import { IdType } from "../models/IdType";
 import { NumericFormat } from "react-number-format";
-import { DatePicker } from "../components/DatePicker";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { expandedControllingTasks } from "../utils/dataAtoms";
 import { DashboardHeader } from "./DashboardHeader";
+import { columnVisibilityAtom, TableSettingsButton } from "./TableSettings";
+import { PayoutDialog } from "./PayoutDialog";
+import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
+import { formatValue, getRowGridSx, groupSeparator } from "./utils";
+import { useOpenAmountDetails } from "./useOpenAmountDetails";
 
 declare module '@tanstack/react-table' {
-  // @ts-ignore
-  interface ColumnMeta<_TData extends RowData, TValue> {
-    alignment: "left" | "center" | "right"
+  interface ColumnMeta<TData, TValue> {
+    alignment?: "left" | "center" | "right",
+    flex?: number,
+    tooltip?: (context: CellContext<TData, TValue>) => string | null,
+    headerTooltip?: string
+  }
+
+  interface TableMeta<TData> {
+    isOpen: boolean
+  }
+
+  interface TableState {
+    totals: any
   }
 }
+
 
 export function PayrunDashboard() {
   return (
     <>
-      <ContentLayout title={<DashboardHeader backlinkPath=".." />} stickyHeader>
-        <EmployeeTable />
+      <ContentLayout title={<DashboardHeader backlinkPath=".." />}>
+        <PayrunPeriodTable />
       </ContentLayout>
       <Outlet />
     </>
@@ -54,73 +67,172 @@ const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
 const columnHelper = createColumnHelper<EntryRow>();
 
 function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatch<Action>) {
+  function getWageTypeTooltipForPreviousValue(wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
+    if (!context.table.options.meta?.isOpen)
+      return null;
+    if (previousValueColumnName && context.table.getState().columnVisibility[previousValueColumnName])
+      return null;
+    const previousValue = formatValue(context.row.original.previousEntry?.[wageType]);
+    return `${t("Value from previous period")} ${previousValue ?? "-"}`;
+  }
   return [
+    columnHelper.accessor("identifier",
+      {
+        id: "identifier",
+        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+        header: t("Id"),
+        footer: t("Total"),
+        size: 150,
+        meta: {
+          flex: 1,
+          tooltip: (context) => !context.table.getState().columnVisibility.employee ? context.row.original.name : null
+        }
+      }),
     columnHelper.accessor(row => `${row.lastName} ${row.firstName}`,
       {
-        id: "employeeName",
-        cell: (props) => {
-          return (
-            <Typography key={props.row.id} noWrap>
-              <Tooltip title={props.row.original.identifier} placement="right">
-                <span>{props.getValue()}</span>
-              </Tooltip>
-            </Typography>
-          )
-        },
-        header: t("Employee"),
-        size: Number.MAX_SAFE_INTEGER
+        id: "employee",
+        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+        header: t("Name"),
+        footer: context => !context.table.getState().columnVisibility.identifier ? t("Total") : null,
+        size: 150,
+        meta: {
+          flex: 1,
+          tooltip: (context) => !context.table.getState().columnVisibility.identifier ? context.row.original.identifier : null
+        }
       }),
     columnHelper.accessor("entry.employerCost",
       {
-        cell: (props) => <Wage name="employerCost" entry={props.row.original} isOpen={props.table.options.meta.isOpen} t={t} />,
-        header: _ => <Tooltip title={t("Gross wage plus employer cost")}><span>{t("Total cost")}</span></Tooltip>,
-        size: 100,
+        id: "employerCost",
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+        header: t("Total cost"),
+        size: 110,
         meta: {
-          alignment: "right"
+          alignment: "right",
+          tooltip: (context) => getWageTypeTooltipForPreviousValue("employerCost", context),
+          headerTooltip: t("Gross wage plus employer cost")
+        }
+      }),
+    columnHelper.accessor("previousEntry.grossWage",
+      {
+        id: "grossPreviousPeriod",
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+        header: t("Gross PP"),
+        size: 110,
+        meta: {
+          alignment: "right",
+          headerTooltip: t("Difference gross to previous period")
+        }
+      }),
+    columnHelper.accessor(row => formatValue((row.entry?.grossWage ?? 0) - (row.previousEntry?.grossWage ?? 0)),
+      {
+        id: "grossDiff",
+        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+        header: t("Diff. gross"),
+        size: 110,
+        meta: {
+          alignment: "right",
+          headerTooltip: t("Difference gross to previous period")
         }
       }),
     columnHelper.accessor("entry.grossWage",
       {
-        cell: (props) => <HighlightedWageType name="grossWage" entry={props.row.original} isOpen={props.table.options.meta.isOpen} t={t} />,
+        cell: (props) => {
+          const { entry, previousEntry } = props.row.original;
+          const wage = entry?.["grossWage"];
+          const previousWage = previousEntry?.["grossWage"];
+          const isOpen = props.table.options.meta?.isOpen;
+          if (!isOpen || !wage || wage === previousWage) {
+            // no highlight
+            return <Typography noWrap>{formatValue(props.getValue())}</Typography>
+          }
+          const trendingUp = !previousWage || (wage > previousWage);
+
+          const Icon = trendingUp ? TrendingUp : TrendingDown;
+          const color = trendingUp ? "green" : "red";
+          return (
+            <>
+              <Icon fontSize="small" htmlColor={color} />
+              <Typography noWrap color={color}>{formatValue(props.getValue())}</Typography>
+            </>
+          )
+        },
         header: t("Gross"),
-        size: 100,
+        size: 110,
         meta: {
-          alignment: "right"
+          alignment: "right",
+          tooltip: (context) => getWageTypeTooltipForPreviousValue("grossWage", context, "grossPreviousPeriod")
         }
       }),
     columnHelper.accessor("entry.netWage",
       {
-        cell: (props) => <Wage name="netWage" entry={props.row.original} isOpen={props.table.options.meta.isOpen} t={t} />,
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
         header: t("Net"),
-        size: 100,
+        size: 110,
         meta: {
-          alignment: "right"
+          alignment: "right",
+          tooltip: (context) => getWageTypeTooltipForPreviousValue("netWage", context)
         }
       }),
     columnHelper.accessor("entry.offsetting",
       {
-        cell: (props) => <Wage name="offsetting" entry={props.row.original} isOpen={props.table.options.meta.isOpen} t={t} />,
-        header: _ => <Tooltip title={t("Offsetting")}><span>{t("OT")}</span></Tooltip>,
-        size: 100,
+        id: "offsetting",
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+        header: t("OT"),
+        size: 110,
         meta: {
-          alignment: "right"
+          alignment: "right",
+          tooltip: (context) => getWageTypeTooltipForPreviousValue("offsetting", context),
+          headerTooltip: t("Offsetting")
+        }
+      }),
+    columnHelper.accessor("entry.retro",
+      {
+        id: "retro",
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+        header: t("Retro"),
+        size: 110,
+        meta: {
+          alignment: "right",
+          tooltip: (context) => getWageTypeTooltipForPreviousValue("retro", context)
+        }
+      }),
+    columnHelper.accessor("entry.openGarnishmentPreviousPeriod",
+      {
+        id: "openGarnishmentPreviousPeriod",
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+        header: t("GPP"),
+        size: 110,
+        meta: {
+          alignment: "right",
+          headerTooltip: t("Garnishment from previous period")
         }
       }),
     columnHelper.accessor("entry.openBalancePreviousPeriod",
       {
-        id: "openPrevious",
-        cell: open => <Typography textAlign="right">{formatValue(open.getValue())}</Typography>,
-        header: _ => <Tooltip title={t("Open from previous period")}><span>{t("Open PP")}</span></Tooltip>,
-        size: 100,
+        id: "openPreviousPeriod",
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+        header: t("OPP"),
+        size: 110,
         meta: {
-          alignment: "right"
+          alignment: "right",
+          headerTooltip: t("Open from previous period")
         }
       }),
     columnHelper.accessor("entry.paidOut",
       {
-        cell: paid => <Typography textAlign="right">{formatValue(paid.getValue())}</Typography>,
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
         header: t("Paid"),
-        size: 100,
+        size: 110,
+        meta: {
+          alignment: "right"
+        }
+      }),
+    columnHelper.accessor("entry.garnishment",
+      {
+        id: "garnishment",
+        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+        header: t("Garnishment"),
+        size: 110,
         meta: {
           alignment: "right"
         }
@@ -128,9 +240,22 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
     columnHelper.accessor("entry.open",
       {
         id: "open",
-        cell: open => <Typography textAlign="right">{formatValue(open.getValue())}</Typography>,
+        cell: context => {
+          const { hasDetails, popover, openPopover, closePopover } = useOpenAmountDetails(context);
+          let value = formatValue(context.getValue());
+          if (value !== null) {
+            value = value + (hasDetails ? "*" : "")
+          }
+          return (
+            <>
+              <Typography onMouseOver={openPopover} onMouseLeave={closePopover}>{value}</Typography>
+              {popover}
+            </>
+          )
+        },
         header: t("Open"),
-        size: 100,
+        footer: (props) => formatValue(props.table.getState().totals.open),
+        size: 110,
         meta: {
           alignment: "right"
         }
@@ -150,7 +275,8 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
           return <AmountInput employee={props.row.original} dispatch={dispatch} onClick={onClick} />;
         },
         header: t("dashboard_payout_header"),
-        size: 86,
+        footer: (props) => formatValue(props.table.getState().totals.payingOut),
+        size: 110,
         meta: {
           alignment: "right"
         }
@@ -171,7 +297,10 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
           </Stack>
         )
       },
-      size: 35
+      size: 55,
+      meta: {
+        alignment: "center"
+      }
     }),
     columnHelper.display({
       id: "events",
@@ -187,26 +316,18 @@ function createColumns(t: TFunction<"translation", undefined>, dispatch: Dispatc
           </Stack>
         )
       },
-      size: 35
+      header: _ => <TableSettingsButton />,
+      size: 55,
+      meta: {
+        alignment: "center"
+      }
     })
   ];
 }
 
-type BankAccountDetails = {
-  iban: string | undefined
-  accountName: string | undefined
-}
 
-type LoaderData = {
-  employees: Array<Employee>
-  payrunPeriod: PayrunPeriod
-  previousPayrunPeriod: PayrunPeriod | undefined
-  controllingTasks: Array<Array<AvailableCase>>
-  caseValueCounts: Array<number>
-  bankAccountDetails: BankAccountDetails
-}
-
-type EntryRow = Employee & {
+export type EntryRow = Employee & {
+  name: string
   entry: PayrunPeriodEntry | undefined
   previousEntry: PayrunPeriodEntry | undefined
   amount: number | undefined
@@ -239,28 +360,64 @@ function createRowClickHandler(row: Row<EntryRow>, state: State, dispatch: Dispa
 }
 
 
-function getStickySx(position: { top?: number, bottom?: number }): SxProps<Theme> {
+function getColumnStickySx(column: Column<EntryRow>): SxProps<Theme> {
+  const pinned = column.getIsPinned();
+  const sx: SxProps<Theme> = { backgroundColor: "inherit" };
+  if (pinned === "left") {
+    const stickySx = getStickySx(10, { left: column.getStart() })
+    // if (column.getIsLastColumn('left')) {
+    //   console.log("last column left");
+    //   return {
+    //     borderRightStyle: "solid",
+    //     borderRightWidth: "thin",
+    //     borderRightColor: (theme) => theme.palette.divider,
+    //     ...stickySx
+    //   };
+    // }
+    return {
+      ...sx,
+      ...stickySx
+    };
+  }
+  if (pinned === "right") {
+    const stickySx = getStickySx(10, { right: column.getAfter() });
+    // if (column.getIsFirstColumn('right')) {
+    //   return {
+    //     borderLeftStyle: "solid",
+    //     borderLeftWidth: "thin",
+    //     borderLeftColor: (theme) => theme.palette.divider,
+    //     ...stickySx
+    //   };
+    // }
+    return {
+      ...sx,
+      ...stickySx
+    };
+  }
+  return sx;
+}
+
+function getStickySx(priority: number, position: { top?: number, bottom?: number, left?: number, right?: number }): SxProps<Theme> {
   return {
     ...position,
     position: "sticky",
-    backgroundColor: theme => theme.palette.background.default,
-    zIndex: 2
+    zIndex: priority
   }
 }
 
-function EmployeeTable() {
+function PayrunPeriodTable() {
   const { t } = useTranslation();
-  const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const [expanded, setExpanded] = useAtom(expandedControllingTasks);
   const isOpen = payrunPeriod.periodStatus === "Open";
   const employeeRows: Array<EntryRow> = useMemo(() => {
     function mapEmployee(employee: Employee, index: number): EntryRow {
       const entry = payrunPeriod?.entries?.find(entry => entry.employeeId === employee.id);
       const open = entry?.open ?? 0;
-
       return {
         ...employee,
         entry,
+        name: `${employee.firstName} ${employee.lastName}`,
         amount: open,
         previousEntry: previousPayrunPeriod?.entries?.find(entry => entry.employeeId == employee.id),
         controllingTasks: isOpen ? controllingTasks[index] : [],
@@ -278,6 +435,12 @@ function EmployeeTable() {
   );
   const { filtered, filter: mode } = state;
   const columns = useMemo(() => createColumns(t, dispatch), [dispatch, t]);
+  const configuredColumnVisibility = useAtomValue(columnVisibilityAtom);
+  const columnVisibility: VisibilityState = { ...configuredColumnVisibility, ...state.columnVisibility }
+  if (!isOpen) {
+    columnVisibility.open = false;
+    columnVisibility.amount = false
+  }
   const table = useReactTable({
     columns: columns,
     data: filtered,
@@ -286,11 +449,13 @@ function EmployeeTable() {
     },
     state: {
       expanded,
+      columnVisibility,
       rowSelection: state.selected,
-      columnVisibility: isOpen ? state.columnVisibility : {
-        "open": false,
-        "amount": false,
-      },
+      totals: state.totals,
+      columnPinning: {
+        left: ["identifier", "employee"],
+        right: ["open", "amount", "documents", "events"]
+      }
     },
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
@@ -316,60 +481,100 @@ function EmployeeTable() {
     submit(formData, { method: "post" });
   };
 
-  const rowContainerProps = getRowGridProps(table.getVisibleFlatColumns().map(col => col.getSize()));
+  const rowContainerSx = getRowGridSx(table.getVisibleFlatColumns().map(col => ({
+    width: col.getSize(),
+    flex: col.columnDef.meta?.flex
+  })));
+  const minWidth = table.getVisibleFlatColumns().map(col => col.getSize()).reduce((a, b) => a + b);
+  const stickyHeaderSx = getStickySx(50, { top: 0 });
+  const headerSx = { ...stickyHeaderSx, ...rowContainerSx };
   return (
     <Stack>
-      <Stack sx={getStickySx({ top: 149 })}>
-        <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
-          <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
-            <Chip icon={<FilterList />} variant={mode === "Payable" ? "filled" : "outlined"} sx={chipSx} onClick={() => { dispatch({ type: "toggle_mode", mode: "Payable" }) }} color="primary" />
-            <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL" }) }} color="primary" />
-            <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML" }) }} color="primary" />
-          </Stack>
+      <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
+        <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
+          <Chip icon={<FilterList />} variant={mode === "Payable" ? "filled" : "outlined"} sx={chipSx} onClick={() => { dispatch({ type: "toggle_mode", mode: "Payable" }) }} color="primary" />
+          <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL" }) }} color="primary" />
+          <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML" }) }} color="primary" />
         </Stack>
+      </Stack>
+      <Stack sx={{ overflow: "auto", height: "calc(100vh - 206px)" }}>
         {table.getHeaderGroups().map(headerGroup => (
-          <Box key={headerGroup.id} component="div" {...rowContainerProps} sx={{ px: 0.5, py: 1.125 }}>
+          <Box
+            key={headerGroup.id}
+            component="div"
+            sx={
+              {
+                py: 1.125,
+                ...headerSx,
+                backgroundColor: theme => theme.palette.background.default
+              }
+            }>
             {headerGroup.headers.map(header => {
-              const alignment = header.column.columnDef.meta?.alignment ?? "left";
-              return <Typography key={header.id} variant="h6" textAlign={alignment}>
-                {flexRender(
-                  header.column.columnDef.header,
-                  header.getContext())}
-              </Typography>;
+              const { headerTooltip, alignment } = (header.column.columnDef.meta || {});
+              return (
+                <Cell key={header.id} tooltip={headerTooltip} align={alignment} sx={getColumnStickySx(header.column)}>
+                  <Typography variant="h6" noWrap>
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </Typography>
+                </Cell>
+              );
             })}
           </Box>
         ))}
+        {
+          isOpen ?
+            groupRows(table.getRowModel().rows).map(group => (
+              <Fragment key={group.name}>
+                <Divider textAlign="left" sx={{ ...getStickySx(30, { top: 45, left: 0, right: 0 }), backgroundColor: theme => theme.palette.background.default }}>{t(group.name)}</Divider>
+                {group.rows.map(row =>
+                  <EmployeeRow
+                    key={row.id}
+                    row={row}
+                    onClick={createRowClickHandler(row, state, dispatch)}
+                    minWidth={minWidth}
+                    containerSx={rowContainerSx}
+                  />)}
+              </Fragment>
+            ))
+            :
+            table.getRowModel().rows.map(row => (
+              <EmployeeRow
+                key={row.id}
+                row={row}
+                minWidth={minWidth}
+                containerSx={rowContainerSx}
+              />
+            ))
+        }
+        <Totals state={state} onPayout={onPayout} minWidth={minWidth}>
+          {table.getFooterGroups().map(footerGroup => (
+            <Box key={footerGroup.id} component="div" sx={{ py: 1.125, ...rowContainerSx }}>
+              {footerGroup.headers.map(footer => {
+                const alignment = footer.column.columnDef.meta?.alignment;
+                const stickySx = getColumnStickySx(footer.column);
+                return (
+                  <Cell key={footer.id} align={alignment} sx={stickySx}>
+                    <Typography fontWeight="bold">
+                      {flexRender(footer.column.columnDef.footer, footer.getContext())}
+                    </Typography>
+                  </Cell>
+                );
+              })}
+            </Box>
+          ))}
+        </Totals>
       </Stack>
-      {
-        isOpen ?
-          groupRows(table.getRowModel().rows).map(group => (
-            <Fragment key={group.name}>
-              <Divider textAlign="left" sx={getStickySx({ top: 227 })}>{t(group.name)}</Divider>
-              {group.rows.map(row =>
-                <EmployeeRow
-                  key={row.id}
-                  row={row}
-                  onClick={createRowClickHandler(row, state, dispatch)}
-                  containerProps={rowContainerProps}
-                />)}
-            </Fragment>
-          ))
-          :
-          table.getRowModel().rows.map(row => (
-            <EmployeeRow
-              key={row.id}
-              row={row}
-              onClick={createRowClickHandler(row, state, dispatch)}
-              containerProps={rowContainerProps}
-            />
-          ))
-      }
-      <TotalsRow state={state} onPayout={onPayout} containerProps={rowContainerProps} />
-    </Stack>
+    </Stack >
   )
 }
 
-function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout: (valutaDate: string, accountIban: string) => void, containerProps: Object }) {
+type TotalsProps = {
+  state: State,
+  onPayout: (valutaDate: string, accountIban: string) => void,
+  minWidth?: number
+} & PropsWithChildren
+
+function Totals({ state, onPayout, minWidth, children }: TotalsProps) {
   const { t } = useTranslation();
   if (!(state.totals.open > 0)) {
     return;
@@ -378,26 +583,28 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
     <Stack
       spacing={2}
       sx={{
-        ...getStickySx({ bottom: 0 }),
-        pl: 0.5,
+        minWidth,
+        ...getStickySx(40, { bottom: 0 }),
         py: 2,
         borderTop: 1,
-        borderColor: theme => theme.palette.divider
+        borderColor: theme => theme.palette.divider,
+        backgroundColor: theme => theme.palette.background.default
       }}
     >
-      <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} {...containerProps} >
-        <Typography fontWeight="bold" >{t("Total")}</Typography>
-        <Typography fontWeight="bold" textAlign="right" ></Typography>
-        <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.gross)}</Typography>
-        <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.net)}</Typography>
-        <Typography fontWeight="bold" textAlign="right" ></Typography>
-        <Typography fontWeight="bold" textAlign="right" ></Typography>
-        <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.paidOut)}</Typography>
-        <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.open)}</Typography>
-        <Typography fontWeight="bold" textAlign="right" >{formatValue(state.totals.payingOut)}</Typography>
-      </Stack>
+      {children}
       <Stack direction="row" justifyContent="end">
-        <PayoutDialog state={state} onPayout={onPayout} />
+        <PayoutDialog
+          amount={state.totals.payingOut}
+          employeeCount={Object.values(state.selected).filter(Boolean).length}
+          onPayout={onPayout}>
+          <Button variant="contained" disabled={state.totals.payingOut === 0} sx={getStickySx(40, { right: 0 })}>
+            <Stack direction="row">
+              <span>{t("Payout")}:&nbsp;</span>
+              <span>{formatValue(state.totals.payingOut)}</span>
+              <span>&nbsp;CHF</span>
+            </Stack>
+          </Button>
+        </PayoutDialog>
       </Stack>
     </Stack>
   )
@@ -406,62 +613,6 @@ function TotalsRow({ state, onPayout, containerProps }: { state: State, onPayout
 type RowGroup = {
   name: string
   rows: Array<Row<EntryRow>>
-}
-
-function PayoutDialog({ state, onPayout }: { state: State, onPayout: (valutaDate: string, accountIban: string) => void }) {
-  const { t } = useTranslation();
-  const { bankAccountDetails } = useRouteLoaderData("payrunperiod") as LoaderData;
-  const [open, setOpen] = useState<boolean>(false);
-  const [valueDate, setValueDate] = useState<Dayjs | null>(dayjs());
-  const [valueDateValid, setValueDateValid] = useState<boolean>(true);
-  const [bankAccount, setBankAccount] = useState<BankAccountDetails>(bankAccountDetails)
-
-  const handleOpen = () => {
-    setOpen(true);
-  }
-
-  const handleClose = () => {
-    setOpen(false);
-  }
-
-  return (
-    <>
-      <Button variant="contained" disabled={state.totals.payingOut === 0} onClick={handleOpen}>
-        <Stack direction="row">
-          <span>{t("Payout")}:&nbsp;</span>
-          <span>{formatValue(state.totals.payingOut)}</span>
-          <span>&nbsp;CHF</span>
-        </Stack>
-      </Button>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{t("Payout")}</DialogTitle>
-        <DialogContent sx={{ width: "90vw", maxWidth: 500 }}>
-          <Stack spacing={2}>
-            <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
-              <Typography>{t("Employee number")}</Typography>
-              <Typography fontWeight="bold">{Object.values(state.selected).filter(Boolean).length}</Typography>
-            </Box>
-            <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
-              <Typography>{t("Amount")}</Typography>
-              <Typography fontWeight="bold">{formatValue(state.totals.payingOut)} CHF</Typography>
-            </Box>
-            <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
-              <Typography>{t("Bank account")}</Typography>
-              <BankAccountSelector bankAccount={bankAccount} />
-            </Box>
-            <Box {...getRowGridProps([120, Number.MAX_SAFE_INTEGER])}>
-              <Typography>{t("Value date")}</Typography>
-              <DatePicker variant="standard" disablePast value={valueDate} onChange={(v) => setValueDate(v)} onError={(e) => setValueDateValid(!e)}></DatePicker>
-            </Box>
-            <Stack direction="row" justifyContent="end" spacing={2}>
-              <Button onClick={handleClose}>{t("Cancel")}</Button>
-              <Button disabled={!valueDate || !valueDateValid || !bankAccount?.iban} variant="contained" onClick={() => onPayout(valueDate!.toISOString(), bankAccount.iban!)}>{t("Confirm")}</Button>
-            </Stack>
-          </Stack>
-        </DialogContent>
-      </Dialog>
-    </>
-  )
 }
 
 function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
@@ -504,102 +655,78 @@ function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
 
 type DashboardRowProps = {
   row: Row<EntryRow>
-  onClick: () => void
-  containerProps: Object
+  onClick?: () => void
+  containerSx: SxProps<Theme>
+  minWidth?: number
 }
 
-function EmployeeRow({ row, onClick, containerProps }: DashboardRowProps) {
+function EmployeeRow({ row, onClick, containerSx, minWidth }: DashboardRowProps) {
   let stackSx: SxProps<Theme> = {
-    p: 0.5,
     userSelect: "none",
-    height: 40
+    height: 40,
+    backgroundColor: (theme: Theme) => theme.palette.background.default
   };
   if (row.getCanSelect()) {
     stackSx["&:hover"] = {
-      backgroundColor: (theme: Theme) => theme.palette.primary.hover,
+      backgroundColor: (theme: Theme) => theme.palette.selection[row.getIsSelected() ? "light" : "dark"],
       cursor: "pointer"
     };
     if (row.getIsSelected()) {
-      stackSx.backgroundColor = (theme: Theme) => `${theme.palette.primary.active} !important`
+      stackSx.backgroundColor = (theme: Theme) => theme.palette.selection.main;
     };
   }
   if (row.getCanExpand()) {
     stackSx["&:hover"] = {
-      backgroundColor: (theme: Theme) => `rgba(${theme.palette.warning.mainChannel} / 0.03)`,
+      backgroundColor: (theme: Theme) => theme.palette.selectionAttention[row.getIsExpanded() ? "light" : "dark"],
       cursor: "pointer"
     };
     if (row.getIsExpanded()) {
-      stackSx.backgroundColor = (theme: Theme) => `rgba(${theme.palette.warning.mainChannel} / 0.05) !important`;
+      stackSx.backgroundColor = (theme: Theme) => theme.palette.selectionAttention.main;
     };
   }
+  const rowSx: SxProps<Theme> = { ...stackSx, ...containerSx };
   const elevation = row.getCanExpand() && row.getIsExpanded() ? 1 : 0;
   const visibleCells = row.getVisibleCells();
   return (
-    <Stack component={Paper} elevation={elevation} sx={{ transition: "none" }}>
-      <Box component="div" sx={stackSx} onClick={onClick} {...containerProps}>
-        {visibleCells.map((cell) => flexRender(cell.column.columnDef.cell, { ...cell.getContext(), key: cell.id }))}
+    <Stack component={Paper} elevation={elevation} sx={{ transition: "none", minWidth }}>
+      <Box component="div" sx={rowSx} onClick={onClick}>
+        {visibleCells.map((cell) => {
+          const { tooltip, alignment } = (cell.column.columnDef.meta || {});
+          const cellContext = cell.getContext();
+          const stickySx = getColumnStickySx(cell.column);
+          return (
+            <Cell key={cell.id} tooltip={tooltip?.(cellContext)} align={alignment} sx={stickySx}>
+              {flexRender(cell.column.columnDef.cell, cellContext)}
+            </Cell>
+          );
+        })}
       </Box>
       {row.getIsExpanded() &&
-        <Stack>
-          {row.original.controllingTasks?.map(task => <CaseTask key={task.name} _case={task} objectId={row.original.id} type="P" />)}
-        </Stack>
+        <>
+          {row.original.controllingTasks?.map(task => <CaseTask key={task.name} _case={task} objectId={row.original.id} type="P" stackSx={caseTaskSx} />)}
+        </>
       }
     </Stack >
   );
 }
 
-export function getRowGridProps(columnSizes: Array<number>) {
-  const templateColumns = columnSizes.map(size => {
-    if (size === Number.MAX_SAFE_INTEGER) {
-      return "1fr"
-    }
-    return size + "px";
-  }).join(" ");
-  return {
-    display: "grid",
-    gap: 2,
-    gridTemplateColumns: templateColumns,
-    gridTemplateRows: "auto",
-    alignItems: "center"
-  }
-}
+const caseTaskSx = getStickySx(10, { left: 0 });
 
-type WageProps = {
-  name: string
-  entry: EntryRow
-  isOpen: boolean,
-  t: TFunction<"translation", undefined>
-  typoSx?: SxProps<Theme>
-  icon?: React.ReactNode
-}
-function Wage({ name, entry, isOpen, typoSx, icon, t }: WageProps) {
-  const sx = { ...typoSx, display: "flex", alignItems: "center", justifyContent: "right", gap: 1 };
-  const wage = formatValue(entry.entry?.[name]);
-  if (!isOpen) {
-    return <Typography sx={sx}>{icon}{wage}</Typography>;
-  }
-  const previousWage = formatValue(entry.previousEntry?.[name]);
+type CellProps = {
+  tooltip?: string | null | undefined
+  color?: string
+  align?: "left" | "center" | "right"
+  sx?: SxProps<Theme>
+} & PropsWithChildren
 
+function Cell({ color, align, tooltip, sx, children }: CellProps) {
   return (
-    <Tooltip title={`${t("Value from previous period")} ${previousWage ?? "-"}`}>
-      <Typography sx={sx}>{icon}{wage}</Typography>
+    <Tooltip title={tooltip}>
+      <Box display="flex" color={color} justifyContent={align} alignItems="center" gap={0.5} minWidth={0} px={0.5} sx={sx}>
+        {children}
+      </Box>
     </Tooltip>
-  )
-}
-
-function HighlightedWageType(props: WageProps) {
-  const { name, entry } = props;
-  const wage = entry.entry?.[name];
-  const previousWage = entry.previousEntry?.[name];
-  if (!props.isOpen || !wage || wage === previousWage) {
-    // no highlight
-    return <Wage {...props} />
-  }
-  const trendingUp = !previousWage || (wage > previousWage);
-
-  const Icon = trendingUp ? TrendingUp : TrendingDown;
-  const color = trendingUp ? "green" : "red";
-  return <Wage {...props} icon={<Icon fontSize="small" />} typoSx={{ color }} />;
+  );
 }
 
 type FilterMode = "All" | "ML" | "SL" | "Payable";
@@ -616,7 +743,7 @@ type State = {
     gross: number
     net: number
     offsetting: number
-    openPrevious: number
+    openPreviousPeriod: number
     open: number
     paidOut: number
     payingOut: number
@@ -708,7 +835,7 @@ function getTotals(employees: Array<EntryRow>, selected: RowSelectionState) {
     offsetting: 0,
     paidOut: 0,
     open: 0,
-    openPrevious: 0,
+    openPreviousPeriod: 0,
     payingOut: 0
   }
 
@@ -741,14 +868,6 @@ function createInitialState(employeeRows: Array<EntryRow>): State {
   };
 }
 
-const formatter = new Intl.NumberFormat("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const parts = formatter.formatToParts(1000);
-const groupSeparator = parts.find(p => p.type === "group")?.value;
-function formatValue(value: number | null | undefined) {
-  if (!value)
-    return null;
-  return formatter.format(value);
-}
 const hasControllingTasks = (employee: EntryRow) => (employee.controllingTasks?.length ?? 0) > 0;
 const hasOpenAmount = (employee: EntryRow) => ((employee.entry?.netWage ?? 0) - (employee.entry?.paidOut ?? 0)) > 0;
 const isRowSelectionEnabled = (row: EntryRow) => !hasControllingTasks(row) && hasOpenAmount(row);
@@ -793,27 +912,4 @@ export function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
       }}
     />
   );
-}
-
-function BankAccountSelector({ bankAccount }: { bankAccount: BankAccountDetails }) {
-  return (
-    <Stack direction="row" alignItems="center" spacing={1} sx={{
-      userSelect: "none",
-      px: 1,
-      borderStyle: "solid",
-      borderWidth: 1,
-      borderRadius: 1,
-      borderColor: theme => `rgba(${theme.vars.palette.common.onBackgroundChannel} / 0.23)`,
-      // cursor: "pointer",
-      // "&:hover": {
-      //   borderColor: theme => theme.palette.text.primary
-      // }
-    }}>
-      <AccountBalanceIcon />
-      <Stack>
-        <Typography variant="subtitle2">{bankAccount.accountName}</Typography>
-        <Typography variant="body2">{bankAccount.iban}</Typography>
-      </Stack>
-    </Stack>
-  )
 }

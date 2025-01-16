@@ -8,8 +8,8 @@ import { Cancel, ChevronLeft, Download } from "@mui/icons-material";
 import { PayrunPeriod } from "../models/PayrunPeriod";
 import { Employee } from "../models/Employee";
 import { IdType } from "../models/IdType";
-import { getRowGridProps } from "./Dashboard";
 import { requestPainFileDownload } from "../api/FetchClient";
+import { getRowGridSx } from "./utils";
 
 export type Payout = {
   id: IdType
@@ -39,7 +39,7 @@ export function Payouts() {
       <ContentLayout title={<PeriodSection />}>
         <Typography variant="h6">{t("Payouts")}</Typography>
         <Stack>
-          <Box {...rowGridProps}>
+          <Box sx={defaultSx}>
             <Typography fontWeight="bold">{t("Bank account")}</Typography>
             <Typography fontWeight="bold">{t("Amount")}</Typography>
             <Typography fontWeight="bold">{t("Employees")}</Typography>
@@ -58,8 +58,9 @@ export function Payouts() {
 }
 
 
-const rowGridProps = getRowGridProps([200, 150, Number.MAX_SAFE_INTEGER, 75, 80])
+const defaultSx = getRowGridSx([{ width: 200 }, { width: 150 }, { width: 150, flex: 1 }, { width: 75, }, { width: 80 }], 2)
 const inactiveSx: SxProps<Theme> = {
+  ...defaultSx,
   textDecoration: "line-through",
   backgroundColor: theme => theme.palette.action.disabledBackground
 }
@@ -73,10 +74,9 @@ function PayoutSection({ payout, onCancel }: { payout: Payout, onCancel: () => v
     await requestPainFileDownload({ ...params, payrunPeriodId: payrunPeriod.id, payoutId: payout.id }, getPayoutFileName(payout));
   }
   const isCancelled = payout.status === "Inactive";
-  const sx = isCancelled ? inactiveSx : {};
   return (
     <Tooltip title={isCancelled ? t("Cancelled") : null} followCursor>
-      <Box {...rowGridProps} sx={sx}>
+      <Box sx={isCancelled ? inactiveSx : defaultSx}>
         <Typography>{payout.accountIban}</Typography>
         <Typography fontWeight="bold">{formatValue(total)} CHF</Typography>
         <Typography variant="subtitle1">{payout.entries.length}</Typography>

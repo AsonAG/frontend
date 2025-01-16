@@ -12,7 +12,7 @@ type LoaderData = {
 }
 
 export function PeriodDocuments() {
-  const { payrunPeriod } = useLoaderData() as LoaderData;
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
   return (
     <>
       {payrunPeriod.documents?.map(doc => (
@@ -25,8 +25,8 @@ export function PeriodDocuments() {
 }
 function WageStatementSection() {
   const { t } = useTranslation();
-  const { employees } = useRouteLoaderData("payrunperiod") as LoaderData;
-  const { payrunPeriod } = useLoaderData() as LoaderData;
+  const { payrunPeriod, employees } = useRouteLoaderData("payrunperiod") as LoaderData;
+  // const { payrunPeriod } = useLoaderData() as LoaderData;
   const [open, setOpen] = useState(false);
   const entriesMap = useMemo(() => new Map(payrunPeriod.entries.map(e => [e.employeeId, e])), [payrunPeriod.entries]);
   const wageStatements = employees.map(employee => {
