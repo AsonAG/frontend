@@ -44,7 +44,8 @@ declare module '@tanstack/react-table' {
   }
 
   interface TableState {
-    totals: any
+    periodTotals: PeriodTotals
+    payoutTotals: PayoutTotals
   }
 }
 
@@ -82,55 +83,82 @@ function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefine
   return `${t("Value from previous period")} ${previousValue ?? "-"}`;
 }
 
+type PeriodTotals = {
+  employees: number
+  gross: number
+  previousGross: number
+  net: number
+  employerCost: number
+  open: number
+}
+
 function createColumns() {
   return [
-    columnHelper.accessor("identifier",
-      {
-        id: "identifier",
-        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-        header: ({ t }) => t("Id"),
-        footer: ({ t }) => t("Total"),
-        size: 150,
-        meta: {
-          flex: 1,
-          tooltip: (context) => !context.table.getState().columnVisibility.employee ? context.row.original.name : null
-        }
-      }),
-    columnHelper.accessor(row => `${row.lastName} ${row.firstName}`,
-      {
-        id: "employee",
-        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-        header: ({ t }) => t("Name"),
-        footer: ({ table, t }) => !table.getState().columnVisibility.identifier ? t("Total") : null,
-        size: 150,
-        meta: {
-          flex: 1,
-          tooltip: (context) => !context.table.getState().columnVisibility.identifier ? context.row.original.identifier : null
-        }
-      }),
-    columnHelper.accessor("entry.employerCost",
-      {
-        id: "employerCost",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Total cost"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "employerCost", context),
-          headerTooltip: t => t("Gross wage plus employer cost")
-        }
-      }),
-    columnHelper.accessor("previousEntry.grossWage",
-      {
-        id: "grossPreviousPeriod",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Gross PP"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: t => t("Difference gross to previous period")
-        }
-      }),
+    columnHelper.group({
+      id: "employeeTotal",
+      header: ({ table, t }) => `${table.getRowCount()} ${t("Employees")}`,
+      columns: [
+        columnHelper.accessor("identifier",
+          {
+            id: "identifier",
+            cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+            header: ({ t }) => t("Id"),
+            footer: ({ t }) => t("Total"),
+            size: 150,
+            meta: {
+              flex: 1,
+              tooltip: (context) => !context.table.getState().columnVisibility.employee ? context.row.original.name : null
+            }
+          }),
+        columnHelper.accessor(row => `${row.lastName} ${row.firstName}`,
+          {
+            id: "employee",
+            cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+            header: ({ t }) => t("Name"),
+            footer: ({ table, t }) => !table.getState().columnVisibility.identifier ? t("Total") : null,
+            size: 150,
+            meta: {
+              flex: 1,
+              tooltip: (context) => !context.table.getState().columnVisibility.identifier ? context.row.original.identifier : null
+            }
+          }),
+      ]
+    }),
+    columnHelper.group({
+      id: "employerCostTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.employerCost),
+      columns: [
+        columnHelper.accessor("entry.employerCost",
+          {
+            id: "employerCost",
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("Total cost"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "employerCost", context),
+              headerTooltip: t => t("Gross wage plus employer cost")
+            }
+          }),
+      ]
+    }),
+    columnHelper.group({
+      id: "previousGrossWageTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.previousGross),
+      columns: [
+        columnHelper.accessor("previousEntry.grossWage",
+          {
+            id: "grossPreviousPeriod",
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("Gross PP"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              headerTooltip: t => t("Difference gross to previous period")
+            }
+          }),
+      ]
+    }),
     columnHelper.accessor(row => formatValue((row.entry?.grossWage ?? 0) - (row.previousEntry?.grossWage ?? 0)),
       {
         id: "grossDiff",
@@ -142,45 +170,57 @@ function createColumns() {
           headerTooltip: t => t("Difference gross to previous period")
         }
       }),
-    columnHelper.accessor("entry.grossWage",
-      {
-        cell: (props) => {
-          const { entry, previousEntry } = props.row.original;
-          const wage = entry?.["grossWage"];
-          const previousWage = previousEntry?.["grossWage"];
-          const isOpen = props.table.options.meta?.isOpen;
-          if (!isOpen || !wage || wage === previousWage) {
-            // no highlight
-            return <Typography noWrap>{formatValue(props.getValue())}</Typography>
-          }
-          const trendingUp = !previousWage || (wage > previousWage);
+    columnHelper.group({
+      id: "grossWageTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.gross),
+      columns: [
+        columnHelper.accessor("entry.grossWage",
+          {
+            cell: (props) => {
+              const { entry, previousEntry } = props.row.original;
+              const wage = entry?.["grossWage"];
+              const previousWage = previousEntry?.["grossWage"];
+              const isOpen = props.table.options.meta?.isOpen;
+              if (!isOpen || !wage || wage === previousWage) {
+                // no highlight
+                return <Typography noWrap>{formatValue(props.getValue())}</Typography>
+              }
+              const trendingUp = !previousWage || (wage > previousWage);
 
-          const Icon = trendingUp ? TrendingUp : TrendingDown;
-          const color = trendingUp ? "green" : "red";
-          return (
-            <>
-              <Icon fontSize="small" htmlColor={color} />
-              <Typography noWrap color={color}>{formatValue(props.getValue())}</Typography>
-            </>
-          )
-        },
-        header: ({ t }) => t("Gross"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "grossWage", context, "grossPreviousPeriod")
-        }
-      }),
-    columnHelper.accessor("entry.netWage",
-      {
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Net"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "netWage", context)
-        }
-      }),
+              const Icon = trendingUp ? TrendingUp : TrendingDown;
+              const color = trendingUp ? "green" : "red";
+              return (
+                <>
+                  <Icon fontSize="small" htmlColor={color} />
+                  <Typography noWrap color={color}>{formatValue(props.getValue())}</Typography>
+                </>
+              )
+            },
+            header: ({ t }) => t("Gross"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "grossWage", context, "grossPreviousPeriod")
+            }
+          }),
+      ]
+    }),
+    columnHelper.group({
+      id: "netWageTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.net),
+      columns: [
+        columnHelper.accessor("entry.netWage",
+          {
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("Net"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "netWage", context)
+            }
+          }),
+      ]
+    }),
     columnHelper.accessor("entry.offsetting",
       {
         id: "offsetting",
@@ -245,29 +285,35 @@ function createColumns() {
           alignment: "right"
         }
       }),
-    columnHelper.accessor("entry.open",
-      {
-        id: "open",
-        cell: context => {
-          const { hasDetails, popover, openPopover, closePopover } = useOpenAmountDetails(context);
-          let value = formatValue(context.getValue());
-          if (value !== null) {
-            value = value + (hasDetails ? "*" : "")
-          }
-          return (
-            <>
-              <Typography onMouseOver={openPopover} onMouseLeave={closePopover}>{value}</Typography>
-              {popover}
-            </>
-          )
-        },
-        header: ({ t }) => t("Open"),
-        footer: (props) => formatValue(props.table.getState().totals.open),
-        size: 110,
-        meta: {
-          alignment: "right"
-        }
-      }),
+    columnHelper.group({
+      id: "openTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.open),
+      columns: [
+        columnHelper.accessor("entry.open",
+          {
+            id: "open",
+            cell: context => {
+              const { hasDetails, popover, openPopover, closePopover } = useOpenAmountDetails(context);
+              let value = formatValue(context.getValue());
+              if (value !== null) {
+                value = value + (hasDetails ? "*" : "")
+              }
+              return (
+                <>
+                  <Typography onMouseOver={openPopover} onMouseLeave={closePopover}>{value}</Typography>
+                  {popover}
+                </>
+              )
+            },
+            header: ({ t }) => t("Open"),
+            footer: (props) => formatValue(props.table.getState().payoutTotals.open),
+            size: 110,
+            meta: {
+              alignment: "right"
+            }
+          }),
+      ]
+    }),
     columnHelper.accessor("amount",
       {
         id: "amount",
@@ -283,7 +329,7 @@ function createColumns() {
           return <AmountInput employee={row.original} dispatch={dispatch} onClick={onClick} />;
         },
         header: ({ t }) => t("dashboard_payout_header"),
-        footer: (props) => formatValue(props.table.getState().totals.payingOut),
+        footer: (props) => formatValue(props.table.getState().payoutTotals.payingOut),
         size: 110,
         meta: {
           alignment: "right"
@@ -437,6 +483,27 @@ function PayrunPeriodTable() {
     return employees.map(mapEmployee);
   }, [employees, payrunPeriod?.entries]);
 
+  const periodTotals: PeriodTotals = useMemo(() => {
+    let totals = {
+      employees: employees.length,
+      previousGross: 0,
+      gross: 0,
+      net: 0,
+      open: 0,
+      employerCost: 0
+    };
+
+    for (let employee of employeeRows) {
+      const entry = employee.entry;
+      totals.previousGross += employee.previousEntry?.grossWage ?? 0;
+      totals.gross += entry?.grossWage ?? 0;
+      totals.net += entry?.netWage ?? 0;
+      totals.open += entry?.open ?? 0;
+      totals.employerCost += entry?.employerCost ?? 0;
+    }
+    return totals;
+  }, [employeeRows, payrunPeriod?.entries])
+
 
   const [state, dispatch] = useReducer(
     reducer,
@@ -458,9 +525,10 @@ function PayrunPeriodTable() {
     },
     state: {
       expanded,
+      periodTotals,
+      payoutTotals: state.payoutTotals,
       columnVisibility,
       rowSelection: state.selected,
-      totals: state.totals,
       columnPinning: {
         left: ["identifier", "employee"],
         right: ["open", "amount", "documents", "events"]
@@ -490,11 +558,11 @@ function PayrunPeriodTable() {
     submit(formData, { method: "post" });
   };
 
-  const rowContainerSx = getRowGridSx(table.getVisibleFlatColumns().map(col => ({
+  const rowContainerSx = getRowGridSx(table.getVisibleLeafColumns().map(col => ({
     width: col.getSize(),
     flex: col.columnDef.meta?.flex
   })));
-  const minWidth = table.getVisibleFlatColumns().map(col => col.getSize()).reduce((a, b) => a + b);
+  const minWidth = table.getTotalSize();
   const stickyHeaderSx = getStickySx(50, { top: 0 });
   const headerSx = { ...stickyHeaderSx, ...rowContainerSx };
   return (
@@ -519,11 +587,16 @@ function PayrunPeriodTable() {
               }
             }>
             {headerGroup.headers.map(header => {
-              const { headerTooltip, alignment } = (header.column.columnDef.meta || {});
+              if (header.isPlaceholder)
+                return <div></div>;
+              const baseColumn = header.getLeafHeaders()[0].column;
+              const alignment = baseColumn.columnDef.meta?.alignment;
+              const headerTooltip = header.column.columnDef.meta?.headerTooltip;
               const context = { ...header.getContext(), t };
+              const variant = headerGroup.depth !== 0 ? "h6" : undefined;
               return (
-                <Cell key={header.id} tooltip={headerTooltip?.(t)} align={alignment} sx={getColumnStickySx(header.column)}>
-                  <Typography variant="h6" noWrap>
+                <Cell key={header.id} tooltip={headerTooltip?.(t)} align={alignment} sx={{ ...getColumnStickySx(baseColumn), gridColumn: `span ${header.colSpan}` }}>
+                  <Typography variant={variant} noWrap>
                     {flexRender(header.column.columnDef.header, context)}
                   </Typography>
                 </Cell>
@@ -558,40 +631,45 @@ function PayrunPeriodTable() {
               />
             ))
         }
-        <PayoutFooter state={state} onPayout={onPayout} minWidth={minWidth}>
-          {table.getFooterGroups().map(footerGroup => (
-            <Box key={footerGroup.id} component="div" sx={{ py: 1.125, ...rowContainerSx }}>
-              {footerGroup.headers.map(footer => {
-                const alignment = footer.column.columnDef.meta?.alignment;
-                const stickySx = getColumnStickySx(footer.column);
-                const context = { ...footer.getContext(), t };
-                return (
-                  <Cell key={footer.id} align={alignment} sx={stickySx}>
-                    <Typography fontWeight="bold">
-                      {flexRender(footer.column.columnDef.footer, context)}
-                    </Typography>
-                  </Cell>
-                );
-              })}
-            </Box>
-          ))}
-        </PayoutFooter>
+        {
+          periodTotals.open > 0 && (state.mode === "payout") &&
+          <PayoutFooter employeeCount={Object.values(state.selected).filter(Boolean).length} totalPayingOut={state.payoutTotals.payingOut} onPayout={onPayout} minWidth={minWidth}>
+            {table.getFooterGroups().map(footerGroup => {
+              if (footerGroup.depth === 0)
+                return;
+              return (
+                <Box key={footerGroup.id} component="div" sx={{ py: 1.125, ...rowContainerSx }}>
+                  {footerGroup.headers.map(footer => {
+                    const alignment = footer.column.columnDef.meta?.alignment;
+                    const stickySx = getColumnStickySx(footer.column);
+                    const context = { ...footer.getContext(), t };
+                    return (
+                      <Cell key={footer.id} align={alignment} sx={stickySx}>
+                        <Typography fontWeight="bold">
+                          {flexRender(footer.column.columnDef.footer, context)}
+                        </Typography>
+                      </Cell>
+                    );
+                  })}
+                </Box>
+              );
+            })}
+          </PayoutFooter>
+        }
       </Stack>
     </Stack >
   )
 }
 
 type PayoutFooterProps = {
-  state: State,
+  employeeCount: number
+  totalPayingOut: number
   onPayout: (valutaDate: string, accountIban: string) => void,
   minWidth?: number
 } & PropsWithChildren
 
-function PayoutFooter({ state, onPayout, minWidth, children }: PayoutFooterProps) {
+function PayoutFooter({ employeeCount, totalPayingOut, onPayout, minWidth, children }: PayoutFooterProps) {
   const { t } = useTranslation();
-  if (!(state.totals.open > 0)) {
-    return;
-  }
   return (
     <Stack
       spacing={2}
@@ -607,13 +685,13 @@ function PayoutFooter({ state, onPayout, minWidth, children }: PayoutFooterProps
       {children}
       <Stack direction="row" justifyContent="end">
         <PayoutDialog
-          amount={state.totals.payingOut}
-          employeeCount={Object.values(state.selected).filter(Boolean).length}
+          amount={totalPayingOut}
+          employeeCount={employeeCount}
           onPayout={onPayout}>
-          <Button variant="contained" disabled={state.totals.payingOut === 0} sx={getStickySx(40, { right: 0 })}>
+          <Button variant="contained" disabled={totalPayingOut === 0} sx={getStickySx(40, { right: 0 })}>
             <Stack direction="row">
               <span>{t("Payout")}:&nbsp;</span>
-              <span>{formatValue(state.totals.payingOut)}</span>
+              <span>{formatValue(totalPayingOut)}</span>
               <span>&nbsp;CHF</span>
             </Stack>
           </Button>
@@ -746,6 +824,11 @@ function Cell({ color, align, tooltip, sx, children }: CellProps) {
 
 type FilterMode = "All" | "ML" | "SL" | "Payable";
 
+type PayoutTotals = {
+  open: number
+  payingOut: number
+}
+
 type State = {
   employees: Array<EntryRow>
   filtered: Array<EntryRow>
@@ -754,15 +837,7 @@ type State = {
   columnVisibility: VisibilityState
   filter: FilterMode
   mode: "view" | "payout"
-  totals: {
-    gross: number
-    net: number
-    offsetting: number
-    openPreviousPeriod: number
-    open: number
-    paidOut: number
-    payingOut: number
-  }
+  payoutTotals: PayoutTotals
 }
 
 type Action = {
@@ -834,7 +909,7 @@ function reducer(state: State, action: Action): State {
     }
   }
   let stateAfterAction = applyAction();
-  stateAfterAction.totals = getTotals(stateAfterAction.employees, stateAfterAction.selected);
+  stateAfterAction.payoutTotals = getPayoutTotals(stateAfterAction.employees, stateAfterAction.selected);
   stateAfterAction.mode = Object.values(stateAfterAction.selected).some(s => s) ? "payout" : "view";
   stateAfterAction.columnVisibility = stateAfterAction.mode === "view" ? { "amount": false } : {
     "documents": false,
@@ -843,14 +918,9 @@ function reducer(state: State, action: Action): State {
   return stateAfterAction;
 }
 
-function getTotals(employees: Array<EntryRow>, selected: RowSelectionState) {
+function getPayoutTotals(employees: Array<EntryRow>, selected: RowSelectionState) {
   let totals = {
-    gross: 0,
-    net: 0,
-    offsetting: 0,
-    paidOut: 0,
     open: 0,
-    openPreviousPeriod: 0,
     payingOut: 0
   }
 
@@ -858,14 +928,10 @@ function getTotals(employees: Array<EntryRow>, selected: RowSelectionState) {
     if (!selected[employee.id])
       continue;
     const entry = employee.entry;
-    totals.gross += entry?.grossWage ?? 0;
-    totals.net += entry?.netWage ?? 0;
-    totals.paidOut += entry?.paidOut ?? 0;
     totals.open += entry?.open ?? 0;
     totals.payingOut += employee.amount ?? 0;
   }
   return totals;
-
 }
 
 function createInitialState(employeeRows: Array<EntryRow>): State {
@@ -879,7 +945,10 @@ function createInitialState(employeeRows: Array<EntryRow>): State {
     columnVisibility: {
       "amount": false
     },
-    totals: getTotals([], {})
+    payoutTotals: {
+      open: 0,
+      payingOut: 0
+    }
   };
 }
 
@@ -893,7 +962,7 @@ type AmountInputProps = {
   onClick: MouseEventHandler
 }
 
-export function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
+function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
   if (!employee.entry?.open)
     return;
 
@@ -901,11 +970,16 @@ export function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
     dispatch({ type: "set_amount", id: employee.id, amount: floatValue });
   };
 
+  const receiveFocus = () => {
+    dispatch({ type: "set_selected", id: employee.id, selected: true });
+  }
+
   return (
     <NumericFormat
       onClick={onClick}
       value={employee.amount}
       onValueChange={handleChange}
+      onFocus={receiveFocus}
       valueIsNumericString
       thousandSeparator={groupSeparator ?? ""}
       decimalScale={2}
