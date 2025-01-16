@@ -91,8 +91,8 @@ function ColumnVisibilitySection() {
     <Stack>
       <Typography variant="h6">{t("Column visibility")}</Typography>
       <FormGroup>
-        <ColumnVisibilitySwitch column="identifier" label={t("Id")} />
-        <ColumnVisibilitySwitch column="employee" label={t("Employee name")} />
+        <ColumnVisibilitySwitch column="identifier" label={t("Id")} disabledColumn="employee" />
+        <ColumnVisibilitySwitch column="employee" label={t("Employee name")} disabledColumn="identifier" />
         <ColumnVisibilitySwitch column="employerCost" label={t("Gross wage plus employer cost")} />
         <ColumnVisibilitySwitch column="grossPreviousPeriod" label={t("Gross wage from previous period")} />
         <ColumnVisibilitySwitch column="grossDiff" label={t("Gross wage difference to previous period")} />
@@ -106,13 +106,15 @@ function ColumnVisibilitySection() {
   )
 }
 
-function ColumnVisibilitySwitch({ column, label }: { column: keyof ColumnVisibility, label: string }) {
+function ColumnVisibilitySwitch({ column, label, disabledColumn }: { column: keyof ColumnVisibility, label: string, disabledColumn?: keyof ColumnVisibility }) {
   const [columnVisibility, setColumnVisibility] = useAtom(columnVisibilityAtom);
+  const disabled = disabledColumn && !columnVisibility[disabledColumn];
   return <FormControlLabel
     control={
       <Switch
         checked={columnVisibility[column]}
         onChange={(_, checked) => setColumnVisibility({ ...columnVisibility, [column]: checked })}
+        disabled={disabled}
       />
     }
     label={label}
