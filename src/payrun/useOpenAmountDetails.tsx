@@ -23,17 +23,17 @@ export function useOpenAmountDetails(context: CellContext<EntryRow, number | nul
   }
   const offsetting = row.offsetting;
   const retro = row.retro;
-  const openPreviousPeriod = row.openBalancePreviousPeriod;
+  const openWagePayoutPreviousPeriod = row.openWagePayoutPreviousPeriod;
   const garnishment = row.garnishment;
-  const openGarnishmentPreviousPeriod = row.openGarnishmentPreviousPeriod;
+  const openGarnishmentPayoutPreviousPeriod = row.openGarnishmentPayoutPreviousPeriod;
 
   const offsettingHidden = !!(offsetting && !columnVisibility.offsetting);
-  const openPreviousPeriodHidden = !!(openPreviousPeriod && !columnVisibility.openPreviousPeriod);
+  const openWagePayoutPreviousPeriodHidden = !!(openWagePayoutPreviousPeriod && !columnVisibility.openWagePayoutPreviousPeriod);
   const retroHidden = !!(retro && !columnVisibility.retro);
   const garnishmentHidden = !!(garnishment && !columnVisibility.garnishment);
-  const openGarnishmentPreviousPeriodHidden = !!(openGarnishmentPreviousPeriod && !columnVisibility.openGarnishment);
+  const openGarnishmentPayoutPreviousPeriodHidden = !!(openGarnishmentPayoutPreviousPeriod && !columnVisibility.openGarnishmentPayoutPreviousPeriod);
 
-  if (!offsettingHidden && !openPreviousPeriodHidden && !retroHidden && !garnishmentHidden && !openGarnishmentPreviousPeriodHidden) {
+  if (!offsettingHidden && !openWagePayoutPreviousPeriodHidden && !retroHidden && !garnishmentHidden && !openGarnishmentPayoutPreviousPeriodHidden) {
     return { hasDetails: false };
   }
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -65,11 +65,11 @@ export function useOpenAmountDetails(context: CellContext<EntryRow, number | nul
       <Stack spacing={1} sx={{ p: 2 }}>
         <OpenDetailRow label={t("Net")} value={formatValue(context.row.original.entry?.netWage)} />
         {offsettingHidden && <OpenDetailRow label={t("Offsetting")} value={formatValue(context.row.original.entry?.offsetting)} />}
-        {openPreviousPeriodHidden && <OpenDetailRow label={t("Open from previous period")} value={formatValue(context.row.original.entry?.openBalancePreviousPeriod)} />}
+        {openWagePayoutPreviousPeriodHidden && <OpenDetailRow label={t("Open from previous period")} value={formatValue(context.row.original.entry?.openWagePayoutPreviousPeriod)} />}
         {retroHidden && <OpenDetailRow label={t("Retro")} value={formatValue(context.row.original.entry?.retro)} />}
+        <OpenDetailRow label={t("Open")} value={formatValue(context.row.original.entry?.openPayout)} />
         {garnishmentHidden && <OpenDetailRow label={t("Garnishment")} value={formatValue(context.row.original.entry?.garnishment)} />}
-        {openGarnishmentPreviousPeriodHidden && <OpenDetailRow label={t("Garnishment")} value={formatValue(context.row.original.entry?.openGarnishmentPreviousPeriod)} />}
-        <OpenDetailRow label={t("Open")} value={formatValue(context.row.original.entry?.open)} />
+        {openGarnishmentPayoutPreviousPeriodHidden && <OpenDetailRow label={t("Garnishment")} value={formatValue(context.row.original.entry?.openGarnishmentPayoutPreviousPeriod)} />}
       </Stack>
     </Popover>
   );

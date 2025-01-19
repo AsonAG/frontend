@@ -16,9 +16,9 @@ const defaultColumnVisibility: ColumnVisibility = {
   offsetting: false,
   grossPreviousPeriod: false,
   grossDiff: false,
-  openPreviousPeriod: false,
+  openWagePayoutPreviousPeriod: false,
   garnishment: false,
-  openGarnishmentPreviousPeriod: false,
+  openGarnishmentPayoutPreviousPeriod: false,
   retro: false
 }
 
@@ -31,9 +31,9 @@ export type ColumnVisibility = {
   offsetting: boolean
   grossPreviousPeriod: boolean
   grossDiff: boolean
-  openPreviousPeriod: boolean
+  openWagePayoutPreviousPeriod: boolean
   garnishment: boolean
-  openGarnishmentPreviousPeriod: boolean
+  openGarnishmentPayoutPreviousPeriod: boolean
   retro: boolean
 }
 const popoverSx: SxProps<Theme> = {
@@ -70,12 +70,13 @@ function FullWidthTableSection() {
   return (
     <Stack>
       <Typography variant="h6">{t("Table width")}</Typography>
-      <FormGroup>
+      <FormGroup sx={{ pl: 0.5 }}>
         <FormControlLabel
           control={
             <Switch
               checked={fullWidth}
               onChange={(_, checked) => setFullWidth(checked)}
+              size="small"
             />
           }
           label={t("Full width")}
@@ -90,16 +91,16 @@ function ColumnVisibilitySection() {
   return (
     <Stack>
       <Typography variant="h6">{t("Column visibility")}</Typography>
-      <FormGroup>
+      <FormGroup sx={{ pl: 0.5 }}>
         <ColumnVisibilitySwitch column="identifier" label={t("Id")} disabledColumn="employee" />
         <ColumnVisibilitySwitch column="employee" label={t("Employee name")} disabledColumn="identifier" />
         <ColumnVisibilitySwitch column="employerCost" label={t("Gross wage plus employer cost")} />
         <ColumnVisibilitySwitch column="grossPreviousPeriod" label={t("Gross wage from previous period")} />
         <ColumnVisibilitySwitch column="grossDiff" label={t("Gross wage difference to previous period")} />
         <ColumnVisibilitySwitch column="offsetting" label={t("Offsetting")} />
-        <ColumnVisibilitySwitch column="openPreviousPeriod" label={t("Open from previous period")} />
+        <ColumnVisibilitySwitch column="openWagePayoutPreviousPeriod" label={t("Open from previous period")} />
         <ColumnVisibilitySwitch column="garnishment" label={t("Garnishment")} />
-        <ColumnVisibilitySwitch column="openGarnishmentPreviousPeriod" label={t("Garnishment from previous period")} />
+        <ColumnVisibilitySwitch column="openGarnishmentPayoutPreviousPeriod" label={t("Garnishment from previous period")} />
         <ColumnVisibilitySwitch column="retro" label={t("Retro")} />
       </FormGroup>
     </Stack>
@@ -115,6 +116,7 @@ function ColumnVisibilitySwitch({ column, label, disabledColumn }: { column: key
         checked={columnVisibility[column]}
         onChange={(_, checked) => setColumnVisibility({ ...columnVisibility, [column]: checked })}
         disabled={disabled}
+        size="small"
       />
     }
     label={label}

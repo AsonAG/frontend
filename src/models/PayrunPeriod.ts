@@ -11,9 +11,11 @@ export type PayrunPeriodEntry = {
   paidOut: number | null
   garnishment: number
   retro: number
-  open: number | null
-  openBalancePreviousPeriod: number
-  openGarnishmentPreviousPeriod: number
+  openPayout: number | null
+  openWagePayout: number | null
+  openGarnishmentPayout: number | null
+  openWagePayoutPreviousPeriod: number
+  openGarnishmentPayoutPreviousPeriod: number
   documents: Array<PayrunDocument> | null
 }
 

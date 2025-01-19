@@ -244,9 +244,9 @@ function createColumns() {
           tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "retro", context)
         }
       }),
-    columnHelper.accessor("entry.openGarnishmentPreviousPeriod",
+    columnHelper.accessor("entry.openGarnishmentPayoutPreviousPeriod",
       {
-        id: "openGarnishmentPreviousPeriod",
+        id: "openGarnishmentPayoutPreviousPeriod",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
         header: ({ t }) => t("GPP"),
         size: 110,
@@ -255,9 +255,9 @@ function createColumns() {
           headerTooltip: t => t("Garnishment from previous period")
         }
       }),
-    columnHelper.accessor("entry.openBalancePreviousPeriod",
+    columnHelper.accessor("entry.openWagePayoutPreviousPeriod",
       {
-        id: "openPreviousPeriod",
+        id: "openWagePayoutPreviousPeriod",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
         header: ({ t }) => t("OPP"),
         size: 110,
@@ -289,9 +289,9 @@ function createColumns() {
       id: "openTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.open),
       columns: [
-        columnHelper.accessor("entry.open",
+        columnHelper.accessor("entry.openPayout",
           {
-            id: "open",
+            id: "openPayout",
             cell: context => {
               const { hasDetails, popover, openPopover, closePopover } = useOpenAmountDetails(context);
               let value = formatValue(context.getValue());
@@ -393,7 +393,7 @@ export type EntryRow = Employee & {
 
 function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL" | "Payable") {
   if (type === "Payable") {
-    return employees.filter(e => ((e.entry?.open ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0);
+    return employees.filter(e => ((e.entry?.openPayout ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0);
   }
   const predicate = (_: any, i: number) => [1, 3, 5, 6, employees.length - 1].includes(i);
   const inverted = (_: any, i: number) => !predicate(_, i);
@@ -469,7 +469,7 @@ function PayrunPeriodTable() {
   const employeeRows: Array<EntryRow> = useMemo(() => {
     function mapEmployee(employee: Employee, index: number): EntryRow {
       const entry = payrunPeriod?.entries?.find(entry => entry.employeeId === employee.id);
-      const open = entry?.open ?? 0;
+      const open = entry?.openPayout ?? 0;
       return {
         ...employee,
         entry,
@@ -498,7 +498,7 @@ function PayrunPeriodTable() {
       totals.previousGross += employee.previousEntry?.grossWage ?? 0;
       totals.gross += entry?.grossWage ?? 0;
       totals.net += entry?.netWage ?? 0;
-      totals.open += entry?.open ?? 0;
+      totals.open += entry?.openPayout ?? 0;
       totals.employerCost += entry?.employerCost ?? 0;
     }
     return totals;
@@ -531,7 +531,7 @@ function PayrunPeriodTable() {
       rowSelection: state.selected,
       columnPinning: {
         left: ["identifier", "employee"],
-        right: ["open", "amount", "documents", "events"]
+        right: ["openPayout", "amount", "documents", "events"]
       }
     },
     getCoreRowModel: getCoreRowModel(),
@@ -545,11 +545,11 @@ function PayrunPeriodTable() {
   const submit = useSubmit();
 
   const onPayout = async (valueDate: string, accountIban: string) => {
-    const entries = state.employees.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 }));
+    const payouts = state.employees.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 }));
     const payout: Payout = {
       // @ts-ignore
       valueDate,
-      entries,
+      payouts,
       accountIban
     }
     const formData = new FormData();
@@ -588,7 +588,7 @@ function PayrunPeriodTable() {
             }>
             {headerGroup.headers.map(header => {
               if (header.isPlaceholder)
-                return <div></div>;
+                return <div key={header.id}></div>;
               const baseColumn = header.getLeafHeaders()[0].column;
               const alignment = baseColumn.columnDef.meta?.alignment;
               const headerTooltip = header.column.columnDef.meta?.headerTooltip;
@@ -714,10 +714,10 @@ function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
     if ((row.original.controllingTasks?.length ?? 0) > 0) {
       return "payrun_period_controlling";
     }
-    if (!!row.original.entry?.open) {
+    if (!!row.original.entry?.openPayout) {
       return "payrun_period_ready";
     }
-    if (row.original.entry?.open === 0 && ((row.original.entry?.netWage ?? 0) > 0) && ((row.original.entry?.grossWage ?? 0) > 0)) {
+    if (row.original.entry?.openPayout === 0 && ((row.original.entry?.netWage ?? 0) > 0) && ((row.original.entry?.grossWage ?? 0) > 0)) {
       return "payrun_period_paid_out";
     }
     return "payrun_period_without_occupation";
@@ -928,7 +928,7 @@ function getPayoutTotals(employees: Array<EntryRow>, selected: RowSelectionState
     if (!selected[employee.id])
       continue;
     const entry = employee.entry;
-    totals.open += entry?.open ?? 0;
+    totals.open += entry?.openPayout ?? 0;
     totals.payingOut += employee.amount ?? 0;
   }
   return totals;
@@ -963,7 +963,7 @@ type AmountInputProps = {
 }
 
 function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
-  if (!employee.entry?.open)
+  if (!employee.entry?.openPayout)
     return;
 
   const handleChange = ({ floatValue }) => {
@@ -989,7 +989,7 @@ function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
       size="small"
       isAllowed={(values) => {
         const { floatValue } = values;
-        return (floatValue ?? 0) <= (employee.entry?.open ?? 0);
+        return (floatValue ?? 0) <= (employee.entry?.openPayout ?? 0);
       }}
       slotProps={{
         htmlInput: {

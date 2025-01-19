@@ -58,7 +58,10 @@ export function Payouts() {
 }
 
 
-const defaultSx = getRowGridSx([{ width: 200 }, { width: 150 }, { width: 150, flex: 1 }, { width: 75, }, { width: 80 }], 2)
+const defaultSx = {
+  ...getRowGridSx([{ width: 200 }, { width: 150 }, { width: 150, flex: 1 }, { width: 75, }, { width: 80 }], 2),
+  alignItems: "center"
+}
 const inactiveSx: SxProps<Theme> = {
   ...defaultSx,
   textDecoration: "line-through",
@@ -83,12 +86,12 @@ function PayoutSection({ payout, onCancel }: { payout: Payout, onCancel: () => v
         <Typography variant="subtitle1">{dayjs(payout.valueDate).format("L")}</Typography>
         {!isCancelled &&
           <Stack direction="row" spacing={0.5}>
-            <IconButton onClick={download}><Download /></IconButton>
-            <IconButton onClick={onCancel}><Cancel /></IconButton>
+            <IconButton onClick={download} size="small"><Download /></IconButton>
+            <IconButton onClick={onCancel} size="small"><Cancel /></IconButton>
           </Stack>
         }
       </Box>
-    </Tooltip>
+    </Tooltip >
   )
 }
 const formatter = new Intl.NumberFormat("de-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
