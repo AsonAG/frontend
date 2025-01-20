@@ -1,5 +1,5 @@
 import { Settings } from "@mui/icons-material";
-import { FormControlLabel, FormGroup, IconButton, Stack, Switch, SxProps, Theme, Typography } from "@mui/material";
+import { FormControlLabel, FormGroup, IconButton, Stack, Switch, SxProps, Theme, Tooltip, Typography } from "@mui/material";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import * as Popover from '@radix-ui/react-popover';
 import React from "react";
@@ -92,33 +92,35 @@ function ColumnVisibilitySection() {
     <Stack>
       <Typography variant="h6">{t("Column visibility")}</Typography>
       <FormGroup sx={{ pl: 0.5 }}>
-        <ColumnVisibilitySwitch column="identifier" label={t("Id")} disabledColumn="employee" />
-        <ColumnVisibilitySwitch column="employee" label={t("Employee name")} disabledColumn="identifier" />
-        <ColumnVisibilitySwitch column="employerCost" label={t("Gross wage plus employer cost")} />
-        <ColumnVisibilitySwitch column="grossPreviousPeriod" label={t("Gross wage from previous period")} />
-        <ColumnVisibilitySwitch column="grossDiff" label={t("Gross wage difference to previous period")} />
-        <ColumnVisibilitySwitch column="offsetting" label={t("Offsetting")} />
-        <ColumnVisibilitySwitch column="openWagePayoutPreviousPeriod" label={t("Open from previous period")} />
-        <ColumnVisibilitySwitch column="garnishment" label={t("Garnishment")} />
-        <ColumnVisibilitySwitch column="openGarnishmentPayoutPreviousPeriod" label={t("Garnishment from previous period")} />
-        <ColumnVisibilitySwitch column="retro" label={t("Retro")} />
+        <ColumnVisibilitySwitch column="identifier" label={t("Id")} tooltip={t("Id of the employee")} disabledColumn="employee" />
+        <ColumnVisibilitySwitch column="employee" label={t("Name")} tooltip={t("Last name and first name of the employee")} disabledColumn="identifier" />
+        <ColumnVisibilitySwitch column="employerCost" label={t("Total cost")} tooltip={t("Total costs from the employer's perspective")} />
+        <ColumnVisibilitySwitch column="grossPreviousPeriod" label={t("Gross PP")} tooltip={t("Gross wage from previous period")} />
+        <ColumnVisibilitySwitch column="grossDiff" label={t("Diff. gross")} tooltip={t("Gross wage previous period minus gross wage open period")} />
+        <ColumnVisibilitySwitch column="offsetting" label={t("OT")} tooltip={t("Offsettings, i.e. supplements and deductions after the net wage")} />
+        <ColumnVisibilitySwitch column="retro" label={t("Retro")} tooltip={t("Net amount from all retroactive changes prior to the open period")} />
+        <ColumnVisibilitySwitch column="openGarnishmentPayoutPreviousPeriod" label={t("GPP")} tooltip={t("Garnishments to be paid from the previous period")} />
+        <ColumnVisibilitySwitch column="openWagePayoutPreviousPeriod" label={t("OPP")} tooltip={t("Outstanding amount to be paid from the previous period")} />
+        <ColumnVisibilitySwitch column="garnishment" label={t("Garnishment")} tooltip={t("Garnishment open period")} />
       </FormGroup>
     </Stack>
   )
 }
 
-function ColumnVisibilitySwitch({ column, label, disabledColumn }: { column: keyof ColumnVisibility, label: string, disabledColumn?: keyof ColumnVisibility }) {
+function ColumnVisibilitySwitch({ column, label, tooltip, disabledColumn }: { column: keyof ColumnVisibility, label: string, tooltip: string, disabledColumn?: keyof ColumnVisibility }) {
   const [columnVisibility, setColumnVisibility] = useAtom(columnVisibilityAtom);
   const disabled = disabledColumn && !columnVisibility[disabledColumn];
-  return <FormControlLabel
-    control={
-      <Switch
-        checked={columnVisibility[column]}
-        onChange={(_, checked) => setColumnVisibility({ ...columnVisibility, [column]: checked })}
-        disabled={disabled}
-        size="small"
-      />
-    }
-    label={label}
-  />
+  return <Tooltip title={tooltip} followCursor>
+    <FormControlLabel
+      control={
+        <Switch
+          checked={columnVisibility[column]}
+          onChange={(_, checked) => setColumnVisibility({ ...columnVisibility, [column]: checked })}
+          disabled={disabled}
+          size="small"
+        />
+      }
+      label={label}
+    />
+  </Tooltip>
 }

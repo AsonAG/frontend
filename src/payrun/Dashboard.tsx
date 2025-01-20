@@ -107,7 +107,8 @@ function createColumns() {
             size: 150,
             meta: {
               flex: 1,
-              tooltip: (context) => !context.table.getState().columnVisibility.employee ? context.row.original.name : null
+              tooltip: (context) => !context.table.getState().columnVisibility.employee ? context.row.original.name : null,
+              headerTooltip: (t) => t("Id of the employee")
             }
           }),
         columnHelper.accessor(row => `${row.lastName} ${row.firstName}`,
@@ -119,7 +120,8 @@ function createColumns() {
             size: 150,
             meta: {
               flex: 1,
-              tooltip: (context) => !context.table.getState().columnVisibility.identifier ? context.row.original.identifier : null
+              tooltip: (context) => !context.table.getState().columnVisibility.identifier ? context.row.original.identifier : null,
+              headerTooltip: (t) => t("Last name and first name of the employee")
             }
           }),
       ]
@@ -137,7 +139,7 @@ function createColumns() {
             meta: {
               alignment: "right",
               tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "employerCost", context),
-              headerTooltip: t => t("Gross wage plus employer cost")
+              headerTooltip: t => t("Total costs from the employer's perspective")
             }
           }),
       ]
@@ -154,7 +156,7 @@ function createColumns() {
             size: 110,
             meta: {
               alignment: "right",
-              headerTooltip: t => t("Difference gross to previous period")
+              headerTooltip: t => t("Gross wage previous period")
             }
           }),
       ]
@@ -167,7 +169,7 @@ function createColumns() {
         size: 110,
         meta: {
           alignment: "right",
-          headerTooltip: t => t("Difference gross to previous period")
+          headerTooltip: t => t("Gross wage previous period minus gross wage open period")
         }
       }),
     columnHelper.group({
@@ -200,7 +202,8 @@ function createColumns() {
             size: 110,
             meta: {
               alignment: "right",
-              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "grossWage", context, "grossPreviousPeriod")
+              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "grossWage", context, "grossPreviousPeriod"),
+              headerTooltip: (t) => t("Gross wage open period")
             }
           }),
       ]
@@ -216,7 +219,8 @@ function createColumns() {
             size: 110,
             meta: {
               alignment: "right",
-              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "netWage", context)
+              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "netWage", context),
+              headerTooltip: (t) => t("Net wage open period")
             }
           }),
       ]
@@ -230,7 +234,7 @@ function createColumns() {
         meta: {
           alignment: "right",
           tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "offsetting", context),
-          headerTooltip: t => t("Offsetting")
+          headerTooltip: t => t("Offsettings, i.e. supplements and deductions after the net wage")
         }
       }),
     columnHelper.accessor("entry.retro",
@@ -241,7 +245,8 @@ function createColumns() {
         size: 110,
         meta: {
           alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "retro", context)
+          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "retro", context),
+          headerTooltip: (t) => t("Net amount from all retroactive changes prior to the open period")
         }
       }),
     columnHelper.accessor("entry.openGarnishmentPayoutPreviousPeriod",
@@ -252,7 +257,7 @@ function createColumns() {
         size: 110,
         meta: {
           alignment: "right",
-          headerTooltip: t => t("Garnishment from previous period")
+          headerTooltip: t => t("Garnishments to be paid from the previous period")
         }
       }),
     columnHelper.accessor("entry.openWagePayoutPreviousPeriod",
@@ -263,7 +268,7 @@ function createColumns() {
         size: 110,
         meta: {
           alignment: "right",
-          headerTooltip: t => t("Open from previous period")
+          headerTooltip: t => t("Outstanding amount to be paid from the previous period")
         }
       }),
     columnHelper.accessor("entry.paidOut",
@@ -272,7 +277,8 @@ function createColumns() {
         header: ({ t }) => t("Paid"),
         size: 110,
         meta: {
-          alignment: "right"
+          alignment: "right",
+          headerTooltip: (t) => t("Already paid out in the open period")
         }
       }),
     columnHelper.accessor("entry.garnishment",
@@ -282,7 +288,8 @@ function createColumns() {
         header: ({ t }) => t("Garnishment"),
         size: 110,
         meta: {
-          alignment: "right"
+          alignment: "right",
+          headerTooltip: (t) => t("Garnishment open period")
         }
       }),
     columnHelper.group({
@@ -309,7 +316,8 @@ function createColumns() {
             footer: (props) => formatValue(props.table.getState().payoutTotals.open),
             size: 110,
             meta: {
-              alignment: "right"
+              alignment: "right",
+              headerTooltip: t => t("Outstanding amount to be paid in the open period")
             }
           }),
       ]
@@ -379,7 +387,7 @@ function createColumns() {
   ];
 }
 
-const columns = createColumns();
+export const columns = createColumns();
 
 
 export type EntryRow = Employee & {
@@ -814,7 +822,7 @@ type CellProps = {
 
 function Cell({ color, align, tooltip, sx, children }: CellProps) {
   return (
-    <Tooltip title={tooltip}>
+    <Tooltip title={tooltip} followCursor>
       <Box display="flex" color={color} justifyContent={align} alignItems="center" gap={0.5} minWidth={0} px={0.5} sx={sx}>
         {children}
       </Box>
