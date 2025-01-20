@@ -5,7 +5,7 @@ import { PeriodDocuments } from "./PeriodDocuments";
 
 export function ClosedPeriodDocuments() {
   return (
-    <ContentLayout title={<DashboardHeader backlinkPath=".." />}>
+    <ContentLayout title={<DashboardHeader />}>
       <PeriodDocuments />
     </ContentLayout>
   )

@@ -53,7 +53,7 @@ declare module '@tanstack/react-table' {
 export function PayrunDashboard() {
   return (
     <>
-      <ContentLayout title={<DashboardHeader backlinkPath=".." />}>
+      <ContentLayout title={<DashboardHeader index />}>
         <PayrunPeriodTable />
       </ContentLayout>
       <Outlet />

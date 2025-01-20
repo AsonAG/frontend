@@ -20,7 +20,7 @@ export function ReviewOpenPeriod() {
   const { payrunPeriod } = useLoaderData() as LoaderData;
   return (
     <>
-      <ContentLayout title={<DashboardHeader backlinkPath=".." />}>
+      <ContentLayout title={<DashboardHeader />}>
         <PeriodDocuments />
         <Stack direction="row" justifyContent="end">
           <ResponsiveDialog>
