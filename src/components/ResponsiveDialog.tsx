@@ -1,14 +1,17 @@
 import React from "react";
 import { Drawer } from "vaul";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Box, Stack, styled } from "@mui/material";
+import { Box, styled } from "@mui/material";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { ReactNode } from "react";
 
 const DrawerContent = styled("div", {
 	shouldForwardProp: (name) => !(name === "containerWidth" || name === "disablePadding"),
-})(({ theme }) =>
+})<Props>(({ theme, spacing }) =>
 	theme.unstable_sx({
+		display: "flex",
+		flexDirection: "column",
+		gap: theme.spacing(spacing ?? 2),
 		position: "fixed",
 		borderTopLeftRadius: theme.shape.borderRadius * 4,
 		borderTopRightRadius: theme.shape.borderRadius * 4,
@@ -28,8 +31,11 @@ const DrawerContent = styled("div", {
 
 const DialogContent = styled("div", {
 	shouldForwardProp: (name) => !(name === "containerWidth" || name === "disablePadding"),
-})<Props>(({ theme, containerWidth, disablePadding }) =>
+})<Props>(({ theme, containerWidth, disablePadding, spacing }) =>
 	theme.unstable_sx({
+		display: "flex",
+		flexDirection: "column",
+		gap: theme.spacing(spacing ?? 2),
 		position: "fixed",
 		borderRadius: 1,
 		backgroundColor: theme.palette.background.default,
@@ -72,20 +78,18 @@ export const ResponsiveDialogContent = React.forwardRef<HTMLDivElement, Props>(
 				/>
 				<Component.Content asChild {...props} ref={forwardedRef}>
 					<Content>
-						<Stack spacing={spacing ?? 2}>
-							{isMobile && (
-								<Box
-									sx={{
-										bgcolor: "divider",
-										borderRadius: 1,
-										alignSelf: "center",
-										height: 6,
-										width: "3rem",
-									}}
-								/>
-							)}
-							{children}
-						</Stack>
+						{isMobile && (
+							<Box
+								sx={{
+									bgcolor: "divider",
+									borderRadius: 1,
+									alignSelf: "center",
+									height: 6,
+									width: "3rem",
+								}}
+							/>
+						)}
+						{children}
 					</Content>
 				</Component.Content>
 			</Component.Portal>

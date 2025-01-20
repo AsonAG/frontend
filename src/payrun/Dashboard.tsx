@@ -378,7 +378,7 @@ function createColumns() {
           </Stack>
         )
       },
-      header: _ => <TableSettingsButton />,
+      header: ({ t }) => <Tooltip title={t("Settings")}><TableSettingsButton /></Tooltip>,
       size: 55,
       meta: {
         alignment: "center"

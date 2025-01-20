@@ -5,7 +5,9 @@ import {
   Stack,
   Typography,
   Box,
-  Button
+  Button,
+  SxProps,
+  Theme
 } from "@mui/material";
 import { formatDate } from "../utils/DateUtils";
 import { formatCaseValue } from "../utils/Format";
@@ -106,9 +108,9 @@ function Table() {
     getRowId: originalRow => originalRow.id,
   });
   return (
-    <Stack>
+    <Stack flex={1} sx={{ overflowY: "auto" }}>
       {table.getHeaderGroups().map(headerGroup => (
-        <Row key={headerGroup.id}>
+        <Row key={headerGroup.id} sx={{ position: "sticky", top: 0, backgroundColor: theme => theme.palette.background.default }}>
           {headerGroup.headers.map(header => (
             <Typography fontWeight="bold" key={header.id} sx={{ p: 0.5 }}>
               {flexRender(
@@ -138,9 +140,9 @@ function Table() {
   )
 }
 
-function Row({ children }: PropsWithChildren) {
+function Row({ sx, children }: { sx?: SxProps<Theme> } & PropsWithChildren) {
   return (
-    <Box display="grid" gridTemplateColumns="75px 1fr 1fr 75px 75px" gridTemplateRows="auto" alignItems="start">
+    <Box display="grid" gridTemplateColumns="75px 1fr 1fr 75px 75px" gridTemplateRows="auto" alignItems="start" sx={sx}>
       {children}
     </Box>
   )
