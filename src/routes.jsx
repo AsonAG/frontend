@@ -740,6 +740,7 @@ const routeData = [
 										return redirect("payouts");
 									}
 									toast("error", "Error while creating the payout");
+									return null;
 								}
 							},
 							createRoutePayrunPeriodDocument(),
