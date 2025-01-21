@@ -32,6 +32,7 @@ import { useAtomValue } from "jotai";
 import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, hideReportsFeatureAtom, missingDataEmployeesAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
+import { unwrap } from "jotai/utils";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {
@@ -85,25 +86,25 @@ function OpenTasksBadgeIcon() {
 	);
 }
 
+const unwrappedCompanyMissingDataCountAtom = unwrap(companyMissingDataCountAtom, (prev => prev ?? 0))
 function CompanyBadgeIcon({ icon }) {
+	const count = useAtomValue(unwrappedCompanyMissingDataCountAtom);
 	return (
-		<Suspense fallback={icon}>
-			<AtomBadge atom={companyMissingDataCountAtom} color="warning" countFunc={count => count}>
-				{icon}
-			</AtomBadge>
-		</Suspense>
+		<Badge badgeContent={count} color="warning" overlap="circular">
+			{icon}
+		</Badge>
 	);
 }
 
+const unwrappedMissingDataEmployeesAtom = unwrap(missingDataEmployeesAtom, (prev => prev ?? []));
+
 function EmployeeBadgeIcon({ icon }) {
-	const count = (data) =>
-		data.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0);
+	const cases =  useAtomValue(unwrappedMissingDataEmployeesAtom);
+	const count = cases.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0)
 	return (
-		<Suspense fallback={icon}>
-			<AtomBadge atom={missingDataEmployeesAtom} color="warning" countFunc={count}>
+			<Badge badgeContent={count} color="warning" overlap="circular">
 				{icon}
-			</AtomBadge>
-		</Suspense>
+			</Badge>
 	);
 }
 
