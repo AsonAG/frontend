@@ -35,7 +35,7 @@ import {
 import { useSearchParam } from "../../hooks/useSearchParam";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { StatusChip } from "../../scenes/employees/StatusChip";
-import { useMissingDataCount } from "../../utils/dataAtoms";
+import { useEmployeeMissingDataCount } from "../../utils/dataAtoms";
 
 const TableContext = createContext({ variant: "standard", showButtons: true });
 
@@ -275,7 +275,7 @@ function EmployeeRow({ employee, showStatus }) {
 function EmployeeButtons({ employee }) {
 	const { t } = useTranslation();
 	const variant = "dense";
-	const missingDataCount = useMissingDataCount(employee.id);
+	const missingDataCount = useEmployeeMissingDataCount(employee.id);
 
 	return (
 		<Stack direction="row" spacing={2} py={0.5}>

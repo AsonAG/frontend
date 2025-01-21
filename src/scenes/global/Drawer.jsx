@@ -29,7 +29,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { missingDataTasksAtom, openTasksAtom, showOrgSelectionAtom, employeeMissingDataAtom, hideReportsFeatureAtom } from "../../utils/dataAtoms";
+import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, hideReportsFeatureAtom, missingDataEmployeesAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 
@@ -85,12 +85,22 @@ function OpenTasksBadgeIcon() {
 	);
 }
 
-function ControllingBadgeIcon({ icon }) {
+function CompanyBadgeIcon({ icon }) {
+	return (
+		<Suspense fallback={icon}>
+			<AtomBadge atom={companyMissingDataCountAtom} color="warning" countFunc={count => count}>
+				{icon}
+			</AtomBadge>
+		</Suspense>
+	);
+}
+
+function EmployeeBadgeIcon({ icon }) {
 	const count = (data) =>
 		data.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0);
 	return (
 		<Suspense fallback={icon}>
-			<AtomBadge atom={missingDataTasksAtom} color="warning" countFunc={count}>
+			<AtomBadge atom={missingDataEmployeesAtom} color="warning" countFunc={count}>
 				{icon}
 			</AtomBadge>
 		</Suspense>
@@ -103,7 +113,7 @@ function EmployeeMissingDataBadge({ icon }) {
 	};
 	return (
 		<Suspense fallback={icon}>
-			<AtomBadge atom={employeeMissingDataAtom} color="warning" countFunc={count}>
+			<AtomBadge atom={ESSMissingDataAtom} color="warning" countFunc={count}>
 				{icon}
 			</AtomBadge>
 		</Suspense>
@@ -174,7 +184,7 @@ function MenuItemsPayrollAdmin() {
 			<NavigationItem
 				label={t("Company")}
 				to="company"
-				icon={<BusinessIcon />}
+				icon={<CompanyBadgeIcon icon={<BusinessIcon />} />}
 			/>
 			<NavigationItem
 				label={t("Employees")}
@@ -184,7 +194,7 @@ function MenuItemsPayrollAdmin() {
 			<NavigationItem
 				label={t("Missing data")}
 				to="hr/missingdata"
-				icon={<ControllingBadgeIcon icon={<NotificationImportantIcon />} />}
+				icon={<EmployeeBadgeIcon icon={<NotificationImportantIcon />} />}
 			/>
 			<NavigationItem
 				label={t("Payroll")}

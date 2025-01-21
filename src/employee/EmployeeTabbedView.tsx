@@ -37,5 +37,5 @@ export function EmployeeTabbedView() {
 			<StatusChip status={status} />
 		</Stack>
 	);
-	return <EventTabbedView title={titleComponent} showMissingData />;
+	return <EventTabbedView title={titleComponent} />;
 }

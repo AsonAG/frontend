@@ -17,7 +17,12 @@ type LoaderData = {
   missingData: MissingData
 }
 
-export function EventTabbedView({ title, showMissingData }: { title: ReactNode, showMissingData?: boolean }) {
+type EventTabbedViewProps = {
+  title?: ReactNode,
+  startTabs?: ReactNode
+}
+
+export function EventTabbedView({ title, startTabs }: EventTabbedViewProps) {
   const outlet = useOutlet();
   const isMobile = useIsMobile();
   const { pageTitle, missingData } = useLoaderData() as LoaderData;
@@ -36,8 +41,9 @@ export function EventTabbedView({ title, showMissingData }: { title: ReactNode, 
       {
         !renderTitleOnly &&
         <Stack direction="row" spacing={2} flexWrap="wrap">
+          {startTabs}
           {isMobile && <TabLink title={t("New event")} to="new" />}
-          <TabLink title={t("Data")} to="data" badgeCount={showMissingData ? missingDataCount : undefined} />
+          <TabLink title={t("Data")} to="data" badgeCount={missingDataCount} />
           <TabLink title={t("Documents")} to="documents" />
           <TabLink title={t("Events")} to="events" />
         </Stack>

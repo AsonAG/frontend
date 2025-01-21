@@ -70,10 +70,12 @@ import {
 	payrunAtom,
 	toast,
 	payrollAtom,
-	missingDataTasksAtom,
 	orgsAtom,
-	missingDataMapAtom,
-	employeeMissingDataAtom
+	missingDataEmployeesAtom,
+	ESSMissingDataAtom,
+	missingEmployeeDataMapAtom,
+	missingDataCompanyAtom,
+	onboardingCompanyAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -85,7 +87,6 @@ import { ContentLayout, withPage, withSuspense } from "./components/ContentLayou
 import { NewTaskView } from "./components/NewTaskView";
 import { OrganizationImport } from "./organization/Import";
 import { OrganizationSettings } from "./organization/Settings";
-import { EventTabbedView } from "./components/EventTabbedView";
 import { getEmployeeDisplayString } from "./models/Employee";
 import { DataValueHistory } from "./components/tables/DataTable";
 import { DataView } from "./components/DataView";
@@ -96,6 +97,8 @@ import { getPayoutFileName, Payouts } from "./payrun/Payouts";
 import { ClosedPeriodDocuments } from "./payrun/ClosedPeriodDocuments";
 import { PeriodCaseValueDialog } from "./payrun/PeriodCaseValueDialog";
 import { base64ToBytes } from "./services/converters/BinaryConverter";
+import { CompanyTabbedView } from "./company/CompanyTabbedView";
+import { OnboardingView } from "./company/OnboardingView";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -217,14 +220,17 @@ function createRouteDocument(showTitle) {
 	};
 }
 
-function createRouteDataView(path) {
+function createRouteDataView(path, getData) {
 	return {
 		path,
 		Component: DataView,
-		loader: async ({ params }) => {
+		loader: async (props) => {
+			const { params } = props;
 			const dataCasesPromise = (params.employeeId ? getEmployeeCases(params, "ED") : getCompanyCases(params, "CD"));
-			const [values, valueCounts, dataCases] = await Promise.all([getCurrentValues(params), getCaseValueCount(params, 2), dataCasesPromise])
+			const [values, valueCounts, dataCases] = await Promise.all([getCurrentValues(params), getCaseValueCount(params, 2), dataCasesPromise]);
+			const injectedData = await getData(props);
 			return {
+				...injectedData,
 				values,
 				valueCounts,
 				dataCases
@@ -534,8 +540,8 @@ const routeData = [
 				Component: EmployeeTabbedView,
 				loader: async ({ params }) => {
 					const employee = await getEmployee(params);
-					store.set(missingDataTasksAtom);
-					const map = await store.get(missingDataMapAtom);
+					store.set(missingDataEmployeesAtom);
+					const map = await store.get(missingEmployeeDataMapAtom);
 					return {
 						pageTitle: getEmployeeDisplayString(employee),
 						status: employee.status,
@@ -570,7 +576,12 @@ const routeData = [
 							}
 						})
 					},
-					createRouteDataView("data"),
+					createRouteDataView("data", async ({ params }) => {
+						const map = await store.get(missingEmployeeDataMapAtom);
+						return {
+							missingData: map.get(params.employeeId)
+						};
+					}),
 					createRouteDocument(false),
 					createRouteCaseForm("missingdata/:caseName"),
 					{
@@ -670,10 +681,10 @@ const routeData = [
 				Component: MissingDataView,
 				loader: () => {
 					// refresh missing data
-					store.set(missingDataTasksAtom);
+					store.set(missingDataEmployeesAtom);
 
 					return defer({
-						data: store.get(missingDataMapAtom),
+						data: store.get(missingEmployeeDataMapAtom),
 						title: "Missing data",
 					});
 				}
@@ -836,25 +847,24 @@ const routeData = [
 			},
 			{
 				path: "company",
-				Component: withSuspense(EventTabbedView),
-				loader: ({ params }) => {
+				Component: withSuspense(CompanyTabbedView),
+				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathname !== nextUrl.pathname,
+				loader: async () => {
+					store.set(missingDataCompanyAtom); // refresh
+					store.set(onboardingCompanyAtom);
 					return {
 						pageTitle: "Company",
-						missingDataId: params.payrollId
+						missingData: await store.get(missingDataCompanyAtom),
+						onboardingTaskCount: (await store.get(onboardingCompanyAtom)).length,
 					}
 				},
 				children: [
 					{
-						path: "missingdata",
-						Component: AsyncCaseTable,
-						loader: ({ params }) => {
-							return defer({
-								data: getCompanyCases(params, "CCT"),
-							});
-						},
+						path: "onboarding",
+						Component: OnboardingView,
+						loader: () => store.get(onboardingCompanyAtom),
 					},
-					createRouteCaseForm("missingdata/:caseName", {
-						renderTitle: false,
+					createRouteCaseForm("onboarding/:caseName", {
 					}),
 					{
 						path: "new",
@@ -865,9 +875,7 @@ const routeData = [
 							});
 						},
 					},
-					createRouteCaseForm("new/:caseName", {
-						renderTitle: false,
-					}),
+					createRouteCaseForm("new/:caseName"),
 					{
 						path: "events",
 						Component: AsyncEventTable,
@@ -879,7 +887,14 @@ const routeData = [
 							},
 						}),
 					},
-					createRouteDataView("data"),
+					createRouteDataView("data", async () => {
+						return {
+							missingData: await store.get(missingDataCompanyAtom)
+						};
+					}),
+					createRouteCaseForm("missingdata/:caseName", {
+						redirect: "../../data"
+					}),
 					createRouteDocument(false),
 				],
 			},
@@ -904,9 +919,9 @@ const routeData = [
 						Component: withPage("Missing data", AsyncCaseTable, true),
 						loader: () => {
 							// refresh missing data
-							store.set(employeeMissingDataAtom);
+							store.set(ESSMissingDataAtom);
 							return defer({
-								data: store.get(employeeMissingDataAtom),
+								data: store.get(ESSMissingDataAtom),
 							});
 						},
 						children: [

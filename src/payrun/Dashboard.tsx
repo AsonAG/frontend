@@ -786,10 +786,10 @@ function EmployeeRow({ row, onClick, containerSx, minWidth, dispatch }: Dashboar
     };
   }
   const rowSx: SxProps<Theme> = { ...stackSx, ...containerSx };
-  const elevation = row.getCanExpand() && row.getIsExpanded() ? 1 : 0;
+  const variant = row.getCanExpand() && row.getIsExpanded() ? "outlined" : undefined;
   const visibleCells = row.getVisibleCells();
   return (
-    <Stack component={Paper} elevation={elevation} sx={{ transition: "none", minWidth }}>
+    <Stack component={Paper} variant={variant} sx={{ transition: "none", minWidth }}>
       <Box component="div" sx={rowSx} onClick={onClick}>
         {visibleCells.map((cell) => {
           const { tooltip, alignment } = (cell.column.columnDef.meta || {});

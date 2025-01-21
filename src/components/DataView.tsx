@@ -1,6 +1,6 @@
 import { Button, Stack, Tooltip } from "@mui/material";
 import React from "react";
-import { Link, useRouteLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { DataTable } from "./tables/DataTable";
 import { Warning } from "@mui/icons-material";
 import { MissingData } from "../models/MissingData";
@@ -21,9 +21,10 @@ type LoaderData = {
 
 function MissingDataButtons() {
   const { t } = useTranslation();
-  const { missingData } = useRouteLoaderData("employee") as LoaderData ?? {}; // only display employee missing data
+  const { missingData } = useLoaderData() as LoaderData;
 
-  if (!missingData) {
+  const missingDataCount = missingData?.cases?.length ?? 0;
+  if (missingDataCount === 0) {
     return;
   }
 
@@ -33,8 +34,8 @@ function MissingDataButtons() {
         <Warning color="warning" sx={{ height: 28, width: 23, mr: 0.25 }} />
       </Tooltip>
       <Stack direction="row" flexWrap="wrap" spacing={1}>
-        {missingData.cases?.map(_case => (
-          <Button key={_case.id} component={Link} to={`../missingData/${encodeURIComponent(_case.name)}`} variant="outlined" color="warning" size="small">{_case.displayName}</Button>
+        {missingData?.cases?.map(_case => (
+          <Button key={_case.id} component={Link} to={`../missingdata/${encodeURIComponent(_case.name)}`} variant="outlined" color="warning" size="small">{_case.displayName}</Button>
         ))}
       </Stack>
     </Stack>

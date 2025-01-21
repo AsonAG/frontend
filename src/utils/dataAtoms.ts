@@ -9,6 +9,7 @@ import {
 	getOrganizations,
 	getCompanyMissingDataCases,
 	getEmployeeCases,
+	getCompanyCases,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
@@ -19,6 +20,7 @@ import { MissingData } from "../models/MissingData";
 import { atomWithRefresh, atomWithStorage, createJSONStorage } from "jotai/utils";
 import { ExpandedState } from "@tanstack/react-table";
 import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
+import { AvailableCase } from "../models/AvailableCase";
 
 export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
@@ -82,34 +84,60 @@ export const openTasksAtom = atomWithRefresh(async (get) => {
 	return getTasks({ orgId, payrollId }, filter, orderBy);
 });
 
-export const missingDataTasksAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
+export const missingDataEmployeesAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return [];
 
-	let missingData: Array<MissingData> = [];
 	var employeeMissingData = await getEmployeeMissingData({ orgId, payrollId });
-	var companyMissingDataCases = await getCompanyMissingDataCases({ orgId, payrollId });
 	if (Array.isArray(employeeMissingData)) {
-		missingData = employeeMissingData;
+		return employeeMissingData;
 	}
+	return [];
+})
+
+export const missingDataCompanyAtom = atomWithRefresh<Promise<MissingData>>(async (get) => {
+	const orgId = get(orgIdAtom);
+	const payrollId = get(payrollIdAtom);
+	let missingData: MissingData = {
+		id: payrollId,
+		cases: []
+	};
+	if (orgId === null || payrollId === null)
+		return missingData;
+
+	var companyMissingDataCases = await getCompanyMissingDataCases({ orgId, payrollId });
 	if (Array.isArray(companyMissingDataCases)) {
-		const companyMissingData: MissingData = {
-			id: payrollId,
-			cases: companyMissingDataCases
-		};
-		missingData.push(companyMissingData);
+		missingData.cases = companyMissingDataCases;
 	}
 	return missingData;
-});
+})
+
+export const onboardingCompanyAtom = atomWithRefresh<Promise<Array<AvailableCase>>>(async (get) => {
+	const orgId = get(orgIdAtom);
+	const payrollId = get(payrollIdAtom);
+	if (orgId === null || payrollId === null) return [];
+
+	var companyOnboardingCases = await getCompanyCases({ orgId, payrollId }, "O");
+	if (Array.isArray(companyOnboardingCases)) {
+		return companyOnboardingCases;
+	}
+	return [];
+})
+
+export const companyMissingDataCountAtom = atom(async (get) => {
+	const missingCompanyData = await get(missingDataCompanyAtom);
+	const onboardingData = await get(onboardingCompanyAtom);
+	return missingCompanyData.cases.length + onboardingData.length;
+})
 
 export const showOrgSelectionAtom = atom(async (get) => {
 	const orgs = await get(orgsAtom);
 	return orgs.length > 1;
 });
 
-export const missingDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async (get) => {
-	const missingData = await get(missingDataTasksAtom);
+export const missingEmployeeDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async (get) => {
+	const missingData = await get(missingDataEmployeesAtom);
 	const map = new Map();
 	for (var data of missingData || []) {
 		map.set(data.id, data);
@@ -117,7 +145,7 @@ export const missingDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async 
 	return map;
 });
 
-export const employeeMissingDataAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
+export const ESSMissingDataAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	const selfServiceEmployee = await get(selfServiceEmployeeAtom);
@@ -139,9 +167,9 @@ export function toast(severity: ToastSeverity, message: string) {
 	getDefaultStore().set(toastNotificationAtom, { severity, message });
 }
 
-export function useMissingDataCount(objectId: IdType) {
-	const allMissingData = useAtomValue(missingDataMapAtom);
-	const missingData = allMissingData.get(objectId);
+export function useEmployeeMissingDataCount(objectId: IdType) {
+	const employeeMissingDataMap = useAtomValue(missingEmployeeDataMapAtom);
+	const missingData = employeeMissingDataMap.get(objectId);
 	if (!missingData) return null;
 	return missingData.cases.length;
 }

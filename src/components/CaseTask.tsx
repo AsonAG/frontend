@@ -7,19 +7,21 @@ import {
 import { CategoryLabel } from "./CategoryLabel";
 
 type CaseTaskProps = {
-  objectId: string
-  type: "C" | "E" | "HR" | "P"
+  objectId?: string
+  type: "C" | "E" | "HR" | "P" | "O"
   _case: {
     name: string
     displayName: string
   }
   stackSx?: SxProps<Theme>
+  path?: string
 }
 
-export function CaseTask({ objectId, type, _case, stackSx }: CaseTaskProps) {
-  const subPath = type === "C" ? "company" : `employees/${objectId}`;
+export function CaseTask({ objectId, type, _case, stackSx, path }: CaseTaskProps) {
+  const subPath = type === "C" || type === "O" ? "company" : `employees/${objectId}`;
+  const to = path ?? `${subPath}/new/${encodeURIComponent(_case.name)}`;
   return (
-    <Link to={`${subPath}/new/${encodeURIComponent(_case.name)}`}>
+    <Link to={to}>
       <Stack spacing={1} direction="row" p={1} sx={stackSx} justifySelf="start">
         <CategoryLabel
           label={type}
