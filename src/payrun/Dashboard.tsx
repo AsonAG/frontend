@@ -271,8 +271,9 @@ function createColumns() {
           headerTooltip: t => t("Outstanding amount to be paid from the previous period")
         }
       }),
-    columnHelper.accessor("entry.paidOut",
+    columnHelper.accessor(row => (row.entry?.paidOut ?? 0) + (row.entry?.paidOutGarnishment ?? 0),
       {
+        id: "paidOut",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
         header: ({ t }) => t("Paid"),
         size: 110,
@@ -789,7 +790,7 @@ function EmployeeRow({ row, onClick, containerSx, minWidth, dispatch }: Dashboar
   const variant = row.getCanExpand() && row.getIsExpanded() ? "outlined" : undefined;
   const visibleCells = row.getVisibleCells();
   return (
-    <Stack component={Paper} variant={variant} sx={{ transition: "none", minWidth }}>
+    <Stack component={Paper} elevation={0} variant={variant} sx={{ transition: "none", minWidth }}>
       <Box component="div" sx={rowSx} onClick={onClick}>
         {visibleCells.map((cell) => {
           const { tooltip, alignment } = (cell.column.columnDef.meta || {});

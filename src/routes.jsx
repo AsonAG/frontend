@@ -52,6 +52,7 @@ import {
 	createPayout,
 	cancelPayout,
 	downloadData,
+	bootstrapPayrunPeriods,
 	getCompanyBankDetails as getCompanyBankAccountDetails
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
@@ -99,6 +100,7 @@ import { PeriodCaseValueDialog } from "./payrun/PeriodCaseValueDialog";
 import { base64ToBytes } from "./services/converters/BinaryConverter";
 import { CompanyTabbedView } from "./company/CompanyTabbedView";
 import { OnboardingView } from "./company/OnboardingView";
+import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -434,6 +436,13 @@ const routeData = [
 					}
 					return null;
 				}
+			},
+			{
+				path: "orgs/bootstrap",
+				action: async () => {
+					await bootstrapPayrunPeriods();
+					return redirect("..");
+				}
 			}
 		],
 	},
@@ -715,6 +724,7 @@ const routeData = [
 							newEventRoot: true
 						},
 						shouldRevalidate: ({ nextUrl }) => nextUrl.pathname.endsWith("payrunperiods/open"),
+						ErrorBoundary: PayrunErrorBoundary,
 						loader: async ({ params }) => {
 							const employees = await getEmployees(params)
 								.withActive()
@@ -722,6 +732,9 @@ const routeData = [
 								.fetchJson();
 							if (params.payrunPeriodId === "open") {
 								const payrunPeriod = await getOpenPayrunPeriod(params)
+								if (payrunPeriod === null) {
+									throw new Response("Not found", { status: 404 });
+								}
 								const previousPayrunPeriod = await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
 								const controllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
 								const caseValueCounts = await Promise.all(employees.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.id }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true)));

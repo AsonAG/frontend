@@ -209,6 +209,7 @@ const translations = {
 		"payrun_period_ready": "Auszahlungsbereit",
 		"payrun_period_paid_out": "Ausbezahlt",
 		"payrun_period_without_occupation": "Ohne Beschäftigung",
+		"The open period is being created. Please refresh the page in a moment.": "Die offene Periode wird erstellt, bitte laden Sie die Seite nach kurzer Zeit neu.",
 
 		// Headers
 		"Id of the employee": "Id des Mitarbeiters",

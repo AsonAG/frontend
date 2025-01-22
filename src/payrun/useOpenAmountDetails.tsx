@@ -63,13 +63,13 @@ export function useOpenAmountDetails(context: CellContext<EntryRow, number | nul
       onClose={handlePopoverClose}
     >
       <Stack spacing={1} sx={{ p: 2 }}>
-        <OpenDetailRow label={t("Net")} value={formatValue(context.row.original.entry?.netWage)} />
-        {offsettingHidden && <OpenDetailRow label={t("Offsetting")} value={formatValue(context.row.original.entry?.offsetting)} />}
-        {openWagePayoutPreviousPeriodHidden && <OpenDetailRow label={t("Open from previous period")} value={formatValue(context.row.original.entry?.openWagePayoutPreviousPeriod)} />}
-        {retroHidden && <OpenDetailRow label={t("Retro")} value={formatValue(context.row.original.entry?.retro)} />}
+        <OpenDetailRow label={t("Net wage open period")} value={formatValue(context.row.original.entry?.netWage)} />
+        {offsettingHidden && <OpenDetailRow label={t("Offsettings, i.e. supplements and deductions after the net wage")} value={formatValue(context.row.original.entry?.offsetting)} />}
+        {openWagePayoutPreviousPeriodHidden && <OpenDetailRow label={t("Outstanding amount to be paid from the previous period")} value={formatValue(context.row.original.entry?.openWagePayoutPreviousPeriod)} />}
+        {retroHidden && <OpenDetailRow label={t("Net amount from all retroactive changes prior to the open period")} value={formatValue(context.row.original.entry?.retro)} />}
         <OpenDetailRow label={t("Open")} value={formatValue(context.row.original.entry?.openPayout)} />
-        {garnishmentHidden && <OpenDetailRow label={t("Garnishment")} value={formatValue(context.row.original.entry?.garnishment)} />}
-        {openGarnishmentPayoutPreviousPeriodHidden && <OpenDetailRow label={t("Garnishment")} value={formatValue(context.row.original.entry?.openGarnishmentPayoutPreviousPeriod)} />}
+        {garnishmentHidden && <OpenDetailRow label={t("Garnishment open period")} value={formatValue(context.row.original.entry?.openGarnishmentPayout)} />}
+        {openGarnishmentPayoutPreviousPeriodHidden && <OpenDetailRow label={t("Garnishments to be paid from the previous period")} value={formatValue(context.row.original.entry?.openGarnishmentPayoutPreviousPeriod)} />}
       </Stack>
     </Popover>
   );
@@ -89,5 +89,5 @@ function OpenDetailRow({ label, value }: { label: string, value: string | null }
   )
 }
 
-const openDetailColumns = getRowGridSx([{ width: 150 }, { width: 100 }], 2);
+const openDetailColumns = getRowGridSx([{ width: 310 }, { width: 100 }], 2);
 

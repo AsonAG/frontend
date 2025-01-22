@@ -9,6 +9,7 @@ export type PayrunPeriodEntry = {
   offsetting: number | null
   employerCost: number | null
   paidOut: number | null
+  paidGarnishment: number | null
   garnishment: number
   retro: number
   openPayout: number | null
