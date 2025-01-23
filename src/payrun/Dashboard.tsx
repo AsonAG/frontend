@@ -51,10 +51,11 @@ declare module '@tanstack/react-table' {
 
 
 export function PayrunDashboard() {
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   return (
     <>
       <ContentLayout title={<DashboardHeader index />}>
-        <PayrunPeriodTable />
+        <PayrunPeriodTable key={payrunPeriod?.id} />
       </ContentLayout>
       <Outlet />
     </>
@@ -490,7 +491,7 @@ function PayrunPeriodTable() {
       }
     }
     return employees.map(mapEmployee);
-  }, [employees, payrunPeriod?.entries]);
+  }, [employees, payrunPeriod?.entries, previousPayrunPeriod?.entries, isOpen, controllingTasks, caseValueCounts]);
 
   const periodTotals: PeriodTotals = useMemo(() => {
     let totals = {
