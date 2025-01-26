@@ -798,7 +798,7 @@ function EmployeeRow({ row, onClick, containerSx, minWidth, dispatch }: Dashboar
       </Box>
       {row.getIsExpanded() &&
         <>
-          {row.original.controllingTasks?.map(task => <CaseTask key={task.name} _case={task} objectId={row.original.id} type="P" stackSx={caseTaskSx} />)}
+          {row.original.controllingTasks?.map(task => <CaseTask key={task.name} _case={task} objectId={row.original.employeeId} type="P" stackSx={caseTaskSx} />)}
         </>
       }
     </Stack >
