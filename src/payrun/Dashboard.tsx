@@ -545,7 +545,7 @@ function PayrunPeriodTable() {
   const submit = useSubmit();
 
   const onPayout = async (valueDate: string, accountIban: string) => {
-    const payouts = state.entries.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 }));
+    const payouts = state.entries.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.employeeId, amount: x.amount || 0 }));
     const payout: Payout = {
       // @ts-ignore
       valueDate,

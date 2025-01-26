@@ -756,7 +756,7 @@ const routeData = [
 									const response1 = await createPayout({ ...params, payrunPeriodId }, payout);
 									// const [response1, response2] = await Promise.all([createPayout({ ...params, payrunPeriodId }, payout), createPayout({ ...params, payrunPeriodId }, payout)]);
 									if (response1.ok) {
-										toast("success", "")
+										toast("success", "Payout created")
 										const createdPayout = await response1.json();
 										const bytes = base64ToBytes(createdPayout.painFile.content);
 										const blob = new Blob([bytes], { type: createdPayout.painFile.contentType })
