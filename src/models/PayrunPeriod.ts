@@ -4,12 +4,15 @@ export type PayrunPeriodEntry = {
   id: IdType
   employeeId: IdType
   payrunJobId: IdType
+  identifier: string
+  lastName: string
+  firstName: string
   netWage: number | null
   grossWage: number | null
   offsetting: number | null
   employerCost: number | null
   paidOut: number | null
-  paidGarnishment: number | null
+  paidOutGarnishment: number | null
   garnishment: number
   retro: number
   openPayout: number | null

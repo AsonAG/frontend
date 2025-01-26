@@ -726,23 +726,19 @@ const routeData = [
 						shouldRevalidate: ({ nextUrl }) => nextUrl.pathname.endsWith("payrunperiods/open"),
 						ErrorBoundary: PayrunErrorBoundary,
 						loader: async ({ params }) => {
-							const employees = await getEmployees(params)
-								.withActive()
-								.withQueryParam("orderBy", `lastName asc`)
-								.fetchJson();
 							if (params.payrunPeriodId === "open") {
 								const payrunPeriod = await getOpenPayrunPeriod(params)
 								if (payrunPeriod === null) {
 									throw new Response("Not found", { status: 404 });
 								}
 								const previousPayrunPeriod = await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
-								const controllingTasks = await Promise.all(employees.map(e => getEmployeeCases({ ...params, employeeId: e.id }, "P")));
-								const caseValueCounts = await Promise.all(employees.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.id }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true)));
+								const controllingTasks = await Promise.all(payrunPeriod.entries.map(e => getEmployeeCases({ ...params, employeeId: e.employeeId }, "P")));
+								const caseValueCounts = await Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true)));
 								const bankAccountDetails = await getCompanyBankAccountDetails(params);
-								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
+								return { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
 							}
 							const payrunPeriod = await getPayrunPeriod(params);
-							return { employees, payrunPeriod };
+							return { payrunPeriod };
 						},
 						children: [
 							{

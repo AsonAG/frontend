@@ -131,7 +131,7 @@ function createColumns() {
       id: "employerCostTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.employerCost),
       columns: [
-        columnHelper.accessor("entry.employerCost",
+        columnHelper.accessor("employerCost",
           {
             id: "employerCost",
             cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
@@ -149,7 +149,7 @@ function createColumns() {
       id: "previousGrossWageTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.previousGross),
       columns: [
-        columnHelper.accessor("previousEntry.grossWage",
+        columnHelper.accessor(row => row.previousEntry?.grossWage ?? null,
           {
             id: "grossPreviousPeriod",
             cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
@@ -162,7 +162,7 @@ function createColumns() {
           }),
       ]
     }),
-    columnHelper.accessor(row => formatValue((row.entry?.grossWage ?? 0) - (row.previousEntry?.grossWage ?? 0)),
+    columnHelper.accessor(row => formatValue((row.grossWage ?? 0) - (row.previousEntry?.grossWage ?? 0)),
       {
         id: "grossDiff",
         cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
@@ -177,18 +177,17 @@ function createColumns() {
       id: "grossWageTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.gross),
       columns: [
-        columnHelper.accessor("entry.grossWage",
+        columnHelper.accessor("grossWage",
           {
             cell: (props) => {
-              const { entry, previousEntry } = props.row.original;
-              const wage = entry?.["grossWage"];
-              const previousWage = previousEntry?.["grossWage"];
+              const { grossWage, previousEntry } = props.row.original;
+              const previousGrossWage = previousEntry?.grossWage;
               const isOpen = props.table.options.meta?.isOpen;
-              if (!isOpen || !wage || wage === previousWage) {
+              if (!isOpen || !grossWage || grossWage === previousGrossWage) {
                 // no highlight
                 return <Typography noWrap>{formatValue(props.getValue())}</Typography>
               }
-              const trendingUp = !previousWage || (wage > previousWage);
+              const trendingUp = !previousGrossWage || (grossWage > previousGrossWage);
 
               const Icon = trendingUp ? TrendingUp : TrendingDown;
               const color = trendingUp ? "green" : "red";
@@ -213,7 +212,7 @@ function createColumns() {
       id: "netWageTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.net),
       columns: [
-        columnHelper.accessor("entry.netWage",
+        columnHelper.accessor("netWage",
           {
             cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
             header: ({ t }) => t("Net"),
@@ -226,7 +225,7 @@ function createColumns() {
           }),
       ]
     }),
-    columnHelper.accessor("entry.offsetting",
+    columnHelper.accessor("offsetting",
       {
         id: "offsetting",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
@@ -238,7 +237,7 @@ function createColumns() {
           headerTooltip: t => t("Offsettings, i.e. supplements and deductions after the net wage")
         }
       }),
-    columnHelper.accessor("entry.retro",
+    columnHelper.accessor("retro",
       {
         id: "retro",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
@@ -250,7 +249,7 @@ function createColumns() {
           headerTooltip: (t) => t("Net amount from all retroactive changes prior to the open period")
         }
       }),
-    columnHelper.accessor("entry.openGarnishmentPayoutPreviousPeriod",
+    columnHelper.accessor("openGarnishmentPayoutPreviousPeriod",
       {
         id: "openGarnishmentPayoutPreviousPeriod",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
@@ -261,7 +260,7 @@ function createColumns() {
           headerTooltip: t => t("Garnishments to be paid from the previous period")
         }
       }),
-    columnHelper.accessor("entry.openWagePayoutPreviousPeriod",
+    columnHelper.accessor("openWagePayoutPreviousPeriod",
       {
         id: "openWagePayoutPreviousPeriod",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
@@ -272,7 +271,7 @@ function createColumns() {
           headerTooltip: t => t("Outstanding amount to be paid from the previous period")
         }
       }),
-    columnHelper.accessor(row => (row.entry?.paidOut ?? 0) + (row.entry?.paidOutGarnishment ?? 0),
+    columnHelper.accessor(row => (row.paidOut ?? 0) + (row.paidOutGarnishment ?? 0),
       {
         id: "paidOut",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
@@ -283,7 +282,7 @@ function createColumns() {
           headerTooltip: (t) => t("Already paid out in the open period")
         }
       }),
-    columnHelper.accessor("entry.garnishment",
+    columnHelper.accessor("garnishment",
       {
         id: "garnishment",
         cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
@@ -298,7 +297,7 @@ function createColumns() {
       id: "openTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.open),
       columns: [
-        columnHelper.accessor("entry.openPayout",
+        columnHelper.accessor("openPayout",
           {
             id: "openPayout",
             cell: context => {
@@ -336,7 +335,7 @@ function createColumns() {
               event.stopPropagation();
             }
           }
-          return <AmountInput employee={row.original} dispatch={dispatch} onClick={onClick} />;
+          return <AmountInput entry={row.original} dispatch={dispatch} onClick={onClick} />;
         },
         header: ({ t }) => t("dashboard_payout_header"),
         footer: (props) => formatValue(props.table.getState().payoutTotals.payingOut),
@@ -348,7 +347,7 @@ function createColumns() {
     columnHelper.display({
       id: "documents",
       cell: (props) => {
-        const payrunEntry = props.row.original.entry;
+        const payrunEntry = props.row.original;
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             {
@@ -369,13 +368,13 @@ function createColumns() {
     columnHelper.display({
       id: "events",
       cell: ({ row, t }) => {
-        const { entry, caseValueCount } = row.original;
-        if (!entry || caseValueCount === 0)
+        const { employeeId, caseValueCount } = row.original;
+        if (caseValueCount === 0)
           return <div></div>;
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             <Tooltip title={t("Events")} placement="left">
-              <IconButton size="small" component={Link} to={`employees/${entry.employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
+              <IconButton size="small" component={Link} to={`employees/${employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
             </Tooltip>
           </Stack>
         )
@@ -392,9 +391,7 @@ function createColumns() {
 export const columns = createColumns();
 
 
-export type EntryRow = Employee & {
-  name: string
-  entry: PayrunPeriodEntry | undefined
+export type EntryRow = PayrunPeriodEntry & {
   previousEntry: PayrunPeriodEntry | undefined
   amount: number | undefined
   controllingTasks: Array<AvailableCase> | undefined
@@ -403,7 +400,7 @@ export type EntryRow = Employee & {
 
 function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL" | "Payable") {
   if (type === "Payable") {
-    return employees.filter(e => ((e.entry?.openPayout ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0);
+    return employees.filter(e => ((e.openPayout ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0);
   }
   const predicate = (_: any, i: number) => [1, 3, 5, 6, employees.length - 1].includes(i);
   const inverted = (_: any, i: number) => !predicate(_, i);
@@ -473,29 +470,22 @@ function getStickySx(priority: number, position: { top?: number, bottom?: number
 
 function PayrunPeriodTable() {
   const { t } = useTranslation();
-  const { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  const { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const [expanded, setExpanded] = useAtom(expandedControllingTasks);
   const isOpen = payrunPeriod.periodStatus === "Open";
-  const employeeRows: Array<EntryRow> = useMemo(() => {
-    function mapEmployee(employee: Employee, index: number): EntryRow {
-      const entry = payrunPeriod?.entries?.find(entry => entry.employeeId === employee.id);
-      const open = entry?.openPayout ?? 0;
-      return {
-        ...employee,
-        entry,
-        name: `${employee.firstName} ${employee.lastName}`,
-        amount: open,
-        previousEntry: previousPayrunPeriod?.entries?.find(entry => entry.employeeId == employee.id),
-        controllingTasks: isOpen ? controllingTasks[index] : [],
-        caseValueCount: isOpen ? caseValueCounts[index] : 0
-      }
-    }
-    return employees.map(mapEmployee);
-  }, [employees, payrunPeriod?.entries, previousPayrunPeriod?.entries, isOpen, controllingTasks, caseValueCounts]);
+  const rows: Array<EntryRow> = useMemo(() => {
+    return payrunPeriod.entries.map((entry, index) => ({
+      ...entry,
+      amount: entry.openPayout ?? 0,
+      previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.id),
+      controllingTasks: isOpen ? controllingTasks[index] : [],
+      caseValueCount: isOpen ? caseValueCounts[index] : 0
+    }));
+  }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingTasks, caseValueCounts]);
 
   const periodTotals: PeriodTotals = useMemo(() => {
     let totals = {
-      employees: employees.length,
+      employees: payrunPeriod.entries.length,
       previousGross: 0,
       gross: 0,
       net: 0,
@@ -503,21 +493,21 @@ function PayrunPeriodTable() {
       employerCost: 0
     };
 
-    for (let employee of employeeRows) {
-      const entry = employee.entry;
-      totals.previousGross += employee.previousEntry?.grossWage ?? 0;
+    for (let row of rows) {
+      const entry = row;
+      totals.previousGross += row.previousEntry?.grossWage ?? 0;
       totals.gross += entry?.grossWage ?? 0;
       totals.net += entry?.netWage ?? 0;
       totals.open += entry?.openPayout ?? 0;
       totals.employerCost += entry?.employerCost ?? 0;
     }
     return totals;
-  }, [employeeRows, payrunPeriod?.entries])
+  }, [rows, payrunPeriod.entries])
 
 
   const [state, dispatch] = useReducer(
     reducer,
-    employeeRows,
+    rows,
     createInitialState
   );
   const { filtered, filter: mode } = state;
@@ -555,7 +545,7 @@ function PayrunPeriodTable() {
   const submit = useSubmit();
 
   const onPayout = async (valueDate: string, accountIban: string) => {
-    const payouts = state.employees.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 }));
+    const payouts = state.entries.filter(e => state.selected[e.id]).map(x => ({ employeeId: x.id, amount: x.amount || 0 }));
     const payout: Payout = {
       // @ts-ignore
       valueDate,
@@ -579,9 +569,11 @@ function PayrunPeriodTable() {
     <Stack>
       <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
         <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
-          <Chip icon={<FilterList />} variant={mode === "Payable" ? "filled" : "outlined"} sx={chipSx} onClick={() => { dispatch({ type: "toggle_mode", mode: "Payable" }) }} color="primary" />
-          <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL" }) }} color="primary" />
-          <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML" }) }} color="primary" />
+          <Chip label={t("payrun_period_ready")} variant={mode === "Payable" ? "filled" : "outlined"} size="small" onClick={() => { dispatch({ type: "toggle_mode", mode: "Payable" }) }} color="primary" />
+          {
+            // <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL" }) }} color="primary" />
+            // <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML" }) }} color="primary" />
+          }
         </Stack>
       </Stack>
       <Stack sx={{ overflow: "auto", height: "calc(100vh - 206px)" }}>
@@ -718,16 +710,16 @@ type RowGroup = {
 
 function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
   function groupingFn(row: Row<EntryRow>) {
-    if (!row.original.entry?.payrunJobId) {
+    if (!row.original.payrunJobId) {
       return "payrun_period_calculating";
     }
     if ((row.original.controllingTasks?.length ?? 0) > 0) {
       return "payrun_period_controlling";
     }
-    if (!!row.original.entry?.openPayout) {
+    if (!!row.original.openPayout) {
       return "payrun_period_ready";
     }
-    if (row.original.entry?.openPayout === 0 && ((row.original.entry?.netWage ?? 0) > 0) && ((row.original.entry?.grossWage ?? 0) > 0)) {
+    if (row.original.openPayout === 0 && ((row.original.netWage ?? 0) > 0) && ((row.original.grossWage ?? 0) > 0)) {
       return "payrun_period_paid_out";
     }
     return "payrun_period_without_occupation";
@@ -840,7 +832,7 @@ type PayoutTotals = {
 }
 
 type State = {
-  employees: Array<EntryRow>
+  entries: Array<EntryRow>
   filtered: Array<EntryRow>
   selected: RowSelectionState
   expanded: ExpandedState
@@ -871,7 +863,7 @@ type Action = {
 function reducer(state: State, action: Action): State {
   const resetState = (): State => ({
     ...state,
-    filtered: state.employees,
+    filtered: state.entries,
     selected: {},
     expanded: {},
     filter: "All"
@@ -885,14 +877,14 @@ function reducer(state: State, action: Action): State {
         if (action.mode === state.filter) {
           return resetState();
         }
-        const employees = getFilteredEmployees(state.employees, action.mode);
+        const rows = getFilteredEmployees(state.entries, action.mode);
         const selected: RowSelectionState = Object.fromEntries(
-          employees.map(e => ([e.id, isRowSelectionEnabled(e)]))
+          rows.map(e => ([e.id, isRowSelectionEnabled(e)]))
         );
         return {
           ...state,
           selected,
-          filtered: employees,
+          filtered: rows,
           filter: action.mode,
         }
       }
@@ -906,7 +898,7 @@ function reducer(state: State, action: Action): State {
           selected: selected,
         };
       case "set_amount":
-        const employee = state.employees.find(e => e.id === action.id);
+        const employee = state.entries.find(e => e.id === action.id);
         if (employee) {
           employee.amount = action.amount;
         }
@@ -919,7 +911,7 @@ function reducer(state: State, action: Action): State {
     }
   }
   let stateAfterAction = applyAction();
-  stateAfterAction.payoutTotals = getPayoutTotals(stateAfterAction.employees, stateAfterAction.selected);
+  stateAfterAction.payoutTotals = getPayoutTotals(stateAfterAction.entries, stateAfterAction.selected);
   stateAfterAction.mode = Object.values(stateAfterAction.selected).some(s => s) ? "payout" : "view";
   stateAfterAction.columnVisibility = stateAfterAction.mode === "view" ? { "amount": false } : {
     "documents": false,
@@ -928,25 +920,24 @@ function reducer(state: State, action: Action): State {
   return stateAfterAction;
 }
 
-function getPayoutTotals(employees: Array<EntryRow>, selected: RowSelectionState) {
+function getPayoutTotals(entries: Array<EntryRow>, selected: RowSelectionState) {
   let totals = {
     open: 0,
     payingOut: 0
   }
 
-  for (let employee of employees) {
-    if (!selected[employee.id])
+  for (let entry of entries) {
+    if (!selected[entry.id])
       continue;
-    const entry = employee.entry;
     totals.open += entry?.openPayout ?? 0;
-    totals.payingOut += employee.amount ?? 0;
+    totals.payingOut += entry.amount ?? 0;
   }
   return totals;
 }
 
 function createInitialState(employeeRows: Array<EntryRow>): State {
   return {
-    employees: employeeRows,
+    entries: employeeRows,
     filtered: employeeRows,
     selected: {},
     expanded: {},
@@ -962,32 +953,32 @@ function createInitialState(employeeRows: Array<EntryRow>): State {
   };
 }
 
-const hasControllingTasks = (employee: EntryRow) => (employee.controllingTasks?.length ?? 0) > 0;
-const hasOpenAmount = (employee: EntryRow) => ((employee.entry?.netWage ?? 0) - (employee.entry?.paidOut ?? 0)) > 0;
+const hasControllingTasks = (entry: EntryRow) => (entry.controllingTasks?.length ?? 0) > 0;
+const hasOpenAmount = (entry: EntryRow) => ((entry.netWage ?? 0) - (entry.paidOut ?? 0)) > 0;
 const isRowSelectionEnabled = (row: EntryRow) => !hasControllingTasks(row) && hasOpenAmount(row);
 
 type AmountInputProps = {
-  employee: EntryRow
+  entry: EntryRow
   dispatch: Dispatch<Action>
   onClick: MouseEventHandler
 }
 
-function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
-  if (!employee.entry?.openPayout)
+function AmountInput({ entry, dispatch, onClick }: AmountInputProps) {
+  if (!entry.openPayout)
     return;
 
   const handleChange = ({ floatValue }) => {
-    dispatch({ type: "set_amount", id: employee.id, amount: floatValue });
+    dispatch({ type: "set_amount", id: entry.id, amount: floatValue });
   };
 
   const receiveFocus = () => {
-    dispatch({ type: "set_selected", id: employee.id, selected: true });
+    dispatch({ type: "set_selected", id: entry.id, selected: true });
   }
 
   return (
     <NumericFormat
       onClick={onClick}
-      value={employee.amount}
+      value={entry.amount}
       onValueChange={handleChange}
       onFocus={receiveFocus}
       valueIsNumericString
@@ -999,7 +990,7 @@ function AmountInput({ employee, dispatch, onClick }: AmountInputProps) {
       size="small"
       isAllowed={(values) => {
         const { floatValue } = values;
-        return (floatValue ?? 0) <= (employee.entry?.openPayout ?? 0);
+        return (floatValue ?? 0) <= (entry.openPayout ?? 0);
       }}
       slotProps={{
         htmlInput: {

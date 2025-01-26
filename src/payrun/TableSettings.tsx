@@ -1,5 +1,5 @@
 import { Settings } from "@mui/icons-material";
-import { FormControlLabel, FormGroup, IconButton, Stack, Switch, SxProps, Theme, Tooltip, Typography } from "@mui/material";
+import { FormControlLabel, FormGroup, IconButton, IconButtonProps, Stack, Switch, SxProps, Theme, Tooltip, Typography } from "@mui/material";
 import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import * as Popover from '@radix-ui/react-popover';
 import React from "react";
@@ -44,11 +44,11 @@ const popoverSx: SxProps<Theme> = {
   zIndex: theme => theme.zIndex.appBar
 };
 
-export function TableSettingsButton() {
+export const TableSettingsButton = React.forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <IconButton size="small">
+        <IconButton size="small" ref={ref} {...props}>
           <Settings fontSize="small" />
         </IconButton>
       </Popover.Trigger>
@@ -61,8 +61,9 @@ export function TableSettingsButton() {
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
+
   )
-}
+})
 
 function FullWidthTableSection() {
   const { t } = useTranslation();

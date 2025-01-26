@@ -15,7 +15,7 @@ type OpenAmountDetails = {
 export function useOpenAmountDetails(context: CellContext<EntryRow, number | null>): OpenAmountDetails {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const { t } = useTranslation();
-  const row = context.row.original.entry;
+  const row = context.row.original;
   const columnVisibility = context.table.getState().columnVisibility;
 
   if (!row) {
@@ -63,13 +63,13 @@ export function useOpenAmountDetails(context: CellContext<EntryRow, number | nul
       onClose={handlePopoverClose}
     >
       <Stack spacing={1} sx={{ p: 2 }}>
-        <OpenDetailRow label={t("Net wage open period")} value={formatValue(context.row.original.entry?.netWage)} />
-        {offsettingHidden && <OpenDetailRow label={t("Offsettings, i.e. supplements and deductions after the net wage")} value={formatValue(context.row.original.entry?.offsetting)} />}
-        {openWagePayoutPreviousPeriodHidden && <OpenDetailRow label={t("Outstanding amount to be paid from the previous period")} value={formatValue(context.row.original.entry?.openWagePayoutPreviousPeriod)} />}
-        {retroHidden && <OpenDetailRow label={t("Net amount from all retroactive changes prior to the open period")} value={formatValue(context.row.original.entry?.retro)} />}
-        <OpenDetailRow label={t("Open")} value={formatValue(context.row.original.entry?.openPayout)} />
-        {garnishmentHidden && <OpenDetailRow label={t("Garnishment open period")} value={formatValue(context.row.original.entry?.openGarnishmentPayout)} />}
-        {openGarnishmentPayoutPreviousPeriodHidden && <OpenDetailRow label={t("Garnishments to be paid from the previous period")} value={formatValue(context.row.original.entry?.openGarnishmentPayoutPreviousPeriod)} />}
+        <OpenDetailRow label={t("Net wage open period")} value={formatValue(context.row.original.netWage)} />
+        {offsettingHidden && <OpenDetailRow label={t("Offsettings, i.e. supplements and deductions after the net wage")} value={formatValue(context.row.original.offsetting)} />}
+        {openWagePayoutPreviousPeriodHidden && <OpenDetailRow label={t("Outstanding amount to be paid from the previous period")} value={formatValue(context.row.original.openWagePayoutPreviousPeriod)} />}
+        {retroHidden && <OpenDetailRow label={t("Net amount from all retroactive changes prior to the open period")} value={formatValue(context.row.original.retro)} />}
+        <OpenDetailRow label={t("Open")} value={formatValue(context.row.original.openPayout)} />
+        {garnishmentHidden && <OpenDetailRow label={t("Garnishment open period")} value={formatValue(context.row.original.openGarnishmentPayout)} />}
+        {openGarnishmentPayoutPreviousPeriodHidden && <OpenDetailRow label={t("Garnishments to be paid from the previous period")} value={formatValue(context.row.original.openGarnishmentPayoutPreviousPeriod)} />}
       </Stack>
     </Popover>
   );
