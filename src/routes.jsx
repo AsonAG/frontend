@@ -726,6 +726,10 @@ const routeData = [
 						shouldRevalidate: ({ nextUrl }) => nextUrl.pathname.endsWith("payrunperiods/open"),
 						ErrorBoundary: PayrunErrorBoundary,
 						loader: async ({ params }) => {
+							const employees = await getEmployees(params)
+								.withActive()
+								.withQueryParam("orderBy", `lastName asc`)
+								.fetchJson();
 							if (params.payrunPeriodId === "open") {
 								const payrunPeriod = await getOpenPayrunPeriod(params)
 								if (payrunPeriod === null) {
@@ -735,10 +739,10 @@ const routeData = [
 								const controllingTasks = await Promise.all(payrunPeriod.entries.map(e => getEmployeeCases({ ...params, employeeId: e.employeeId }, "P")));
 								const caseValueCounts = await Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true)));
 								const bankAccountDetails = await getCompanyBankAccountDetails(params);
-								return { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
+								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
 							}
 							const payrunPeriod = await getPayrunPeriod(params);
-							return { payrunPeriod };
+							return { employees, payrunPeriod };
 						},
 						children: [
 							{
