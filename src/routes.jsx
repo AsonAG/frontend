@@ -735,11 +735,19 @@ const routeData = [
 								if (payrunPeriod === null) {
 									throw new Response("Not found", { status: 404 });
 								}
-								const previousPayrunPeriod = await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
-								const controllingTasksList = await getPayrunPeriodControllingTasks(params);
+								const evalDate = dayjs().toISOString();
+								const [
+									previousPayrunPeriod,
+									controllingTasksList,
+									caseValueCounts,
+									bankAccountDetails
+								] = await Promise.all([
+									getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle(),
+									getPayrunPeriodControllingTasks(params),
+									Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
+									getCompanyBankAccountDetails(params, evalDate)
+								]);
 								const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
-								const caseValueCounts = await Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true)));
-								const bankAccountDetails = await getCompanyBankAccountDetails(params);
 								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
 							}
 							const payrunPeriod = await getPayrunPeriod(params);

@@ -3,7 +3,6 @@ import { authUserAtom, localUserEmailAtom } from "../auth/getUser";
 import { getDefaultStore } from "jotai";
 import { payrollAtom, userAtom } from "../utils/dataAtoms";
 import { useOidc } from "../auth/authConfig";
-import dayjs from "dayjs";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const organizationsUrl = "/tenants";
@@ -318,8 +317,7 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 		.fetchJson();
 }
 
-export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodStart, payrunPeriodEnd, asCount = false) {
-	const evalDate = dayjs().toISOString();
+export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodStart, payrunPeriodEnd, asCount = false, evalDate = null) {
 	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("employeeId", routeParams.employeeId)
@@ -330,7 +328,7 @@ export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payru
 		.withQueryParam("evaluationDate", evalDate)
 		.withLocalization()
 		.withUser()
-		.fetchJson()
+		.fetchJson();
 }
 
 export function getCaseChangeCaseValues(routeParams, top) {
@@ -406,13 +404,14 @@ export function getCompanyMissingDataCases(routeParams) {
 		.fetchJson();
 }
 
-export async function getCompanyBankDetails(routeParams) {
+export async function getCompanyBankDetails(routeParams, evalDate = null) {
 	const ibanFieldName = "CH.Swissdec.CompanyBankIban";
 	const accountFieldName = "CH.Swissdec.CompanyBankName";
 	const values = await new FetchRequestBuilder(timeValuesUrl, routeParams)
 		.withQueryParam("caseType", "Company")
 		.withQueryParams("caseFieldNames", ibanFieldName)
 		.withQueryParams("caseFieldNames", accountFieldName)
+		.withQueryParam("evaluationDate", evalDate)
 		.withUser()
 		.fetchJson();
 
