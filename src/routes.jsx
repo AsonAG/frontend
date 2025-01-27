@@ -350,9 +350,8 @@ function createRoutePayrunPeriodDocument() {
 		loader: async ({ params, request }) => {
 			const report = getQueryParam(request, "report")
 			const variant = getQueryParam(request, "variant")
-			const payrun = await store.get(payrunAtom);
 			return defer({
-				document: getPayrunPeriodDocument({ ...params, payrunId: payrun.id }, report, variant),
+				document: getPayrunPeriodDocument(params, report, variant),
 			});
 		}
 	}
