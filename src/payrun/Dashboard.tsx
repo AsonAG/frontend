@@ -1,11 +1,10 @@
 import React, { Dispatch, Fragment, MouseEventHandler, PropsWithChildren, useMemo, useReducer } from "react";
 import { Link, Outlet, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { Stack, Typography, IconButton, Tooltip, Paper, SxProps, Theme, Chip, Box, TextField, Divider, Button } from "@mui/material";
-import { FilterList, TrendingDown, TrendingUp } from "@mui/icons-material";
+import { TrendingDown, TrendingUp } from "@mui/icons-material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { CaseTask } from "../components/CaseTask";
-import { Employee } from "../models/Employee";
 import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import { PayrunPeriodEntry } from "../models/PayrunPeriod";
@@ -478,7 +477,7 @@ function PayrunPeriodTable() {
       ...entry,
       amount: entry.openPayout ?? 0,
       previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.id),
-      controllingTasks: isOpen ? controllingTasks[index] : [],
+      controllingTasks: isOpen ? controllingTasks.get(entry.employeeId) : [],
       caseValueCount: isOpen ? caseValueCounts[index] : 0
     }));
   }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingTasks, caseValueCounts]);

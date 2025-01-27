@@ -53,7 +53,8 @@ import {
 	cancelPayout,
 	downloadData,
 	bootstrapPayrunPeriods,
-	getCompanyBankDetails as getCompanyBankAccountDetails
+	getCompanyBankDetails as getCompanyBankAccountDetails,
+	getPayrunPeriodControllingTasks
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -735,7 +736,8 @@ const routeData = [
 									throw new Response("Not found", { status: 404 });
 								}
 								const previousPayrunPeriod = await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle();
-								const controllingTasks = await Promise.all(payrunPeriod.entries.map(e => getEmployeeCases({ ...params, employeeId: e.employeeId }, "P")));
+								const controllingTasksList = await getPayrunPeriodControllingTasks(params);
+								const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
 								const caseValueCounts = await Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true)));
 								const bankAccountDetails = await getCompanyBankAccountDetails(params);
 								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
