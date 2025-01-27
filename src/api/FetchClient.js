@@ -3,6 +3,7 @@ import { authUserAtom, localUserEmailAtom } from "../auth/getUser";
 import { getDefaultStore } from "jotai";
 import { payrollAtom, userAtom } from "../utils/dataAtoms";
 import { useOidc } from "../auth/authConfig";
+import dayjs from "dayjs";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const organizationsUrl = "/tenants";
@@ -318,6 +319,7 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 }
 
 export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodStart, payrunPeriodEnd, asCount = false) {
+	const evalDate = dayjs().toISOString();
 	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("employeeId", routeParams.employeeId)
@@ -325,6 +327,7 @@ export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payru
 		.withQueryParam("orderBy", "created desc")
 		.withQueryParam("substituteLookupCodes", !asCount)
 		.withQueryParam("result", asCount ? "Count" : undefined)
+		.withQueryParam("evaluationDate", evalDate)
 		.withLocalization()
 		.withUser()
 		.fetchJson()
