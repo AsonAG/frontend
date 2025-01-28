@@ -738,15 +738,16 @@ const routeData = [
 								const evalDate = dayjs().toISOString();
 								const [
 									previousPayrunPeriod,
-									controllingTasks,
+									controllingTasksList,
 									caseValueCounts,
 									bankAccountDetails
 								] = await Promise.all([
 									getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle(),
-									Promise.all(payrunPeriod.entries.map(e => getEmployeeCases({ ...params, employeeId: e.employeeId }, "P", null, evalDate))),
+									getPayrunPeriodControllingTasks(params),
 									Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
 									getCompanyBankAccountDetails(params, evalDate)
 								]);
+								const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
 								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
 							}
 							const payrunPeriod = await getPayrunPeriod(params);

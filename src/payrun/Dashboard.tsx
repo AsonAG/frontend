@@ -393,7 +393,7 @@ export const columns = createColumns();
 export type EntryRow = PayrunPeriodEntry & {
   previousEntry: PayrunPeriodEntry | undefined
   amount: number | undefined
-  controllingTasks: Array<Array<AvailableCase>> | undefined
+  controllingTasks: Array<AvailableCase> | undefined
   caseValueCount: number
 }
 
@@ -477,7 +477,7 @@ function PayrunPeriodTable() {
       ...entry,
       amount: entry.openPayout ?? 0,
       previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.id),
-      controllingTasks: isOpen ? controllingTasks[index] : [],
+      controllingTasks: isOpen ? controllingTasks.get(entry.employeeId) : [],
       caseValueCount: isOpen ? caseValueCounts[index] : 0
     }));
   }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingTasks, caseValueCounts]);
