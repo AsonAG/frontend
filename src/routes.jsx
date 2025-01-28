@@ -747,7 +747,6 @@ const routeData = [
 									Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
 									getCompanyBankAccountDetails(params, evalDate)
 								]);
-								const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
 								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
 							}
 							const payrunPeriod = await getPayrunPeriod(params);
