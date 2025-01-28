@@ -22,6 +22,7 @@ import { PayoutDialog } from "./PayoutDialog";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 import { formatValue, getRowGridSx, groupSeparator } from "./utils";
 import { useOpenAmountDetails } from "./useOpenAmountDetails";
+import { FilterBar } from "./FilterBar";
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
@@ -31,7 +32,7 @@ declare module '@tanstack/react-table' {
     headerTooltip?: (t: TFunction<"translation", undefined>) => string | null
   }
   interface CellContext<TData, TValue> {
-    dispatch: Dispatch<Action>
+    dispatch: Dispatch<PayrollTableAction>
     t: TFunction<"translation", undefined>
   }
   interface HeaderContext<TData, TValue> {
@@ -394,7 +395,8 @@ export type EntryRow = PayrunPeriodEntry & {
   previousEntry: PayrunPeriodEntry | undefined
   amount: number | undefined
   controllingTasks: Array<AvailableCase> | undefined
-  caseValueCount: number
+  caseValueCount: number,
+  salaryType: string | null
 }
 
 function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL" | "Payable") {
@@ -409,7 +411,7 @@ function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL" | "P
 
 
 const noop = () => { };
-function createRowClickHandler(row: Row<EntryRow>, state: State, dispatch: Dispatch<Action>) {
+function createRowClickHandler(row: Row<EntryRow>, state: PayrollTableState, dispatch: Dispatch<PayrollTableAction>) {
   if (row.getCanExpand()) {
     return row.getToggleExpandedHandler();
   }
@@ -427,15 +429,6 @@ function getColumnStickySx(column: Column<EntryRow>): SxProps<Theme> {
   const sx: SxProps<Theme> = { backgroundColor: "inherit" };
   if (pinned === "left") {
     const stickySx = getStickySx(10, { left: column.getStart() })
-    // if (column.getIsLastColumn('left')) {
-    //   console.log("last column left");
-    //   return {
-    //     borderRightStyle: "solid",
-    //     borderRightWidth: "thin",
-    //     borderRightColor: (theme) => theme.palette.divider,
-    //     ...stickySx
-    //   };
-    // }
     return {
       ...sx,
       ...stickySx
@@ -444,13 +437,6 @@ function getColumnStickySx(column: Column<EntryRow>): SxProps<Theme> {
   if (pinned === "right") {
     const stickySx = getStickySx(10, { right: column.getAfter() });
     // if (column.getIsFirstColumn('right')) {
-    //   return {
-    //     borderLeftStyle: "solid",
-    //     borderLeftWidth: "thin",
-    //     borderLeftColor: (theme) => theme.palette.divider,
-    //     ...stickySx
-    //   };
-    // }
     return {
       ...sx,
       ...stickySx
@@ -469,7 +455,7 @@ function getStickySx(priority: number, position: { top?: number, bottom?: number
 
 function PayrunPeriodTable() {
   const { t } = useTranslation();
-  const { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  const { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const [expanded, setExpanded] = useAtom(expandedControllingTasks);
   const isOpen = payrunPeriod.periodStatus === "Open";
   const rows: Array<EntryRow> = useMemo(() => {
@@ -478,7 +464,8 @@ function PayrunPeriodTable() {
       amount: entry.openPayout ?? 0,
       previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.employeeId),
       controllingTasks: isOpen ? controllingTasks.get(entry.employeeId) : [],
-      caseValueCount: isOpen ? caseValueCounts[index] : 0
+      caseValueCount: isOpen ? caseValueCounts[index] : 0,
+      salaryType: salaryTypes[index]
     }));
   }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingTasks, caseValueCounts]);
 
@@ -509,7 +496,7 @@ function PayrunPeriodTable() {
     rows,
     createInitialState
   );
-  const { filtered, filter: mode } = state;
+  const { filtered } = state;
   const configuredColumnVisibility = useAtomValue(columnVisibilityAtom);
   const columnVisibility: VisibilityState = { ...configuredColumnVisibility, ...state.columnVisibility }
   if (!isOpen) {
@@ -566,15 +553,7 @@ function PayrunPeriodTable() {
   const headerSx = { ...stickyHeaderSx, ...rowContainerSx };
   return (
     <Stack>
-      <Stack direction="row" spacing={2} flex={1} sx={{ pr: 0.5 }} alignItems="center">
-        <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33 }}>
-          <Chip label={t("payrun_period_ready")} variant={mode === "Payable" ? "filled" : "outlined"} size="small" onClick={() => { dispatch({ type: "toggle_mode", mode: "Payable" }) }} color="primary" />
-          {
-            // <Chip label="SL" variant={mode === "SL" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "SL" }) }} color="primary" />
-            // <Chip label="ML" variant={mode === "ML" ? "filled" : "outlined"} onClick={() => { dispatch({ type: "toggle_mode", mode: "ML" }) }} color="primary" />
-          }
-        </Stack>
-      </Stack>
+      <FilterBar state={state} dispatch={dispatch} />
       <Stack sx={{ overflow: "auto", height: "calc(100vh - 206px)" }}>
         <Box
           component="div"
@@ -750,7 +729,7 @@ type DashboardRowProps = {
   onClick?: () => void
   containerSx: SxProps<Theme>
   minWidth?: number,
-  dispatch: Dispatch<Action>
+  dispatch: Dispatch<PayrollTableAction>
 }
 
 function EmployeeRow({ row, onClick, containerSx, minWidth, dispatch }: DashboardRowProps) {
@@ -823,15 +802,16 @@ function Cell({ color, align, tooltip, sx, children }: CellProps) {
   );
 }
 
-type FilterMode = "All" | "ML" | "SL" | "Payable";
+type FilterMode = "Payable" | string;
 
 type PayoutTotals = {
   open: number
   payingOut: number
 }
 
-type State = {
+export type PayrollTableState = {
   entries: Array<EntryRow>
+  filterGroups: Record<string, Array<EntryRow>>
   filtered: Array<EntryRow>
   selected: RowSelectionState
   expanded: ExpandedState
@@ -841,11 +821,11 @@ type State = {
   payoutTotals: PayoutTotals
 }
 
-type Action = {
+export type PayrollTableAction = {
   type: "reset_mode"
 } | {
   type: "toggle_mode"
-  mode: "ML" | "SL" | "Payable"
+  mode: "payable" | string
 } | {
   type: "set_selected"
   id: IdType
@@ -859,8 +839,8 @@ type Action = {
   id: IdType
 }
 
-function reducer(state: State, action: Action): State {
-  const resetState = (): State => ({
+function reducer(state: PayrollTableState, action: PayrollTableAction): PayrollTableState {
+  const resetState = (): PayrollTableState => ({
     ...state,
     filtered: state.entries,
     selected: {},
@@ -876,7 +856,7 @@ function reducer(state: State, action: Action): State {
         if (action.mode === state.filter) {
           return resetState();
         }
-        const rows = getFilteredEmployees(state.entries, action.mode);
+        const rows = state.filterGroups[action.mode];
         const selected: RowSelectionState = Object.fromEntries(
           rows.map(e => ([e.id, isRowSelectionEnabled(e)]))
         );
@@ -934,10 +914,15 @@ function getPayoutTotals(entries: Array<EntryRow>, selected: RowSelectionState) 
   return totals;
 }
 
-function createInitialState(employeeRows: Array<EntryRow>): State {
+function createInitialState(employeeRows: Array<EntryRow>): PayrollTableState {
+  const salaryTypeFilterGroup = Object.groupBy(employeeRows.filter(row => row.salaryType), (row => row.salaryType));
   return {
     entries: employeeRows,
     filtered: employeeRows,
+    filterGroups: {
+      payable: employeeRows.filter(e => ((e.openPayout ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0),
+      ...salaryTypeFilterGroup
+    },
     selected: {},
     expanded: {},
     filter: "All",
@@ -958,7 +943,7 @@ const isRowSelectionEnabled = (row: EntryRow) => !hasControllingTasks(row) && ha
 
 type AmountInputProps = {
   entry: EntryRow
-  dispatch: Dispatch<Action>
+  dispatch: Dispatch<PayrollTableAction>
   onClick: MouseEventHandler
 }
 

@@ -54,7 +54,8 @@ import {
 	downloadData,
 	bootstrapPayrunPeriods,
 	getCompanyBankDetails as getCompanyBankAccountDetails,
-	getPayrunPeriodControllingTasks
+	getPayrunPeriodControllingTasks,
+	getEmployeeSalaryType
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -69,7 +70,6 @@ import {
 	orgAtom,
 	userAtom,
 	selfServiceEmployeeAtom,
-	payrunAtom,
 	toast,
 	payrollAtom,
 	orgsAtom,
@@ -740,15 +740,17 @@ const routeData = [
 									previousPayrunPeriod,
 									controllingTasksList,
 									caseValueCounts,
+									salaryTypes,
 									bankAccountDetails
 								] = await Promise.all([
-									getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle(),
-									getPayrunPeriodControllingTasks(params),
-									Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
-									getCompanyBankAccountDetails(params, evalDate)
+									await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle(),
+									await getPayrunPeriodControllingTasks(params),
+									await Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
+									await Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
+									await getCompanyBankAccountDetails(params, evalDate)
 								]);
 								const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
-								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, bankAccountDetails };
+								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes, bankAccountDetails };
 							}
 							const payrunPeriod = await getPayrunPeriod(params);
 							return { employees, payrunPeriod };

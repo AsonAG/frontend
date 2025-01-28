@@ -405,6 +405,21 @@ export function getCompanyMissingDataCases(routeParams) {
 		.fetchJson();
 }
 
+export async function getEmployeeSalaryType(routeParams, evalDate = null) {
+	const salaryType = "CH.Swissdec.EmployeeSalaryType"
+	const caseValue = await new FetchRequestBuilder(timeValuesUrl, routeParams)
+		.withQueryParam("caseType", "Employee")
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParams("caseFieldNames", salaryType)
+		.withQueryParam("valueDate", evalDate)
+		.withQueryParam("substituteLookupCodes", true)
+		.withLocalization()
+		.withUser()
+		.fetchSingle();
+
+	return caseValue?.value;
+}
+
 export async function getCompanyBankDetails(routeParams, evalDate = null) {
 	const ibanFieldName = "CH.Swissdec.CompanyBankIban";
 	const accountFieldName = "CH.Swissdec.CompanyBankName";
