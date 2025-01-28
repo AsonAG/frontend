@@ -415,7 +415,7 @@ function createRowClickHandler(row: Row<EntryRow>, state: State, dispatch: Dispa
   }
   if (row.getCanSelect()) {
     return () => {
-      dispatch({ type: "set_selected", id: row.id, selected: !state.selected[row.id] });
+      dispatch({ type: "set_selected", id: row.original.id, selected: !state.selected[row.id] });
     };
   }
   return noop;
@@ -476,7 +476,7 @@ function PayrunPeriodTable() {
     return payrunPeriod.entries.map((entry, index) => ({
       ...entry,
       amount: entry.openPayout ?? 0,
-      previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.id),
+      previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.employeeId),
       controllingTasks: isOpen ? controllingTasks.get(entry.employeeId) : [],
       caseValueCount: isOpen ? caseValueCounts[index] : 0
     }));
