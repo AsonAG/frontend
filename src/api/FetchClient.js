@@ -295,12 +295,13 @@ export function getEmployeeByIdentifier(routeParams, identifier) {
 		.fetchSingle();
 }
 
-export function getEmployeeCases(routeParams, clusterSetName, signal) {
+export function getEmployeeCases(routeParams, clusterSetName, signal, evalDate = null) {
 	return new FetchRequestBuilder(caseSetsUrl, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("clusterSetName", clusterSetName)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("orderBy", `name asc`)
+		.withQueryParam("evaluationDate", evalDate)
 		.withSignal(signal)
 		.withLocalization()
 		.withUser()
