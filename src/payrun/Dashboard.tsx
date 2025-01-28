@@ -576,18 +576,18 @@ function PayrunPeriodTable() {
         </Stack>
       </Stack>
       <Stack sx={{ overflow: "auto", height: "calc(100vh - 206px)" }}>
-        {table.getHeaderGroups().map(headerGroup => (
-          <Box
-            key={headerGroup.id}
-            component="div"
-            sx={
-              {
-                py: 1.125,
-                ...headerSx,
-                backgroundColor: theme => theme.palette.background.default
-              }
-            }>
-            {headerGroup.headers.map(header => {
+        <Box
+          component="div"
+          sx={
+            {
+              py: 1.125,
+              ...headerSx,
+              rowGap: theme => theme.spacing(0.5),
+              backgroundColor: theme => theme.palette.background.default
+            }
+          }>
+          {table.getHeaderGroups().map(headerGroup =>
+            headerGroup.headers.map(header => {
               if (header.isPlaceholder)
                 return <div key={header.id}></div>;
               const baseColumn = header.getLeafHeaders()[0].column;
@@ -602,9 +602,9 @@ function PayrunPeriodTable() {
                   </Typography>
                 </Cell>
               );
-            })}
-          </Box>
-        ))}
+            })
+          )}
+        </Box>
         {
           isOpen ?
             groupRows(table.getRowModel().rows).map(group => (
