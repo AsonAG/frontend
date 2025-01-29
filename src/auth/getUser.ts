@@ -25,10 +25,6 @@ function createAuthUserAtom(): WritableAtom<NullableUser, [NullableUser], void> 
 			email: "ajo@ason.ch",
 			[authRoleProperty]: {
 				user: {},
-				hr: {},
-				onboarding: {},
-				admin: {},
-				provider: {}
 			},
 			sub: "",
 			iss: "",
