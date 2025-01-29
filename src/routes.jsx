@@ -42,7 +42,7 @@ import {
 	getCaseChangeCaseValues,
 	getCurrentValues,
 	getCaseValueCount,
-	getClosedPayrunPeriod,
+	getClosedPayrunPeriods,
 	getOpenPayrunPeriod,
 	closePayrunPeriod,
 	getPayrunPeriodDocument,
@@ -55,7 +55,8 @@ import {
 	bootstrapPayrunPeriods,
 	getCompanyBankDetails as getCompanyBankAccountDetails,
 	getPayrunPeriodControllingTasks,
-	getEmployeeSalaryType
+	getEmployeeSalaryType,
+	getPreviousPayrunPeriod
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -709,7 +710,7 @@ const routeData = [
 						loader: paginatedLoader({
 							pageCount: 15,
 							name: "closedPayrunPeriods",
-							getRequestBuilder: async ({ params }) => getClosedPayrunPeriod(params),
+							getRequestBuilder: async ({ params }) => getClosedPayrunPeriods(params),
 							getLoaderData: async ({ params }) => {
 								return ({
 									openPayrunPeriod: getOpenPayrunPeriod(params),
@@ -726,34 +727,29 @@ const routeData = [
 						shouldRevalidate: ({ nextUrl }) => nextUrl.pathname.endsWith("payrunperiods/open"),
 						ErrorBoundary: PayrunErrorBoundary,
 						loader: async ({ params }) => {
-							const employees = await getEmployees(params)
-								.withActive()
-								.withQueryParam("orderBy", `lastName asc`)
-								.fetchJson();
-							if (params.payrunPeriodId === "open") {
-								const payrunPeriod = await getOpenPayrunPeriod(params)
-								if (payrunPeriod === null) {
-									throw new Response("Not found", { status: 404 });
-								}
-								const evalDate = dayjs().toISOString();
-								const [
-									previousPayrunPeriod,
-									controllingTasksList,
-									caseValueCounts,
-									salaryTypes,
-									bankAccountDetails
-								] = await Promise.all([
-									await getClosedPayrunPeriod(params).withQueryParam("top", 1).withQueryParam("loadRelated", true).fetchSingle(),
-									await getPayrunPeriodControllingTasks(params),
-									await Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
-									await Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
-									await getCompanyBankAccountDetails(params, evalDate)
-								]);
-								const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
-								return { employees, payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes, bankAccountDetails };
+							const isOpen = params.payrunPeriodId === "open";
+							const payrunPeriod = isOpen ? await getOpenPayrunPeriod(params) : await getPayrunPeriod(params);
+							if (payrunPeriod === null) {
+								throw new Response("Not found", { status: 404 });
 							}
-							const payrunPeriod = await getPayrunPeriod(params);
-							return { employees, payrunPeriod };
+							const evalDate = dayjs().toISOString();
+							console.time("load");
+							const [
+								previousPayrunPeriod,
+								controllingTasksList,
+								caseValueCounts,
+								salaryTypes,
+								bankAccountDetails
+							] = await Promise.all([
+								getPreviousPayrunPeriod(params, payrunPeriod.periodStart),
+								isOpen ? getPayrunPeriodControllingTasks(params) : [],
+								Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
+								Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
+								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
+							]);
+							console.timeEnd("load");
+							const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
+							return { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes, bankAccountDetails };
 						},
 						children: [
 							{

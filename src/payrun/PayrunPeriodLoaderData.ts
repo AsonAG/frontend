@@ -9,4 +9,5 @@ export type PayrunPeriodLoaderData = {
   controllingTasks: Map<IdType, Array<AvailableCase>>
   caseValueCounts: Array<number>
   bankAccountDetails: BankAccountDetails
+  salaryTypes: Array<string>
 }

@@ -482,10 +482,19 @@ export function getPayrun(routeParams) {
 		.fetchSingle();
 }
 
-export function getClosedPayrunPeriod(routeParams) {
+export function getClosedPayrunPeriods(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
 		.withQueryParam("orderBy", "periodStart desc")
 		.withQueryParam("filter", `periodStatus ne 'Open'`);
+}
+
+export function getPreviousPayrunPeriod(routeParams, payrunPeriodStart) {
+	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
+		.withQueryParam("orderBy", "periodStart desc")
+		.withQueryParam("filter", `periodStart lt '${payrunPeriodStart}'`)
+		.withQueryParam("top", 1)
+		.withQueryParam("loadRelated", true)
+		.fetchSingle();
 }
 
 export function getPayrunPeriod(routeParams) {

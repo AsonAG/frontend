@@ -399,17 +399,6 @@ export type EntryRow = PayrunPeriodEntry & {
   salaryType: string | null
 }
 
-function getFilteredEmployees(employees: Array<EntryRow>, type: "ML" | "SL" | "Payable") {
-  if (type === "Payable") {
-    return employees.filter(e => ((e.openPayout ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0);
-  }
-  const predicate = (_: any, i: number) => [1, 3, 5, 6, employees.length - 1].includes(i);
-  const inverted = (_: any, i: number) => !predicate(_, i);
-  const filterPredicate = type === "SL" ? predicate : inverted;
-  return employees.filter(filterPredicate);
-}
-
-
 const noop = () => { };
 function createRowClickHandler(row: Row<EntryRow>, state: PayrollTableState, dispatch: Dispatch<PayrollTableAction>) {
   if (row.getCanExpand()) {

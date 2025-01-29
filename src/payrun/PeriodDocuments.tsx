@@ -1,13 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, Outlet, useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Link, Outlet, useRouteLoaderData } from "react-router-dom";
 import { Chip, IconButton, Stack, Typography } from "@mui/material";
 import { ArrowDropDown, ArrowDropUp, Code, PictureAsPdf } from "@mui/icons-material";
-import { Employee, getEmployeeDisplayString } from "../models/Employee";
+import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunDocument, PayrunPeriod } from "../models/PayrunPeriod";
 
 type LoaderData = {
-  employees: Array<Employee>
   payrunPeriod: PayrunPeriod
 }
 
@@ -25,14 +24,11 @@ export function PeriodDocuments() {
 }
 function WageStatementSection() {
   const { t } = useTranslation();
-  const { payrunPeriod, employees } = useRouteLoaderData("payrunperiod") as LoaderData;
-  // const { payrunPeriod } = useLoaderData() as LoaderData;
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
   const [open, setOpen] = useState(false);
-  const entriesMap = useMemo(() => new Map(payrunPeriod.entries.map(e => [e.employeeId, e])), [payrunPeriod.entries]);
-  const wageStatements = employees.map(employee => {
-    const entry = entriesMap.get(employee.id);
+  const wageStatements = payrunPeriod.entries.map(entry => {
     const wageStatementDoc = entry?.documents?.find(doc => doc.attributes?.type === "wagestatement")
-    return wageStatementDoc ? [getEmployeeDisplayString(employee), entry?.id, wageStatementDoc] : null;
+    return wageStatementDoc ? [getEmployeeDisplayString(entry), entry?.id, wageStatementDoc] : null;
   }).filter(Boolean);
   if (wageStatements.length === 0)
     return;
