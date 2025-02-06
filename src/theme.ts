@@ -49,6 +49,7 @@ declare module '@mui/material/Chip' {
   interface ChipPropsColorOverrides {
     blueviolet: true
     pdfred: true
+    green: true
   }
 }
 
@@ -85,6 +86,10 @@ const lightModeDesignTokens = {
     },
     pdfred: {
       main: "#FF0000",
+      contrastText: "#fff"
+    },
+    green: {
+      main: "rgb(33, 115, 70)",
       contrastText: "#fff"
     }
   },
@@ -123,6 +128,10 @@ const darkModeDesignTokens = {
     },
     pdfred: {
       main: "#FF0000",
+      contrastText: "#fff"
+    },
+    green: {
+      main: "rgb(33, 115, 70)",
       contrastText: "#fff"
     }
   },

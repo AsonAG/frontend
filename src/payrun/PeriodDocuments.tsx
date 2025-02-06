@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useRouteLoaderData } from "react-router-dom";
 import { Chip, IconButton, Stack, Typography } from "@mui/material";
-import { ArrowDropDown, ArrowDropUp, Code, PictureAsPdf } from "@mui/icons-material";
+import { ArrowDropDown, ArrowDropUp, Code, Functions, PictureAsPdf } from "@mui/icons-material";
 import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunDocument, PayrunPeriod } from "../models/PayrunPeriod";
 
@@ -103,6 +103,8 @@ function DocumentChip({ doc, ...chipProps }: { doc: PayrunDocument } & ChipProps
       return <XmlChip {...chipProps} />
     case "application/pdf":
       return <PdfChip {...chipProps} />
+    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      return <ExcelChip {...chipProps} />
   }
 }
 
@@ -133,5 +135,20 @@ function PdfChip({ to, label }: ChipProps) {
       icon={<PictureAsPdf fontSize="small" />}
       onClick={noop}
       color="pdfred" />
+  )
+}
+
+function ExcelChip({ to, label }: ChipProps) {
+  label ??= "Excel";
+  return (
+    <Chip
+      variant="outlined"
+      component={Link}
+      to={to}
+      label={label}
+      size="small"
+      icon={<Functions fontSize="small" />}
+      onClick={noop}
+      color="green" />
   )
 }
