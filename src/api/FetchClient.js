@@ -322,7 +322,7 @@ export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payru
 	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("employeeId", routeParams.employeeId)
-		.withQueryParam("filter", `(created ge '${payrunPeriodOpened}' and start le '${payrunPeriodEnd}') or (start ge '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')`)
+		.withQueryParam("filter", `((created ge '${payrunPeriodOpened}' and start le '${payrunPeriodEnd}') or (start ge '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')) and documentCount eq 0`)
 		.withQueryParam("orderBy", "created desc")
 		.withQueryParam("substituteLookupCodes", !asCount)
 		.withQueryParam("result", asCount ? "Count" : undefined)
