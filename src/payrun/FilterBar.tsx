@@ -1,7 +1,7 @@
 import { Chip, Divider, Stack } from "@mui/material"
 import React, { Dispatch, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { PayrollTableAction, PayrollTableState } from "./Dashboard"
+import { PayrollTableAction, PayrollTableState, TableGroup } from "./Dashboard"
 
 type FilterBarProps = {
   state: PayrollTableState,
@@ -10,24 +10,41 @@ type FilterBarProps = {
 
 export function FilterBar({ state, dispatch }: FilterBarProps) {
   const { t } = useTranslation();
-  const { filter, filterGroups } = state;
+  const { rowFilter, group } = state;
+  const salaryTypes = useMemo(() => [...new Set(state.entries.map(x => x.salaryType))].filter(Boolean).sort(), [state.entries]);
 
   const chips = useMemo(() => {
-    const { payable, ...rest } = filterGroups;
     return (
       <Stack direction="row" spacing={0.5} flex={1} sx={{ height: 33, pb: 0.5 }}>
-        <FilterModeChip label={t("payrun_period_ready")} isSelected={filter === "payable"} onClick={() => dispatch({ type: "toggle_mode", mode: "payable" })} />
+        <GroupChip label={t("payrun_period_controlling")} group="Controlling" state={state} dispatch={dispatch} />
+        <GroupChip label={t("payrun_period_ready")} group="Payable" state={state} dispatch={dispatch} />
+        <GroupChip label={t("payrun_period_calculating")} group="Calculating" state={state} dispatch={dispatch} />
+        <GroupChip label={t("payrun_period_paid_out")} group="PaidOut" state={state} dispatch={dispatch} />
+        <GroupChip label={t("payrun_period_without_occupation")} group="WithoutOccupation" state={state} dispatch={dispatch} />
         <Divider orientation="vertical" variant="middle" flexItem sx={{ mx: 0.75 }} />
         {
-          Object.keys(rest).sort().map(group => (
-            <FilterModeChip key={group} label={group} isSelected={filter === group} onClick={() => dispatch({ type: "toggle_mode", mode: group })} />
+          salaryTypes.map(salaryType => (
+            <FilterBarChip key={salaryType} label={salaryType!} isSelected={salaryType === rowFilter} onClick={() => dispatch({ type: "set_filter", filter: salaryType! })} />
           ))
         }
       </Stack>
     )
-  }, [filterGroups, filter]);
+  }, [group, rowFilter]);
 
   return chips;
+}
+
+type GroupChipProps = {
+  label: string
+  group: TableGroup
+  state: PayrollTableState,
+  dispatch: Dispatch<PayrollTableAction>
+}
+function GroupChip({ label, group, state, dispatch }: GroupChipProps) {
+  const count = (state.entryStateGroups[group] ?? []).length;
+  return (
+    <FilterBarChip label={label + ` (${count})`} isSelected={group === state.group} onClick={() => dispatch({ type: "set_group", group })} />
+  )
 }
 
 type FilterModeChip = {
@@ -35,7 +52,7 @@ type FilterModeChip = {
   isSelected: boolean,
   onClick: () => void
 }
-function FilterModeChip({ label, isSelected, onClick }: FilterModeChip) {
+function FilterBarChip({ label, isSelected, onClick }: FilterModeChip) {
   return (
     <Chip
       label={label}

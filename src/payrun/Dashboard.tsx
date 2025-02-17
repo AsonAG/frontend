@@ -1,53 +1,22 @@
-import React, { Dispatch, Fragment, MouseEventHandler, PropsWithChildren, useMemo, useReducer } from "react";
-import { Link, Outlet, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Stack, Typography, IconButton, Tooltip, Paper, SxProps, Theme, Chip, Box, TextField, Divider, Button } from "@mui/material";
-import { TrendingDown, TrendingUp } from "@mui/icons-material";
+import React, { Dispatch, PropsWithChildren, useMemo, useReducer } from "react";
+import { Outlet, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { Stack, Typography, Tooltip, Paper, SxProps, Theme, Box, Divider } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { CaseTask } from "../components/CaseTask";
-import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
-import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
-import { PayrunPeriodEntry } from "../models/PayrunPeriod";
 import { Payout } from "./Payouts";
-import { CellContext, Column, createColumnHelper, ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { TFunction } from "i18next";
-import { AvailableCase } from "../models/AvailableCase";
+import { Column, ExpandedState, flexRender, getCoreRowModel, getExpandedRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { IdType } from "../models/IdType";
-import { NumericFormat } from "react-number-format";
 import { useAtom, useAtomValue } from "jotai";
 import { expandedControllingTasks } from "../utils/dataAtoms";
 import { DashboardHeader } from "./DashboardHeader";
-import { columnVisibilityAtom, TableSettingsButton } from "./TableSettings";
-import { PayoutDialog } from "./PayoutDialog";
+import { columnVisibilityAtom } from "./TableSettings";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
-import { formatValue, getRowGridSx, groupSeparator } from "./utils";
-import { useOpenAmountDetails } from "./useOpenAmountDetails";
+import { getRowGridSx, getStickySx } from "./utils";
 import { FilterBar } from "./FilterBar";
-
-declare module '@tanstack/react-table' {
-  interface ColumnMeta<TData, TValue> {
-    alignment?: "left" | "center" | "right",
-    flex?: number,
-    tooltip?: (context: CellContext<TData, TValue>, t: TFunction<"translation", undefined>) => string | null,
-    headerTooltip?: (t: TFunction<"translation", undefined>) => string | null
-  }
-  interface CellContext<TData, TValue> {
-    dispatch: Dispatch<PayrollTableAction>
-    t: TFunction<"translation", undefined>
-  }
-  interface HeaderContext<TData, TValue> {
-    t: TFunction<"translation", undefined>
-  }
-
-  interface TableMeta<TData> {
-    isOpen: boolean
-  }
-
-  interface TableState {
-    periodTotals: PeriodTotals
-    payoutTotals: PayoutTotals
-  }
-}
+import { EntryRow, PayoutTotals, PeriodTotals } from "./types";
+import { columns } from "./TableColumns";
+import { PayoutFooter } from "./PayoutFooter";
 
 
 export function PayrunDashboard() {
@@ -62,342 +31,6 @@ export function PayrunDashboard() {
   );
 }
 
-const chipSx = {
-  "& .MuiChip-label": {
-    display: "none"
-  },
-  "& .MuiChip-icon": {
-    ml: 0.75,
-    mr: 0.625
-  }
-}
-
-const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
-const columnHelper = createColumnHelper<EntryRow>();
-
-function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefined>, wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
-  if (!context.table.options.meta?.isOpen)
-    return null;
-  if (previousValueColumnName && context.table.getState().columnVisibility[previousValueColumnName])
-    return null;
-  const previousValue = formatValue(context.row.original.previousEntry?.[wageType]);
-  return `${t("Value from previous period")} ${previousValue ?? "-"}`;
-}
-
-type PeriodTotals = {
-  employees: number
-  gross: number
-  previousGross: number
-  net: number
-  employerCost: number
-  open: number
-}
-
-function createColumns() {
-  return [
-    columnHelper.group({
-      id: "employeeTotal",
-      header: ({ table, t }) => `${table.getRowCount()} ${t("Employees")}`,
-      columns: [
-        columnHelper.accessor("identifier",
-          {
-            id: "identifier",
-            cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-            header: ({ t }) => t("Id"),
-            footer: ({ t }) => t("Total"),
-            size: 150,
-            meta: {
-              flex: 1,
-              tooltip: (context) => !context.table.getState().columnVisibility.employee ? context.row.original.name : null,
-              headerTooltip: (t) => t("Id of the employee")
-            }
-          }),
-        columnHelper.accessor(row => `${row.lastName} ${row.firstName}`,
-          {
-            id: "employee",
-            cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-            header: ({ t }) => t("Name"),
-            footer: ({ table, t }) => !table.getState().columnVisibility.identifier ? t("Total") : null,
-            size: 150,
-            meta: {
-              flex: 1,
-              tooltip: (context) => !context.table.getState().columnVisibility.identifier ? context.row.original.identifier : null,
-              headerTooltip: (t) => t("Last name and first name of the employee")
-            }
-          }),
-      ]
-    }),
-    columnHelper.group({
-      id: "employerCostTotal",
-      header: ({ table }) => formatValue(table.getState().periodTotals.employerCost),
-      columns: [
-        columnHelper.accessor("employerCost",
-          {
-            id: "employerCost",
-            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-            header: ({ t }) => t("Total cost"),
-            size: 110,
-            meta: {
-              alignment: "right",
-              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "employerCost", context),
-              headerTooltip: t => t("Total costs from the employer's perspective")
-            }
-          }),
-      ]
-    }),
-    columnHelper.group({
-      id: "previousGrossWageTotal",
-      header: ({ table }) => formatValue(table.getState().periodTotals.previousGross),
-      columns: [
-        columnHelper.accessor(row => row.previousEntry?.grossWage ?? null,
-          {
-            id: "grossPreviousPeriod",
-            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-            header: ({ t }) => t("Gross PP"),
-            size: 110,
-            meta: {
-              alignment: "right",
-              headerTooltip: t => t("Gross wage previous period")
-            }
-          }),
-      ]
-    }),
-    columnHelper.accessor(row => formatValue((row.grossWage ?? 0) - (row.previousEntry?.grossWage ?? 0)),
-      {
-        id: "grossDiff",
-        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-        header: ({ t }) => t("Diff. gross"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: t => t("Gross wage previous period minus gross wage open period")
-        }
-      }),
-    columnHelper.group({
-      id: "grossWageTotal",
-      header: ({ table }) => formatValue(table.getState().periodTotals.gross),
-      columns: [
-        columnHelper.accessor("grossWage",
-          {
-            cell: (props) => {
-              const { grossWage, previousEntry } = props.row.original;
-              const previousGrossWage = previousEntry?.grossWage;
-              const isOpen = props.table.options.meta?.isOpen;
-              if (!isOpen || !grossWage || grossWage === previousGrossWage) {
-                // no highlight
-                return <Typography noWrap>{formatValue(props.getValue())}</Typography>
-              }
-              const trendingUp = !previousGrossWage || (grossWage > previousGrossWage);
-
-              const Icon = trendingUp ? TrendingUp : TrendingDown;
-              const color = trendingUp ? "green" : "red";
-              return (
-                <>
-                  <Icon fontSize="small" htmlColor={color} />
-                  <Typography noWrap color={color}>{formatValue(props.getValue())}</Typography>
-                </>
-              )
-            },
-            header: ({ t }) => t("Gross"),
-            size: 110,
-            meta: {
-              alignment: "right",
-              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "grossWage", context, "grossPreviousPeriod"),
-              headerTooltip: (t) => t("Gross wage open period")
-            }
-          }),
-      ]
-    }),
-    columnHelper.group({
-      id: "netWageTotal",
-      header: ({ table }) => formatValue(table.getState().periodTotals.net),
-      columns: [
-        columnHelper.accessor("netWage",
-          {
-            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-            header: ({ t }) => t("Net"),
-            size: 110,
-            meta: {
-              alignment: "right",
-              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "netWage", context),
-              headerTooltip: (t) => t("Net wage open period")
-            }
-          }),
-      ]
-    }),
-    columnHelper.accessor("offsetting",
-      {
-        id: "offsetting",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("OT"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "offsetting", context),
-          headerTooltip: t => t("Offsettings, i.e. supplements and deductions after the net wage")
-        }
-      }),
-    columnHelper.accessor("retro",
-      {
-        id: "retro",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Retro"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "retro", context),
-          headerTooltip: (t) => t("Net amount from all retroactive changes prior to the open period")
-        }
-      }),
-    columnHelper.accessor("openGarnishmentPayoutPreviousPeriod",
-      {
-        id: "openGarnishmentPayoutPreviousPeriod",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("GPP"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: t => t("Garnishments to be paid from the previous period")
-        }
-      }),
-    columnHelper.accessor("openWagePayoutPreviousPeriod",
-      {
-        id: "openWagePayoutPreviousPeriod",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("OPP"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: t => t("Outstanding amount to be paid from the previous period")
-        }
-      }),
-    columnHelper.accessor(row => (row.paidOut ?? 0) + (row.paidOutGarnishment ?? 0),
-      {
-        id: "paidOut",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Paid"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: (t) => t("Already paid out in the open period")
-        }
-      }),
-    columnHelper.accessor("garnishment",
-      {
-        id: "garnishment",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Garnishment"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: (t) => t("Garnishment open period")
-        }
-      }),
-    columnHelper.group({
-      id: "openTotal",
-      header: ({ table }) => formatValue(table.getState().periodTotals.open),
-      columns: [
-        columnHelper.accessor("openPayout",
-          {
-            id: "openPayout",
-            cell: context => {
-              const { hasDetails, popover, openPopover, closePopover } = useOpenAmountDetails(context);
-              let value = formatValue(context.getValue());
-              if (value !== null) {
-                value = value + (hasDetails ? "*" : "")
-              }
-              return (
-                <>
-                  <Typography onMouseOver={openPopover} onMouseLeave={closePopover}>{value}</Typography>
-                  {popover}
-                </>
-              )
-            },
-            header: ({ t }) => t("Open"),
-            footer: (props) => formatValue(props.table.getState().payoutTotals.open),
-            size: 110,
-            meta: {
-              alignment: "right",
-              headerTooltip: t => t("Outstanding amount to be paid in the open period")
-            }
-          }),
-      ]
-    }),
-    columnHelper.accessor("amount",
-      {
-        id: "amount",
-        cell: function({ row, dispatch }) {
-          if (row.getCanExpand()) {
-            return;
-          }
-          const onClick: MouseEventHandler = (event) => {
-            if (row.getIsSelected()) {
-              event.stopPropagation();
-            }
-          }
-          return <AmountInput entry={row.original} dispatch={dispatch} onClick={onClick} />;
-        },
-        header: ({ t }) => t("dashboard_payout_header"),
-        footer: (props) => formatValue(props.table.getState().payoutTotals.payingOut),
-        size: 110,
-        meta: {
-          alignment: "right"
-        }
-      }),
-    columnHelper.display({
-      id: "documents",
-      cell: (props) => {
-        const payrunEntry = props.row.original;
-        return (
-          <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
-            {
-              payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => (
-                <Tooltip key={doc.id} title={doc.name} placement="left">
-                  <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
-                </Tooltip>
-              ))
-            }
-          </Stack>
-        )
-      },
-      size: 55,
-      meta: {
-        alignment: "center"
-      }
-    }),
-    columnHelper.display({
-      id: "events",
-      cell: ({ row, t }) => {
-        const { employeeId, caseValueCount } = row.original;
-        if (caseValueCount === 0)
-          return <div></div>;
-        return (
-          <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
-            <Tooltip title={t("Events")} placement="left">
-              <IconButton size="small" component={Link} to={`employees/${employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
-            </Tooltip>
-          </Stack>
-        )
-      },
-      header: ({ t }) => <Tooltip title={t("Settings")}><TableSettingsButton /></Tooltip>,
-      size: 55,
-      meta: {
-        alignment: "center"
-      }
-    })
-  ];
-}
-
-export const columns = createColumns();
-
-
-export type EntryRow = PayrunPeriodEntry & {
-  previousEntry: PayrunPeriodEntry | undefined
-  amount: number | undefined
-  controllingTasks: Array<AvailableCase> | undefined
-  caseValueCount: number,
-  salaryType: string | null
-}
 
 const noop = () => { };
 function createRowClickHandler(row: Row<EntryRow>, state: PayrollTableState, dispatch: Dispatch<PayrollTableAction>) {
@@ -434,14 +67,7 @@ function getColumnStickySx(column: Column<EntryRow>): SxProps<Theme> {
   return sx;
 }
 
-function getStickySx(priority: number, position: { top?: number, bottom?: number, left?: number, right?: number }): SxProps<Theme> {
-  return {
-    ...position,
-    position: "sticky",
-    zIndex: priority
-  }
-}
-
+const emptyRows = [];
 function PayrunPeriodTable() {
   const { t } = useTranslation();
   const { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
@@ -485,16 +111,16 @@ function PayrunPeriodTable() {
     rows,
     createInitialState
   );
-  const { filtered } = state;
   const configuredColumnVisibility = useAtomValue(columnVisibilityAtom);
   const columnVisibility: VisibilityState = { ...configuredColumnVisibility, ...state.columnVisibility }
   if (!isOpen) {
     columnVisibility.open = false;
     columnVisibility.amount = false
   }
+
   const table = useReactTable({
     columns: columns,
-    data: filtered,
+    data: state.entryStateGroups[state.group] ?? emptyRows,
     meta: {
       isOpen
     },
@@ -574,34 +200,19 @@ function PayrunPeriodTable() {
           )}
         </Box>
         {
-          isOpen ?
-            groupRows(table.getRowModel().rows).map(group => (
-              <Fragment key={group.name}>
-                <Divider textAlign="left" sx={{ ...getStickySx(30, { top: 45, left: 0, right: 0 }), backgroundColor: theme => theme.palette.background.default }}>{t(group.name)}</Divider>
-                {group.rows.map(row =>
-                  <EmployeeRow
-                    key={row.id}
-                    row={row}
-                    onClick={createRowClickHandler(row, state, dispatch)}
-                    minWidth={minWidth}
-                    containerSx={rowContainerSx}
-                    dispatch={dispatch}
-                  />)}
-              </Fragment>
-            ))
-            :
-            table.getRowModel().rows.map(row => (
-              <EmployeeRow
-                key={row.id}
-                row={row}
-                minWidth={minWidth}
-                containerSx={rowContainerSx}
-                dispatch={dispatch}
-              />
-            ))
+          table.getRowModel().rows.map(row => (
+            <EmployeeRow
+              key={row.id}
+              row={row}
+              onClick={createRowClickHandler(row, state, dispatch)}
+              minWidth={minWidth}
+              containerSx={rowContainerSx}
+              dispatch={dispatch}
+            />
+          ))
         }
         {
-          periodTotals.open > 0 && (state.mode === "payout") &&
+          periodTotals.open > 0 && (state.group === "Payable") &&
           <PayoutFooter employeeCount={Object.values(state.selected).filter(Boolean).length} totalPayingOut={state.payoutTotals.payingOut} onPayout={onPayout} minWidth={minWidth}>
             {table.getFooterGroups().map(footerGroup => {
               if (footerGroup.depth === 0)
@@ -629,88 +240,6 @@ function PayrunPeriodTable() {
     </Stack >
   )
 }
-
-type PayoutFooterProps = {
-  employeeCount: number
-  totalPayingOut: number
-  onPayout: (valutaDate: string, accountIban: string) => void,
-  minWidth?: number
-} & PropsWithChildren
-
-function PayoutFooter({ employeeCount, totalPayingOut, onPayout, minWidth, children }: PayoutFooterProps) {
-  const { t } = useTranslation();
-  return (
-    <Stack
-      spacing={2}
-      sx={{
-        minWidth,
-        ...getStickySx(40, { bottom: 0 }),
-        py: 2,
-        borderTop: 1,
-        borderColor: theme => theme.palette.divider,
-        backgroundColor: theme => theme.palette.background.default
-      }}
-    >
-      {children}
-      <Stack direction="row" justifyContent="end">
-        <PayoutDialog
-          amount={totalPayingOut}
-          employeeCount={employeeCount}
-          onPayout={onPayout}>
-          <Button variant="contained" disabled={totalPayingOut === 0} sx={getStickySx(40, { right: 0 })}>
-            <Stack direction="row">
-              <span>{t("Payout")}:&nbsp;</span>
-              <span>{formatValue(totalPayingOut)}</span>
-              <span>&nbsp;CHF</span>
-            </Stack>
-          </Button>
-        </PayoutDialog>
-      </Stack>
-    </Stack>
-  )
-}
-
-type RowGroup = {
-  name: string
-  rows: Array<Row<EntryRow>>
-}
-
-function groupRows(rows: Array<Row<EntryRow>>): Array<RowGroup> {
-  function groupingFn(row: Row<EntryRow>) {
-    if (!row.original.payrunJobId) {
-      return "payrun_period_calculating";
-    }
-    if ((row.original.controllingTasks?.length ?? 0) > 0) {
-      return "payrun_period_controlling";
-    }
-    if (!!row.original.openPayout) {
-      return "payrun_period_ready";
-    }
-    if (row.original.openPayout === 0 && ((row.original.netWage ?? 0) > 0) && ((row.original.grossWage ?? 0) > 0)) {
-      return "payrun_period_paid_out";
-    }
-    return "payrun_period_without_occupation";
-  }
-  const grouping = Object.groupBy(rows, groupingFn) as Record<string, Array<Row<EntryRow>>>;
-  const result: Array<RowGroup> = [];
-  if (grouping["payrun_period_calculating"]) {
-    result.push({ name: "payrun_period_calculating", rows: grouping["payrun_period_calculating"] });
-  }
-  if (grouping["payrun_period_controlling"]) {
-    result.push({ name: "payrun_period_controlling", rows: grouping["payrun_period_controlling"] });
-  }
-  if (grouping["payrun_period_ready"]) {
-    result.push({ name: "payrun_period_ready", rows: grouping["payrun_period_ready"] });
-  }
-  if (grouping["payrun_period_paid_out"]) {
-    result.push({ name: "payrun_period_paid_out", rows: grouping["payrun_period_paid_out"] });
-  }
-  if (grouping["payrun_period_without_occupation"]) {
-    result.push({ name: "payrun_period_without_occupation", rows: grouping["payrun_period_without_occupation"] });
-  }
-  return result;
-}
-
 
 
 type DashboardRowProps = {
@@ -791,30 +320,25 @@ function Cell({ color, align, tooltip, sx, children }: CellProps) {
   );
 }
 
-type FilterMode = "Payable" | string;
-
-type PayoutTotals = {
-  open: number
-  payingOut: number
-}
+export type TableGroup = "Controlling" | "Payable" | "Calculating" | "PaidOut" | "WithoutOccupation";
 
 export type PayrollTableState = {
   entries: Array<EntryRow>
-  filterGroups: Record<string, Array<EntryRow>>
-  filtered: Array<EntryRow>
+  entryStateGroups: Record<string, Array<EntryRow>>
+  group: TableGroup
+  rowFilter: string | null
   selected: RowSelectionState
   expanded: ExpandedState
   columnVisibility: VisibilityState
-  filter: FilterMode
-  mode: "view" | "payout"
   payoutTotals: PayoutTotals
 }
 
 export type PayrollTableAction = {
-  type: "reset_mode"
+  type: "set_filter"
+  filter: string
 } | {
-  type: "toggle_mode"
-  mode: "payable" | string
+  type: "set_group"
+  group: TableGroup
 } | {
   type: "set_selected"
   id: IdType
@@ -829,31 +353,30 @@ export type PayrollTableAction = {
 }
 
 function reducer(state: PayrollTableState, action: PayrollTableAction): PayrollTableState {
-  const resetState = (): PayrollTableState => ({
-    ...state,
-    filtered: state.entries,
-    selected: {},
-    expanded: {},
-    filter: "All"
-  });
-
-  function applyAction() {
+  function applyAction(): PayrollTableState {
     switch (action.type) {
-      case "reset_mode":
-        return resetState();
-      case "toggle_mode": {
-        if (action.mode === state.filter) {
-          return resetState();
+      case "set_filter":
+        let filter: string | null = action.filter;
+        if (state.rowFilter === action.filter) {
+          filter = null;
         }
-        const rows = state.filterGroups[action.mode];
-        const selected: RowSelectionState = Object.fromEntries(
-          rows.map(e => ([e.id, isRowSelectionEnabled(e)]))
-        );
+        const entries = filter === null ? state.entries : state.entries.filter(e => e.salaryType === action.filter);
+        const groups = groupRows(entries);
         return {
           ...state,
-          selected,
-          filtered: rows,
-          filter: action.mode,
+          rowFilter: filter,
+          entryStateGroups: groups,
+          selected: state.group === "Payable" ? getSelectedState(groups["Payable"]) : state.selected
+        };
+      case "set_group": {
+        if (action.group === state.group) {
+          return state;
+        }
+        const rows = state.entryStateGroups[action.group];
+        return {
+          ...state,
+          group: action.group,
+          selected: action.group === "Payable" ? getSelectedState(rows) : {}
         }
       }
       case "set_selected":
@@ -880,14 +403,18 @@ function reducer(state: PayrollTableState, action: PayrollTableAction): PayrollT
   }
   let stateAfterAction = applyAction();
   stateAfterAction.payoutTotals = getPayoutTotals(stateAfterAction.entries, stateAfterAction.selected);
-  stateAfterAction.mode = Object.values(stateAfterAction.selected).some(s => s) ? "payout" : "view";
-  stateAfterAction.columnVisibility = stateAfterAction.mode === "view" ? { "amount": false } : {
+  stateAfterAction.columnVisibility = stateAfterAction.group !== "Payable" ? { "amount": false } : {
     "documents": false,
     "events": false
   }
   return stateAfterAction;
 }
 
+function getSelectedState(rows: Array<EntryRow>): RowSelectionState {
+  if (!rows)
+    return {};
+  return Object.fromEntries(rows.map(r => [r.id, true]));
+}
 function getPayoutTotals(entries: Array<EntryRow>, selected: RowSelectionState) {
   let totals = {
     open: 0,
@@ -904,18 +431,13 @@ function getPayoutTotals(entries: Array<EntryRow>, selected: RowSelectionState) 
 }
 
 function createInitialState(employeeRows: Array<EntryRow>): PayrollTableState {
-  const salaryTypeFilterGroup = Object.groupBy(employeeRows.filter(row => row.salaryType), (row => row.salaryType));
   return {
     entries: employeeRows,
-    filtered: employeeRows,
-    filterGroups: {
-      payable: employeeRows.filter(e => ((e.openPayout ?? 0) > 0) && (e.controllingTasks?.length ?? 0) === 0),
-      ...salaryTypeFilterGroup
-    },
+    entryStateGroups: groupRows(employeeRows),
+    rowFilter: null,
     selected: {},
     expanded: {},
-    filter: "All",
-    mode: "view",
+    group: "Controlling",
     columnVisibility: {
       "amount": false
     },
@@ -930,49 +452,21 @@ const hasControllingTasks = (entry: EntryRow) => (entry.controllingTasks?.length
 const hasOpenAmount = (entry: EntryRow) => ((entry.netWage ?? 0) - (entry.paidOut ?? 0)) > 0;
 const isRowSelectionEnabled = (row: EntryRow) => !hasControllingTasks(row) && hasOpenAmount(row);
 
-type AmountInputProps = {
-  entry: EntryRow
-  dispatch: Dispatch<PayrollTableAction>
-  onClick: MouseEventHandler
-}
-
-function AmountInput({ entry, dispatch, onClick }: AmountInputProps) {
-  if (!entry.openPayout)
-    return;
-
-  const handleChange = ({ floatValue }) => {
-    dispatch({ type: "set_amount", id: entry.id, amount: floatValue });
-  };
-
-  const receiveFocus = () => {
-    dispatch({ type: "set_selected", id: entry.id, selected: true });
+function groupRows(rows: Array<EntryRow>): Record<TableGroup, Array<EntryRow>> {
+  return Object.groupBy(rows, groupingFn);
+  function groupingFn(row: EntryRow): TableGroup {
+    if (!row.payrunJobId) {
+      return "Calculating";
+    }
+    if ((row.controllingTasks?.length ?? 0) > 0) {
+      return "Controlling";
+    }
+    if (!!row.openPayout) {
+      return "Payable";
+    }
+    if (row.openPayout === 0 && ((row.netWage ?? 0) > 0) && ((row.grossWage ?? 0) > 0)) {
+      return "PaidOut";
+    }
+    return "WithoutOccupation";
   }
-
-  return (
-    <NumericFormat
-      onClick={onClick}
-      value={entry.amount}
-      onValueChange={handleChange}
-      onFocus={receiveFocus}
-      valueIsNumericString
-      thousandSeparator={groupSeparator ?? ""}
-      decimalScale={2}
-      fixedDecimalScale
-      customInput={TextField}
-      type="numeric"
-      size="small"
-      isAllowed={(values) => {
-        const { floatValue } = values;
-        return (floatValue ?? 0) <= (entry.openPayout ?? 0);
-      }}
-      slotProps={{
-        htmlInput: {
-          style: {
-            textAlign: "right",
-            padding: "4px 8px 4px 0"
-          }
-        }
-      }}
-    />
-  );
 }

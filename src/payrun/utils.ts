@@ -38,3 +38,11 @@ export function formatValue(value: number | null | undefined) {
     return null;
   return formatter.format(value);
 }
+export function getStickySx(priority: number, position: { top?: number, bottom?: number, left?: number, right?: number }): SxProps<Theme> {
+  return {
+    ...position,
+    position: "sticky",
+    zIndex: priority
+  }
+}
+
