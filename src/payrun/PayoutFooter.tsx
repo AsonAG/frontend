@@ -27,10 +27,10 @@ export function PayoutFooter({ onPayout, minWidth, children }: PayoutFooterProps
         backgroundColor: theme => theme.palette.background.default
       }}
     >
-      {children}
+      {employeeCount > 0 && children}
       <Stack direction="row" justifyContent="end">
         {
-          Object.keys(state.selected).length === 0 ?
+          employeeCount === 0 ?
             <SelectAllButton /> :
             <PayoutDialog
               amount={totalPayingOut}

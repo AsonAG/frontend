@@ -220,6 +220,7 @@ function PayrunPeriodTable() {
           ))
         }
         {
+          state.group === "Payable" &&
           <PayoutFooter onPayout={onPayout} minWidth={minWidth}>
             {Object.keys(state.selected).length > 0 && table.getFooterGroups().map(footerGroup => {
               if (footerGroup.depth === 0)
