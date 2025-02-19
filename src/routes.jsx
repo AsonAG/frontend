@@ -749,7 +749,8 @@ const routeData = [
 							]);
 							console.timeEnd("load");
 							const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
-							return { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes, bankAccountDetails };
+							const salaryTypesSet = [...new Set(salaryTypes)].filter(Boolean).sort();
+							return { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes, salaryTypesSet, bankAccountDetails };
 						},
 						children: [
 							{

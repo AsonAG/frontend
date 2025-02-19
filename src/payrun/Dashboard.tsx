@@ -1,6 +1,6 @@
-import React, { Dispatch, PropsWithChildren, useMemo, useReducer } from "react";
-import { Outlet, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Stack, Typography, Tooltip, Paper, SxProps, Theme, Box, Divider } from "@mui/material";
+import React, { createContext, Dispatch, PropsWithChildren, useContext, useMemo, useReducer } from "react";
+import { Outlet, Link, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { Stack, Typography, Tooltip, Paper, SxProps, Theme, Box, Divider, Button, Chip } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { CaseTask } from "../components/CaseTask";
@@ -13,24 +13,29 @@ import { DashboardHeader } from "./DashboardHeader";
 import { columnVisibilityAtom } from "./TableSettings";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 import { getRowGridSx, getStickySx } from "./utils";
-import { FilterBar } from "./FilterBar";
+import { GroupTabs } from "./GroupTabs";
 import { EntryRow, PayoutTotals, PeriodTotals } from "./types";
 import { columns } from "./TableColumns";
 import { PayoutFooter } from "./PayoutFooter";
+import { getEmployeeDisplayString } from "../models/Employee";
 
+
+type PayrollTableContextProps = {
+  state: PayrollTableState
+  dispatch: Dispatch<PayrollTableAction>
+}
+
+export const PayrollTableContext = createContext<PayrollTableContextProps>(null!);
 
 export function PayrunDashboard() {
   const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   return (
     <>
-      <ContentLayout title={<DashboardHeader index />}>
-        <PayrunPeriodTable key={payrunPeriod?.id} />
-      </ContentLayout>
+      <PayrunPeriodView key={payrunPeriod.id} />
       <Outlet />
     </>
   );
 }
-
 
 const noop = () => { };
 function createRowClickHandler(row: Row<EntryRow>, state: PayrollTableState, dispatch: Dispatch<PayrollTableAction>) {
@@ -67,11 +72,8 @@ function getColumnStickySx(column: Column<EntryRow>): SxProps<Theme> {
   return sx;
 }
 
-const emptyRows = [];
-function PayrunPeriodTable() {
-  const { t } = useTranslation();
+function PayrunPeriodView() {
   const { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
-  const [expanded, setExpanded] = useAtom(expandedControllingTasks);
   const isOpen = payrunPeriod.periodStatus === "Open";
   const rows: Array<EntryRow> = useMemo(() => {
     return payrunPeriod.entries.map((entry, index) => ({
@@ -83,34 +85,41 @@ function PayrunPeriodTable() {
       salaryType: salaryTypes[index]
     }));
   }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingTasks, caseValueCounts]);
-
-  const periodTotals: PeriodTotals = useMemo(() => {
-    let totals = {
-      employees: payrunPeriod.entries.length,
-      previousGross: 0,
-      gross: 0,
-      net: 0,
-      open: 0,
-      employerCost: 0
-    };
-
-    for (let row of rows) {
-      const entry = row;
-      totals.previousGross += row.previousEntry?.grossWage ?? 0;
-      totals.gross += entry?.grossWage ?? 0;
-      totals.net += entry?.netWage ?? 0;
-      totals.open += entry?.openPayout ?? 0;
-      totals.employerCost += entry?.employerCost ?? 0;
-    }
-    return totals;
-  }, [rows, payrunPeriod.entries])
-
-
   const [state, dispatch] = useReducer(
     reducer,
     rows,
     createInitialState
   );
+
+  const header = (
+    <DashboardHeader index>
+      <GroupTabs />
+    </DashboardHeader>
+  );
+
+  const view = state.group === "Controlling" ?
+    <ControllingList /> :
+    <PayrunPeriodTable />
+
+  return (
+    <PayrollTableContext.Provider value={{ state, dispatch }}>
+      <ContentLayout title={header}>
+        {view}
+      </ContentLayout>
+    </PayrollTableContext.Provider>
+  );
+}
+
+const emptyRows = []; // use the same instance to prevent rerenders
+function PayrunPeriodTable() {
+  const { t } = useTranslation();
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  const [expanded, setExpanded] = useAtom(expandedControllingTasks);
+  const isOpen = payrunPeriod.periodStatus === "Open";
+
+  const { state, dispatch } = useContext(PayrollTableContext);
+
+
   const configuredColumnVisibility = useAtomValue(columnVisibilityAtom);
   const columnVisibility: VisibilityState = { ...configuredColumnVisibility, ...state.columnVisibility }
   if (!isOpen) {
@@ -126,7 +135,7 @@ function PayrunPeriodTable() {
     },
     state: {
       expanded,
-      periodTotals,
+      periodTotals: state.periodTotals,
       payoutTotals: state.payoutTotals,
       columnVisibility,
       rowSelection: state.selected,
@@ -168,7 +177,6 @@ function PayrunPeriodTable() {
   const headerSx = { ...stickyHeaderSx, ...rowContainerSx };
   return (
     <Stack>
-      <FilterBar state={state} dispatch={dispatch} />
       <Stack sx={{ overflow: "auto", height: "calc(100vh - 206px)" }}>
         <Box
           component="div"
@@ -212,9 +220,8 @@ function PayrunPeriodTable() {
           ))
         }
         {
-          periodTotals.open > 0 && (state.group === "Payable") &&
-          <PayoutFooter employeeCount={Object.values(state.selected).filter(Boolean).length} totalPayingOut={state.payoutTotals.payingOut} onPayout={onPayout} minWidth={minWidth}>
-            {table.getFooterGroups().map(footerGroup => {
+          <PayoutFooter onPayout={onPayout} minWidth={minWidth}>
+            {Object.keys(state.selected).length > 0 && table.getFooterGroups().map(footerGroup => {
               if (footerGroup.depth === 0)
                 return;
               return (
@@ -320,7 +327,7 @@ function Cell({ color, align, tooltip, sx, children }: CellProps) {
   );
 }
 
-export type TableGroup = "Controlling" | "Payable" | "Calculating" | "PaidOut" | "WithoutOccupation";
+export type TableGroup = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "WithoutOccupation";
 
 export type PayrollTableState = {
   entries: Array<EntryRow>
@@ -331,11 +338,12 @@ export type PayrollTableState = {
   expanded: ExpandedState
   columnVisibility: VisibilityState
   payoutTotals: PayoutTotals
+  periodTotals: PeriodTotals
 }
 
 export type PayrollTableAction = {
   type: "set_filter"
-  filter: string
+  filter: string | null
 } | {
   type: "set_group"
   group: TableGroup
@@ -343,6 +351,8 @@ export type PayrollTableAction = {
   type: "set_selected"
   id: IdType
   selected: boolean
+} | {
+  type: "select_all"
 } | {
   type: "set_amount"
   id: IdType
@@ -356,17 +366,17 @@ function reducer(state: PayrollTableState, action: PayrollTableAction): PayrollT
   function applyAction(): PayrollTableState {
     switch (action.type) {
       case "set_filter":
-        let filter: string | null = action.filter;
         if (state.rowFilter === action.filter) {
-          filter = null;
+          return state;
         }
-        const entries = filter === null ? state.entries : state.entries.filter(e => e.salaryType === action.filter);
+        const entries = action.filter === null ? state.entries : state.entries.filter(e => e.salaryType === action.filter);
         const groups = groupRows(entries);
         return {
           ...state,
-          rowFilter: filter,
+          rowFilter: action.filter,
           entryStateGroups: groups,
-          selected: state.group === "Payable" ? getSelectedState(groups["Payable"]) : state.selected
+          selected: state.group === "Payable" ? getSelectedState(groups["Payable"]) : state.selected,
+          periodTotals: getPeriodTotals(groups["Payable"])
         };
       case "set_group": {
         if (action.group === state.group) {
@@ -376,7 +386,8 @@ function reducer(state: PayrollTableState, action: PayrollTableAction): PayrollT
         return {
           ...state,
           group: action.group,
-          selected: action.group === "Payable" ? getSelectedState(rows) : {}
+          selected: {},
+          periodTotals: getPeriodTotals(rows)
         }
       }
       case "set_selected":
@@ -387,6 +398,13 @@ function reducer(state: PayrollTableState, action: PayrollTableAction): PayrollT
         return {
           ...state,
           selected: selected,
+        };
+      case "select_all":
+        if (state.group !== "Payable")
+          return state;
+        return {
+          ...state,
+          selected: getSelectedState(state.entryStateGroups["Payable"]),
         };
       case "set_amount":
         const employee = state.entries.find(e => e.id === action.id);
@@ -403,7 +421,8 @@ function reducer(state: PayrollTableState, action: PayrollTableAction): PayrollT
   }
   let stateAfterAction = applyAction();
   stateAfterAction.payoutTotals = getPayoutTotals(stateAfterAction.entries, stateAfterAction.selected);
-  stateAfterAction.columnVisibility = stateAfterAction.group !== "Payable" ? { "amount": false } : {
+  const isPayingOut = stateAfterAction.group === "Payable" && stateAfterAction.payoutTotals.payingOut > 0;
+  stateAfterAction.columnVisibility = !isPayingOut ? { "amount": false } : {
     "documents": false,
     "events": false
   }
@@ -430,6 +449,29 @@ function getPayoutTotals(entries: Array<EntryRow>, selected: RowSelectionState) 
   return totals;
 }
 
+function getPeriodTotals(entries: Array<EntryRow>): PeriodTotals {
+  let totals = {
+    employees: 0,
+    previousGross: 0,
+    gross: 0,
+    net: 0,
+    open: 0,
+    employerCost: 0
+  };
+  if (!Array.isArray(entries)) {
+    return totals;
+  }
+
+  for (let entry of entries) {
+    totals.previousGross += entry.previousEntry?.grossWage ?? 0;
+    totals.gross += entry?.grossWage ?? 0;
+    totals.net += entry?.netWage ?? 0;
+    totals.open += entry?.openPayout ?? 0;
+    totals.employerCost += entry?.employerCost ?? 0;
+  }
+  return totals;
+}
+
 function createInitialState(employeeRows: Array<EntryRow>): PayrollTableState {
   return {
     entries: employeeRows,
@@ -444,6 +486,14 @@ function createInitialState(employeeRows: Array<EntryRow>): PayrollTableState {
     payoutTotals: {
       open: 0,
       payingOut: 0
+    },
+    periodTotals: {
+      employees: 0,
+      previousGross: 0,
+      gross: 0,
+      net: 0,
+      open: 0,
+      employerCost: 0
     }
   };
 }
@@ -469,4 +519,63 @@ function groupRows(rows: Array<EntryRow>): Record<TableGroup, Array<EntryRow>> {
     }
     return "WithoutOccupation";
   }
+}
+
+
+function ControllingList() {
+  const { t } = useTranslation();
+  const { state } = useContext(PayrollTableContext);
+  const wageControlling = state.entryStateGroups["Controlling"];
+  const withoutOccupation = state.entryStateGroups["WithoutOccupation"];
+  if (!wageControlling && !withoutOccupation) {
+    return <Typography>{t("All entries are ok.")}</Typography>
+  }
+
+  return (
+    <Stack spacing={2}>
+      <WageControllingList wageControlling={wageControlling} />
+      <WithoutOccupationList withoutOccupation={withoutOccupation} />
+    </Stack>
+  )
+}
+
+function WageControllingList({ wageControlling }: { wageControlling: Array<EntryRow> }) {
+  const { t } = useTranslation();
+  if (!wageControlling)
+    return;
+
+  return (
+    <Stack spacing={1}>
+      <Typography variant="h6">{t("payrun_period_wage_controlling")}</Typography>
+      {wageControlling.map(entry => <ControllingRow key={entry.id} entry={entry} />)}
+    </Stack>
+  )
+}
+
+function ControllingRow({ entry }: { entry: EntryRow }) {
+  return (
+    <Stack spacing={0.5}>
+      <Typography>{getEmployeeDisplayString(entry)}</Typography>
+      <Stack direction="row">
+        {
+          entry?.controllingTasks?.map(task => <Button key={task.id} component={Link} to={`employees/${entry.employeeId}/new/${encodeURIComponent(task.name)}`} variant="outlined" color="warning" size="small">{task.displayName}</Button>)
+        }
+      </Stack>
+    </Stack>
+  )
+}
+
+function WithoutOccupationList({ withoutOccupation }: { withoutOccupation: Array<EntryRow> }) {
+  const { t } = useTranslation();
+  if (!withoutOccupation)
+    return;
+
+  return (
+    <Stack spacing={1}>
+      <Typography variant="h6">{t("payrun_period_without_occupation")}</Typography>
+      <Stack direction="row" spacing={0.5}>
+        {withoutOccupation.map(entry => <Chip key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" />)}
+      </Stack>
+    </Stack>
+  )
 }

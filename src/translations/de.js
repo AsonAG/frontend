@@ -205,13 +205,15 @@ const translations = {
 		"Employee number": "Mitarbeiteranzahl",
 		"New relevant values in open period": "Neue relevante Werte in der offenen Periode",
 		"payrun_period_calculating": "Wird berechnet...",
-		"payrun_period_controlling": "Lohnkontrolle",
+		"payrun_period_controlling": "Kontrolle",
+		"payrun_period_wage_controlling": "Lohnkontrolle",
 		"payrun_period_ready": "Auszahlungsbereit",
 		"payrun_period_paid_out": "Ausbezahlt",
 		"payrun_period_without_occupation": "Ohne Beschäftigung",
 		"The open period is being created. Please refresh the page in a moment.": "Die offene Periode wird erstellt, bitte laden Sie die Seite nach kurzer Zeit neu.",
 		"Payout created": "Auszahlung erstellt",
 		"Error while creating the payout": "Fehler beim Erstellen der Auszahlung",
+		"Being calculated...": "Werden berechnet...",
 
 		// Headers
 		"Id of the employee": "Id des Mitarbeiters",
@@ -245,6 +247,7 @@ const translations = {
 		"Column visibility": "Spaltensichtbarkeit",
 		"Table width": "Tabellenbreite",
 		"Full width": "Ganze Breite",
+		"Salary type": "Lohntyp",
 
 		// Command
 		"Select event": "Ereignis auswählen",

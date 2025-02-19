@@ -3,11 +3,13 @@ import { Employee } from "../models/Employee";
 import { PayrunPeriod } from "../models/PayrunPeriod";
 import { AvailableCase } from "../models/AvailableCase";
 import dayjs from "dayjs";
-import React from "react";
-import { Box, Chip, IconButton, Stack, Tooltip } from "@mui/material";
+import React, { PropsWithChildren } from "react";
+import { Box, Chip, Divider, IconButton, Stack, Tooltip } from "@mui/material";
 import { PageHeaderTitle } from "../components/ContentLayout";
 import { ChevronLeft, NextPlan, PriceCheck, Receipt } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+import { FilterButton } from "./EntryFilter";
+import { CalculatingIndicator } from "./CalculatingIndicator";
 
 type LoaderData = {
   employees: Array<Employee>
@@ -18,9 +20,9 @@ type LoaderData = {
 
 type DashboardHeaderProps = {
   index?: boolean
-}
+} & PropsWithChildren;
 
-export function DashboardHeader({ index }: DashboardHeaderProps) {
+export function DashboardHeader({ index, children }: DashboardHeaderProps) {
   const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
   const { t } = useTranslation();
   const periodDate = dayjs.utc(payrunPeriod.periodStart).format("MMMM YYYY");
@@ -34,7 +36,14 @@ export function DashboardHeader({ index }: DashboardHeaderProps) {
       {periodOpen && <Chip color="success" size="small" label={t("Offen")} />}
       {!!index &&
         <>
-          <Box sx={{ flex: 1 }} />
+          <Box sx={{ flex: 1 }}>
+            {children}
+          </Box>
+          <CalculatingIndicator />
+          <Tooltip title={t("Filter")}>
+            <FilterButton />
+          </Tooltip>
+          <Divider orientation="vertical" variant="middle" flexItem sx={{ mx: 0.75 }} />
           <Tooltip title={t("Payouts")}>
             <IconButton component={Link} to="payouts"><PriceCheck /></IconButton>
           </Tooltip>

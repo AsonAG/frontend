@@ -3,16 +3,13 @@ import {
   NavLink as RouterLink,
 } from "react-router-dom";
 import { Badge, Typography } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled, Theme } from "@mui/system";
 import { Ref, forwardRef } from "react";
 import React from "react";
 
 
-const Link = styled(
-  forwardRef(function Link(itemProps: NavLinkProps, ref: Ref<HTMLAnchorElement>) {
-    return <RouterLink ref={ref} {...itemProps} role={undefined} />;
-  }),
-)(({ theme }) => {
+
+const styling = (theme: Theme) => {
   const underline = (opacity = 1.0) => ({
     "::after": {
       opacity,
@@ -28,6 +25,7 @@ const Link = styled(
   return {
     display: "block",
     textDecoration: "none",
+    cursor: "pointer",
     color: theme.palette.text.primary,
     paddingBottom: theme.spacing(1),
     fontWeight: "bold",
@@ -44,7 +42,15 @@ const Link = styled(
       color: theme.palette.primary.light,
     },
   };
-});
+};
+
+const Link = styled(
+  forwardRef(function Link(itemProps: NavLinkProps, ref: Ref<HTMLAnchorElement>) {
+    return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+  }),
+)(({ theme }) => styling(theme));
+
+const Button = styled("div")(({ theme }) => styling(theme));
 
 export function TabLink({ to, title, badgeCount }: { to: string, title: string, badgeCount?: number }) {
   return (
@@ -54,4 +60,15 @@ export function TabLink({ to, title, badgeCount }: { to: string, title: string, 
       </Link>
     </Badge>
   );
+}
+
+export function TabButton({ active, title, badgeCount, onClick }) {
+  return (
+    <Badge badgeContent={badgeCount} color="primary" variant="oob">
+      <Button className={active ? "active" : undefined} onClick={onClick}>
+        <Typography>{title}</Typography>
+      </Button>
+    </Badge>
+
+  )
 }

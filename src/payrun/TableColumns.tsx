@@ -28,7 +28,6 @@ function createColumns() {
   return [
     columnHelper.group({
       id: "employeeTotal",
-      header: ({ table, t }) => `${table.getRowCount()} ${t("Employees")}`,
       columns: [
         columnHelper.accessor("identifier",
           {

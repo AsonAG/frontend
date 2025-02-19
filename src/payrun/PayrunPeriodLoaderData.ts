@@ -10,4 +10,5 @@ export type PayrunPeriodLoaderData = {
   caseValueCounts: Array<number>
   bankAccountDetails: BankAccountDetails
   salaryTypes: Array<string>
+  salaryTypesSet: Array<string>
 }

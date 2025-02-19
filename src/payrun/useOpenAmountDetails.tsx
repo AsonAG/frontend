@@ -3,7 +3,7 @@ import { CellContext } from "@tanstack/react-table";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatValue, getRowGridSx } from "./utils";
-import { EntryRow } from "./Dashboard";
+import { EntryRow } from "./types";
 
 type OpenAmountDetails = {
   hasDetails: boolean

@@ -20,7 +20,8 @@ const translations = {
 
 		payout_sum: "Payout {{amount}}",
 		"payrun_period_calculating": "Calculating",
-		"payrun_period_controlling": "Wage controlling",
+		"payrun_period_controlling": "Controlling",
+		"payrun_period_wage_controlling": "Wage Controlling",
 		"payrun_period_ready": "Ready to pay out",
 		"payrun_period_paid_out": "Paid out",
 		"payrun_period_without_occupation": "Without occupation",

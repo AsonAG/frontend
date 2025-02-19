@@ -195,7 +195,7 @@ function createThemeSettings(mode: ThemeMode): ThemeOptions {
             props: { variant: "oob" },
             style: {
               "& .MuiBadge-badge": {
-                right: "-10%",
+                right: "-5%",
               },
             },
           },
