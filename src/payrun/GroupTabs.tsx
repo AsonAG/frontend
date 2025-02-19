@@ -29,7 +29,10 @@ type GroupChipProps = {
   dispatch: Dispatch<PayrollTableAction>
 }
 function GroupTab({ label, group, state, dispatch }: GroupChipProps) {
-  const count = (state.entryStateGroups[group] ?? []).length;
+  let count = (state.entryStateGroups[group] ?? []).length;
+  if (group === "Controlling") { // Temp fix
+    count += (state.entryStateGroups["WithoutOccupation"] ?? []).length
+  }
   return (
     <TabButton title={label} active={group === state.group} badgeCount={count} onClick={() => dispatch({ type: "set_group", group })} />
   )
