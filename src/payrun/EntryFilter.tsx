@@ -15,7 +15,7 @@ export const FilterButton = React.forwardRef<HTMLButtonElement, IconButtonProps>
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <Badge badgeContent={filterActive ? 1 : 0} color="primary">
+        <Badge badgeContent={filterActive ? 1 : 0} color="primary" overlap="circular">
           <IconButton color={filterActive ? "primary" : undefined} ref={ref} {...props}>
             <FilterAlt />
           </IconButton>
