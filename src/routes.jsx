@@ -733,7 +733,6 @@ const routeData = [
 								throw new Response("Not found", { status: 404 });
 							}
 							const evalDate = dayjs().toISOString();
-							console.time("load");
 							const [
 								previousPayrunPeriod,
 								controllingTasksList,
@@ -747,7 +746,6 @@ const routeData = [
 								Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
 								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
 							]);
-							console.timeEnd("load");
 							const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
 							const salaryTypesSet = [...new Set(salaryTypes)].filter(Boolean).sort();
 							return { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes, salaryTypesSet, bankAccountDetails };
@@ -775,7 +773,12 @@ const routeData = [
 									return null;
 								}
 							},
-							createRoutePayrunPeriodDocument(),
+							{
+								Component: PayrunDashboard,
+								children: [
+									createRoutePayrunPeriodDocument()
+								]
+							},
 							{
 								id: "payrunperiodreview",
 								path: "review",

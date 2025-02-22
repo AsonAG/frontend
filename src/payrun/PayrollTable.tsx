@@ -254,24 +254,34 @@ function getPayoutTotals(entries: Array<EntryRow>, selected: RowSelectionState) 
 
 function getPeriodTotals(entries: Array<EntryRow>): PeriodTotals {
   let totals = {
-    employees: 0,
+    employerCost: 0,
     previousGross: 0,
     gross: 0,
     net: 0,
+    offsetting: 0,
+    retro: 0,
+    openGarnishmentPayoutPreviousPeriod: 0,
+    openWagePayoutPreviousPeriod: 0,
+    paid: 0,
+    garnishment: 0,
     open: 0,
-    employerCost: 0
   };
   if (!Array.isArray(entries)) {
     return totals;
   }
 
   for (let entry of entries) {
+    totals.employerCost += entry?.employerCost ?? 0;
     totals.previousGross += entry.previousEntry?.grossWage ?? 0;
     totals.gross += entry?.grossWage ?? 0;
     totals.net += entry?.netWage ?? 0;
-    totals.open += entry?.
-      openPayout ?? 0;
-    totals.employerCost += entry?.employerCost ?? 0;
+    totals.offsetting += entry?.offsetting ?? 0;
+    totals.retro += entry?.retro ?? 0;
+    totals.openGarnishmentPayoutPreviousPeriod += entry?.openGarnishmentPayoutPreviousPeriod ?? 0;
+    totals.openWagePayoutPreviousPeriod += entry?.openWagePayoutPreviousPeriod ?? 0;
+    totals.paid += ((entry?.paidOut ?? 0) + (entry?.paidOutGarnishment ?? 0));
+    totals.garnishment += entry?.garnishment ?? 0;
+    totals.open += entry?.openPayout ?? 0;
   }
   return totals;
 }

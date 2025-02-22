@@ -152,74 +152,92 @@ function createColumns() {
           }),
       ]
     }),
-    columnHelper.accessor("offsetting",
-      {
-        id: "offsetting",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("OT"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "offsetting", context),
-          headerTooltip: t => t("Offsettings, i.e. supplements and deductions after the net wage")
-        }
-      }),
-    columnHelper.accessor("retro",
-      {
-        id: "retro",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Retro"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "retro", context),
-          headerTooltip: (t) => t("Net amount from all retroactive changes prior to the open period")
-        }
-      }),
-    columnHelper.accessor("openGarnishmentPayoutPreviousPeriod",
-      {
-        id: "openGarnishmentPayoutPreviousPeriod",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("GPP"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: t => t("Garnishments to be paid from the previous period")
-        }
-      }),
-    columnHelper.accessor("openWagePayoutPreviousPeriod",
-      {
-        id: "openWagePayoutPreviousPeriod",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("OPP"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: t => t("Outstanding amount to be paid from the previous period")
-        }
-      }),
-    columnHelper.accessor(row => (row.paidOut ?? 0) + (row.paidOutGarnishment ?? 0),
-      {
-        id: "paidOut",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Paid"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: (t) => t("Already paid out in the open period")
-        }
-      }),
-    columnHelper.accessor("garnishment",
-      {
-        id: "garnishment",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Garnishment"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: (t) => t("Garnishment open period")
-        }
-      }),
+    columnHelper.group({
+      id: "offsettingTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.offsetting),
+      columns: [
+        columnHelper.accessor("offsetting",
+          {
+            id: "offsetting",
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("OT"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "offsetting", context),
+              headerTooltip: t => t("Offsettings, i.e. supplements and deductions after the net wage")
+            }
+          }),
+      ]
+    }),
+    columnHelper.group({
+      id: "openGarnishmentPayoutPreviousPeriodTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.openGarnishmentPayoutPreviousPeriod),
+      columns: [
+        columnHelper.accessor("openGarnishmentPayoutPreviousPeriod",
+          {
+            id: "openGarnishmentPayoutPreviousPeriod",
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("GPP"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              headerTooltip: t => t("Garnishments to be paid from the previous period")
+            }
+          }),
+      ]
+    }),
+    columnHelper.group({
+      id: "openWagePayoutPreviousPeriodTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.openWagePayoutPreviousPeriod),
+      columns: [
+        columnHelper.accessor("openWagePayoutPreviousPeriod",
+          {
+            id: "openWagePayoutPreviousPeriod",
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("OPP"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              headerTooltip: t => t("Outstanding amount to be paid from the previous period")
+            }
+          }),
+      ]
+    }),
+    columnHelper.group({
+      id: "paidTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.paid),
+      columns: [
+        columnHelper.accessor(row => (row.paidOut ?? 0) + (row.paidOutGarnishment ?? 0),
+          {
+            id: "paidOut",
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("Paid"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              headerTooltip: (t) => t("Already paid out in the open period")
+            }
+          }),
+      ]
+    }),
+    columnHelper.group({
+      id: "garnishmentTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.garnishment),
+      columns: [
+        columnHelper.accessor("garnishment",
+          {
+            id: "garnishment",
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("Garnishment"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              headerTooltip: (t) => t("Garnishment open period")
+            }
+          }),
+      ]
+    }),
     columnHelper.group({
       id: "openTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.open),

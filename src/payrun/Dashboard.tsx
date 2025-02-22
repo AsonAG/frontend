@@ -1,6 +1,6 @@
-import React, { createContext, Dispatch, useCallback, useContext, useMemo, useReducer, useState } from "react";
-import { Outlet, Link, useRouteLoaderData } from "react-router-dom";
-import { Stack, Typography, Button, Chip, TextField, InputAdornment, Box } from "@mui/material";
+import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer, useState } from "react";
+import { Link as RouterLink, Outlet, useRouteLoaderData, LinkProps } from "react-router-dom";
+import { Stack, Typography, Button, Chip, TextField, InputAdornment, Box, styled } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { DashboardHeader } from "./DashboardHeader";
@@ -263,16 +263,34 @@ function WageControllingList({ wageControlling }: { wageControlling: Array<Entry
 
 function ControllingRow({ entry }: { entry: EntryRow }) {
   return (
-    <Stack spacing={0.5}>
-      <Typography>{getEmployeeDisplayString(entry)}</Typography>
+    <Stack spacing={0.5} alignItems="start">
+      <Link to={`../../hr/employees/${entry.employeeId}`} >{getEmployeeDisplayString(entry)}</Link>
       <Stack direction="row" spacing={0.5} flexWrap="wrap">
         {
-          entry?.controllingTasks?.map(task => <Button key={task.id} component={Link} to={`employees/${entry.employeeId}/new/${encodeURIComponent(task.name)}`} variant="outlined" color="warning" size="small">{task.displayName}</Button>)
+          entry?.controllingTasks?.map(task => <Button key={task.id} component={RouterLink} to={`employees/${entry.employeeId}/new/${encodeURIComponent(task.name)}`} variant="outlined" color="warning" size="small">{task.displayName}</Button>)
         }
       </Stack>
     </Stack>
   )
 }
+
+const Link = styled(
+  forwardRef(function Link(itemProps: LinkProps, ref: Ref<HTMLAnchorElement>) {
+    return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+  }),
+)(({ theme }) => {
+  return {
+    display: "block",
+    textDecoration: "none",
+    paddingTop: theme.spacing(0.25),
+    paddingBottom: theme.spacing(0.25),
+    borderRadius: theme.shape.borderRadius,
+    color: theme.palette.primary.main,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.hover
+    }
+  };
+});
 
 function WithoutOccupationList({ withoutOccupation }: { withoutOccupation: Array<EntryRow> }) {
   const { t } = useTranslation();
@@ -283,8 +301,10 @@ function WithoutOccupationList({ withoutOccupation }: { withoutOccupation: Array
     <Stack spacing={1}>
       <Typography variant="h6">{t("payrun_period_without_occupation")}</Typography>
       <Stack direction="row" spacing={0.5} flexWrap="wrap">
-        {withoutOccupation.map(entry => <Chip key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" />)}
+        {withoutOccupation.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
       </Stack>
     </Stack>
   )
 }
+
+const noop = () => { };

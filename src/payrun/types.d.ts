@@ -25,11 +25,16 @@ declare module '@tanstack/react-table' {
 }
 
 export type PeriodTotals = {
-  employees: number
-  gross: number
-  previousGross: number
-  net: number
   employerCost: number
+  previousGross: number
+  gross: number
+  net: number
+  offsetting: number
+  retro: number
+  openGarnishmentPayoutPreviousPeriod: number
+  openWagePayoutPreviousPeriod: number
+  paid: number
+  garnishment: number
   open: number
 }
 export type PayoutTotals = {

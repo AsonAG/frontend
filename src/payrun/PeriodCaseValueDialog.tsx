@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useMemo } from "react";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { Link, useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Stack,
@@ -72,6 +72,7 @@ function createColumns(t: TFunction<"translation", undefined>) {
 }
 export function PeriodCaseValueDialog() {
   const { t } = useTranslation();
+  const params = useParams();
   const navigate = useNavigate();
   const onClose = () => navigate("..");
   return (
@@ -79,7 +80,8 @@ export function PeriodCaseValueDialog() {
       <ResponsiveDialogContent containerWidth>
         <Typography variant="h6">{t("New relevant values in open period")}</Typography>
         <Table />
-        <Stack direction="row" justifyContent="end">
+        <Stack direction="row" justifyContent="end" spacing={2}>
+          <Button to={`../../../hr/employees/${params.employeeId}`} component={Link}>{t("Go to employee data")}</Button>
           <ResponsiveDialogClose>
             <Button variant="outlined">{t("Close")}</Button>
           </ResponsiveDialogClose>

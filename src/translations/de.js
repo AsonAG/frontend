@@ -253,6 +253,7 @@ const translations = {
 		"All employees have been paid out.": "Alle Mitarbeiter wurden ausbezahlt.",
 		"No payment has been made yet.": "Es wurde noch keine Auszahlung getätigt.",
 		"No matches.": "Keine Treffer.",
+		"Go to employee data": "Gehe zu Mitarbeiterdaten",
 
 		// Command
 		"Select event": "Ereignis auswählen",
