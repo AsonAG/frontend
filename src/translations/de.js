@@ -248,6 +248,11 @@ const translations = {
 		"Table width": "Tabellenbreite",
 		"Full width": "Ganze Breite",
 		"Salary type": "Lohntyp",
+		"Employee search": "Mitarbeitersuche",
+		"Controlling completed.": "Kontrolle abgeschlossen.",
+		"All employees have been paid out.": "Alle Mitarbeiter wurden ausbezahlt.",
+		"No payment has been made yet.": "Es wurde noch keine Auszahlung getätigt.",
+		"No matches.": "Keine Treffer.",
 
 		// Command
 		"Select event": "Ereignis auswählen",

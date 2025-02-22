@@ -10,12 +10,12 @@ import { useContainerWidthSetting } from "../App";
 const jsonLocalStorage = createJSONStorage<ColumnVisibility>(() => localStorage);
 
 const defaultColumnVisibility: ColumnVisibility = {
-  identifier: true,
-  employee: false,
-  employerCost: true,
+  identifier: false,
+  employee: true,
+  employerCost: false,
   offsetting: false,
   grossPreviousPeriod: false,
-  grossDiff: false,
+  grossDiff: true,
   openWagePayoutPreviousPeriod: false,
   garnishment: false,
   openGarnishmentPayoutPreviousPeriod: false,

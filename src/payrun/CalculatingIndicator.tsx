@@ -17,12 +17,12 @@ export function CalculatingIndicator() {
     setAnchorEl(null);
   };
   const open = Boolean(anchorEl);
-  const entriesBeingCalculated = state.entryStateGroups["Calculating"];
+  const entriesBeingCalculated = state.entriesByState["Calculating"];
   if (!entriesBeingCalculated)
     return;
 
   return <>
-    <CircularProgress size={16} onMouseOver={handlePopoverOpen} onMouseLeave={handlePopoverClose} sx={{ mx: 1 }} />
+    <CircularProgress size={20} onMouseOver={handlePopoverOpen} onMouseLeave={handlePopoverClose} sx={{ alignSelf: "center" }} />
     <Popover
       elevation={1}
       sx={{

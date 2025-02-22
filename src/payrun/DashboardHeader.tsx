@@ -39,7 +39,6 @@ export function DashboardHeader({ index, children }: DashboardHeaderProps) {
           <Box sx={{ flex: 1 }}>
             {children}
           </Box>
-          <CalculatingIndicator />
           <Tooltip title={t("Filter")}>
             <FilterButton />
           </Tooltip>

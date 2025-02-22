@@ -1,8 +1,8 @@
 import { TFunction } from "i18next";
 import { Dispatch } from "react";
-import { PayrollTableAction } from "./Dashboard";
 import { PayrunPeriodEntry } from "../models/PayrunPeriod";
 import { AvailableCase } from "../models/AvailableCase";
+import { PayrunTableAction } from "./PayrollTable";
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
@@ -12,17 +12,12 @@ declare module '@tanstack/react-table' {
     headerTooltip?: (t: TFunction<"translation", undefined>) => string | null
   }
   interface CellContext<TData, TValue> {
-    dispatch: Dispatch<PayrollTableAction>
+    dispatch: Dispatch<PayrunTableAction>
     t: TFunction<"translation", undefined>
   }
   interface HeaderContext<TData, TValue> {
     t: TFunction<"translation", undefined>
   }
-
-  interface TableMeta<TData> {
-    isOpen: boolean
-  }
-
   interface TableState {
     periodTotals: PeriodTotals
     payoutTotals: PayoutTotals

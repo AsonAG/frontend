@@ -14,8 +14,6 @@ import { AmountInput } from "./AmountInput";
 
 const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
 function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefined>, wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
-  if (!context.table.options.meta?.isOpen)
-    return null;
   if (previousValueColumnName && context.table.getState().columnVisibility[previousValueColumnName])
     return null;
   const previousValue = formatValue(context.row.original.previousEntry?.[wageType]);
@@ -112,8 +110,7 @@ function createColumns() {
             cell: (props) => {
               const { grossWage, previousEntry } = props.row.original;
               const previousGrossWage = previousEntry?.grossWage;
-              const isOpen = props.table.options.meta?.isOpen;
-              if (!isOpen || !grossWage || grossWage === previousGrossWage) {
+              if (!grossWage || grossWage === previousGrossWage) {
                 // no highlight
                 return <Typography noWrap>{formatValue(props.getValue())}</Typography>
               }

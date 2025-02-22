@@ -11,7 +11,7 @@ import { PayrollTableContext } from "./Dashboard";
 
 export const FilterButton = React.forwardRef<HTMLButtonElement, IconButtonProps>((props, ref) => {
   const { state } = useContext(PayrollTableContext);
-  const filterActive = state.rowFilter !== null;
+  const filterActive = state.salaryType !== null;
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
@@ -39,14 +39,14 @@ function SalaryTypeSection() {
   const { t } = useTranslation();
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let value = (event.target as HTMLInputElement).value;
-    dispatch({ type: "set_filter", filter: value === "all" ? null : value });
+    dispatch({ type: "set_salary_type", salaryType: value === "all" ? null : value });
   };
 
   return (
     <FormControl>
       <FormLabel>{t("Salary type")}</FormLabel>
       <RadioGroup
-        value={state.rowFilter ?? "all"}
+        value={state.salaryType ?? "all"}
         onChange={handleChange}
       >
         <FormControlLabel value="all" control={<Radio />} label={t("All")} />
