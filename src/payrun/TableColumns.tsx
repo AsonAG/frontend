@@ -1,4 +1,3 @@
-import { EntryRow } from "./Dashboard";
 import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import React, { MouseEventHandler } from "react";
 import { formatValue } from "./utils";
@@ -11,6 +10,8 @@ import { TFunction } from "i18next";
 import { useOpenAmountDetails } from "./useOpenAmountDetails";
 import { TableSettingsButton } from "./TableSettings";
 import { AmountInput } from "./AmountInput";
+import { RowSelectionButton } from "./RowSelectionButton";
+import { EntryRow } from "./types";
 
 const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
 function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefined>, wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
@@ -26,6 +27,7 @@ function createColumns() {
   return [
     columnHelper.group({
       id: "employeeTotal",
+      header: ({ state, dispatch, completed }) => !completed && <RowSelectionButton state={state} dispatch={dispatch} />,
       columns: [
         columnHelper.accessor("identifier",
           {

@@ -116,7 +116,7 @@ export const PayrunTable = memo(function PayrunTable({ entries, completed }: Pay
               const baseColumn = header.getLeafHeaders()[0].column;
               const alignment = baseColumn.columnDef.meta?.alignment;
               const headerTooltip = header.column.columnDef.meta?.headerTooltip;
-              const context = { ...header.getContext(), t };
+              const context = { ...header.getContext(), t, dispatch, state, completed };
               const variant = headerGroup.depth !== 0 ? "h6" : undefined;
               return (
                 <Cell key={header.id} tooltip={headerTooltip?.(t)} align={alignment} sx={{ ...getColumnStickySx(baseColumn), gridColumn: `span ${header.colSpan}` }}>
@@ -303,7 +303,7 @@ function reducer(state: PayrunTableState, action: PayrunTableAction): PayrunTabl
     case "toggle_selected":
       newState = {
         ...state,
-        selected: getSelectedState(state.entries),
+        selected: state.selectedEmployeeCount < state.entries.length ? getSelectedState(state.entries) : {},
       };
       break;
     case "set_amount":

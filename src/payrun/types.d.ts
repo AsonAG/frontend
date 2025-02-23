@@ -2,7 +2,7 @@ import { TFunction } from "i18next";
 import { Dispatch } from "react";
 import { PayrunPeriodEntry } from "../models/PayrunPeriod";
 import { AvailableCase } from "../models/AvailableCase";
-import { PayrunTableAction } from "./PayrollTable";
+import { PayrunTableAction, PayrunTableState } from "./PayrollTable";
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
@@ -16,11 +16,14 @@ declare module '@tanstack/react-table' {
     t: TFunction<"translation", undefined>
   }
   interface HeaderContext<TData, TValue> {
+    state: PayrunTableState
+    dispatch: Dispatch<PayrunTableAction>
+    completed: boolean
     t: TFunction<"translation", undefined>
   }
   interface TableState {
-    periodTotals: PeriodTotals
     payoutTotals: PayoutTotals
+    periodTotals: PeriodTotals
   }
 }
 
