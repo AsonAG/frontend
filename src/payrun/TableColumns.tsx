@@ -306,7 +306,7 @@ function createColumns() {
             {
               payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => (
                 <Tooltip key={doc.id} title={doc.name} placement="left">
-                  <IconButton size="small" component={Link} to={`${payrunEntry.id} / doc / ${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
+                  <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
                 </Tooltip>
               ))
             }
