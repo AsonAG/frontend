@@ -38,7 +38,7 @@ function createColumns() {
             size: 150,
             meta: {
               flex: 1,
-              tooltip: (context) => !context.table.getState().columnVisibility.employee ? context.row.original.name : null,
+              tooltip: (context) => !context.table.getState().columnVisibility.employee ? `${context.row.original.lastName} ${context.row.original.firstName}` : null,
               headerTooltip: (t) => t("Id of the employee")
             }
           }),
@@ -92,17 +92,23 @@ function createColumns() {
           }),
       ]
     }),
-    columnHelper.accessor(row => formatValue((row.grossWage ?? 0) - (row.previousEntry?.grossWage ?? 0)),
-      {
-        id: "grossDiff",
-        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-        header: ({ t }) => t("Diff. gross"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          headerTooltip: t => t("Gross wage previous period minus gross wage open period")
-        }
-      }),
+    columnHelper.group({
+      id: "diffGrossWageTotal",
+      header: ({ table }) => formatValue(table.getState().periodTotals.diffGross),
+      columns: [
+        columnHelper.accessor(row => formatValue((row.grossWage ?? 0) - (row.previousEntry?.grossWage ?? 0)),
+          {
+            id: "grossDiff",
+            cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+            header: ({ t }) => t("Diff. gross"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              headerTooltip: t => t("Gross wage previous period minus gross wage open period")
+            }
+          }),
+      ]
+    }),
     columnHelper.group({
       id: "grossWageTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.gross),
@@ -300,7 +306,7 @@ function createColumns() {
             {
               payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => (
                 <Tooltip key={doc.id} title={doc.name} placement="left">
-                  <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
+                  <IconButton size="small" component={Link} to={`${payrunEntry.id} / doc / ${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
                 </Tooltip>
               ))
             }
@@ -321,7 +327,7 @@ function createColumns() {
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             <Tooltip title={t("Events")} placement="left">
-              <IconButton size="small" component={Link} to={`employees/${employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
+              <IconButton size="small" component={Link} to={`employees / ${employeeId} / events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
             </Tooltip>
           </Stack>
         )

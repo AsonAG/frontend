@@ -3,11 +3,11 @@ import { NumericFormat } from "react-number-format";
 import { groupSeparator } from "./utils";
 import { TextField } from "@mui/material";
 import { EntryRow } from "./types";
-import { DashboardAction } from "./Dashboard";
+import { PayrunTableAction } from "./PayrollTable";
 
 type AmountInputProps = {
   entry: EntryRow
-  dispatch: Dispatch<DashboardAction>
+  dispatch: Dispatch<PayrunTableAction>
   onClick: MouseEventHandler
 }
 

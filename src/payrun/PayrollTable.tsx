@@ -256,6 +256,7 @@ function getPeriodTotals(entries: Array<EntryRow>): PeriodTotals {
   let totals = {
     employerCost: 0,
     previousGross: 0,
+    diffGross: 0,
     gross: 0,
     net: 0,
     offsetting: 0,
@@ -283,6 +284,7 @@ function getPeriodTotals(entries: Array<EntryRow>): PeriodTotals {
     totals.garnishment += entry?.garnishment ?? 0;
     totals.open += entry?.openPayout ?? 0;
   }
+  totals.diffGross = totals.gross - totals.previousGross;
   return totals;
 }
 

@@ -30,6 +30,7 @@ declare module '@tanstack/react-table' {
 export type PeriodTotals = {
   employerCost: number
   previousGross: number
+  diffGross: number
   gross: number
   net: number
   offsetting: number
