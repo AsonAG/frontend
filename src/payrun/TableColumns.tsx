@@ -327,7 +327,7 @@ function createColumns() {
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             <Tooltip title={t("Events")} placement="left">
-              <IconButton size="small" component={Link} to={`employees / ${employeeId} / events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
+              <IconButton size="small" component={Link} to={`employees/${employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
             </Tooltip>
           </Stack>
         )
