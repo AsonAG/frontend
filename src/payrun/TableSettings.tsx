@@ -36,6 +36,9 @@ export type ColumnVisibility = {
   openGarnishmentPayoutPreviousPeriod: boolean
   retro: boolean
 }
+
+export const fullWidthTableAtom = atomWithStorage<boolean>("settings.view.fullContainerWidth", false, jsonLocalStorage, { getOnInit: true });
+
 const popoverSx: SxProps<Theme> = {
   border: 1,
   borderColor: "divider",
@@ -67,7 +70,7 @@ export const TableSettingsButton = React.forwardRef<HTMLButtonElement, IconButto
 
 function FullWidthTableSection() {
   const { t } = useTranslation();
-  const [fullWidth, setFullWidth] = useContainerWidthSetting("payrunperiodview");
+  const [fullWidth, setFullWidth] = useAtom(fullWidthTableAtom);
   return (
     <Stack>
       <Typography variant="h6">{t("Table width")}</Typography>

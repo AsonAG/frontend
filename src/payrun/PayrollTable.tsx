@@ -6,7 +6,7 @@ import { Payout } from "./Payouts";
 import { Column, flexRender, getCoreRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { IdType } from "../models/IdType";
 import { useAtomValue } from "jotai";
-import { columnVisibilityAtom } from "./TableSettings";
+import { columnVisibilityAtom, fullWidthTableAtom } from "./TableSettings";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 import { getRowGridSx, getStickySx } from "./utils";
 import { EntryRow, PayoutTotals, PeriodTotals } from "./types";
@@ -96,9 +96,16 @@ export const PayrunTable = memo(function PayrunTable({ entries, completed }: Pay
   const minWidth = table.getTotalSize();
   const stickyHeaderSx = getStickySx(50, { top: 0 });
   const headerSx = { ...stickyHeaderSx, ...rowContainerSx };
+  const useFullWidth = useAtomValue(fullWidthTableAtom);
+  const containerWidth = useFullWidth ?
+    {
+      position: { lg: "absolute" },
+      left: { lg: "calc(264px + 3 * var(--mui-spacing))" },
+      right: { lg: "calc(3 * var(--mui-spacing))" }
+    } : {}
   return (
     <Stack>
-      <Stack sx={{ overflow: "auto", height: "calc(100vh - 206px)" }}>
+      <Stack sx={{ overflow: "auto", height: "calc(100vh - 206px)", ...containerWidth }}>
         <Box
           component="div"
           sx={
@@ -186,7 +193,7 @@ function TableRow({ row, onClick, containerSx, dispatch }: TableRowProps) {
   const { t } = useTranslation();
   let stackSx: SxProps<Theme> = {
     userSelect: "none",
-    height: 40,
+    minHeight: 32,
     backgroundColor: (theme: Theme) => theme.palette.background.default
   };
   if (row.getCanSelect()) {

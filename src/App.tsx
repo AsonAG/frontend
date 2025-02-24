@@ -97,9 +97,8 @@ export function App({ renderDrawer = false }) {
 
 const mainContainerProps = { px: 0, sm: { px: 0 } };
 function MainContainer() {
-	const containerWidth = useContainerWidth();
 	return (
-		<Container component="main" maxWidth={containerWidth} sx={mainContainerProps}>
+		<Container component="main" maxWidth="lg" sx={mainContainerProps}>
 			<Outlet />
 		</Container>
 	)
@@ -136,30 +135,4 @@ function RenderProductionBanner() {
 		document.documentElement.style.setProperty('--production', value);
 	}, [isProvider]);
 	return null;
-}
-
-function useContainerWidth(): Breakpoint | false {
-	const matches = useMatches();
-	const last = matches[matches.length - 1].id;
-	const fullContainerWidth = useAtomValue(fullContainerWidthSettingAtom);
-	if (last in fullContainerWidth && fullContainerWidth[last]) {
-		return false;
-	}
-	return "lg";
-}
-
-export type FullContainerWidthSetting = Record<string, boolean>
-
-const jsonLocalStorage = createJSONStorage<FullContainerWidthSetting>(() => localStorage);
-
-const defaultFullContainerWidthSetting: FullContainerWidthSetting = {};
-
-export const fullContainerWidthSettingAtom = atomWithStorage<FullContainerWidthSetting>("settings.view.fullContainerWidth", defaultFullContainerWidthSetting, jsonLocalStorage, { getOnInit: true });
-
-export function useContainerWidthSetting(view: string): [boolean, (value: boolean) => void] {
-	const [fullWidth, setFullWidth] = useAtom(fullContainerWidthSettingAtom);
-	function setContainerWidth(checked: boolean) {
-		setFullWidth({ ...fullWidth, [view]: checked })
-	}
-	return [fullWidth[view] ?? false, setContainerWidth];
 }
