@@ -24,12 +24,8 @@ type GroupChipProps = {
 }
 function PayrunTab({ label, tab }: GroupChipProps) {
   const { state, dispatch } = useContext(PayrollTableContext);
-  let count = (state.entriesByState[tab] ?? []).length;
-  if (tab === "Controlling") {
-    count += (state.entriesByState["WithoutOccupation"] ?? []).length
-  }
   return (
-    <TabButton title={label} active={tab === state.selectedTab} badgeCount={count} onClick={() => dispatch({ type: "set_tab", tab })} />
+    <TabButton title={label} active={tab === state.selectedTab} badgeCount={state.entryCountByTab[tab]} onClick={() => dispatch({ type: "set_tab", tab })} />
   )
 }
 
@@ -38,7 +34,7 @@ export function PayrunTabContent({ tab, emptyText, children }: { tab: Tab, empty
   const { state } = useContext(PayrollTableContext);
   if (tab !== state.selectedTab)
     return;
-  if (!state.entriesByState[tab]) {
+  if (state.entryCountByTab[tab] === 0) {
     const text = state.employeeFilter ? "No matches." : emptyText;
     return <Typography>{t(text)}</Typography>
   }

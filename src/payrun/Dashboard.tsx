@@ -53,26 +53,38 @@ function PayrunPeriodView() {
   const header = (
     <DashboardHeader index>
       <Stack direction="row" spacing={2}>
-        <PayrunTabs />
-        <CalculatingIndicator />
+        {
+          isOpen && <>
+            <PayrunTabs />
+            <CalculatingIndicator />
+          </>
+        }
         <Box flex={1} />
         <EmployeeTableSearchField />
       </Stack>
     </DashboardHeader>
   );
 
+
   return (
     <PayrollTableContext.Provider value={{ state, dispatch }}>
       <ContentLayout title={header}>
-        <PayrunTabContent tab="Controlling" emptyText="Controlling completed.">
-          <ControllingList />
-        </PayrunTabContent>
-        <PayrunTabContent tab="Payable" emptyText="All employees have been paid out.">
-          <PayrunTable entries={state.entriesByState["Payable"]} completed={false} />
-        </PayrunTabContent>
-        <PayrunTabContent tab="PaidOut" emptyText="No payment has been made yet.">
-          <PayrunTable entries={state.entriesByState["PaidOut"]} completed={true} />
-        </PayrunTabContent>
+        {
+          isOpen ? (
+            <>
+              <PayrunTabContent tab="Controlling" emptyText="Controlling completed.">
+                <ControllingList />
+              </PayrunTabContent>
+              <PayrunTabContent tab="Payable" emptyText="All employees have been paid out.">
+                <PayrunTable entries={state.entriesByState["Payable"]} completed={false} />
+              </PayrunTabContent>
+              <PayrunTabContent tab="PaidOut" emptyText="No payment has been made yet.">
+                <PayrunTable entries={state.entriesByState["PaidOut"]} completed={true} />
+              </PayrunTabContent>
+            </>
+          ) :
+            <PayrunTable entries={state.filteredEntries} completed={true} />
+        }
       </ContentLayout>
     </PayrollTableContext.Provider>
   );
@@ -117,7 +129,9 @@ function EmployeeTableSearchField() {
 }
 export type DashboardState = {
   entries: Array<EntryRow>
+  filteredEntries: Array<EntryRow>
   entriesByState: Record<EntryState, EntryRow[]>
+  entryCountByTab: Record<Tab, number>
   selectedTab: Tab,
   salaryType: string | null
   employeeFilter: string
@@ -163,8 +177,9 @@ function reducer(state: DashboardState, action: DashboardAction): DashboardState
       };
       break;
   }
-  const entries = newState.entries.filter(e => filterBySalaryType(e, newState.salaryType) && filterBySearch(e, newState.employeeFilter));
-  newState.entriesByState = groupRows(entries);
+  newState.filteredEntries = newState.entries.filter(e => filterBySalaryType(e, newState.salaryType) && filterBySearch(e, newState.employeeFilter));
+  newState.entriesByState = groupRows(newState.filteredEntries);
+  newState.entryCountByTab = getEntryCountByTab(newState.entriesByState);
   if (action.type === "set_employee_filter") {
     newState.selectedTab = getSelectedTabAfterSearch(newState);
   }
@@ -202,9 +217,12 @@ function getSelectedTabAfterSearch(state: DashboardState): Tab {
 
 
 function createInitialState(employeeRows: Array<EntryRow>): DashboardState {
+  var grouped = groupRows(employeeRows);
   return {
     entries: employeeRows,
-    entriesByState: groupRows(employeeRows),
+    filteredEntries: employeeRows,
+    entriesByState: grouped,
+    entryCountByTab: getEntryCountByTab(grouped),
     selectedTab: "Controlling",
     salaryType: null,
     employeeFilter: ""
@@ -228,6 +246,14 @@ function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
     }
     return "WithoutOccupation";
   }
+}
+
+function getEntryCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab, number> {
+  return {
+    "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["WithoutOccupation"]?.length ?? 0),
+    "Payable": (grouped["Payable"]?.length ?? 0),
+    "PaidOut": (grouped["PaidOut"]?.length ?? 0)
+  };
 }
 
 
