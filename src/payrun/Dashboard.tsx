@@ -1,6 +1,6 @@
 import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer, useState } from "react";
 import { Link as RouterLink, Outlet, useRouteLoaderData, LinkProps } from "react-router-dom";
-import { Stack, Typography, Button, Chip, TextField, InputAdornment, Box, styled } from "@mui/material";
+import { Stack, Typography, Button, Chip, TextField, InputAdornment, Box, styled, IconButton } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { DashboardHeader } from "./DashboardHeader";
@@ -11,7 +11,7 @@ import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunTable } from "./PayrollTable";
 import { CalculatingIndicator } from "./CalculatingIndicator";
 import { useDebounceCallback } from "usehooks-ts";
-import { Search } from "@mui/icons-material";
+import { Clear, Search } from "@mui/icons-material";
 
 
 type PayrollTableContextProps = {
@@ -109,6 +109,13 @@ function EmployeeTableSearchField() {
     debounced(updatedValue);
   };
 
+  const iconAction = () => {
+    dispatch({ type: "set_employee_filter", filter: "" });
+    setLocalSearchTerm("");
+  };
+
+  const isEmptySearch = !state.employeeFilter;
+
   return (
     <TextField
       variant="outlined"
@@ -119,7 +126,9 @@ function EmployeeTableSearchField() {
         input: {
           endAdornment: (
             <InputAdornment position="end">
-              <Search />
+              <IconButton onClick={iconAction} disabled={isEmptySearch} edge="end">
+                {isEmptySearch ? <Search /> : <Clear />}
+              </IconButton>
             </InputAdornment>
           )
         }
