@@ -170,7 +170,7 @@ export function toast(severity: ToastSeverity, message: string) {
 export function useEmployeeMissingDataCount(objectId: IdType) {
 	const employeeMissingDataMap = useAtomValue(missingEmployeeDataMapAtom);
 	const missingData = employeeMissingDataMap.get(objectId);
-	if (!missingData) return null;
+	if (!missingData) return 0;
 	return missingData.cases.length;
 }
 

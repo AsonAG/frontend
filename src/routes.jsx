@@ -10,7 +10,7 @@ import {
 
 import { OrganizationList } from "./organization/List";
 import Dashboard from "./scenes/dashboard";
-import { AsyncEmployeeTable } from "./components/tables/EmployeeTable";
+import { AsyncEmployeeTable } from "./employee/EmployeeTable";
 import { AsyncCaseTable } from "./components/tables/CaseTable";
 import { AsyncEventTable } from "./components/tables/EventTable";
 import dayjs from "dayjs";
@@ -256,20 +256,10 @@ function createRouteEmployeeTable(path, showButtons = true) {
 	return {
 		path,
 		Component: AsyncEmployeeTable,
-		loader: async ({ request, params }) => {
-			const searchParams = new URL(request.url).searchParams;
-			const searchTerm = searchParams.get("search");
-			const showAll = !!searchParams.get("showAll");
-			let filter;
-			if (searchTerm) {
-				filter = `contains_ci(firstName, '${searchTerm}') or contains_ci(lastName, '${searchTerm}') or contains_ci(identifier, '${searchTerm}')`;
-			}
+		loader: async ({ params }) => {
 			return defer({
 				showButtons,
-				data: getEmployees(params)
-					.withQueryParam("filter", filter)
-					.withQueryParam("status", showAll ? null : "Active")
-					.fetchJson(),
+				data: getEmployees(params).fetchJson(),
 			});
 		}
 	};

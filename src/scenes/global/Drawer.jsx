@@ -99,12 +99,12 @@ function CompanyBadgeIcon({ icon }) {
 const unwrappedMissingDataEmployeesAtom = unwrap(missingDataEmployeesAtom, (prev => prev ?? []));
 
 function EmployeeBadgeIcon({ icon }) {
-	const cases =  useAtomValue(unwrappedMissingDataEmployeesAtom);
+	const cases = useAtomValue(unwrappedMissingDataEmployeesAtom);
 	const count = cases.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0)
 	return (
-			<Badge badgeContent={count} color="warning" overlap="circular">
-				{icon}
-			</Badge>
+		<Badge badgeContent={count} color="warning" overlap="circular">
+			{icon}
+		</Badge>
 	);
 }
 
@@ -190,12 +190,7 @@ function MenuItemsPayrollAdmin() {
 			<NavigationItem
 				label={t("Employees")}
 				to="hr/employees"
-				icon={<PeopleOutlinedIcon />}
-			/>
-			<NavigationItem
-				label={t("Missing data")}
-				to="hr/missingdata"
-				icon={<EmployeeBadgeIcon icon={<NotificationImportantIcon />} />}
+				icon={<EmployeeBadgeIcon icon={<PeopleOutlinedIcon />} />}
 			/>
 			<NavigationItem
 				label={t("Payroll")}

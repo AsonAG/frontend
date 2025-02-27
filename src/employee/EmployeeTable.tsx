@@ -1,69 +1,119 @@
-import { React, createContext, useContext, useState, forwardRef } from "react";
-import { useAsyncValue, useLoaderData, Link as RouterLink } from "react-router-dom";
+import React, { createContext, useContext, useState, forwardRef, Dispatch, useReducer, useCallback } from "react";
+import { useAsyncValue, useLoaderData, Link as RouterLink, LinkProps } from "react-router-dom";
 import {
-	Divider,
 	Stack,
 	Typography,
 	TextField,
 	useMediaQuery,
-	InputAdornment,
 	IconButton,
 	Button,
-	Switch,
-	FormGroup,
-	FormControlLabel,
+	useTheme,
+	Theme,
+	SxProps,
+	IconButtonProps,
+	styled
 } from "@mui/material";
-import { useTheme } from "@emotion/react";
-import { TableButton } from "../buttons/TableButton";
+import { TableButton } from "../components/buttons/TableButton";
 import { useTranslation } from "react-i18next";
-import { useDebounceCallback } from "usehooks-ts";
-import styled from "@emotion/styled";
 
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import WorkOutlinetIcon from "@mui/icons-material/WorkOutline";
-import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
-import { ContentLayout } from "../ContentLayout";
+import { AsyncDataRoute } from "../routes/AsyncDataRoute";
+import { ContentLayout } from "../components/ContentLayout";
 import { Search } from "@mui/icons-material";
 import {
 	ResponsiveDialog,
 	ResponsiveDialogClose,
 	ResponsiveDialogContent,
 	ResponsiveDialogTrigger,
-} from "../ResponsiveDialog";
-import { useSearchParam } from "../../hooks/useSearchParam";
-import { useIsMobile } from "../../hooks/useIsMobile";
-import { StatusChip } from "../../scenes/employees/StatusChip";
-import { useEmployeeMissingDataCount } from "../../utils/dataAtoms";
+} from "../components/ResponsiveDialog";
+import { useSearchParam } from "../hooks/useSearchParam";
+import { StatusChip } from "../scenes/employees/StatusChip";
+import { useEmployeeMissingDataCount } from "../utils/dataAtoms";
+import { SearchField } from "../components/SearchField";
+import { EmployeeTableFilter } from "./TableFilter";
+import { Employee, getEmployeeDisplayString } from "../models/Employee";
+import { IdType } from "../models/IdType";
 
-const TableContext = createContext({ variant: "standard", showButtons: true });
+
+type EmployeeTableContextProps = {
+	state: TableState
+	dispatch: Dispatch<TableAction>
+	variant: "standard" | "dense"
+	showButtons: boolean
+}
+
+export const EmployeeTableContext = createContext<EmployeeTableContextProps>(null!);
+
+export type TableState = {
+	onlyActive: boolean
+	onlyWithMissingData: boolean
+	filter: string
+}
+
+
+export type TableAction = {
+	type: "toggle_show_inactive"
+} | {
+	type: "toggle_only_with_missing_data"
+} | {
+	type: "set_filter"
+	filter: string
+}
+function reducer(state: TableState, action: TableAction): TableState {
+	switch (action.type) {
+		case "toggle_show_inactive": {
+			return {
+				...state,
+				onlyActive: !state.onlyActive
+			};
+		}
+		case "toggle_only_with_missing_data":
+			return {
+				...state,
+				onlyWithMissingData: !state.onlyWithMissingData
+			};
+		case "set_filter":
+			return {
+				...state,
+				filter: action.filter
+			};
+	}
+}
 
 export function AsyncEmployeeTable() {
-	const { showButtons = true } = useLoaderData();
+	const { showButtons = true } = useLoaderData() as { showButtons: boolean };
 	const theme = useTheme();
-	const variant = useMediaQuery(theme.breakpoints.down("sm"))
+	const variant: "standard" | "dense" = useMediaQuery(theme.breakpoints.down("sm"))
 		? "dense"
 		: "standard";
 
-	const tableContext = { variant, showButtons };
+	const [state, dispatch] = useReducer(reducer, {
+		onlyActive: true,
+		onlyWithMissingData: false,
+		filter: ""
+	});
+
+	const tableContext = { state, dispatch, variant, showButtons };
 
 	return (
-		<TableContext.Provider value={tableContext}>
+		<EmployeeTableContext.Provider value={tableContext}>
 			<ContentLayout title="Employees" buttons={<EmployeeTableButtons />}>
 				<AsyncDataRoute>
 					<EmployeeTable />
 				</AsyncDataRoute>
 			</ContentLayout>
-		</TableContext.Provider>
+		</EmployeeTableContext.Provider>
 	);
 }
 
 const Link = styled(
-	forwardRef(function Link(itemProps, ref) {
+	forwardRef<HTMLAnchorElement, LinkProps>(function Link(itemProps, ref) {
 		return <RouterLink ref={ref} {...itemProps} role={undefined} />;
 	}),
-)(({ theme }) => {
+)(({ theme }: { theme: Theme }) => {
 	return {
 		display: "flex",
 		textDecoration: "none",
@@ -84,8 +134,12 @@ const Link = styled(
 	};
 });
 
+type SearchButtonProps = {
+	isFiltering: boolean
+} & IconButtonProps;
+
 const SearchButton = styled(
-	forwardRef(function SearchButton(itemProps, ref) {
+	forwardRef<HTMLButtonElement, SearchButtonProps>(function SearchButton(itemProps, ref) {
 		return (
 			<IconButton ref={ref} {...itemProps} role={undefined}>
 				<Search />
@@ -107,11 +161,11 @@ const SearchButton = styled(
 
 function EmployeeTableButtons() {
 	const { t } = useTranslation();
-	const { variant } = useContext(TableContext);
+	const { variant } = useContext(EmployeeTableContext);
 	return (
 		<Stack direction="row" spacing={2}>
-			<EmployeeStatusSwitch />
 			<EmployeeTableSearch />
+			<EmployeeTableFilter />
 			<TableButton
 				title={t("New employee")}
 				to="new"
@@ -122,61 +176,22 @@ function EmployeeTableButtons() {
 	);
 }
 
-function EmployeeStatusSwitch() {
-	const { t } = useTranslation();
-	const [showAll, setShowAll] = useSearchParam("showAll", { replace: true });
-	const isMobile = useIsMobile();
-	if (isMobile) return;
-
-	const label = t("Only active");
-	const handleChange = (event) =>
-		setShowAll(event.target.checked ? null : "true");
-	return (
-		<FormGroup>
-			<FormControlLabel
-				control={<Switch checked={!showAll} onChange={handleChange} />}
-				label={label}
-			/>
-		</FormGroup>
-	);
-}
 
 function EmployeeTableSearchField() {
 	const { t } = useTranslation();
-	const [searchTerm, setSearchTerm] = useSearchParam("search", {
-		replace: true,
-	});
-	const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
-	const debounced = useDebounceCallback(setSearchTerm, 500);
-
-	const onChange = (event) => {
-		const updatedValue = event.target.value;
-		setLocalSearchTerm(updatedValue);
-		debounced.cancel();
-		debounced(updatedValue);
-	};
-
+	const { state, dispatch } = useContext(EmployeeTableContext);
+	const setValue = useCallback((filter: string) => dispatch({ type: "set_filter", filter }), [state, dispatch]);
 	return (
-		<TextField
-			variant="outlined"
+		<SearchField
 			label={t("Search")}
-			onChange={onChange}
-			value={localSearchTerm}
-			slotProps={{
-				input: {
-					endAdornment: (
-						<InputAdornment position="end">
-							<Search />
-						</InputAdornment>
-					)
-				}
-			}}
+			value={state.filter}
+			setValue={setValue}
 		/>
 	);
 }
 
 function EmployeeTableSearch() {
-	const { variant } = useContext(TableContext);
+	const { variant } = useContext(EmployeeTableContext);
 	if (variant === "dense") {
 		return <EmployeeTableSearchDialog />;
 	}
@@ -191,8 +206,8 @@ function EmployeeTableSearchDialog() {
 		setSearchTerm(localSearchTerm);
 	};
 	const onClear = () => {
-		setSearchTerm(null);
-		setLocalSearchTerm(null);
+		setSearchTerm("");
+		setLocalSearchTerm("");
 	};
 	return (
 		<ResponsiveDialog>
@@ -222,24 +237,20 @@ function EmployeeTableSearchDialog() {
 }
 
 function EmployeeTable() {
-	const employees = useAsyncValue();
-	const [showAll] = useSearchParam("showAll");
+	const employees = useAsyncValue() as Employee[];
 	return (
-		<>
-			<Stack>
-				{employees.map((employee) => (
-					<EmployeeRow
-						key={employee.id}
-						employee={employee}
-						showStatus={showAll}
-					/>
-				))}
-			</Stack>
-		</>
+		<Stack>
+			{employees.map((employee) => (
+				<EmployeeRow
+					key={employee.id}
+					employee={employee}
+				/>
+			))}
+		</Stack>
 	);
 }
 
-const sx = {
+const sx: SxProps<Theme> = {
 	borderRadius: (theme) => theme.spacing(1),
 	"&:hover": {
 		backgroundColor: (theme) => theme.palette.primary.hover,
@@ -249,8 +260,16 @@ const sx = {
 	},
 };
 
-function EmployeeRow({ employee, showStatus }) {
-	const { variant, showButtons } = useContext(TableContext);
+function EmployeeRow({ employee }: { employee: Employee }) {
+	const { state, variant, showButtons } = useContext(EmployeeTableContext);
+	const missingDataCount = useEmployeeMissingDataCount(employee.id);
+	if (state.onlyActive && employee.status === "Inactive")
+		return;
+	if (state.onlyWithMissingData && (missingDataCount === 0))
+		return;
+	if (!!state.filter && !getEmployeeDisplayString(employee).toLowerCase().includes(state.filter.toLowerCase()))
+		return;
+
 	return (
 		<Stack direction="row" alignItems="center" sx={sx} mx={-0.5} px={0.5}>
 			<Link to={employee.id}>
@@ -264,37 +283,36 @@ function EmployeeRow({ employee, showStatus }) {
 					>
 						{employee.identifier}
 					</Typography>
-					{showStatus && <StatusChip status={employee.status} />}
+					{!state.onlyActive && <StatusChip status={employee.status} />}
 				</Stack>
 			</Link>
-			{variant === "standard" && showButtons && <EmployeeButtons employee={employee} />}
+			{variant === "standard" && showButtons && <EmployeeButtons employeeId={employee} missingDataCount={missingDataCount} />}
 		</Stack>
 	);
 }
 
-function EmployeeButtons({ employee }) {
+function EmployeeButtons({ employeeId, missingDataCount }: { employeeId: IdType, missingDataCount: number }) {
 	const { t } = useTranslation();
 	const variant = "dense";
-	const missingDataCount = useEmployeeMissingDataCount(employee.id);
 
 	return (
 		<Stack direction="row" spacing={2} py={0.5}>
 			<TableButton
 				title={t("Data")}
-				to={employee.id + "/data"}
+				to={employeeId + "/data"}
 				variant={variant}
 				icon={<WorkOutlinetIcon />}
 				badgeCount={missingDataCount}
 			/>
 			<TableButton
 				title={t("Documents")}
-				to={employee.id + "/documents"}
+				to={employeeId + "/documents"}
 				variant={variant}
 				icon={<DescriptionOutlinedIcon />}
 			/>
 			<TableButton
 				title={t("Events")}
-				to={employee.id + "/events"}
+				to={employeeId + "/events"}
 				variant={variant}
 				icon={<WorkHistoryOutlinedIcon />}
 			/>

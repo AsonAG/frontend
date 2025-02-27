@@ -1,6 +1,6 @@
 import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer, useState } from "react";
 import { Link as RouterLink, Outlet, useRouteLoaderData, LinkProps } from "react-router-dom";
-import { Stack, Typography, Button, Chip, TextField, InputAdornment, Box, styled, IconButton } from "@mui/material";
+import { Stack, Typography, Button, Chip, Box, styled } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { DashboardHeader } from "./DashboardHeader";
@@ -10,8 +10,7 @@ import { EntryRow } from "./types";
 import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunTable } from "./PayrollTable";
 import { CalculatingIndicator } from "./CalculatingIndicator";
-import { useDebounceCallback } from "usehooks-ts";
-import { Clear, Search } from "@mui/icons-material";
+import { SearchField } from "../components/SearchField";
 
 
 type PayrollTableContextProps = {
@@ -97,43 +96,14 @@ type EntryState = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "Witho
 function EmployeeTableSearchField() {
   const { t } = useTranslation();
   const { state, dispatch } = useContext(PayrollTableContext);
-  const [localSearchTerm, setLocalSearchTerm] = useState(state.employeeFilter);
   const setFilter = useCallback((filter: string) => dispatch({ type: "set_employee_filter", filter }), [dispatch]);
 
-  const debounced = useDebounceCallback(setFilter, 300);
-
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedValue = event.target.value;
-    setLocalSearchTerm(updatedValue);
-    debounced.cancel();
-    debounced(updatedValue);
-  };
-
-  const iconAction = () => {
-    dispatch({ type: "set_employee_filter", filter: "" });
-    setLocalSearchTerm("");
-  };
-
-  const isEmptySearch = !state.employeeFilter;
 
   return (
-    <TextField
-      variant="outlined"
+    <SearchField
       label={t("Employee search")}
-      onChange={onChange}
-      value={localSearchTerm}
-      slotProps={{
-        input: {
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={iconAction} disabled={isEmptySearch} edge="end">
-                {isEmptySearch ? <Search /> : <Clear />}
-              </IconButton>
-            </InputAdornment>
-          )
-        }
-      }}
-    />
+      value={state.employeeFilter}
+      setValue={setFilter} />
   );
 }
 export type DashboardState = {
