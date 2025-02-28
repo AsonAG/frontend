@@ -29,7 +29,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, hideReportsFeatureAtom, missingDataEmployeesAtom } from "../../utils/dataAtoms";
+import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, hideReportsFeatureAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom } from "../../utils/dataAtoms";
 import { Description } from "@mui/icons-material";
 import { useRole } from "../../hooks/useRole";
 import { unwrap } from "jotai/utils";
@@ -121,6 +121,15 @@ function EmployeeMissingDataBadge({ icon }) {
 	);
 
 }
+function PayrollBadgeIcon({ icon }) {
+	const count = useAtomValue(payrollControllingDataTotalCountAtom);
+	return (
+		<Badge badgeContent={count} color="warning" overlap="circular">
+			{icon}
+		</Badge>
+	);
+}
+
 
 function defaultCount(data) {
 	return data.count;
@@ -196,7 +205,8 @@ function MenuItemsPayrollAdmin() {
 				label={t("Payroll")}
 				to="payrunperiods/open"
 				activeOn="payrunperiods-root"
-				icon={<PaymentsIcon />} />
+				icon={<PayrollBadgeIcon icon={<PaymentsIcon />} />}
+			/>
 			{!hideReports &&
 				<NavigationItem
 					label={t("Reports")}

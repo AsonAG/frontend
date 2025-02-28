@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer, useState } from "react";
+import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer } from "react";
 import { Link as RouterLink, Outlet, useRouteLoaderData, LinkProps } from "react-router-dom";
 import { Stack, Typography, Button, Chip, Box, styled } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
@@ -11,6 +11,8 @@ import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunTable } from "./PayrollTable";
 import { CalculatingIndicator } from "./CalculatingIndicator";
 import { SearchField } from "../components/SearchField";
+import { MissingDataCase } from "../models/MissingData";
+
 
 
 type PayrollTableContextProps = {
@@ -31,18 +33,19 @@ export function PayrunDashboard() {
 }
 
 function PayrunPeriodView() {
-  const { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  const { payrunPeriod, previousPayrunPeriod, controllingData, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const isOpen = payrunPeriod.periodStatus === "Open";
   const rows: Array<EntryRow> = useMemo(() => {
+    var controllingDataMap = new Map(controllingData.employeeControllingCases.map(x => [x.id, x.cases]));
     return payrunPeriod.entries.map((entry, index) => ({
       ...entry,
       amount: entry.openPayout ?? 0,
       previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.employeeId),
-      controllingTasks: isOpen ? controllingTasks.get(entry.employeeId) : [],
+      controllingTasks: isOpen ? controllingDataMap.get(entry.employeeId) : [],
       caseValueCount: isOpen ? caseValueCounts[index] : 0,
       salaryType: salaryTypes[index]
     }));
-  }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingTasks, caseValueCounts]);
+  }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData, caseValueCounts]);
   const [state, dispatch] = useReducer(
     reducer,
     rows,
@@ -196,7 +199,7 @@ function getSelectedTabAfterSearch(state: DashboardState): Tab {
 
 
 function createInitialState(employeeRows: Array<EntryRow>): DashboardState {
-  var grouped = groupRows(employeeRows);
+  const grouped = groupRows(employeeRows);
   return {
     entries: employeeRows,
     filteredEntries: employeeRows,
@@ -239,33 +242,50 @@ function getEntryCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab
 function ControllingList() {
   const { t } = useTranslation();
   const { state } = useContext(PayrollTableContext);
+  const { controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const wageControlling = state.entriesByState["Controlling"];
   const withoutOccupation = state.entriesByState["WithoutOccupation"];
-  if (!wageControlling && !withoutOccupation) {
+  if (!wageControlling && !withoutOccupation && controllingData.companyControllingCases.length === 0) {
     return <Typography>{t("All entries are ok.")}</Typography>
   }
 
   return (
     <Stack spacing={2}>
-      <WageControllingList wageControlling={wageControlling} />
+      <WageControllingList wageControlling={wageControlling} companyControllingCases={controllingData.companyControllingCases} />
       <WithoutOccupationList withoutOccupation={withoutOccupation} />
     </Stack>
   )
 }
 
-function WageControllingList({ wageControlling }: { wageControlling: Array<EntryRow> }) {
+function WageControllingList({ wageControlling, companyControllingCases }: { wageControlling: Array<EntryRow>, companyControllingCases: MissingDataCase[] }) {
   const { t } = useTranslation();
-  if (!wageControlling)
+  if (!wageControlling && companyControllingCases.length === 0)
     return;
 
   return (
     <Stack spacing={1}>
       <Typography variant="h6">{t("payrun_period_wage_controlling")}</Typography>
+      <CompanyControllingRow companyControllingCases={companyControllingCases} />
       {wageControlling.map(entry => <ControllingRow key={entry.id} entry={entry} />)}
     </Stack>
   )
 }
 
+function CompanyControllingRow({ companyControllingCases }: { companyControllingCases: MissingDataCase[] }) {
+  const { t } = useTranslation();
+  if (companyControllingCases.length === 0)
+    return;
+  return (
+    <Stack spacing={0.5} alignItems="start">
+      <Typography>{t("Company")}</Typography>
+      <Stack direction="row" spacing={0.5} flexWrap="wrap">
+        {
+          companyControllingCases.map(task => <Button key={task.id} component={RouterLink} to={`company/new/${encodeURIComponent(task.name)}`} variant="outlined" color="warning" size="small">{task.displayName}</Button>)
+        }
+      </Stack>
+    </Stack>
+  )
+}
 function ControllingRow({ entry }: { entry: EntryRow }) {
   return (
     <Stack spacing={0.5} alignItems="start">

@@ -3,6 +3,7 @@ import { Dispatch } from "react";
 import { PayrunPeriodEntry } from "../models/PayrunPeriod";
 import { AvailableCase } from "../models/AvailableCase";
 import { PayrunTableAction, PayrunTableState } from "./PayrollTable";
+import { MissingData, MissingDataCase } from "../models/MissingData";
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData, TValue> {
@@ -49,7 +50,13 @@ export type PayoutTotals = {
 export type EntryRow = PayrunPeriodEntry & {
   previousEntry: PayrunPeriodEntry | undefined
   amount: number | undefined
-  controllingTasks: Array<AvailableCase> | undefined
+  controllingTasks: Array<MissingDataCase> | undefined
   caseValueCount: number,
   salaryType: string | null
 }
+
+export type ControllingData = {
+  employeeControllingCases: MissingData[],
+  companyControllingCases: MissingDataCase[]
+}
+

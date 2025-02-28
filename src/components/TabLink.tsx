@@ -62,9 +62,9 @@ export function TabLink({ to, title, badgeCount }: { to: string, title: string, 
   );
 }
 
-export function TabButton({ active, title, badgeCount, onClick }) {
+export function TabButton({ active, title, badgeCount, badgeColor, onClick }) {
   return (
-    <Badge badgeContent={badgeCount} color="primary" variant="oob" showZero>
+    <Badge badgeContent={badgeCount} color={badgeColor} variant="oob" showZero>
       <Button className={active ? "active" : undefined} onClick={onClick}>
         <Typography>{title}</Typography>
       </Button>

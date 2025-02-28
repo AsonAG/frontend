@@ -10,17 +10,19 @@ import {
 	getCompanyMissingDataCases,
 	getEmployeeCases,
 	getCompanyCases,
+	getPayrunPeriodControllingTasks,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
 import { IdType } from "../models/IdType";
-import { MissingData } from "../models/MissingData";
+import { MissingData, MissingDataCase } from "../models/MissingData";
 import { atomWithRefresh, atomWithStorage, createJSONStorage } from "jotai/utils";
 import { ExpandedState } from "@tanstack/react-table";
 import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 import { AvailableCase } from "../models/AvailableCase";
+import { ControllingData } from "../payrun/types";
 
 export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
@@ -197,3 +199,17 @@ const jsonSessionStorage = createJSONStorage(() => sessionStorage) as SyncStorag
 export const documentRecentSettingAtom = atomWithStorage<boolean>("setting.document.recent", true, undefined, { getOnInit: true });
 export const expandedControllingTasks = atomWithStorage<ExpandedState>("config.payrolldashboard.expanded", {}, jsonSessionStorage, { getOnInit: true });
 export const hideReportsFeatureAtom = atomWithStorage<boolean>("feature.reports.hide", false, undefined, { getOnInit: true });
+
+
+export const payrollControllingDataAtom = atomWithRefresh<Promise<ControllingData>>(async (get) => {
+	const orgId = get(orgIdAtom);
+	const payrollId = get(payrollIdAtom);
+	if (orgId === null || payrollId === null) return [];
+	var controllingData = await getPayrunPeriodControllingTasks({ orgId, payrollId });
+	return controllingData;
+})
+
+export const payrollControllingDataTotalCountAtom = atom(async (get) => {
+	const controllingData = await get(payrollControllingDataAtom);
+	return controllingData.employeeControllingCases.length + (controllingData.companyControllingCases.length > 0 ? 1 : 0);
+})

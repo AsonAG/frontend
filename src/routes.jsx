@@ -78,7 +78,8 @@ import {
 	ESSMissingDataAtom,
 	missingEmployeeDataMapAtom,
 	missingDataCompanyAtom,
-	onboardingCompanyAtom
+	onboardingCompanyAtom,
+	payrollControllingDataAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -723,22 +724,22 @@ const routeData = [
 								throw new Response("Not found", { status: 404 });
 							}
 							const evalDate = dayjs().toISOString();
+							store.set(payrollControllingDataAtom);
 							const [
 								previousPayrunPeriod,
-								controllingTasksList,
+								controllingData,
 								caseValueCounts,
 								salaryTypes,
 								bankAccountDetails
 							] = await Promise.all([
 								getPreviousPayrunPeriod(params, payrunPeriod.periodStart),
-								isOpen ? getPayrunPeriodControllingTasks(params) : [],
+								isOpen ? store.get(payrollControllingDataAtom) : { employeeControllingCases: [], companyControllingCases: [] },
 								Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
 								Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
 								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
 							]);
-							const controllingTasks = new Map(controllingTasksList.map(({ id, cases }) => [id, cases]));
 							const salaryTypesSet = [...new Set(salaryTypes)].filter(Boolean).sort();
-							return { payrunPeriod, previousPayrunPeriod, controllingTasks, caseValueCounts, salaryTypes, salaryTypesSet, bankAccountDetails };
+							return { payrunPeriod, previousPayrunPeriod, controllingData, caseValueCounts, salaryTypes, salaryTypesSet, bankAccountDetails };
 						},
 						children: [
 							{
