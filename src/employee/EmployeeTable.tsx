@@ -286,7 +286,7 @@ function EmployeeRow({ employee }: { employee: Employee }) {
 					{!state.onlyActive && <StatusChip status={employee.status} />}
 				</Stack>
 			</Link>
-			{variant === "standard" && showButtons && <EmployeeButtons employeeId={employee} missingDataCount={missingDataCount} />}
+			{variant === "standard" && showButtons && <EmployeeButtons employeeId={employee.id} missingDataCount={missingDataCount} />}
 		</Stack>
 	);
 }
