@@ -11,7 +11,7 @@ type RowSelectionButtonProps = {
 
 export function RowSelectionButton({ state, dispatch }: RowSelectionButtonProps) {
   const { t } = useTranslation();
-  const checked = state.selectedEmployeeCount === state.entries.length;
+  const checked = state.selectedEmployeeCount === state.fullSelectionCount;
   const indeterminate = state.selectedEmployeeCount > 0 && !checked;
   return (
     <FormGroup>

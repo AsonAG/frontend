@@ -17,6 +17,7 @@ import { PayoutFooter } from "./PayoutFooter";
 export type PayrunTableState = {
   entries: EntryRow[]
   selected: RowSelectionState
+  fullSelectionCount: number
   payoutTotals: PayoutTotals
   selectedEmployeeCount: number
 }
@@ -242,7 +243,7 @@ function Cell({ color, align, tooltip, sx, children }: CellProps) {
 function getSelectedState(rows: Array<EntryRow>): RowSelectionState {
   if (!rows)
     return {};
-  return Object.fromEntries(rows.map(r => [r.id, true]));
+  return Object.fromEntries(rows.map(r => [r.id, isRowSelectionEnabled(r)]));
 }
 function getPayoutTotals(entries: Array<EntryRow>, selected: RowSelectionState) {
   let totals = {
@@ -312,7 +313,7 @@ function reducer(state: PayrunTableState, action: PayrunTableAction): PayrunTabl
     case "toggle_selected":
       newState = {
         ...state,
-        selected: state.selectedEmployeeCount < state.entries.length ? getSelectedState(state.entries) : {},
+        selected: state.selectedEmployeeCount < state.fullSelectionCount ? getSelectedState(state.entries) : {},
       };
       break;
     case "set_amount":
@@ -334,6 +335,7 @@ function createInitialState(entries: EntryRow[]): PayrunTableState {
   return {
     entries,
     selected: {},
+    fullSelectionCount: getSelectionCount(getSelectedState(entries)),
     selectedEmployeeCount: 0,
     payoutTotals: {
       open: 0,
@@ -351,6 +353,8 @@ function createRowClickHandler(row: Row<EntryRow>, state: PayrunTableState, disp
   }
   return noop;
 }
+
+function getSelectionCount(state: RowSelectionState) { return Object.values(state).filter(Boolean).length; }
 
 
 function getColumnStickySx(column: Column<EntryRow>): SxProps<Theme> {
