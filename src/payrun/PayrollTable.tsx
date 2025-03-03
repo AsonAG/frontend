@@ -39,7 +39,7 @@ type PayrunTableProps = {
 }
 const isRowSelectionEnabled = (row: EntryRow) => !hasControllingTasks(row) && hasOpenAmount(row);
 const hasControllingTasks = (entry: EntryRow) => (entry.controllingTasks?.length ?? 0) > 0;
-const hasOpenAmount = (entry: EntryRow) => ((entry.netWage ?? 0) - (entry.paidOut ?? 0)) > 0;
+const hasOpenAmount = (entry: EntryRow) => ((entry.openPayout ?? 0)) > 0;
 
 export const PayrunTable = memo(function PayrunTable({ entries, completed }: PayrunTableProps) {
   const { t } = useTranslation();
