@@ -26,7 +26,10 @@ export function FieldDetails() {
 	const { field } = useContext(FieldContext);
 	const { t } = useTranslation();
 
-	if (field.attributes["input.hidden"] || field.timeType === "Timeless") {
+	if (field.attributes["input.hidden"]) {
+		return null;
+	}
+	if (field.timeType === "Timeless" && !field.description) {
 		return null;
 	}
 

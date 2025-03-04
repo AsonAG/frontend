@@ -14,11 +14,12 @@ export function CaseFieldDetails({ caseField, onClose }) {
   const { t } = useTranslation();
   const title = `${t("Details")} ${caseField.displayName}`;
   const closeButton = <ButtonClose onClose={onClose} />;
+  const showHistory = caseField.timeType !== "Timeless";
 
   return (
     <DetailsContainer title={title} closeButton={closeButton}>
       <CaseFieldDescription description={caseField.description} />
-      <CaseFieldHistory caseFieldName={caseField.name} />
+      {showHistory && <CaseFieldHistory caseFieldName={caseField.name} /> }
     </DetailsContainer>
   )
 }

@@ -182,18 +182,18 @@ function createColumns() {
       id: "retroTotal",
       header: ({ table }) => formatValue(table.getState().periodTotals.retro),
       columns: [
-    columnHelper.accessor("retro",
-      {
-        id: "retro",
-        cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
-        header: ({ t }) => t("Retro"),
-        size: 110,
-        meta: {
-          alignment: "right",
-          tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "retro", context),
-          headerTooltip: (t) => t("Net amount from all retroactive changes prior to the open period")
-        }
-      }),
+        columnHelper.accessor("retro",
+          {
+            id: "retro",
+            cell: (props) => <Typography noWrap>{formatValue(props.getValue())}</Typography>,
+            header: ({ t }) => t("Retro"),
+            size: 110,
+            meta: {
+              alignment: "right",
+              tooltip: (context, t) => getWageTypeTooltipForPreviousValue(t, "retro", context),
+              headerTooltip: (t) => t("Net amount from all retroactive changes prior to the open period")
+            }
+          }),
       ]
     }),
     columnHelper.group({
