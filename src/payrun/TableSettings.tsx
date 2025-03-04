@@ -5,7 +5,6 @@ import * as Popover from '@radix-ui/react-popover';
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
-import { useContainerWidthSetting } from "../App";
 
 const jsonLocalStorage = createJSONStorage<ColumnVisibility>(() => localStorage);
 
