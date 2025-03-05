@@ -29,7 +29,6 @@ import {
 	getTask,
 	updateTask,
 	getDocument,
-	getReports,
 	createEmployee,
 	updateEmployee,
 	addTask,
@@ -83,8 +82,6 @@ import {
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
-import { AsyncReportsView } from "./components/ReportsView";
-import { AsyncReportView } from "./components/ReportView";
 import { MissingDataView } from "./components/MissingDataView";
 import { EmployeeForm } from "./components/EmployeeForm";
 import { ContentLayout, withPage, withSuspense } from "./components/ContentLayout";
@@ -847,19 +844,6 @@ const routeData = [
 				]
 			},
 			...createRouteCaseForms("payrunperiods/:payrunPeriodId"),
-			{
-				path: "hr/reports",
-				Component: AsyncReportsView,
-				loader: ({ params }) => {
-					return defer({
-						data: getReports(params, "AvailableReports"),
-					});
-				},
-			},
-			{
-				path: "hr/reports/:reportId",
-				Component: AsyncReportView,
-			},
 			{
 				path: "company",
 				Component: withSuspense(CompanyTabbedView),

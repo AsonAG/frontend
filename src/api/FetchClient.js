@@ -45,11 +45,6 @@ const payrollResultsUrl =
 	"/tenants/:orgId/payrollresults";
 const wageTypesUrl =
 	"/tenants/:orgId/payrollresults/:payrollResultId/wagetypes";
-const reportsUrl = "/tenants/:orgId/payrolls/:payrollId/reports";
-const buildReportUrl =
-	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/build";
-const generateReportUrl =
-	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/generate";
 const exportUrl = "/tenants/:orgId/export";
 
 const store = getDefaultStore();
@@ -538,31 +533,6 @@ export function getPayrunPeriodDocument(routeParams, report, variant) {
 		.withQueryParam("report", report)
 		.withQueryParam("variant", variant)
 		.fetchJson();
-}
-
-export function getReports(routeParams, clusterSet) {
-	return new FetchRequestBuilder(reportsUrl, routeParams)
-		.withQueryParam("clusterSetName", clusterSet)
-		.withLocalization()
-		.fetchJson();
-}
-
-export function getReport(routeParams, reportRequest, signal) {
-	return new FetchRequestBuilder(buildReportUrl, routeParams)
-		.withMethod("POST")
-		.withBody(reportRequest)
-		.withLocalization()
-		.withSignal(signal)
-		.fetch();
-}
-
-export function generateReport(routeParams, reportRequest, format) {
-	return new FetchRequestBuilder(generateReportUrl, routeParams)
-		.withMethod("POST")
-		.withBody(reportRequest)
-		.withTimout(10 * 60 * 1000)
-		.withQueryParam("format", format)
-		.fetch();
 }
 
 export function buildCase(routeParams, caseChangeSetup) {

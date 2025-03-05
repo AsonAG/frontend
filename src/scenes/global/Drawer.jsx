@@ -29,8 +29,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, hideReportsFeatureAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom } from "../../utils/dataAtoms";
-import { Description } from "@mui/icons-material";
+import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom } from "../../utils/dataAtoms";
 import { useRole } from "../../hooks/useRole";
 import { unwrap } from "jotai/utils";
 
@@ -188,7 +187,6 @@ function MenuItemsOrganization() {
 
 function MenuItemsPayrollAdmin() {
 	const { t } = useTranslation();
-	const hideReports = useAtomValue(hideReportsFeatureAtom);
 	return (
 		<NavigationGroup>
 			<NavigationItem
@@ -207,13 +205,6 @@ function MenuItemsPayrollAdmin() {
 				activeOn="payrunperiods-root"
 				icon={<PayrollBadgeIcon icon={<PaymentsIcon />} />}
 			/>
-			{!hideReports &&
-				<NavigationItem
-					label={t("Reports")}
-					to="hr/reports"
-					icon={<Description />}
-				/>
-			}
 			<NavigationItem
 				label={t("Tasks")}
 				to="hr/tasks"
