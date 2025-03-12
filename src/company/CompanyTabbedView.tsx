@@ -22,6 +22,17 @@ export function CompanyTabbedView() {
     return <Navigate to="onboarding" replace />;
   }
   return (
-    <EventTabbedView startTabs={onboardingTab} />
+    <EventTabbedView startTabs={onboardingTab} endTabs={<ConfigTabs />} />
   );
+}
+
+function ConfigTabs() {
+  const { t } = useTranslation();
+  return (
+    <>
+      <TabLink title={t("Wage type master")} to="wagetypemaster" />
+      <TabLink title={t("Account master")} to="accountmaster" />
+      <TabLink title={t("Cost center master")} to="costcentermaster" />
+    </>
+  )
 }

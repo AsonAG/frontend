@@ -55,7 +55,11 @@ import {
 	getCompanyBankDetails as getCompanyBankAccountDetails,
 	getPayrunPeriodControllingTasks,
 	getEmployeeSalaryType,
-	getPreviousPayrunPeriod
+	getPreviousPayrunPeriod,
+	getLookupSet,
+	addLookupValue,
+	updateLookupValue,
+	deleteLookupValue
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -78,7 +82,8 @@ import {
 	missingEmployeeDataMapAtom,
 	missingDataCompanyAtom,
 	onboardingCompanyAtom,
-	payrollControllingDataAtom
+	payrollControllingDataAtom,
+	clientRegulationAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -91,6 +96,7 @@ import { OrganizationSettings } from "./organization/Settings";
 import { getEmployeeDisplayString } from "./models/Employee";
 import { DataValueHistory } from "./components/tables/DataTable";
 import { DataView } from "./components/DataView";
+import { MasterLookupTable } from "./components/MasterLookupTable";
 
 import { PayrunPeriodList } from "./payrun/List";
 import { ReviewOpenPeriod } from "./payrun/ReviewOpenPeriod";
@@ -162,6 +168,65 @@ function createRouteCaseForm(path, data) {
 				}
 			}
 		]
+	};
+}
+
+function createRouteLookupForm(path, lookupName, keyName) {
+	return {
+		path,
+		Component: MasterLookupTable,
+		loader: async ({ params }) => {
+			const regulation = await store.get(clientRegulationAtom);
+			if (!regulation)
+				return null;
+			const lookup = await getLookupSet({ regulationId: regulation.id, ...params }, lookupName);
+			return {
+				lookup,
+				keyName,
+				regulationId: regulation.id,
+			};
+		},
+		action: async ({ params, request }) => {
+			const formData = await request.formData();
+			const regulationId = formData.get("regulationId");
+			const lookupId = formData.get("lookupId");
+			const lookupValueId = formData.get("lookupValueId");
+			const actionParams = { regulationId, lookupId, lookupValueId, ...params };
+			let successMessage;
+			let action;
+			switch (request.method) {
+				case "POST":
+					action = addLookupValue(actionParams, {
+						key: formData.get("key"),
+						value: formData.get("value")
+					});
+					successMessage = "Created!";
+					break;
+				case "PUT":
+					action = updateLookupValue(actionParams, {
+						id: formData.get("lookupValueId"),
+						key: formData.get("key"),
+						value: formData.get("value")
+					});
+					successMessage = "Updated!";
+					break;
+				case "DELETE":
+					action = deleteLookupValue(actionParams);
+					successMessage = "Deleted!";
+					break;
+				default:
+					throw new Response("", { status: 405 });
+			}
+			const response = await action;
+
+			if (response.ok) {
+				toast("success", successMessage);
+				return { success: true };
+			} else {
+				toast("error", "Action failed.");
+				return null;
+			}
+		},
 	};
 }
 
@@ -863,6 +928,15 @@ const routeData = [
 						Component: OnboardingView,
 						loader: () => store.get(onboardingCompanyAtom),
 					},
+					{
+						path: "wagetypemaster",
+						Component: MasterLookupTable,
+						loader: ({ params }) => {
+							return null;
+						}
+					},
+					createRouteLookupForm("accountmaster", "AccountMaster", "Account number"),
+					createRouteLookupForm("costcentermaster", "CostCenterMaster", "Cost center"),
 					createRouteCaseForm("onboarding/:caseName", {
 					}),
 					{

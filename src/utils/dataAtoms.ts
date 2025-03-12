@@ -11,13 +11,14 @@ import {
 	getEmployeeCases,
 	getCompanyCases,
 	getPayrunPeriodControllingTasks,
+	getClientRegulation,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
 import { IdType } from "../models/IdType";
-import { MissingData, MissingDataCase } from "../models/MissingData";
+import { MissingData } from "../models/MissingData";
 import { atomWithRefresh, atomWithStorage, createJSONStorage } from "jotai/utils";
 import { ExpandedState } from "@tanstack/react-table";
 import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
@@ -126,6 +127,12 @@ export const onboardingCompanyAtom = atomWithRefresh<Promise<Array<AvailableCase
 	}
 	return [];
 })
+
+export const clientRegulationAtom = atom(async (get) => {
+	const orgId = get(orgIdAtom);
+	if (orgId === null) return null;
+	return await getClientRegulation({ orgId });
+});
 
 export const companyMissingDataCountAtom = atom(async (get) => {
 	const missingCompanyData = await get(missingDataCompanyAtom);

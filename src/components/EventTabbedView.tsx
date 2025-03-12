@@ -20,9 +20,10 @@ type LoaderData = {
 type EventTabbedViewProps = {
   title?: ReactNode,
   startTabs?: ReactNode
+  endTabs?: ReactNode
 }
 
-export function EventTabbedView({ title, startTabs }: EventTabbedViewProps) {
+export function EventTabbedView({ title, startTabs, endTabs }: EventTabbedViewProps) {
   const outlet = useOutlet();
   const isMobile = useIsMobile();
   const { pageTitle, missingData } = useLoaderData() as LoaderData;
@@ -46,6 +47,7 @@ export function EventTabbedView({ title, startTabs }: EventTabbedViewProps) {
           <TabLink title={t("Data")} to="data" badgeCount={missingDataCount} />
           <TabLink title={t("Documents")} to="documents" />
           <TabLink title={t("Events")} to="events" />
+          {endTabs}
         </Stack>
       }
       {outlet}

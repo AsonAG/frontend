@@ -255,6 +255,11 @@ const translations = {
 		"No payment has been made yet.": "Es wurde noch keine Auszahlung getätigt.",
 		"No matches.": "Keine Treffer.",
 		"Go to employee data": "Gehe zu Mitarbeiterdaten",
+		"Wage type master": "Lohnartenstamm",
+		"Account master": "Kontostamm",
+		"Cost center master": "Kostenstellenstamm",
+		"Cost center": "Kostenstelle",
+		"Account number": "Kontonummer",
 
 		// Command
 		"Select event": "Ereignis auswählen",
