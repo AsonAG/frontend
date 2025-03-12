@@ -5,6 +5,7 @@ import { Chip, IconButton, Stack, Typography } from "@mui/material";
 import { ArrowDropDown, ArrowDropUp, Code, Functions, PictureAsPdf } from "@mui/icons-material";
 import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunDocument, PayrunPeriod } from "../models/PayrunPeriod";
+import { IdType } from "../models/IdType";
 
 type LoaderData = {
   payrunPeriod: PayrunPeriod
@@ -60,32 +61,43 @@ function WageStatements({ wageStatements }) {
 }
 
 const noop = () => { };
-function DocumentSection({ payrunPeriodId, document }) {
+type DocumentSectionProps = {
+  payrunPeriodId: IdType,
+  document: PayrunDocument
+}
+function DocumentSection({ payrunPeriodId, document }: DocumentSectionProps) {
+  const { t } = useTranslation();
   return (
     <Stack spacing={1}>
       <Typography variant="h6">{document.name}</Typography>
-      <Stack direction="row" spacing={1} flexWrap="wrap">
-        <DocumentChip doc={document} to={`${payrunPeriodId}/doc/${document.id}`} />
-        {document.attributes?.reports?.flatMap(report => {
-          if (report.Variants) {
-            return report.Variants.map(variant => (
-              <PdfChip
-                key={variant}
-                label={report.Name.split(".").pop() + " " + variant}
-                to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}&variant=${encodeURIComponent(variant)}`}
-              />
-            ));
-          }
-          return (
-            <PdfChip
-              key={report.Name}
-              label={report.Name.split(".").pop()}
-              to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}`}
-            />
+      {
+        document.documentStatus === "Generating" ?
+          <Typography>{t("Generating...")}</Typography> :
+          (
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              <DocumentChip doc={document} to={`${payrunPeriodId}/doc/${document.id}`} />
+              {document.attributes?.reports?.flatMap(report => {
+                if (report.Variants) {
+                  return report.Variants.map(variant => (
+                    <PdfChip
+                      key={variant}
+                      label={report.Name.split(".").pop() + " " + variant}
+                      to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}&variant=${encodeURIComponent(variant)}`}
+                    />
+                  ));
+                }
+                return (
+                  <PdfChip
+                    key={report.Name}
+                    label={report.Name.split(".").pop()}
+                    to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}`}
+                  />
+                )
+              }
+              )}
+            </Stack>
           )
-        }
-        )}
-      </Stack>
+      }
     </Stack >
   )
 }

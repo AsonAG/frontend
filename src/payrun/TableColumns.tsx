@@ -317,16 +317,22 @@ function createColumns() {
       }),
     columnHelper.display({
       id: "documents",
-      cell: (props) => {
-        const payrunEntry = props.row.original;
+      cell: ({ row, t }) => {
+        const payrunEntry = row.original;
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             {
-              payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => (
-                <Tooltip key={doc.id} title={doc.name} placement="left">
-                  <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
-                </Tooltip>
-              ))
+              payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => {
+                const isGenerating = doc.documentStatus === "Generating";
+                const tooltip = isGenerating ? t("generate_document", { doc }) : doc.name;
+                return (
+                  <Tooltip key={doc.id} title={tooltip} placement="left">
+                    <span>
+                      <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation} loading={isGenerating}><FilePresentRoundedIcon /></IconButton>
+                    </span>
+                  </Tooltip>
+                );
+              })
             }
           </Stack>
         )

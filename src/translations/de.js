@@ -215,6 +215,9 @@ const translations = {
 		"Payout created": "Auszahlung erstellt",
 		"Error while creating the payout": "Fehler beim Erstellen der Auszahlung",
 		"Being calculated...": "Werden berechnet...",
+		generate_document: "{{doc.name}} wird generiert...",
+		"Generating...": "Wird generiert...",
+		"The period is being processed...": "Die Periode wird aufbereitet...",
 
 		// Headers
 		"Id of the employee": "Id des Mitarbeiters",

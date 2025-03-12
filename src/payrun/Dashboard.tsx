@@ -214,7 +214,7 @@ function createInitialState(employeeRows: Array<EntryRow>): DashboardState {
 function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
   return Object.groupBy(rows, groupingFn);
   function groupingFn(row: EntryRow): EntryState {
-    if (!row.payrunJobId) {
+    if (row.processingStatus === "Processing") {
       return "Calculating";
     }
     if ((row.controllingTasks?.length ?? 0) > 0) {
