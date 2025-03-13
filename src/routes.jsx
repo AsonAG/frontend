@@ -53,13 +53,13 @@ import {
 	downloadData,
 	bootstrapPayrunPeriods,
 	getCompanyBankDetails as getCompanyBankAccountDetails,
-	getPayrunPeriodControllingTasks,
 	getEmployeeSalaryType,
 	getPreviousPayrunPeriod,
 	getLookupSet,
 	addLookupValue,
 	updateLookupValue,
-	deleteLookupValue
+	deleteLookupValue,
+	getPayrollWageTypes
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -932,8 +932,33 @@ const routeData = [
 					{
 						path: "wagetypemaster",
 						Component: WageTypeControlling,
-						loader: ({ params }) => {
-							return null;
+						loader: async ({ params }) => {
+							const regulation = await store.get(clientRegulationAtom);
+							if (!regulation)
+								return null;
+							const [
+								wageTypes,
+								fibuAccountLookup,
+								accountMaster
+							] = await Promise.all([
+								getPayrollWageTypes(params),
+								getLookupSet({ regulationId: regulation.id, ...params }, "WageTypeFibuAccount"),
+								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster")
+							]);
+
+							if (fibuAccountLookup) {
+								const debitMap = new Map([fibuAccountLookup.values.map(x => [x.key, x.value.debitId])])
+								const creditMap = new Map([fibuAccountLookup.values.map(x => [x.key, x.value.creditId])])
+								for (var wt of wageTypes) {
+									wt.debit = debitMap.get(wt.wageTypeNumber);
+									wt.credit = creditMap.get(wt.wageTypeNumber);
+								}
+							}
+
+							return {
+								wageTypes,
+								accountMaster
+							}
 						}
 					},
 					createRouteLookupForm("accountmaster", "AccountMaster", "Account number"),
