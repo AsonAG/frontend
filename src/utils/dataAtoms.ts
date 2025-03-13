@@ -130,8 +130,9 @@ export const onboardingCompanyAtom = atomWithRefresh<Promise<Array<AvailableCase
 
 export const clientRegulationAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);
-	if (orgId === null) return null;
-	return await getClientRegulation({ orgId });
+	const payrollId = get(payrollIdAtom);
+	if (orgId === null || payrollId === null) return [];
+	return await getClientRegulation({ orgId, payrollId });
 });
 
 export const companyMissingDataCountAtom = atom(async (get) => {

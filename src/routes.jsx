@@ -223,7 +223,7 @@ function createRouteLookupForm(path, lookupName, keyName) {
 				toast("success", successMessage);
 				return { success: true };
 			} else {
-				toast("error", "Action failed.");
+				toast("error", "Action failed");
 				return null;
 			}
 		},

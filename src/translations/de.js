@@ -260,6 +260,7 @@ const translations = {
 		"Cost center master": "Kostenstellenstamm",
 		"Cost center": "Kostenstelle",
 		"Account number": "Kontonummer",
+		"Action failed": "Aktion fehlgeschlagen",
 
 		// Command
 		"Select event": "Ereignis auswählen",

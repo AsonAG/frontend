@@ -648,7 +648,7 @@ export function cancelPayout(routeParams) {
 
 export function getClientRegulation(routeParams) {
 	return new FetchRequestBuilder(regulationsUrl, routeParams)
-		.withQueryParam("filter", "name eq 'Client'")
+		.withQueryParam("filter", `name eq 'ClientRegulation:${routeParams.payrollId}'`)
 		.fetchSingle();
 }
 
