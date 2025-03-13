@@ -107,6 +107,7 @@ import { base64ToBytes } from "./services/converters/BinaryConverter";
 import { CompanyTabbedView } from "./company/CompanyTabbedView";
 import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
+import { WageTypeControlling } from "./company/WageTypeControlling";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -930,7 +931,7 @@ const routeData = [
 					},
 					{
 						path: "wagetypemaster",
-						Component: MasterLookupTable,
+						Component: WageTypeControlling,
 						loader: ({ params }) => {
 							return null;
 						}
