@@ -244,6 +244,10 @@ const translations = {
 		"Open": "Offen",
 		"Outstanding amount to be paid in the open period": "Ausstehender Betrag zur Zahlung der offenen Periode",
 		"Amount": "Betrag",
+		"Credit": "Soll",
+		"Debit": "Haben",
+		"Attributes": "Eigenschaften",
+		"Updated!": "Geändert!",
 
 		"Column visibility": "Spaltensichtbarkeit",
 		"Table width": "Tabellenbreite",

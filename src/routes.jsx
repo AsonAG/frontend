@@ -917,10 +917,17 @@ const routeData = [
 				loader: async () => {
 					store.set(missingDataCompanyAtom); // refresh
 					store.set(onboardingCompanyAtom);
+					const [
+						missingData,
+						onboardingTask
+					] = await Promise.all([
+						store.get(missingDataCompanyAtom),
+						store.get(onboardingCompanyAtom)
+					]);
 					return {
 						pageTitle: "Company",
-						missingData: await store.get(missingDataCompanyAtom),
-						onboardingTaskCount: (await store.get(onboardingCompanyAtom)).length,
+						missingData,
+						onboardingTaskCount: onboardingTask.length,
 					}
 				},
 				children: [
@@ -946,18 +953,39 @@ const routeData = [
 								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster")
 							]);
 
-							if (fibuAccountLookup) {
-								const debitMap = new Map([fibuAccountLookup.values.map(x => [x.key, x.value.debitId])])
-								const creditMap = new Map([fibuAccountLookup.values.map(x => [x.key, x.value.creditId])])
-								for (var wt of wageTypes) {
-									wt.debit = debitMap.get(wt.wageTypeNumber);
-									wt.credit = creditMap.get(wt.wageTypeNumber);
+							const map = new Map(fibuAccountLookup.values.map(x => [x.key, x]))
+							for (const wt of wageTypes) {
+								wt.accountLookupValue = null;
+								const accountLookupValue = map.get(wt.wageTypeNumber.toString());
+								if (accountLookupValue) {
+									wt.accountLookupValue = {
+										...accountLookupValue,
+										value: JSON.parse(accountLookupValue.value)
+									}
 								}
-							}
 
+							}
+							const accountMasterMap = new Map(accountMaster.values.map(x => [x.key, x]));
 							return {
 								wageTypes,
-								accountMaster
+								fibuAccountLookup,
+								accountMaster,
+								accountMasterMap,
+								regulationId: regulation.id
+							}
+						},
+						action: async ({ params, request }) => {
+							const { lookupValue, ...otherParams } = await request.json();
+							const actionParams = { lookupValueId: lookupValue.id, ...params, ...otherParams };
+							const action = !!lookupValue.id ? updateLookupValue : addLookupValue;
+							const response = await action(actionParams, lookupValue);
+
+							if (response.ok) {
+								toast("success", "Updated!");
+								return { success: true };
+							} else {
+								toast("error", "Action failed");
+								return null;
 							}
 						}
 					},

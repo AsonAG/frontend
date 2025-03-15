@@ -4,11 +4,20 @@ import React from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { WageType } from "../models/WageType";
 import { IdType } from "../models/IdType";
-import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
+
+type AccountLookupValue = {
+  id: IdType
+  key: string
+  created: string
+  value: WageTypeAccounts
+}
+type WageTypeAccounts = {
+  debitAccountNumber: string
+  creditAccountNumber: string
+}
 
 export type WageTypeRow = {
-  debit: IdType
-  credit: IdType
+  accountLookupValue: AccountLookupValue | null
 } & WageType
 
 const columnHelper = createColumnHelper<WageTypeRow>();
@@ -26,17 +35,25 @@ function createColumns() {
         header: ({ t }) => t("Name"),
         size: 250,
       }),
-    columnHelper.accessor("debit",
+    columnHelper.accessor(row => row.accountLookupValue?.value?.creditAccountNumber,
       {
-        cell: (props) => <WageTypeAccountPicker lookupValueId={props.getValue()} />,
-        header: ({ t }) => t("Debit"),
-        size: 100,
-      }),
-    columnHelper.accessor("credit",
-      {
-        cell: (props) => <WageTypeAccountPicker lookupValueId={props.getValue()} />,
+        id: "credit",
+        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
         header: ({ t }) => t("Credit"),
-        size: 100,
+        size: 120,
+        meta: {
+          alignment: "right"
+        }
+      }),
+    columnHelper.accessor(row => row.accountLookupValue?.value?.debitAccountNumber,
+      {
+        id: "debit",
+        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+        header: ({ t }) => t("Debit"),
+        size: 120,
+        meta: {
+          alignment: "right"
+        }
       }),
     columnHelper.accessor(wt => wt.attributes?.length,
       {
