@@ -59,7 +59,8 @@ import {
 	addLookupValue,
 	updateLookupValue,
 	deleteLookupValue,
-	getPayrollWageTypes
+	getPayrollWageTypes,
+	getPayrollCollectors
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -946,11 +947,13 @@ const routeData = [
 							const [
 								wageTypes,
 								fibuAccountLookup,
-								accountMaster
+								accountMaster,
+								collectors
 							] = await Promise.all([
 								getPayrollWageTypes(params),
 								getLookupSet({ regulationId: regulation.id, ...params }, "WageTypeFibuAccount"),
-								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster")
+								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster"),
+								getPayrollCollectors(params)
 							]);
 
 							const map = new Map(fibuAccountLookup.values.map(x => [x.key, x]))
@@ -968,6 +971,7 @@ const routeData = [
 							const accountMasterMap = new Map(accountMaster.values.map(x => [x.key, x]));
 							return {
 								wageTypes,
+								collectors,
 								fibuAccountLookup,
 								accountMaster,
 								accountMasterMap,

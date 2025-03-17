@@ -8,9 +8,11 @@ import { getRowGridSx } from "../payrun/utils";
 import { LookupSet, LookupValue } from "../models/LookupSet";
 import { IdType } from "../models/IdType";
 import { WageTypeDetails } from "./WageTypeDetails";
+import { Collector } from "../models/Collector";
 
 export type WageTypeControllingLoaderData = {
   wageTypes: WageTypeRow[]
+  collectors: Collector[]
   accountMaster: LookupSet
   accountMasterMap: Map<string, LookupValue>
   fibuAccountLookup: LookupSet

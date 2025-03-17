@@ -29,7 +29,7 @@ function createColumns() {
         header: ({ t }) => t("Number"),
         size: 80
       }),
-    columnHelper.accessor("name",
+    columnHelper.accessor("displayName",
       {
         cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
         header: ({ t }) => t("Name"),

@@ -248,6 +248,9 @@ const translations = {
 		"Debit": "Haben",
 		"Attributes": "Eigenschaften",
 		"Updated!": "Geändert!",
+		"Number": "Nummer",
+		"Collectors": "Basen",
+		"inactive_collector_chip": "{{count}} inaktive Basen...",
 
 		"Column visibility": "Spaltensichtbarkeit",
 		"Table width": "Tabellenbreite",

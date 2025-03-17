@@ -1,5 +1,5 @@
 import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, Stack, Tooltip, Typography } from "@mui/material";
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useMemo, useReducer, useState } from "react";
 import { WageTypeRow } from "./WageTypeColumns";
 import { getRowGridSx } from "../payrun/utils";
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
 import { LookupValue } from "../models/LookupSet";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
-import { useTheme } from "@emotion/react";
+import { Collector } from "../models/Collector";
 
 
 type WageTypeDetailsProps = {
@@ -19,7 +19,7 @@ const dialogColumns = getRowGridSx([{ width: 150 }, { width: 150, flex: 1 }], 2)
 export function WageTypeDetails({ wageType, onClose }: WageTypeDetailsProps) {
   const { t } = useTranslation();
   const fetcher = useFetcher();
-  const { accountMasterMap, regulationId, fibuAccountLookup } = useLoaderData() as WageTypeControllingLoaderData;
+  const { accountMasterMap, regulationId, fibuAccountLookup, collectors } = useLoaderData() as WageTypeControllingLoaderData;
   const [state, dispatch] = useReducer(reducer, { wageType, accountMasterMap }, createInitialState);
 
   const onSubmit = () => {
@@ -49,7 +49,7 @@ export function WageTypeDetails({ wageType, onClose }: WageTypeDetailsProps) {
 
   return (
     <Dialog open onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{wageType.name}</DialogTitle>
+      <DialogTitle>{wageType.displayName}</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={1}>
           <Box sx={dialogColumns}>
@@ -58,7 +58,7 @@ export function WageTypeDetails({ wageType, onClose }: WageTypeDetailsProps) {
           </Box>
           <Box sx={dialogColumns}>
             <Typography>{t("Collectors")}</Typography>
-            <WageTypeCollectors wageType={wageType} />
+            <WageTypeCollectors wageType={wageType} collectors={collectors} />
           </Box>
         </Stack>
       </DialogContent>
@@ -137,16 +137,16 @@ function WageTypeAttributes({ wageType }: { wageType: WageTypeRow }) {
       <WageTypeAttributeChip attribute="Bvg.Retrospective" attributeValue={wageType.attributes?.["Bvg.Retrospective"]} category="Bvg" />
       <WageTypeAttributeChip attribute="Payslip" attributeValue={wageType.attributes?.["Payslip"]} category="Payslip" />
       <WageTypeAttributeChip attribute="FAK.billing" attributeValue={wageType.attributes?.["FAK.billing"]} category="FAK" />
-      <WageTypeAttributeChip attribute="Bvg.Retrospective" attributeValue={wageType.attributes?.["Bvg.Retrospective"]} category="Bvg" />
     </Stack>
   )
 }
 
-function WageTypeCollectors({ wageType }: { wageType: WageTypeRow }) {
+function WageTypeCollectors({ wageType, collectors }: { wageType: WageTypeRow, collectors: Collector[] }) {
+  const groupedCollectors = useMemo(() => Object.groupBy(collectors, ({ name }) => wageType.collectors?.includes(name) ? "active" : "inactive"), [collectors, wageType.collectors]) as Record<"active" | "inactive", Collector[]>;
   return (
     <Stack direction="row" flexWrap="wrap" spacing={0.5}>
-      {wageType.collectors.map(c => <CollectorChip key={c} collectorName={c} />)}
-      {wageType.collectorGroups.map(c => <CollectorChip key={c} collectorName={c} />)}
+      {groupedCollectors["active"].map(collector => <CollectorChip key={collector.id} collectorName={collector.displayName} active={wageType.collectors?.includes(collector.name)} />)}
+      <InactiveCollectors collectors={groupedCollectors["inactive"]} />
     </Stack>
   )
 }
@@ -170,11 +170,22 @@ function WageTypeAttributeChip({ attribute, attributeValue, tooltip, category }:
 type CollectorChipProps = {
   collectorName: string,
   tooltip?: string
+  active: boolean
 }
-function CollectorChip({ collectorName, tooltip }: CollectorChipProps) {
+function CollectorChip({ collectorName, tooltip, active }: CollectorChipProps) {
   return (
     <Tooltip title={tooltip}>
-      <Chip label={collectorName} size="small" />
+      <Chip label={collectorName} size="small" color={active ? "primary" : "default"} variant={active ? "filled" : "outlined"} />
     </Tooltip>
   )
+}
+function InactiveCollectors({ collectors }: { collectors: Collector[] }) {
+  const { t } = useTranslation();
+  const [showInactive, setShowInactive] = useState(false);
+  if (!showInactive) {
+    return <Chip label={t("inactive_collector_chip", { count: collectors.length })} size="small" variant={"outlined"} onClick={() => setShowInactive(true)} />
+  }
+
+  return collectors.map(collector => <CollectorChip key={collector.id} collectorName={collector.displayName} active={false} />);
+
 }
