@@ -25,7 +25,7 @@ const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
 const missingDataEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
 const payrollLookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
-const payrollWageTypesUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypes";
+const payrollWageTypeMasterUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
@@ -679,7 +679,7 @@ export function deleteLookupValue(routeParams) {
 }
 
 export function getPayrollWageTypes(routeParams) {
-	return new FetchRequestBuilder(payrollWageTypesUrl, routeParams)
+	return new FetchRequestBuilder(payrollWageTypeMasterUrl, routeParams)
 		.withLocalization()
 		.fetchJson();
 }
