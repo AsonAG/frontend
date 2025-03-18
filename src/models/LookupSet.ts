@@ -8,5 +8,6 @@ export type LookupSet = {
 export type LookupValue = {
   id: IdType
   key: string
+  created: string
   value: string
 }

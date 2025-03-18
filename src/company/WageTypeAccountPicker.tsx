@@ -14,9 +14,6 @@ const filterOptions = createFilterOptions({
 });
 
 
-export function WageTypeAccountPicker2() {
-  return <Typography>Test</Typography>
-}
 export function WageTypeAccountPicker({ value, onChange }: WageTypeAccountPickerProps) {
   const { accountMaster } = useLoaderData() as WageTypeControllingLoaderData;
 

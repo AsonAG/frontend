@@ -12,6 +12,8 @@ import {
 	getCompanyCases,
 	getPayrunPeriodControllingTasks,
 	getClientRegulation,
+	getPayrollWageTypes,
+	getLookupSet,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
@@ -19,11 +21,13 @@ import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
 import { IdType } from "../models/IdType";
 import { MissingData } from "../models/MissingData";
-import { atomWithRefresh, atomWithStorage, createJSONStorage } from "jotai/utils";
+import { atomWithRefresh, atomWithStorage, createJSONStorage, unwrap } from "jotai/utils";
 import { ExpandedState } from "@tanstack/react-table";
 import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 import { AvailableCase } from "../models/AvailableCase";
 import { ControllingData } from "../payrun/types";
+import { AccountLookupValue, WageType, WageTypeWithAccount } from "../models/WageType";
+import { LookupSet } from "../models/LookupSet";
 
 export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
@@ -220,3 +224,59 @@ export const payrollControllingDataTotalCountAtom = atom(async (get) => {
 	const controllingData = await get(payrollControllingDataAtom);
 	return controllingData.employeeControllingCases.length + (controllingData.companyControllingCases.length > 0 ? 1 : 0);
 })
+
+export const payrollWageTypesAtom = atomWithRefresh<Promise<WageType[]>>(async (get) => {
+	const orgId = get(orgIdAtom);
+	const payrollId = get(payrollIdAtom);
+	if (orgId === null || payrollId === null) return [];
+	var wageTypes = await getPayrollWageTypes({ orgId, payrollId });
+	return wageTypes;
+});
+
+export const fibuAccountLookupAtom = atomWithRefresh<Promise<LookupSet>>(async (get) => {
+	const orgId = get(orgIdAtom);
+	const payrollId = get(payrollIdAtom);
+	if (orgId === null || payrollId === null) return [];
+	const regulation = await get(clientRegulationAtom);
+	if (!regulation)
+		return null;
+	return await getLookupSet({ orgId, payrollId, regulationId: regulation.id }, "WageTypeFibuAccount")
+});
+
+export const payrollWageTypesWithAccountingInfoAtom = atomWithRefresh<Promise<WageTypeWithAccount[]>>(async (get) => {
+	const [
+		wageTypes,
+		fibuAccountLookup
+	]: [WageType[], LookupSet] = await Promise.all([
+		get(payrollWageTypesAtom),
+		get(fibuAccountLookupAtom)
+	]);
+
+	const map = new Map(fibuAccountLookup.values.map(x => [x.key, x]))
+	return wageTypes.map(wt => {
+		const lookupValue = map.get(wt.wageTypeNumber.toString());
+		const accountLookupValue: AccountLookupValue | null = lookupValue ? { ...lookupValue, value: JSON.parse(lookupValue.value) } : null;
+		const accountAssignmentRequired =
+			wt.attributes?.["Accounting.Relevant"] === "Y" &&
+			(!accountLookupValue?.value?.creditAccountNumber &&
+				!accountLookupValue?.value?.debitAccountNumber);
+		return {
+			...wt,
+			accountAssignmentRequired,
+			accountLookupValue
+		}
+	});
+});
+
+export function refreshPayrollWageTypes() {
+	const store = getDefaultStore();
+	store.set(payrollWageTypesAtom);
+	store.set(fibuAccountLookupAtom);
+	store.set(payrollWageTypesWithAccountingInfoAtom);
+
+}
+
+export const payrollWageTypesWithMissingAccountInfoCountAtom = atom<Promise<number>>(async (get) => {
+	const wageTypesWithAccountingInfo = await get(payrollWageTypesWithAccountingInfoAtom);
+	return wageTypesWithAccountingInfo.filter(wt => wt.accountAssignmentRequired).length;
+});

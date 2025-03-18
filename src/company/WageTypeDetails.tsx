@@ -1,6 +1,5 @@
 import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, Stack, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useMemo, useReducer, useState } from "react";
-import { WageTypeRow } from "./WageTypeColumns";
 import { getRowGridSx } from "../payrun/utils";
 import { useTranslation } from "react-i18next";
 import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
@@ -8,10 +7,11 @@ import { LookupValue } from "../models/LookupSet";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
 import { Collector } from "../models/Collector";
+import { WageType, WageTypeWithAccount } from "../models/WageType";
 
 
 type WageTypeDetailsProps = {
-  wageType: WageTypeRow
+  wageType: WageTypeWithAccount
   onClose: () => void
 }
 
@@ -19,7 +19,7 @@ const dialogColumns = getRowGridSx([{ width: 150 }, { width: 150, flex: 1 }], 2)
 export function WageTypeDetails({ wageType, onClose }: WageTypeDetailsProps) {
   const { t } = useTranslation();
   const fetcher = useFetcher();
-  const { accountMasterMap, regulationId, fibuAccountLookup, collectors } = useLoaderData() as WageTypeControllingLoaderData;
+  const { accountMasterMap, regulationId, fibuAccountLookup, collectors, wageTypeAttributeTranslations } = useLoaderData() as WageTypeControllingLoaderData;
   const [state, dispatch] = useReducer(reducer, { wageType, accountMasterMap }, createInitialState);
 
   const onSubmit = () => {
@@ -112,7 +112,7 @@ function reducer(state: WageTypeFormState, action: WageTypeFormAction): WageType
 }
 
 type InitialStateProps = {
-  wageType: WageTypeRow
+  wageType: WageTypeWithAccount
   accountMasterMap: Map<string, LookupValue>
 }
 
@@ -123,47 +123,55 @@ function createInitialState({ wageType, accountMasterMap }: InitialStateProps): 
   };
 }
 
-function WageTypeAttributes({ wageType }: { wageType: WageTypeRow }) {
+function WageTypeAttributes({ wageType }: { wageType: WageTypeWithAccount }) {
   return (
     <Stack direction="row" flexWrap="wrap" spacing={0.5}>
-      <WageTypeAttributeChip attribute="Accounting.Credit" attributeValue={wageType.attributes?.["Accounting.Credit"]} category="Accounting" />
-      <WageTypeAttributeChip attribute="Accounting.PlusMinus" attributeValue={wageType.attributes?.["Accounting.PlusMinus"]} category="Accounting" />
-      <WageTypeAttributeChip attribute="Wage.Statement" attributeValue={wageType.attributes?.["Wage.Statement"]} category="Wage" />
-      <WageTypeAttributeChip attribute="Stats.Month" attributeValue={wageType.attributes?.["Stats.Month"]} category="Stats" />
-      <WageTypeAttributeChip attribute="Stats.Year" attributeValue={wageType.attributes?.["Stats.Year"]} category="Stats" />
-      <WageTypeAttributeChip attribute="Cost.Center" attributeValue={wageType.attributes?.["Cost.Center"]} category="Cost" />
-      <WageTypeAttributeChip attribute="Bvg.Prospective" attributeValue={wageType.attributes?.["Bvg.Prospective"]} category="Bvg" />
-      <WageTypeAttributeChip attribute="Bvg.Factor" attributeValue={wageType.attributes?.["Bvg.Factor"]} category="Bvg" />
-      <WageTypeAttributeChip attribute="Bvg.Retrospective" attributeValue={wageType.attributes?.["Bvg.Retrospective"]} category="Bvg" />
-      <WageTypeAttributeChip attribute="Payslip" attributeValue={wageType.attributes?.["Payslip"]} category="Payslip" />
-      <WageTypeAttributeChip attribute="FAK.billing" attributeValue={wageType.attributes?.["FAK.billing"]} category="FAK" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Accounting.Credit" category="Accounting" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Accounting.PlusMinus" category="Accounting" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Wage.Statement" category="Wage" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Stats.Month" category="Stats" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Stats.Year" category="Stats" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Cost.Center" category="Cost" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Bvg.Prospective" category="Bvg" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Bvg.Factor" category="Bvg" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Bvg.Retrospective" category="Bvg" />
+      <WageTypeAttributeChip wageType={wageType} attribute="Payslip" category="Payslip" />
+      <WageTypeAttributeChip wageType={wageType} attribute="FAK.billing" category="FAK" />
     </Stack>
   )
 }
 
-function WageTypeCollectors({ wageType, collectors }: { wageType: WageTypeRow, collectors: Collector[] }) {
+function WageTypeCollectors({ wageType, collectors }: { wageType: WageTypeWithAccount, collectors: Collector[] }) {
   const groupedCollectors = useMemo(() => Object.groupBy(collectors, ({ name }) => wageType.collectors?.includes(name) ? "active" : "inactive"), [collectors, wageType.collectors]) as Record<"active" | "inactive", Collector[]>;
   return (
     <Stack direction="row" flexWrap="wrap" spacing={0.5}>
-      {groupedCollectors["active"].map(collector => <CollectorChip key={collector.id} collectorName={collector.displayName} active={wageType.collectors?.includes(collector.name)} />)}
+      {groupedCollectors["active"]?.map(collector => <CollectorChip key={collector.id} collectorName={collector.displayName} active={wageType.collectors?.includes(collector.name)} />)}
       <InactiveCollectors collectors={groupedCollectors["inactive"]} />
     </Stack>
   )
 }
 
 type WageTypeAttributeChipProps = {
+  wageType: WageType
   attribute: string
-  attributeValue: string
   tooltip?: string
   category: string
 }
 
-function WageTypeAttributeChip({ attribute, attributeValue, tooltip, category }: WageTypeAttributeChipProps) {
+function WageTypeAttributeChip({ wageType, attribute, tooltip, category }: WageTypeAttributeChipProps) {
+  const { t } = useTranslation();
+  const { attributeTranslationMap } = useLoaderData() as WageTypeControllingLoaderData;
+  let attributeValue = wageType.attributes?.[attribute];
   if (!attributeValue)
     return;
+  if (attributeValue === "Y")
+    attributeValue = t("Yes");
+  else if (attributeValue === "N")
+    attributeValue = t("No")
+  const label = attributeTranslationMap.get(attribute)?.value ?? attribute;
   return (
     <Tooltip title={tooltip}>
-      <Chip label={`${attribute}: ${attributeValue}`} size="small" />
+      <Chip label={`${label}: ${attributeValue}`} size="small" />
     </Tooltip>
   )
 }

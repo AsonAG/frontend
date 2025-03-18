@@ -32,7 +32,7 @@ function ValueRow({ value }: { value: LookupValue }) {
     <Stack direction="row">
       <Form method={"PUT"} style={{ flex: 1 }}>
         <Stack direction="row" spacing={1}>
-          <TextField name="key" value={lookupData.key} onChange={e => setLookupData({ ...lookupData, key: e.target.value })} sx={{ width: 120 }} size="small" />
+          <TextField name="key" value={lookupData.key} sx={{ width: 120 }} size="small" disabled slotProps={{ htmlInput: { readOnly: true, disabled: false } }} />
           <TextField name="value" value={lookupData.value} onChange={e => setLookupData({ ...lookupData, value: e.target.value })} sx={{ flex: 1 }} size="small" />
           {idElements}
           <IconButton type="submit" tabIndex={-1} color="primary" disabled={!isDirty}><Save /></IconButton>

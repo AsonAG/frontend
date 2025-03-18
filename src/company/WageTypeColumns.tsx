@@ -2,25 +2,9 @@
 import { Typography } from "@mui/material";
 import React from "react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { WageType } from "../models/WageType";
-import { IdType } from "../models/IdType";
+import { WageTypeWithAccount } from "../models/WageType";
 
-type AccountLookupValue = {
-  id: IdType
-  key: string
-  created: string
-  value: WageTypeAccounts
-}
-type WageTypeAccounts = {
-  debitAccountNumber: string
-  creditAccountNumber: string
-}
-
-export type WageTypeRow = {
-  accountLookupValue: AccountLookupValue | null
-} & WageType
-
-const columnHelper = createColumnHelper<WageTypeRow>();
+const columnHelper = createColumnHelper<WageTypeWithAccount>();
 function createColumns() {
   return [
     columnHelper.accessor("wageTypeNumber",
@@ -34,6 +18,9 @@ function createColumns() {
         cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
         header: ({ t }) => t("Name"),
         size: 250,
+        meta: {
+          flex: 1
+        }
       }),
     columnHelper.accessor(row => row.accountLookupValue?.value?.creditAccountNumber,
       {
@@ -55,11 +42,11 @@ function createColumns() {
           alignment: "right"
         }
       }),
-    columnHelper.accessor(wt => wt.attributes?.length,
+    columnHelper.accessor(wt => wt.attributes?.["Configuration.WageType"],
       {
-        id: "attributes",
+        id: "controlling",
         cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
-        header: ({ t }) => t("Attributes"),
+        header: ({ t }) => t("payrun_period_wage_controlling"),
         size: 150,
         meta: {
           flex: 1,

@@ -575,7 +575,7 @@ export function getLookupValues(routeParams, lookupName) {
 	return new FetchRequestBuilder(payrollLookupValuesUrl, routeParams)
 		.withQueryParam("lookupNames", lookupName)
 		.withLocalization()
-		.fetchJson();
+		.fetchSingle();
 }
 
 export function getDocumentCaseFields(routeParams) {

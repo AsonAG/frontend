@@ -59,7 +59,7 @@ import {
 	addLookupValue,
 	updateLookupValue,
 	deleteLookupValue,
-	getPayrollWageTypes,
+	getLookupValues,
 	getPayrollCollectors
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
@@ -84,7 +84,12 @@ import {
 	missingDataCompanyAtom,
 	onboardingCompanyAtom,
 	payrollControllingDataAtom,
-	clientRegulationAtom
+	clientRegulationAtom,
+	payrollWageTypesAtom,
+	payrollWageTypesWithMissingAccountInfoCountAtom,
+	payrollWageTypesWithAccountingInfoAtom,
+	fibuAccountLookupAtom,
+	refreshPayrollWageTypes
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -914,20 +919,24 @@ const routeData = [
 			{
 				path: "company",
 				Component: withSuspense(CompanyTabbedView),
-				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathname !== nextUrl.pathname,
+				shouldRevalidate: ({ currentUrl, nextUrl, actionResult }) => currentUrl.pathname !== nextUrl.pathname || actionResult?.success,
 				loader: async () => {
 					store.set(missingDataCompanyAtom); // refresh
 					store.set(onboardingCompanyAtom);
+					refreshPayrollWageTypes();
 					const [
 						missingData,
-						onboardingTask
+						onboardingTask,
+						missingWageTypeAccountInfoCount
 					] = await Promise.all([
 						store.get(missingDataCompanyAtom),
-						store.get(onboardingCompanyAtom)
+						store.get(onboardingCompanyAtom),
+						store.get(payrollWageTypesWithMissingAccountInfoCountAtom)
 					]);
 					return {
 						pageTitle: "Company",
 						missingData,
+						missingWageTypeAccountInfoCount,
 						onboardingTaskCount: onboardingTask.length,
 					}
 				},
@@ -948,33 +957,25 @@ const routeData = [
 								wageTypes,
 								fibuAccountLookup,
 								accountMaster,
+								wageTypeAttributeTranslations,
 								collectors
 							] = await Promise.all([
-								getPayrollWageTypes(params),
-								getLookupSet({ regulationId: regulation.id, ...params }, "WageTypeFibuAccount"),
+								store.get(payrollWageTypesWithAccountingInfoAtom),
+								store.get(fibuAccountLookupAtom),
 								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster"),
+								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
 								getPayrollCollectors(params)
 							]);
-
-							const map = new Map(fibuAccountLookup.values.map(x => [x.key, x]))
-							for (const wt of wageTypes) {
-								wt.accountLookupValue = null;
-								const accountLookupValue = map.get(wt.wageTypeNumber.toString());
-								if (accountLookupValue) {
-									wt.accountLookupValue = {
-										...accountLookupValue,
-										value: JSON.parse(accountLookupValue.value)
-									}
-								}
-
-							}
+							console.log(wageTypeAttributeTranslations);
 							const accountMasterMap = new Map(accountMaster.values.map(x => [x.key, x]));
+							const attributeTranslationMap = new Map(wageTypeAttributeTranslations.values.map(x => [x.key, x]));
 							return {
 								wageTypes,
 								collectors,
 								fibuAccountLookup,
 								accountMaster,
 								accountMasterMap,
+								attributeTranslationMap,
 								regulationId: regulation.id
 							}
 						},

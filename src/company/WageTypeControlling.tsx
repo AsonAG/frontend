@@ -1,28 +1,30 @@
 import { Box, Stack, SxProps, Theme, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
-import { columns, WageTypeRow } from "./WageTypeColumns";
-import { flexRender, getCoreRowModel, Row, useReactTable } from "@tanstack/react-table";
+import { columns } from "./WageTypeColumns";
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { getRowGridSx } from "../payrun/utils";
 import { LookupSet, LookupValue } from "../models/LookupSet";
 import { IdType } from "../models/IdType";
 import { WageTypeDetails } from "./WageTypeDetails";
 import { Collector } from "../models/Collector";
+import { WageTypeWithAccount } from "../models/WageType";
 
 export type WageTypeControllingLoaderData = {
-  wageTypes: WageTypeRow[]
+  wageTypes: WageTypeWithAccount[]
   collectors: Collector[]
   accountMaster: LookupSet
   accountMasterMap: Map<string, LookupValue>
   fibuAccountLookup: LookupSet
   regulationId: IdType
+  attributeTranslationMap: Map<string, LookupValue>
 }
 
 export function WageTypeControlling() {
   const { t } = useTranslation();
   const { wageTypes } = useLoaderData() as WageTypeControllingLoaderData;
-  const [selected, setSelected] = useState<WageTypeRow | null>(null);
+  const [selected, setSelected] = useState<WageTypeWithAccount | null>(null);
   const onClose = () => setSelected(null);
   const table = useReactTable({
     columns: columns,
@@ -35,7 +37,6 @@ export function WageTypeControlling() {
     width: col.getSize(),
     flex: col.columnDef.meta?.flex
   })), 1);
-  const rowContainerSx = { ...rowGridSx, ...rowSx };
 
   return <>
     <Stack>
@@ -59,8 +60,9 @@ export function WageTypeControlling() {
       )}
       {
         table.getRowModel().rows.map(row => {
+          const rowSx = { ...rowGridSx, ...getRowSx(row.original) }
           return (
-            <Box key={row.id} sx={rowContainerSx} onClick={() => setSelected(row.original)}>
+            <Box key={row.id} sx={rowSx} onClick={() => setSelected(row.original)}>
               {row.getVisibleCells().map(cell => {
                 const { alignment } = (cell.column.columnDef.meta || {});
                 const cellContext = cell.getContext();
@@ -80,11 +82,14 @@ export function WageTypeControlling() {
   </>
 }
 
-const rowSx: SxProps<Theme> = {
-  userSelect: "none",
-  backgroundColor: (theme: Theme) => theme.palette.background.default,
-  "&:hover": {
-    backgroundColor: (theme: Theme) => theme.palette.selection.main,
-    cursor: "pointer"
+function getRowSx(row: WageTypeWithAccount): SxProps<Theme> {
+  return {
+    userSelect: "none",
+    backgroundColor: (theme: Theme) => row.accountAssignmentRequired ? theme.palette.selectionAttention.dark : theme.palette.background.default,
+    "&:hover": {
+      backgroundColor: (theme: Theme) => row.accountAssignmentRequired ? theme.palette.selectionAttention.light : theme.palette.selection.main,
+      cursor: "pointer"
+    }
   }
-};
+}
+

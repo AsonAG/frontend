@@ -7,6 +7,22 @@ export type WageType = {
   name: string
   displayName: string
   collectors: string[]
-  collectorGroups: string[]
   attributes: Record<string, string>
 }
+
+export type WageTypeWithAccount = {
+  accountLookupValue: AccountLookupValue | null
+  accountAssignmentRequired: boolean
+} & WageType
+
+export type AccountLookupValue = {
+  id: IdType
+  key: string
+  created: string
+  value: WageTypeAccounts
+}
+type WageTypeAccounts = {
+  debitAccountNumber: string
+  creditAccountNumber: string
+}
+

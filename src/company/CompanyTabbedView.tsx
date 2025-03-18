@@ -11,6 +11,7 @@ import { TabLink } from "../components/TabLink";
 
 type LoaderData = {
   onboardingTaskCount: number
+  missingWageTypeAccountInfoCount: number
 }
 
 export function CompanyTabbedView() {
@@ -28,9 +29,10 @@ export function CompanyTabbedView() {
 
 function ConfigTabs() {
   const { t } = useTranslation();
+  const { missingWageTypeAccountInfoCount } = useLoaderData() as LoaderData;
   return (
     <>
-      <TabLink title={t("Wage type master")} to="wagetypemaster" />
+      <TabLink title={t("Wage type master")} to="wagetypemaster" badgeCount={missingWageTypeAccountInfoCount} />
       <TabLink title={t("Account master")} to="accountmaster" />
       <TabLink title={t("Cost center master")} to="costcentermaster" />
     </>
