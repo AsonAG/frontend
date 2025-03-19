@@ -26,7 +26,7 @@ import { ExpandedState } from "@tanstack/react-table";
 import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 import { AvailableCase } from "../models/AvailableCase";
 import { ControllingData } from "../payrun/types";
-import { AccountLookupValue, WageType, WageTypeWithAccount } from "../models/WageType";
+import { AccountLookupValue, WageType, WageTypeDetailed } from "../models/WageType";
 import { LookupSet } from "../models/LookupSet";
 
 export const orgsAtom = atomWithRefresh((get => {
@@ -243,27 +243,43 @@ export const fibuAccountLookupAtom = atomWithRefresh<Promise<LookupSet>>(async (
 	return await getLookupSet({ orgId, payrollId, regulationId: regulation.id }, "WageTypeFibuAccount")
 });
 
-export const payrollWageTypesWithAccountingInfoAtom = atomWithRefresh<Promise<WageTypeWithAccount[]>>(async (get) => {
+export const wageTypeControllingLookupAtom = atomWithRefresh<Promise<LookupSet>>(async (get) => {
+	const orgId = get(orgIdAtom);
+	const payrollId = get(payrollIdAtom);
+	if (orgId === null || payrollId === null) return [];
+	const regulation = await get(clientRegulationAtom);
+	if (!regulation)
+		return null;
+	return await getLookupSet({ orgId, payrollId, regulationId: regulation.id }, "WageTypePayrollControlling");
+});
+
+export const payrollWageTypesWithAccountingInfoAtom = atomWithRefresh<Promise<WageTypeDetailed[]>>(async (get) => {
 	const [
 		wageTypes,
-		fibuAccountLookup
-	]: [WageType[], LookupSet] = await Promise.all([
+		fibuAccountLookup,
+		wageTypeControllingLookup
+	]: [WageType[], LookupSet, LookupSet] = await Promise.all([
 		get(payrollWageTypesAtom),
-		get(fibuAccountLookupAtom)
+		get(fibuAccountLookupAtom),
+		get(wageTypeControllingLookupAtom)
 	]);
 
-	const map = new Map(fibuAccountLookup.values.map(x => [x.key, x]))
+	const accountMap = new Map(fibuAccountLookup.values.map(x => [x.key, x]))
+	const controllingSet = new Set(wageTypeControllingLookup.values.map(x => x.key));
 	return wageTypes.map(wt => {
-		const lookupValue = map.get(wt.wageTypeNumber.toString());
+		const wageTypeNumber = wt.wageTypeNumber.toString();
+		const lookupValue = accountMap.get(wageTypeNumber);
 		const accountLookupValue: AccountLookupValue | null = lookupValue ? { ...lookupValue, value: JSON.parse(lookupValue.value) } : null;
 		const accountAssignmentRequired =
 			wt.attributes?.["Accounting.Relevant"] === "Y" &&
 			(!accountLookupValue?.value?.creditAccountNumber &&
 				!accountLookupValue?.value?.debitAccountNumber);
+		const payrollControllingAttribute = wt.attributes?.["PayrollControlling"];
 		return {
 			...wt,
 			accountAssignmentRequired,
-			accountLookupValue
+			accountLookupValue,
+			controllingEnabled: !payrollControllingAttribute || payrollControllingAttribute === "N" ? "system" : controllingSet.has(wageTypeNumber)
 		}
 	});
 });
@@ -272,6 +288,7 @@ export function refreshPayrollWageTypes() {
 	const store = getDefaultStore();
 	store.set(payrollWageTypesAtom);
 	store.set(fibuAccountLookupAtom);
+	store.set(wageTypeControllingLookupAtom);
 	store.set(payrollWageTypesWithAccountingInfoAtom);
 
 }

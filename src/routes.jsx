@@ -89,7 +89,8 @@ import {
 	payrollWageTypesWithMissingAccountInfoCountAtom,
 	payrollWageTypesWithAccountingInfoAtom,
 	fibuAccountLookupAtom,
-	refreshPayrollWageTypes
+	refreshPayrollWageTypes,
+	wageTypeControllingLookupAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -957,12 +958,14 @@ const routeData = [
 								wageTypes,
 								fibuAccountLookup,
 								accountMaster,
+								wageTypePayrollControllingLookup,
 								wageTypeAttributeTranslations,
 								collectors
 							] = await Promise.all([
 								store.get(payrollWageTypesWithAccountingInfoAtom),
 								store.get(fibuAccountLookupAtom),
 								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster"),
+								store.get(wageTypeControllingLookupAtom),
 								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
 								getPayrollCollectors(params)
 							]);
@@ -973,6 +976,7 @@ const routeData = [
 								wageTypes,
 								collectors,
 								fibuAccountLookup,
+								wageTypePayrollControllingLookup,
 								accountMaster,
 								accountMasterMap,
 								attributeTranslationMap,
@@ -980,12 +984,31 @@ const routeData = [
 							}
 						},
 						action: async ({ params, request }) => {
-							const { lookupValue, ...otherParams } = await request.json();
-							const actionParams = { lookupValueId: lookupValue.id, ...params, ...otherParams };
-							const action = !!lookupValue.id ? updateLookupValue : addLookupValue;
-							const response = await action(actionParams, lookupValue);
+							const { accountLookupValue, controllingLookupValue, regulationId } = await request.json();
+							async function updateAccountLookup(lookupId, lookupValue) {
+								const actionParams = { regulationId, lookupId, lookupValueId: lookupValue.id, ...params };
+								const action = !!lookupValue.id ? updateLookupValue : addLookupValue;
+								const response = await action(actionParams, lookupValue);
+								return response.ok;
+							}
+							async function updateControllingLookup(lookupId, lookupValue) {
+								if (lookupValue === null)
+									return true;
+								const actionParams = { regulationId, lookupId, lookupValueId: lookupValue.id, ...params };
+								const action = !!lookupValue.id ? deleteLookupValue : addLookupValue;
+								const response = await action(actionParams, lookupValue);
+								return response.ok;
+							}
 
-							if (response.ok) {
+							const [
+								accountLookupResponse,
+								controllingLookupResponse
+							] = await Promise.all([
+								updateAccountLookup(accountLookupValue.lookupId, accountLookupValue.lookupValue),
+								updateControllingLookup(controllingLookupValue.lookupId, controllingLookupValue.lookupValue),
+							]);
+
+							if (accountLookupResponse && controllingLookupResponse) {
 								toast("success", "Updated!");
 								return { success: true };
 							} else {

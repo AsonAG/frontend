@@ -268,6 +268,7 @@ const translations = {
 		"Cost center": "Kostenstelle",
 		"Account number": "Kontonummer",
 		"Action failed": "Aktion fehlgeschlagen",
+		"automatic": "automatisch",
 
 		// Command
 		"Select event": "Ereignis auswählen",

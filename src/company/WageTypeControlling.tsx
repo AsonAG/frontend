@@ -9,14 +9,15 @@ import { LookupSet, LookupValue } from "../models/LookupSet";
 import { IdType } from "../models/IdType";
 import { WageTypeDetails } from "./WageTypeDetails";
 import { Collector } from "../models/Collector";
-import { WageTypeWithAccount } from "../models/WageType";
+import { WageTypeDetailed } from "../models/WageType";
 
 export type WageTypeControllingLoaderData = {
-  wageTypes: WageTypeWithAccount[]
+  wageTypes: WageTypeDetailed[]
   collectors: Collector[]
   accountMaster: LookupSet
   accountMasterMap: Map<string, LookupValue>
   fibuAccountLookup: LookupSet
+  wageTypePayrollControllingLookup: LookupSet
   regulationId: IdType
   attributeTranslationMap: Map<string, LookupValue>
 }
@@ -24,7 +25,7 @@ export type WageTypeControllingLoaderData = {
 export function WageTypeControlling() {
   const { t } = useTranslation();
   const { wageTypes } = useLoaderData() as WageTypeControllingLoaderData;
-  const [selected, setSelected] = useState<WageTypeWithAccount | null>(null);
+  const [selected, setSelected] = useState<WageTypeDetailed | null>(null);
   const onClose = () => setSelected(null);
   const table = useReactTable({
     columns: columns,
@@ -67,7 +68,7 @@ export function WageTypeControlling() {
                 const { alignment } = (cell.column.columnDef.meta || {});
                 const cellContext = cell.getContext();
                 return (
-                  <Typography key={cell.id} variant="h6" align={alignment} noWrap sx={{ px: 0.25, py: 0.5 }}>
+                  <Typography key={cell.id} align={alignment} noWrap sx={{ px: 0.25, py: 0.5 }}>
                     {flexRender(cell.column.columnDef.cell, { ...cellContext, t })}
                   </Typography>
 
@@ -82,8 +83,10 @@ export function WageTypeControlling() {
   </>
 }
 
-function getRowSx(row: WageTypeWithAccount): SxProps<Theme> {
+function getRowSx(row: WageTypeDetailed): SxProps<Theme> {
   return {
+    height: 36,
+    alignItems: "center",
     userSelect: "none",
     backgroundColor: (theme: Theme) => row.accountAssignmentRequired ? theme.palette.selectionAttention.dark : theme.palette.background.default,
     "&:hover": {

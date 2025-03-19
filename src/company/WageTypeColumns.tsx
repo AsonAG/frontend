@@ -1,10 +1,11 @@
 
-import { Typography } from "@mui/material";
+import { Checkbox, Typography } from "@mui/material";
 import React from "react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { WageTypeWithAccount } from "../models/WageType";
+import { WageTypeDetailed } from "../models/WageType";
+import { useTranslation } from "react-i18next";
 
-const columnHelper = createColumnHelper<WageTypeWithAccount>();
+const columnHelper = createColumnHelper<WageTypeDetailed>();
 function createColumns() {
   return [
     columnHelper.accessor("wageTypeNumber",
@@ -42,16 +43,24 @@ function createColumns() {
           alignment: "right"
         }
       }),
-    columnHelper.accessor(wt => wt.attributes?.["Configuration.WageType"],
+    columnHelper.accessor("controllingEnabled",
       {
         id: "controlling",
-        cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+        cell: (props) => <ControllingCell value={props.getValue()} />,
         header: ({ t }) => t("payrun_period_wage_controlling"),
-        size: 150,
+        size: 170,
         meta: {
-          flex: 1,
+          alignment: "center"
         }
       }),
   ];
 }
 export const columns = createColumns();
+
+
+function ControllingCell({ value }: { value: "system" | boolean }) {
+  const { t } = useTranslation();
+  if (value === "system")
+    return <Typography noWrap>{t("automatic")}</Typography>
+  return <Checkbox checked={value} size="small" disabled />
+}

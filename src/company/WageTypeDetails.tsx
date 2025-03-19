@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Dialog, DialogContent, DialogTitle, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Chip, Dialog, DialogContent, DialogTitle, Stack, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useMemo, useReducer, useState } from "react";
 import { getRowGridSx } from "../payrun/utils";
 import { useTranslation } from "react-i18next";
@@ -7,11 +7,11 @@ import { LookupValue } from "../models/LookupSet";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
 import { Collector } from "../models/Collector";
-import { WageType, WageTypeWithAccount } from "../models/WageType";
+import { WageType, WageTypeDetailed } from "../models/WageType";
 
 
 type WageTypeDetailsProps = {
-  wageType: WageTypeWithAccount
+  wageType: WageTypeDetailed
   onClose: () => void
 }
 
@@ -19,11 +19,11 @@ const dialogColumns = getRowGridSx([{ width: 150 }, { width: 150, flex: 1 }], 2)
 export function WageTypeDetails({ wageType, onClose }: WageTypeDetailsProps) {
   const { t } = useTranslation();
   const fetcher = useFetcher();
-  const { accountMasterMap, regulationId, fibuAccountLookup, collectors, wageTypeAttributeTranslations } = useLoaderData() as WageTypeControllingLoaderData;
+  const { accountMasterMap, regulationId, fibuAccountLookup, wageTypePayrollControllingLookup, collectors } = useLoaderData() as WageTypeControllingLoaderData;
   const [state, dispatch] = useReducer(reducer, { wageType, accountMasterMap }, createInitialState);
 
   const onSubmit = () => {
-    const lookupValue = {
+    const accountLookupValue = {
       ...wageType.accountLookupValue,
       key: wageType.wageTypeNumber.toString(),
       value: JSON.stringify({
@@ -32,11 +32,31 @@ export function WageTypeDetails({ wageType, onClose }: WageTypeDetailsProps) {
       })
     }
 
+
+    const payrollControllingLookupValue = wageTypePayrollControllingLookup.values.find(x => x.key === wageType.wageTypeNumber.toString());
+    let controllingLookupValue: any = null;
+    if (state.controlling === true && !payrollControllingLookupValue) {
+      controllingLookupValue = {
+        key: wageType.wageTypeNumber.toString(),
+        value: "true"
+      }
+    }
+
+    if (state.controlling === false && !!payrollControllingLookupValue) {
+      controllingLookupValue = payrollControllingLookupValue
+    }
+
     fetcher.submit({
       wageType,
       regulationId,
-      lookupId: fibuAccountLookup.id,
-      lookupValue: lookupValue
+      accountLookupValue: {
+        lookupId: fibuAccountLookup.id,
+        lookupValue: accountLookupValue
+      },
+      controllingLookupValue: {
+        lookupId: wageTypePayrollControllingLookup.id,
+        lookupValue: controllingLookupValue
+      }
     },
       { method: "POST", encType: "application/json" });
   }
@@ -59,6 +79,10 @@ export function WageTypeDetails({ wageType, onClose }: WageTypeDetailsProps) {
           <Box sx={dialogColumns}>
             <Typography>{t("Collectors")}</Typography>
             <WageTypeCollectors wageType={wageType} collectors={collectors} />
+          </Box>
+          <Box sx={dialogColumns}>
+            <Typography>{t("payrun_period_wage_controlling")}</Typography>
+            <Controlling value={state.controlling} onToggle={() => dispatch({ type: "toggle_controlling" })} />
           </Box>
         </Stack>
       </DialogContent>
@@ -85,6 +109,7 @@ export function WageTypeDetails({ wageType, onClose }: WageTypeDetailsProps) {
 type WageTypeFormState = {
   credit: LookupValue | null,
   debit: LookupValue | null,
+  controlling: "system" | boolean
 }
 
 type WageTypeFormAction = {
@@ -93,6 +118,8 @@ type WageTypeFormAction = {
 } | {
   type: "set_debit"
   lookupValue: LookupValue | null
+} | {
+  type: "toggle_controlling"
 }
 
 function reducer(state: WageTypeFormState, action: WageTypeFormAction): WageTypeFormState {
@@ -107,23 +134,32 @@ function reducer(state: WageTypeFormState, action: WageTypeFormAction): WageType
         ...state,
         debit: action.lookupValue
       };
+    case "toggle_controlling": {
+      if (state.controlling === "system")
+        return state;
+      return {
+        ...state,
+        controlling: !state.controlling
+      }
+    }
   }
 
 }
 
 type InitialStateProps = {
-  wageType: WageTypeWithAccount
+  wageType: WageTypeDetailed
   accountMasterMap: Map<string, LookupValue>
 }
 
 function createInitialState({ wageType, accountMasterMap }: InitialStateProps): WageTypeFormState {
   return {
     credit: accountMasterMap.get(wageType.accountLookupValue?.value?.creditAccountNumber ?? "") ?? null,
-    debit: accountMasterMap.get(wageType.accountLookupValue?.value?.debitAccountNumber ?? "") ?? null
+    debit: accountMasterMap.get(wageType.accountLookupValue?.value?.debitAccountNumber ?? "") ?? null,
+    controlling: wageType.controllingEnabled
   };
 }
 
-function WageTypeAttributes({ wageType }: { wageType: WageTypeWithAccount }) {
+function WageTypeAttributes({ wageType }: { wageType: WageTypeDetailed }) {
   return (
     <Stack direction="row" flexWrap="wrap" spacing={0.5}>
       <WageTypeAttributeChip wageType={wageType} attribute="Accounting.Credit" category="Accounting" />
@@ -141,7 +177,7 @@ function WageTypeAttributes({ wageType }: { wageType: WageTypeWithAccount }) {
   )
 }
 
-function WageTypeCollectors({ wageType, collectors }: { wageType: WageTypeWithAccount, collectors: Collector[] }) {
+function WageTypeCollectors({ wageType, collectors }: { wageType: WageTypeDetailed, collectors: Collector[] }) {
   const groupedCollectors = useMemo(() => Object.groupBy(collectors, ({ name }) => wageType.collectors?.includes(name) ? "active" : "inactive"), [collectors, wageType.collectors]) as Record<"active" | "inactive", Collector[]>;
   return (
     <Stack direction="row" flexWrap="wrap" spacing={0.5}>
@@ -195,5 +231,15 @@ function InactiveCollectors({ collectors }: { collectors: Collector[] }) {
   }
 
   return collectors.map(collector => <CollectorChip key={collector.id} collectorName={collector.displayName} active={false} />);
+}
 
+type ControllingProps = {
+  value: "system" | boolean
+  onToggle: () => void
+}
+function Controlling({ value, onToggle }: ControllingProps) {
+  const { t } = useTranslation();
+  if (value === "system")
+    return <Typography>{t("automatic")}</Typography>
+  return <Checkbox checked={value} size="small" onChange={onToggle} sx={{ justifySelf: "start" }} />
 }
