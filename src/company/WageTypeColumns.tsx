@@ -1,5 +1,5 @@
 
-import { Checkbox, Typography } from "@mui/material";
+import { Checkbox, IconButton, Tooltip, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { WageTypeDetailed } from "../models/WageType";
@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
 import { useLoaderData, useNavigation, useSubmit } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
+import { WageTypeDetails } from "./WageTypeDetails";
+import { Info } from "@mui/icons-material";
 
 const columnHelper = createColumnHelper<WageTypeDetailed>();
 function createColumns() {
@@ -52,7 +54,29 @@ function createColumns() {
           return <ControllingCell checked={wageType.controllingEnabled} wageTypeNumber={wageType.wageTypeNumber.toString()} />;
         },
         header: ({ t }) => t("payrun_period_wage_controlling"),
-        size: 170,
+        size: 140,
+        meta: {
+          alignment: "center"
+        }
+      }),
+    columnHelper.display(
+      {
+        id: "details",
+        cell: (props) => {
+          const { t } = useTranslation();
+          const [open, setOpen] = useState<boolean>(false);
+          return (
+            <>
+              <Tooltip title={t("Details")}>
+                <IconButton size="small" onClick={() => setOpen(true)}>
+                  <Info />
+                </IconButton>
+              </Tooltip>
+              {open && <WageTypeDetails wageType={props.row.original} onClose={() => setOpen(false)} />}
+            </>
+          )
+        },
+        size: 40,
         meta: {
           alignment: "center"
         }

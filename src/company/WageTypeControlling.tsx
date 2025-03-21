@@ -1,5 +1,5 @@
 import { Box, Stack, SxProps, Theme, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { useLoaderData } from "react-router-dom";
 import { columns } from "./WageTypeColumns";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { getRowGridSx } from "../payrun/utils";
 import { LookupSet, LookupValue } from "../models/LookupSet";
 import { IdType } from "../models/IdType";
-import { WageTypeDetails } from "./WageTypeDetails";
 import { Collector } from "../models/Collector";
 import { WageTypeDetailed } from "../models/WageType";
 
@@ -38,7 +37,7 @@ export function WageTypeControlling() {
   })), 1);
 
   return <>
-    <Stack>
+    <Stack sx={{ overflow: "auto", height: "calc(100vh - 212px)" }}>
       {table.getHeaderGroups().map(headerGroup => {
         return (
           <Box key={headerGroup.id} sx={rowGridSx}>
@@ -66,9 +65,9 @@ export function WageTypeControlling() {
                 const { alignment } = (cell.column.columnDef.meta || {});
                 const cellContext = cell.getContext();
                 return (
-                  <Typography key={cell.id} align={alignment} noWrap sx={{ px: 0.25, py: 0.5 }}>
+                  <Box key={cell.id} sx={{ px: 0.25, py: 0.5 }} justifySelf={alignment}>
                     {flexRender(cell.column.columnDef.cell, { ...cellContext, t })}
-                  </Typography>
+                  </Box>
 
                 );
               })}
@@ -77,7 +76,6 @@ export function WageTypeControlling() {
         })
       }
     </Stack>
-    {/* selected && <WageTypeDetails wageType={selected} onClose={onClose} /> */}
   </>
 }
 

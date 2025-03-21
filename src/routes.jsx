@@ -999,7 +999,7 @@ const routeData = [
 							const response = await action({ ...params, ...requestParams, lookupValueId: lookupValue.id }, lookupValue);
 							if (response.ok) {
 								toast("success", "Updated!");
-								return {success: true};
+								return { success: true };
 							} else {
 								toast("error", "Action failed");
 								return null;
