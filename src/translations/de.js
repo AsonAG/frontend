@@ -268,6 +268,9 @@ const translations = {
 		"Account number": "Kontonummer",
 		"Action failed": "Aktion fehlgeschlagen",
 		"automatic": "automatisch",
+		"Delete value": "Wert löschen",
+		"Do you really want to delete this value?": "Möchten Sie diesen Wert wirklich löschen?",
+		"This account is associated with a wage type": "Dieses Konto ist einer Lohnart zugewiesen",
 
 		// Command
 		"Select event": "Ereignis auswählen",

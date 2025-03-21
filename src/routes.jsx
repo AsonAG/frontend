@@ -179,20 +179,27 @@ function createRouteCaseForm(path, data) {
 	};
 }
 
-function createRouteLookupForm(path, lookupName, keyName) {
+function createRouteLookupForm(path, lookupName, keyName, loader) {
+	const defaultLoader = async ({ params }) => {
+		const regulation = await store.get(clientRegulationAtom);
+		if (!regulation)
+			return null;
+		const lookup = await getLookupSet({ regulationId: regulation.id, ...params }, lookupName);
+		return {
+			lookup,
+			keyName,
+			regulationId: regulation.id,
+		};
+	};
 	return {
 		path,
 		Component: MasterLookupTable,
-		loader: async ({ params }) => {
-			const regulation = await store.get(clientRegulationAtom);
-			if (!regulation)
-				return null;
-			const lookup = await getLookupSet({ regulationId: regulation.id, ...params }, lookupName);
-			return {
-				lookup,
-				keyName,
-				regulationId: regulation.id,
-			};
+		loader: async (arg) => {
+			let data = await defaultLoader(arg);
+			if (loader) {
+				data = await loader(data, arg);
+			}
+			return data;
 		},
 		action: async ({ params, request }) => {
 			const formData = await request.formData();
@@ -1006,7 +1013,21 @@ const routeData = [
 							}
 						}
 					},
-					createRouteLookupForm("accountmaster", "AccountMaster", "Account number"),
+					createRouteLookupForm("accountmaster", "AccountMaster", "Account number", async (data, { params }) => {
+						const wageTypes = await store.get(payrollWageTypesWithAccountingInfoAtom);
+						const canDelete = (key) => {
+							for (const wt of wageTypes) {
+								if (wt.accountLookupValue?.value?.creditAccountNumber === key || wt.accountLookupValue?.value?.debitAccountNumber === key) {
+									return [false, "This account is associated with a wage type"];
+								}
+							}
+							return [true, null];
+						}
+						return {
+							...data,
+							canDelete
+						}
+					}),
 					createRouteLookupForm("costcentermaster", "CostCenterMaster", "Cost center"),
 					createRouteCaseForm("onboarding/:caseName", {
 					}),
