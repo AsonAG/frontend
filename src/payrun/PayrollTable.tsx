@@ -106,7 +106,7 @@ export const PayrunTable = memo(function PayrunTable({ entries, completed }: Pay
     } : {}
   return (
     <Stack>
-      <Stack sx={{ overflow: "auto", height: "calc(100vh - 165px)", ...containerWidth }}>
+      <Stack sx={{ overflow: "auto", height: "calc(100vh - 173px)", ...containerWidth }}>
         <Box
           component="div"
           sx={
