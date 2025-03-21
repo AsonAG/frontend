@@ -18,9 +18,9 @@ export type WageTypeDetailed = {
 } & WageType
 
 export type AccountLookupValue = {
-  id: IdType
+  id?: IdType
   key: string
-  created: string
+  created?: string
   value: WageTypeAccounts
 }
 type WageTypeAccounts = {

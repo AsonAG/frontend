@@ -25,8 +25,6 @@ export type WageTypeControllingLoaderData = {
 export function WageTypeControlling() {
   const { t } = useTranslation();
   const { wageTypes } = useLoaderData() as WageTypeControllingLoaderData;
-  const [selected, setSelected] = useState<WageTypeDetailed | null>(null);
-  const onClose = () => setSelected(null);
   const table = useReactTable({
     columns: columns,
     data: wageTypes,
@@ -63,7 +61,7 @@ export function WageTypeControlling() {
         table.getRowModel().rows.map(row => {
           const rowSx = { ...rowGridSx, ...getRowSx(row.original) }
           return (
-            <Box key={row.id} sx={rowSx} onClick={() => setSelected(row.original)}>
+            <Box key={row.id} sx={rowSx}>
               {row.getVisibleCells().map(cell => {
                 const { alignment } = (cell.column.columnDef.meta || {});
                 const cellContext = cell.getContext();
@@ -79,7 +77,7 @@ export function WageTypeControlling() {
         })
       }
     </Stack>
-    {selected && <WageTypeDetails wageType={selected} onClose={onClose} />}
+    {/* selected && <WageTypeDetails wageType={selected} onClose={onClose} /> */}
   </>
 }
 

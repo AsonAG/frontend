@@ -272,7 +272,7 @@ export const payrollWageTypesWithAccountingInfoAtom = atomWithRefresh<Promise<Wa
 		const accountLookupValue: AccountLookupValue | null = lookupValue ? { ...lookupValue, value: JSON.parse(lookupValue.value) } : null;
 		const accountAssignmentRequired =
 			wt.attributes?.["Accounting.Relevant"] === "Y" &&
-			(!accountLookupValue?.value?.creditAccountNumber &&
+			(!accountLookupValue?.value?.creditAccountNumber ||
 				!accountLookupValue?.value?.debitAccountNumber);
 		const payrollControllingAttribute = wt.attributes?.["PayrollControlling"];
 		return {

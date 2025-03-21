@@ -6,8 +6,8 @@ export type LookupSet = {
 }
 
 export type LookupValue = {
-  id: IdType
+  id?: IdType
   key: string
-  created: string
+  created?: string
   value: string
 }

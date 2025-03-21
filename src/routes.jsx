@@ -969,7 +969,6 @@ const routeData = [
 								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
 								getPayrollCollectors(params)
 							]);
-							console.log(wageTypeAttributeTranslations);
 							const accountMasterMap = new Map(accountMaster.values.map(x => [x.key, x]));
 							const attributeTranslationMap = new Map(wageTypeAttributeTranslations.values.map(x => [x.key, x]));
 							return {
@@ -984,33 +983,23 @@ const routeData = [
 							}
 						},
 						action: async ({ params, request }) => {
-							const { accountLookupValue, controllingLookupValue, regulationId } = await request.json();
-							async function updateAccountLookup(lookupId, lookupValue) {
-								const actionParams = { regulationId, lookupId, lookupValueId: lookupValue.id, ...params };
-								const action = !!lookupValue.id ? updateLookupValue : addLookupValue;
-								const response = await action(actionParams, lookupValue);
-								return response.ok;
+							const { lookupValue, ...requestParams } = await request.json();
+							let action;
+							switch (request.method) {
+								case "POST":
+									action = addLookupValue;
+									break;
+								case "PUT":
+									action = updateLookupValue;
+									break;
+								case "DELETE":
+									action = deleteLookupValue;
+									break;
 							}
-							async function updateControllingLookup(lookupId, lookupValue) {
-								if (lookupValue === null)
-									return true;
-								const actionParams = { regulationId, lookupId, lookupValueId: lookupValue.id, ...params };
-								const action = !!lookupValue.id ? deleteLookupValue : addLookupValue;
-								const response = await action(actionParams, lookupValue);
-								return response.ok;
-							}
-
-							const [
-								accountLookupResponse,
-								controllingLookupResponse
-							] = await Promise.all([
-								updateAccountLookup(accountLookupValue.lookupId, accountLookupValue.lookupValue),
-								updateControllingLookup(controllingLookupValue.lookupId, controllingLookupValue.lookupValue),
-							]);
-
-							if (accountLookupResponse && controllingLookupResponse) {
+							const response = await action({ ...params, ...requestParams, lookupValueId: lookupValue.id }, lookupValue);
+							if (response.ok) {
 								toast("success", "Updated!");
-								return { success: true };
+								return {success: true};
 							} else {
 								toast("error", "Action failed");
 								return null;
