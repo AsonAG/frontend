@@ -81,13 +81,12 @@ export function WageTypeControlling() {
 
 function getRowSx(row: WageTypeDetailed): SxProps<Theme> {
   return {
-    height: 36,
+    height: 42,
     alignItems: "center",
     userSelect: "none",
     backgroundColor: (theme: Theme) => row.accountAssignmentRequired ? theme.palette.selectionAttention.dark : theme.palette.background.default,
     "&:hover": {
       backgroundColor: (theme: Theme) => row.accountAssignmentRequired ? theme.palette.selectionAttention.light : theme.palette.selection.main,
-      cursor: "pointer"
     }
   }
 }

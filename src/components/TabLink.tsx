@@ -52,9 +52,9 @@ const Link = styled(
 
 const Button = styled("div")(({ theme }) => styling(theme));
 
-export function TabLink({ to, title, badgeCount }: { to: string, title: string, badgeCount?: number }) {
+export function TabLink({ to, title, badgeCount, asDot = false }: { to: string, title: string, badgeCount?: number, asDot?: boolean }) {
   return (
-    <Badge badgeContent={badgeCount} color="warning" variant="oob">
+    <Badge badgeContent={badgeCount} color="warning" variant={asDot ? "dot" : "oob"}>
       <Link to={to}>
         <Typography>{title}</Typography>
       </Link>

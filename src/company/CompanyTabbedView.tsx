@@ -32,7 +32,7 @@ function ConfigTabs() {
   const { missingWageTypeAccountInfoCount } = useLoaderData() as LoaderData;
   return (
     <>
-      <TabLink title={t("Wage types")} to="wagetypemaster" badgeCount={missingWageTypeAccountInfoCount} />
+      <TabLink title={t("Wage types")} to="wagetypemaster" badgeCount={missingWageTypeAccountInfoCount} asDot />
       <TabLink title={t("Account master")} to="accountmaster" />
       <TabLink title={t("Cost center")} to="costcentermaster" />
     </>
