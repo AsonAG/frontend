@@ -18,6 +18,7 @@ export function FieldValueDateComponent({
 	propertyName = "value",
 	displayName,
 	required,
+	...otherProps
 }) {
 	const {
 		field,
@@ -48,6 +49,7 @@ export function FieldValueDateComponent({
 			sx={{
 				flex: 1,
 			}}
+			{...otherProps}
 		/>
 	);
 }

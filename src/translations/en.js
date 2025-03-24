@@ -27,6 +27,7 @@ const translations = {
 		"payrun_period_without_occupation": "Without occupation",
 		"dashboard_payout_header": "Payout",
 		"inactive_collector_chip": "{{count}} inactive collectors...",
+		// "date_accounting_start_date_validation": "Date has to be greater than the payroll accounting start date ({{accountingStartDate}})"
 	},
 };
 

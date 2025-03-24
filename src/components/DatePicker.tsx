@@ -52,7 +52,9 @@ interface DateTimePickerProps extends MuiDateTimePickerProps<Dayjs> {
 
 type DatePickerVariants = "standard" | "datetime" | "month" | "year";
 
-type Props<T> = T extends "datetime" ? DateTimePickerProps : DatePickerProps;
+type Props<T> = (T extends "datetime" ? DateTimePickerProps : DatePickerProps) & {
+	minDateErrorMessage?: string
+};
 
 export function DatePicker<T extends DatePickerVariants>({
 	variant,
@@ -60,6 +62,7 @@ export function DatePicker<T extends DatePickerVariants>({
 	slotProps,
 	required = false,
 	onChange,
+	minDateErrorMessage,
 	...datePickerProps
 }: Props<T>) {
 	const { user } = useRouteLoaderData("root") as any;
@@ -74,8 +77,8 @@ export function DatePicker<T extends DatePickerVariants>({
 			DateValidationError | DateTimeValidationError
 		>,
 	) => {
-		const validationError = getValidationError(context.validationError, t);
-		inputRef.current?.setCustomValidity(validationError);
+		const validationError = getValidationError({ validationError: context.validationError, minDateErrorMessage });
+		inputRef.current?.setCustomValidity(t(validationError));
 		if (!validationError && onChange) {
 			// @ts-ignore
 			onChange(newDate);
@@ -134,7 +137,10 @@ export function DatePicker<T extends DatePickerVariants>({
 			inputRef.current?.setCustomValidity("");
 			return;
 		}
-		const validationError = !value ? t("Please enter a date") : "";
+		let validationError = ""
+		if (!value) {
+			validationError = t("Please enter a date");
+		}
 		inputRef.current?.setCustomValidity(validationError);
 	}, [value, inputRef.current, required]);
 
@@ -158,9 +164,19 @@ export function DatePicker<T extends DatePickerVariants>({
 	);
 }
 
-function getValidationError(validationError, t) {
-	if (validationError === "minDate" || validationError === "maxDate")
-		return t("Date is not in the valid range.");
-	if (validationError) return t("Invalid date");
+type GetValidationErrorProps = {
+	validationError: DateTimeValidationError
+	minDateErrorMessage?: string
+}
+function getValidationError({ validationError, minDateErrorMessage }: GetValidationErrorProps) {
+	if (validationError === "minDate") {
+		return minDateErrorMessage ?? "Date is not in the valid range.";
+	}
+	if (validationError === "maxDate") {
+		return "Date is not in the valid range.";
+	}
+	if (validationError) {
+		return "Invalid date";
+	}
 	return "";
 }
