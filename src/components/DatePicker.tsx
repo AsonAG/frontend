@@ -13,7 +13,7 @@ import { useRouteLoaderData } from "react-router-dom";
 import { getDateLocale } from "../services/converters/DateLocaleExtractor";
 import { InputAdornment, InputAdornmentProps, IconButton } from "@mui/material";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
-import React, { MouseEventHandler, useEffect, useRef } from "react";
+import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 
@@ -71,15 +71,16 @@ export function DatePicker<T extends DatePickerVariants>({
 	const Picker = variant === "datetime" ? MuiDateTimePicker : MuiDatePicker;
 	let pickerProps = {};
 	const { value } = datePickerProps;
+	const [validationError, setValidationError] = useState<string>("");
 	const handleDateChange = (
 		newDate: Dayjs | null,
 		context: PickerChangeHandlerContext<
 			DateValidationError | DateTimeValidationError
 		>,
 	) => {
-		const validationError = getValidationError({ validationError: context.validationError, minDateErrorMessage });
-		inputRef.current?.setCustomValidity(t(validationError));
-		if (!validationError && onChange) {
+		setValidationError(getValidationError({ validationError: context.validationError, minDateErrorMessage }));
+		const isValid = newDate === null || newDate.isValid();
+		if (isValid && onChange) {
 			// @ts-ignore
 			onChange(newDate);
 		}
@@ -133,16 +134,20 @@ export function DatePicker<T extends DatePickerVariants>({
 	// populates the input field with a placeholder.
 	// The default HTML Form validation error message won't display because of that.
 	useEffect(() => {
+		if (validationError) {
+			inputRef.current?.setCustomValidity(t(validationError));
+			return;
+		}
 		if (!required) {
 			inputRef.current?.setCustomValidity("");
 			return;
 		}
-		let validationError = ""
+		let error = ""
 		if (!value) {
-			validationError = t("Please enter a date");
+			error = t("Please enter a date");
 		}
-		inputRef.current?.setCustomValidity(validationError);
-	}, [value, inputRef.current, required]);
+		inputRef.current?.setCustomValidity(error);
+	}, [value?.toISOString(), inputRef.current, required, validationError]);
 
 	return (
 		<LocalizationProvider
