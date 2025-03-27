@@ -149,6 +149,8 @@ const headerSx: SxProps<Theme> = {
 }
 
 function WageTypeCategoryHeader({ header, expanded, onClick, index }: WageTypeCategoryHeaderProps) {
+  const { attributeTranslationMap } = useLoaderData() as WageTypeControllingLoaderData;
+  const text = attributeTranslationMap.get(header)?.value ?? header;
   const icon = expanded ? <ExpandLess /> : <ExpandMore />;
   return (
     <Stack direction="row"
@@ -160,7 +162,7 @@ function WageTypeCategoryHeader({ header, expanded, onClick, index }: WageTypeCa
         zIndex: 10 + index
       }}>
       {icon}
-      <Typography>{header}</Typography>
+      <Typography>{text}</Typography>
     </Stack>
   )
 
