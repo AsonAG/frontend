@@ -272,6 +272,7 @@ const translations = {
 		"Do you really want to delete this value?": "Möchten Sie diesen Wert wirklich löschen?",
 		"This account is associated with a wage type": "Dieses Konto ist einer Lohnart zugewiesen",
 		"date_accounting_start_date_validation": "Datum muss grösser oder gleich dem Startdatum der Lohnbuchhaltung ({{accountingStartDate}}) sein",
+		"Without category": "Ohne Kategorie",
 
 		// Command
 		"Select event": "Ereignis auswählen",

@@ -1,4 +1,4 @@
-import { Box, Stack, SxProps, Theme, Typography } from "@mui/material";
+import { Badge, Box, Stack, SxProps, Theme, Typography } from "@mui/material";
 import React, { useMemo, useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { columns } from "./WageTypeColumns";
@@ -40,8 +40,10 @@ export function WageTypeControlling() {
     flex: col.columnDef.meta?.flex
   })), 1);
 
-  const groupedRows = useMemo(() => {
-    return Object.groupBy(table.getRowModel().rows, ({ original }) => original.attributes?.["Wage.Category"]) as Record<string, Array<Row<WageTypeDetailed>>>
+  const [rowsByCategory, withoutCategory] = useMemo(() => {
+    const grouped = Object.groupBy(table.getRowModel().rows, ({ original }) => original.attributes?.["Wage.Category"] ?? "noCategory") as Record<string, Array<Row<WageTypeDetailed>>>
+    const { noCategory, ...result } = grouped;
+    return [result, noCategory];
   }, [table.getRowModel().rows]);
 
   return <>
@@ -72,10 +74,12 @@ export function WageTypeControlling() {
       }
       )}
       {
-        Object.entries(groupedRows).map(([category, rows], index) =>
-          <WageTypeCategoryGroup key={category} category={category} rows={rows} rowGridSx={rowGridSx} index={index} />
+        Object.entries(rowsByCategory).map(([category, rows]) =>
+          <WageTypeCategoryGroup key={category} category={category} rows={rows} rowGridSx={rowGridSx} />
         )
+
       }
+      <WageTypeCategoryGroup category={t("Without category")} rows={withoutCategory} rowGridSx={rowGridSx} />
     </Stack>
   </>
 }
@@ -93,12 +97,17 @@ type WageTypeCategoryProps = {
   category: string
   rows: Array<Row<WageTypeDetailed>>
   rowGridSx: SxProps<Theme>
-  index: number
 }
 
-function WageTypeCategoryGroup({ category, rows, rowGridSx, index }: WageTypeCategoryProps) {
-  const [expanded, setExpanded] = useState<boolean>(true);
-  const header = <WageTypeCategoryHeader header={category} expanded={expanded} onClick={() => setExpanded(p => !p)} index={index} />;
+function WageTypeCategoryGroup({ category, rows, rowGridSx }: WageTypeCategoryProps) {
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const hasMissingData = rows.filter(r => r.original.accountAssignmentRequired).length > 0;
+  const header =
+    <WageTypeCategoryHeader
+      header={category}
+      expanded={expanded}
+      onClick={() => setExpanded(p => !p)}
+      hasMissingData={hasMissingData} />;
   if (!expanded) {
     return header;
   }
@@ -129,7 +138,7 @@ type WageTypeCategoryHeaderProps = {
   header: string
   expanded: boolean
   onClick: () => void
-  index: number
+  hasMissingData: boolean
 }
 
 const headerSx: SxProps<Theme> = {
@@ -137,7 +146,7 @@ const headerSx: SxProps<Theme> = {
   minHeight: 36,
   maxHeight: 36,
   alignItems: "center",
-  backgroundColor: theme => theme.palette.background.default,
+  backgroundColor: theme => blend(theme.palette.background.default, theme.palette.action.hover, theme.palette.action.hoverOpacity * 1.5),
   borderColor: theme => theme.palette.divider,
   borderStyle: "solid",
   borderWidth: 0,
@@ -148,7 +157,7 @@ const headerSx: SxProps<Theme> = {
   }
 }
 
-function WageTypeCategoryHeader({ header, expanded, onClick, index }: WageTypeCategoryHeaderProps) {
+function WageTypeCategoryHeader({ header, expanded, onClick, hasMissingData }: WageTypeCategoryHeaderProps) {
   const { attributeTranslationMap } = useLoaderData() as WageTypeControllingLoaderData;
   const text = attributeTranslationMap.get(header)?.value ?? header;
   const icon = expanded ? <ExpandLess /> : <ExpandMore />;
@@ -158,12 +167,16 @@ function WageTypeCategoryHeader({ header, expanded, onClick, index }: WageTypeCa
       spacing={1}
       sx={{
         ...headerSx,
-        borderBottomWidth: expanded ? 1 : 0,
-        zIndex: 10 + index
+        borderBottomWidth: expanded ? 1 : 0
       }}>
       {icon}
-      <Typography>{text}</Typography>
+      <Badge variant={hasMissingData ? "dot" : "standard"} color="warning" sx={{
+        "& .MuiBadge-badge": {
+          top: 3
+        }
+      }}>
+        <Typography pr={0.5}>{text}</Typography>
+      </Badge>
     </Stack>
   )
-
 }
