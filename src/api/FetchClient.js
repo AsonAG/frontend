@@ -12,6 +12,10 @@ const payrollsUrl = "/tenants/:orgId/payrolls";
 const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
 const payrollRegulationsUrl = "/tenants/:orgId/payrolls/:payrollId/regulations";
 const divisionsUrl = "/tenants/:orgId/divisions";
+const regulationsUrl = "/tenants/:orgId/regulations";
+const lookupSetUrl = "/tenants/:orgId/regulations/:regulationId/lookups/sets";
+const lookupValuesUrl = "/tenants/:orgId/regulations/:regulationId/lookups/:lookupId/values";
+const lookupValueUrl = "/tenants/:orgId/regulations/:regulationId/lookups/:lookupId/values/:lookupValueId";
 const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
 const caseChangeCaseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
 const caseValueCountUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values/count";
@@ -19,8 +23,10 @@ const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values";
 const timeValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values/time";
 const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
 const missingDataEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
-const lookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
+const payrollLookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
+const payrollWageTypeMasterUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
+const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
 const employeeUrl = "/tenants/:orgId/employees/:employeeId";
@@ -566,10 +572,10 @@ export async function getUser(routeParams, identifier) {
 }
 
 export function getLookupValues(routeParams, lookupName) {
-	return new FetchRequestBuilder(lookupValuesUrl, routeParams)
+	return new FetchRequestBuilder(payrollLookupValuesUrl, routeParams)
 		.withQueryParam("lookupNames", lookupName)
 		.withLocalization()
-		.fetchJson();
+		.fetchSingle();
 }
 
 export function getDocumentCaseFields(routeParams) {
@@ -640,6 +646,47 @@ export function cancelPayout(routeParams) {
 	return new FetchRequestBuilder(payoutUrl, routeParams)
 		.withMethod("POST")
 		.fetch();
+}
+
+export function getClientRegulation(routeParams) {
+	return new FetchRequestBuilder(regulationsUrl, routeParams)
+		.withQueryParam("filter", `name eq 'ClientRegulation:${routeParams.payrollId}'`)
+		.fetchSingle();
+}
+
+export function getLookupSet(routeParams, lookupName) {
+	return new FetchRequestBuilder(lookupSetUrl, routeParams)
+		.withQueryParam("filter", `name eq '${lookupName}'`)
+		.fetchSingle();
+}
+
+export function addLookupValue(routeParams, lookupValue) {
+	return new FetchRequestBuilder(lookupValuesUrl, routeParams)
+		.withMethod("POST")
+		.withBody(lookupValue)
+		.fetch();
+}
+export function updateLookupValue(routeParams, lookupValue) {
+	return new FetchRequestBuilder(lookupValueUrl, routeParams)
+		.withMethod("PUT")
+		.withBody(lookupValue)
+		.fetch();
+}
+export function deleteLookupValue(routeParams) {
+	return new FetchRequestBuilder(lookupValueUrl, routeParams)
+		.withMethod("DELETE")
+		.fetch();
+}
+
+export function getPayrollWageTypes(routeParams) {
+	return new FetchRequestBuilder(payrollWageTypeMasterUrl, routeParams)
+		.withLocalization()
+		.fetchJson();
+}
+export function getPayrollCollectors(routeParams) {
+	return new FetchRequestBuilder(payrollCollectorsUrl, routeParams)
+		.withLocalization()
+		.fetchJson();
 }
 
 export async function requestExportDataDownload(routeParams, name) {

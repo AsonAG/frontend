@@ -1,7 +1,6 @@
 import { TFunction } from "i18next";
 import { Dispatch } from "react";
 import { PayrunPeriodEntry } from "../models/PayrunPeriod";
-import { AvailableCase } from "../models/AvailableCase";
 import { PayrunTableAction, PayrunTableState } from "./PayrollTable";
 import { MissingData, MissingDataCase } from "../models/MissingData";
 

@@ -201,14 +201,18 @@ function createThemeSettings(mode: ThemeMode): ThemeOptions {
           },
         ],
         styleOverrides: {
-          badge: ({ theme }) => ({
-            height: 16,
-            minWidth: 16,
-            letterSpacing: 0,
-            paddingLeft: theme.spacing(0.5),
-            paddingRight: theme.spacing(0.5),
-          }),
-        },
+          badge: ({ theme, ownerState }) => {
+            if (ownerState?.variant !== "dot") {
+              return {
+                height: 16,
+                minWidth: 16,
+                letterSpacing: 0,
+                paddingLeft: theme.spacing(0.5),
+                paddingRight: theme.spacing(0.5),
+              };
+            }
+          },
+        }
       },
       MuiSkeleton: {
         styleOverrides: {

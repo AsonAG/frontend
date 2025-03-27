@@ -88,7 +88,7 @@ export function useLookupData(field, onChange) {
 				{ orgId, payrollId },
 				field.lookupSettings.lookupName,
 			);
-			const lookupValues = lookupData[0].values.map((lv) =>
+			const lookupValues = lookupData.values.map((lv) =>
 				JSON.parse(lv.value),
 			);
 

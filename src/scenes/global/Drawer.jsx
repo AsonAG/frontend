@@ -120,8 +120,10 @@ function EmployeeMissingDataBadge({ icon }) {
 	);
 
 }
+
+const unwrappedPayrollControllingDataTotalCountAtom = unwrap(payrollControllingDataTotalCountAtom, (prev => prev ?? 0));
 function PayrollBadgeIcon({ icon }) {
-	const count = useAtomValue(payrollControllingDataTotalCountAtom);
+	const count = useAtomValue(unwrappedPayrollControllingDataTotalCountAtom);
 	return (
 		<Badge badgeContent={count} color="warning" overlap="circular">
 			{icon}

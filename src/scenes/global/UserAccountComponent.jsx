@@ -39,9 +39,10 @@ function AuthenticatedUserSettings() {
 
 	const { t } = useTranslation();
 	const auth = useAuth();
-	const handleLogout = () => {
+	const handleLogout = async () => {
 		if (auth.isAuthenticated) {
-			auth.removeUser();
+			await auth.removeUser();
+			await auth.signoutRedirect();
 		}
 	};
 

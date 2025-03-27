@@ -53,9 +53,14 @@ import {
 	downloadData,
 	bootstrapPayrunPeriods,
 	getCompanyBankDetails as getCompanyBankAccountDetails,
-	getPayrunPeriodControllingTasks,
 	getEmployeeSalaryType,
-	getPreviousPayrunPeriod
+	getPreviousPayrunPeriod,
+	getLookupSet,
+	addLookupValue,
+	updateLookupValue,
+	deleteLookupValue,
+	getLookupValues,
+	getPayrollCollectors
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -78,7 +83,14 @@ import {
 	missingEmployeeDataMapAtom,
 	missingDataCompanyAtom,
 	onboardingCompanyAtom,
-	payrollControllingDataAtom
+	payrollControllingDataAtom,
+	clientRegulationAtom,
+	payrollWageTypesAtom,
+	payrollWageTypesWithMissingAccountInfoCountAtom,
+	payrollWageTypesWithAccountingInfoAtom,
+	fibuAccountLookupAtom,
+	refreshPayrollWageTypes,
+	wageTypeControllingLookupAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -91,6 +103,7 @@ import { OrganizationSettings } from "./organization/Settings";
 import { getEmployeeDisplayString } from "./models/Employee";
 import { DataValueHistory } from "./components/tables/DataTable";
 import { DataView } from "./components/DataView";
+import { MasterLookupTable } from "./components/MasterLookupTable";
 
 import { PayrunPeriodList } from "./payrun/List";
 import { ReviewOpenPeriod } from "./payrun/ReviewOpenPeriod";
@@ -101,6 +114,7 @@ import { base64ToBytes } from "./services/converters/BinaryConverter";
 import { CompanyTabbedView } from "./company/CompanyTabbedView";
 import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
+import { WageTypeControlling } from "./company/WageTypeControlling";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -162,6 +176,72 @@ function createRouteCaseForm(path, data) {
 				}
 			}
 		]
+	};
+}
+
+function createRouteLookupForm(path, lookupName, keyName, loader) {
+	const defaultLoader = async ({ params }) => {
+		const regulation = await store.get(clientRegulationAtom);
+		if (!regulation)
+			return null;
+		const lookup = await getLookupSet({ regulationId: regulation.id, ...params }, lookupName);
+		return {
+			lookup,
+			keyName,
+			regulationId: regulation.id,
+		};
+	};
+	return {
+		path,
+		Component: MasterLookupTable,
+		loader: async (arg) => {
+			let data = await defaultLoader(arg);
+			if (loader) {
+				data = await loader(data, arg);
+			}
+			return data;
+		},
+		action: async ({ params, request }) => {
+			const formData = await request.formData();
+			const regulationId = formData.get("regulationId");
+			const lookupId = formData.get("lookupId");
+			const lookupValueId = formData.get("lookupValueId");
+			const actionParams = { regulationId, lookupId, lookupValueId, ...params };
+			let successMessage;
+			let action;
+			switch (request.method) {
+				case "POST":
+					action = addLookupValue(actionParams, {
+						key: formData.get("key"),
+						value: formData.get("value")
+					});
+					successMessage = "Created!";
+					break;
+				case "PUT":
+					action = updateLookupValue(actionParams, {
+						id: formData.get("lookupValueId"),
+						key: formData.get("key"),
+						value: formData.get("value")
+					});
+					successMessage = "Updated!";
+					break;
+				case "DELETE":
+					action = deleteLookupValue(actionParams);
+					successMessage = "Deleted!";
+					break;
+				default:
+					throw new Response("", { status: 405 });
+			}
+			const response = await action;
+
+			if (response.ok) {
+				toast("success", successMessage);
+				return { success: true };
+			} else {
+				toast("error", "Action failed");
+				return null;
+			}
+		},
 	};
 }
 
@@ -847,14 +927,25 @@ const routeData = [
 			{
 				path: "company",
 				Component: withSuspense(CompanyTabbedView),
-				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathname !== nextUrl.pathname,
+				shouldRevalidate: ({ currentUrl, nextUrl, actionResult }) => currentUrl.pathname !== nextUrl.pathname || actionResult?.success,
 				loader: async () => {
 					store.set(missingDataCompanyAtom); // refresh
 					store.set(onboardingCompanyAtom);
+					refreshPayrollWageTypes();
+					const [
+						missingData,
+						onboardingTask,
+						missingWageTypeAccountInfoCount
+					] = await Promise.all([
+						store.get(missingDataCompanyAtom),
+						store.get(onboardingCompanyAtom),
+						store.get(payrollWageTypesWithMissingAccountInfoCountAtom)
+					]);
 					return {
 						pageTitle: "Company",
-						missingData: await store.get(missingDataCompanyAtom),
-						onboardingTaskCount: (await store.get(onboardingCompanyAtom)).length,
+						missingData,
+						missingWageTypeAccountInfoCount,
+						onboardingTaskCount: onboardingTask.length,
 					}
 				},
 				children: [
@@ -863,6 +954,81 @@ const routeData = [
 						Component: OnboardingView,
 						loader: () => store.get(onboardingCompanyAtom),
 					},
+					{
+						path: "wagetypemaster",
+						Component: WageTypeControlling,
+						loader: async ({ params }) => {
+							const regulation = await store.get(clientRegulationAtom);
+							if (!regulation)
+								return null;
+							const [
+								wageTypes,
+								fibuAccountLookup,
+								accountMaster,
+								wageTypePayrollControllingLookup,
+								wageTypeAttributeTranslations,
+								collectors
+							] = await Promise.all([
+								store.get(payrollWageTypesWithAccountingInfoAtom),
+								store.get(fibuAccountLookupAtom),
+								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster"),
+								store.get(wageTypeControllingLookupAtom),
+								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
+								getPayrollCollectors(params)
+							]);
+							const accountMasterMap = new Map(accountMaster.values.map(x => [x.key, x]));
+							const attributeTranslationMap = new Map(wageTypeAttributeTranslations.values.map(x => [x.key, x]));
+							return {
+								wageTypes,
+								collectors,
+								fibuAccountLookup,
+								wageTypePayrollControllingLookup,
+								accountMaster,
+								accountMasterMap,
+								attributeTranslationMap,
+								regulationId: regulation.id
+							}
+						},
+						action: async ({ params, request }) => {
+							const { lookupValue, ...requestParams } = await request.json();
+							let action;
+							switch (request.method) {
+								case "POST":
+									action = addLookupValue;
+									break;
+								case "PUT":
+									action = updateLookupValue;
+									break;
+								case "DELETE":
+									action = deleteLookupValue;
+									break;
+							}
+							const response = await action({ ...params, ...requestParams, lookupValueId: lookupValue.id }, lookupValue);
+							if (response.ok) {
+								toast("success", "Updated!");
+								return { success: true };
+							} else {
+								toast("error", "Action failed");
+								return null;
+							}
+						}
+					},
+					createRouteLookupForm("accountmaster", "AccountMaster", "Account number", async (data, { params }) => {
+						const wageTypes = await store.get(payrollWageTypesWithAccountingInfoAtom);
+						const canDelete = (key) => {
+							for (const wt of wageTypes) {
+								if (wt.accountLookupValue?.value?.creditAccountNumber === key || wt.accountLookupValue?.value?.debitAccountNumber === key) {
+									return [false, "This account is associated with a wage type"];
+								}
+							}
+							return [true, null];
+						}
+						return {
+							...data,
+							canDelete
+						}
+					}),
+					createRouteLookupForm("costcentermaster", "CostCenterMaster", "Cost center"),
 					createRouteCaseForm("onboarding/:caseName", {
 					}),
 					{

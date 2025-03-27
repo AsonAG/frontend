@@ -13,7 +13,7 @@ import { useRouteLoaderData } from "react-router-dom";
 import { getDateLocale } from "../services/converters/DateLocaleExtractor";
 import { InputAdornment, InputAdornmentProps, IconButton } from "@mui/material";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
-import React, { MouseEventHandler, useEffect, useRef } from "react";
+import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 
@@ -52,7 +52,9 @@ interface DateTimePickerProps extends MuiDateTimePickerProps<Dayjs> {
 
 type DatePickerVariants = "standard" | "datetime" | "month" | "year";
 
-type Props<T> = T extends "datetime" ? DateTimePickerProps : DatePickerProps;
+type Props<T> = (T extends "datetime" ? DateTimePickerProps : DatePickerProps) & {
+	minDateErrorMessage?: string
+};
 
 export function DatePicker<T extends DatePickerVariants>({
 	variant,
@@ -60,6 +62,7 @@ export function DatePicker<T extends DatePickerVariants>({
 	slotProps,
 	required = false,
 	onChange,
+	minDateErrorMessage,
 	...datePickerProps
 }: Props<T>) {
 	const { user } = useRouteLoaderData("root") as any;
@@ -68,15 +71,16 @@ export function DatePicker<T extends DatePickerVariants>({
 	const Picker = variant === "datetime" ? MuiDateTimePicker : MuiDatePicker;
 	let pickerProps = {};
 	const { value } = datePickerProps;
+	const [validationError, setValidationError] = useState<string>("");
 	const handleDateChange = (
 		newDate: Dayjs | null,
 		context: PickerChangeHandlerContext<
 			DateValidationError | DateTimeValidationError
 		>,
 	) => {
-		const validationError = getValidationError(context.validationError, t);
-		inputRef.current?.setCustomValidity(validationError);
-		if (!validationError && onChange) {
+		setValidationError(getValidationError({ validationError: context.validationError, minDateErrorMessage }));
+		const isValid = newDate === null || newDate.isValid();
+		if (isValid && onChange) {
 			// @ts-ignore
 			onChange(newDate);
 		}
@@ -130,13 +134,20 @@ export function DatePicker<T extends DatePickerVariants>({
 	// populates the input field with a placeholder.
 	// The default HTML Form validation error message won't display because of that.
 	useEffect(() => {
+		if (validationError) {
+			inputRef.current?.setCustomValidity(t(validationError));
+			return;
+		}
 		if (!required) {
 			inputRef.current?.setCustomValidity("");
 			return;
 		}
-		const validationError = !value ? t("Please enter a date") : "";
-		inputRef.current?.setCustomValidity(validationError);
-	}, [value, inputRef.current, required]);
+		let error = ""
+		if (!value) {
+			error = t("Please enter a date");
+		}
+		inputRef.current?.setCustomValidity(error);
+	}, [value?.toISOString(), inputRef.current, required, validationError]);
 
 	return (
 		<LocalizationProvider
@@ -158,9 +169,19 @@ export function DatePicker<T extends DatePickerVariants>({
 	);
 }
 
-function getValidationError(validationError, t) {
-	if (validationError === "minDate" || validationError === "maxDate")
-		return t("Date is not in the valid range.");
-	if (validationError) return t("Invalid date");
+type GetValidationErrorProps = {
+	validationError: DateTimeValidationError
+	minDateErrorMessage?: string
+}
+function getValidationError({ validationError, minDateErrorMessage }: GetValidationErrorProps) {
+	if (validationError === "minDate") {
+		return minDateErrorMessage ?? "Date is not in the valid range.";
+	}
+	if (validationError === "maxDate") {
+		return "Date is not in the valid range.";
+	}
+	if (validationError) {
+		return "Invalid date";
+	}
 	return "";
 }

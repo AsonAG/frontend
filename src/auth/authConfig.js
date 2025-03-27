@@ -20,10 +20,6 @@ export const authConfig = {
 	loadUserInfo: true,
 
 	onSigninCallback: async (user) => {
-		window.history.replaceState(
-			{},
-			window.document.title,
-			user?.state?.location || window.location.pathname,
-		);
-	},
+		location.href = user?.state?.location || "/";
+	}
 };
