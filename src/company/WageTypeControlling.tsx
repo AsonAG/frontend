@@ -101,6 +101,8 @@ type WageTypeCategoryProps = {
 
 function WageTypeCategoryGroup({ category, rows, rowGridSx }: WageTypeCategoryProps) {
   const [expanded, setExpanded] = useState<boolean>(false);
+  if (!rows || rows.length === 0)
+    return;
   const hasMissingData = rows.filter(r => r.original.accountAssignmentRequired).length > 0;
   const header =
     <WageTypeCategoryHeader
