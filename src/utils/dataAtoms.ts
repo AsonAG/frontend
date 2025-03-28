@@ -243,29 +243,16 @@ export const fibuAccountLookupAtom = atomWithRefresh<Promise<LookupSet>>(async (
 	return await getLookupSet({ orgId, payrollId, regulationId: regulation.id }, "WageTypeFibuAccount")
 });
 
-export const wageTypeControllingLookupAtom = atomWithRefresh<Promise<LookupSet>>(async (get) => {
-	const orgId = get(orgIdAtom);
-	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return [];
-	const regulation = await get(clientRegulationAtom);
-	if (!regulation)
-		return null;
-	return await getLookupSet({ orgId, payrollId, regulationId: regulation.id }, "WageTypePayrollControlling");
-});
-
 export const payrollWageTypesWithAccountingInfoAtom = atomWithRefresh<Promise<WageTypeDetailed[]>>(async (get) => {
 	const [
 		wageTypes,
 		fibuAccountLookup,
-		wageTypeControllingLookup
-	]: [WageType[], LookupSet, LookupSet] = await Promise.all([
+	]: [WageType[], LookupSet] = await Promise.all([
 		get(payrollWageTypesAtom),
 		get(fibuAccountLookupAtom),
-		get(wageTypeControllingLookupAtom)
 	]);
 
 	const accountMap = new Map(fibuAccountLookup.values.map(x => [x.key, x]))
-	const controllingSet = new Set(wageTypeControllingLookup.values.map(x => x.key));
 	return wageTypes.map(wt => {
 		const wageTypeNumber = wt.wageTypeNumber.toString();
 		const lookupValue = accountMap.get(wageTypeNumber);
@@ -274,12 +261,10 @@ export const payrollWageTypesWithAccountingInfoAtom = atomWithRefresh<Promise<Wa
 			wt.attributes?.["Accounting.Relevant"] === "Y" &&
 			(!accountLookupValue?.value?.creditAccountNumber ||
 				!accountLookupValue?.value?.debitAccountNumber);
-		const payrollControllingAttribute = wt.attributes?.["PayrollControlling"];
 		return {
 			...wt,
 			accountAssignmentRequired,
 			accountLookupValue,
-			controllingEnabled: !payrollControllingAttribute || payrollControllingAttribute === "N" ? "system" : controllingSet.has(wageTypeNumber)
 		}
 	});
 });
@@ -288,7 +273,6 @@ export function refreshPayrollWageTypes() {
 	const store = getDefaultStore();
 	store.set(payrollWageTypesAtom);
 	store.set(fibuAccountLookupAtom);
-	store.set(wageTypeControllingLookupAtom);
 	store.set(payrollWageTypesWithAccountingInfoAtom);
 
 }

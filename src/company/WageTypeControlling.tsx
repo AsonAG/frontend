@@ -19,6 +19,7 @@ export type WageTypeControllingLoaderData = {
   accountMasterMap: Map<string, LookupValue>
   fibuAccountLookup: LookupSet
   wageTypePayrollControllingLookup: LookupSet
+  controlTypesMap: Map<string, Map<string, string>>
   regulationId: IdType
   attributeTranslationMap: Map<string, LookupValue>
 }

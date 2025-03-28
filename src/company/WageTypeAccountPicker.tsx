@@ -1,4 +1,4 @@
-import { Autocomplete, Badge, Box, createFilterOptions, TextField, Typography } from "@mui/material";
+import { Autocomplete, Badge, Box, createFilterOptions, SxProps, TextField, Theme, Typography } from "@mui/material";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
@@ -79,9 +79,17 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageT
           }
         }
       }}
+      sx={autoCompleteSx}
       size="small"
     >
     </Autocomplete>
   )
 }
 );
+
+const autoCompleteSx: SxProps<Theme> = {
+  ".MuiAutocomplete-input": {
+    paddingTop: "0 !important",
+    paddingBottom: "0 !important"
+  }
+}

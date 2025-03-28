@@ -9,6 +9,7 @@ import { useLoaderData, useNavigation, useSubmit } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
 import { WageTypeDetails } from "./WageTypeDetails";
 import { Info } from "@mui/icons-material";
+import { ControllingPicker } from "./WageTypeControllingPicker";
 
 const columnHelper = createColumnHelper<WageTypeDetailed>();
 function createColumns() {
@@ -42,22 +43,22 @@ function createColumns() {
         header: ({ t }) => t("Debit"),
         size: 180
       }),
-    columnHelper.accessor("controllingEnabled",
+    columnHelper.display(
       {
         id: "controlling",
         cell: (props) => {
           const { t } = useTranslation();
+          const { controlTypesMap } = useLoaderData() as WageTypeControllingLoaderData;
           const wageType = props.row.original;
-          if (wageType.controllingEnabled === "system")
+          const wageTypeNumber = wageType.wageTypeNumber.toString()
+          const payrollControlling = wageType.attributes?.["PayrollControlling"];
+          const automaticControlling = !payrollControlling || payrollControlling === "N" || !controlTypesMap.has(wageTypeNumber);
+          if (automaticControlling)
             return <Typography noWrap>{t("automatic")}</Typography>
-
-          return <ControllingCell checked={wageType.controllingEnabled} wageTypeNumber={wageType.wageTypeNumber.toString()} />;
+          return <ControllingPicker wageTypeNumber={wageTypeNumber} controlTypes={controlTypesMap.get(wageTypeNumber)!} />;
         },
         header: ({ t }) => t("payrun_period_wage_controlling"),
-        size: 140,
-        meta: {
-          alignment: "center"
-        }
+        size: 180
       }),
     columnHelper.display(
       {

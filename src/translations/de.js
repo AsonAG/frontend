@@ -251,6 +251,8 @@ const translations = {
 		"Number": "Nummer",
 		"Collectors": "Basen",
 		"inactive_collector_chip": "{{count}} inaktive Basen...",
+		"{{count}} checks active": "{{count}} Kontrollen aktiv",
+		"No checks": "Keine Kontrolle",
 
 		"Column visibility": "Spaltensichtbarkeit",
 		"Table width": "Tabellenbreite",

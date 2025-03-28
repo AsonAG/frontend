@@ -85,12 +85,10 @@ import {
 	onboardingCompanyAtom,
 	payrollControllingDataAtom,
 	clientRegulationAtom,
-	payrollWageTypesAtom,
 	payrollWageTypesWithMissingAccountInfoCountAtom,
 	payrollWageTypesWithAccountingInfoAtom,
 	fibuAccountLookupAtom,
 	refreshPayrollWageTypes,
-	wageTypeControllingLookupAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -966,23 +964,37 @@ const routeData = [
 								fibuAccountLookup,
 								accountMaster,
 								wageTypePayrollControllingLookup,
+								wageTypeControlTypes,
 								wageTypeAttributeTranslations,
 								collectors
 							] = await Promise.all([
 								store.get(payrollWageTypesWithAccountingInfoAtom),
 								store.get(fibuAccountLookupAtom),
 								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster"),
-								store.get(wageTypeControllingLookupAtom),
+								getLookupSet({ regulationId: regulation.id, ...params }, "WageTypePayrollControlling"),
+								getLookupValues(params, "CH.Swissdec.WageTypesControlTypes"),
 								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
 								getPayrollCollectors(params)
 							]);
 							const accountMasterMap = new Map(accountMaster.values.map(x => [x.key, x]));
 							const attributeTranslationMap = new Map(wageTypeAttributeTranslations.values.map(x => [x.key, x]));
+							const controlTypesMap = new Map();
+							for (const value of wageTypeControlTypes.values) {
+								const keys = JSON.parse(value.key);
+								if (!Array.isArray(keys) || keys.length !== 2)
+									continue;
+								if (!controlTypesMap.has(keys[0])) {
+									controlTypesMap.set(keys[0], new Map());
+
+								}
+								controlTypesMap.get(keys[0]).set(keys[1], value.value);
+							}
 							return {
 								wageTypes,
 								collectors,
 								fibuAccountLookup,
 								wageTypePayrollControllingLookup,
+								controlTypesMap,
 								accountMaster,
 								accountMasterMap,
 								attributeTranslationMap,
