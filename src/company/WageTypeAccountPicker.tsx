@@ -55,7 +55,7 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageT
       filterOptions={filterOptions}
       renderInput={(params) => {
         return (
-          <Badge variant={value === null ? "dot" : "standard"} color="warning" component="div" sx={{ width: "100%" }}>
+          <Badge variant={!(wageType.accountLookupValue?.value?.[accountType]) ? "dot" : "standard"} color="warning" component="div" sx={{ width: "100%" }}>
             <TextField {...params} />
           </Badge>
         )
