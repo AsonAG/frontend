@@ -1,4 +1,4 @@
-import { Autocomplete, Box, createFilterOptions, TextField, Typography } from "@mui/material";
+import { Autocomplete, Badge, Box, createFilterOptions, TextField, Typography } from "@mui/material";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
@@ -53,7 +53,13 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageT
       value={value}
       options={accountMaster.values}
       filterOptions={filterOptions}
-      renderInput={(params) => <TextField {...params} />}
+      renderInput={(params) => {
+        return (
+          <Badge variant={value === null ? "dot" : "standard"} color="warning" component="div" sx={{ width: "100%" }}>
+            <TextField {...params} sx={{ backgroundColor: (theme) => value === null ? theme.palette.selectionAttention.dark : undefined }} />
+          </Badge>
+        )
+      }}
       onChange={(_, value, __, ___) => onChange(value)}
       getOptionLabel={option => `${option.key} ${option.value}`}
       renderOption={(props, option) => {

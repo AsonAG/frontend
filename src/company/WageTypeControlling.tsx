@@ -84,13 +84,10 @@ export function WageTypeControlling() {
   </>
 }
 
-function getRowSx(row: WageTypeDetailed): SxProps<Theme> {
-  return {
-    minHeight: 42,
-    maxHeight: 42,
-    alignItems: "center",
-    backgroundColor: (theme: Theme) => row.accountAssignmentRequired ? theme.palette.selectionAttention.dark : theme.palette.background.default
-  }
+const defaultRowSx: SxProps<Theme> = {
+  minHeight: 42,
+  maxHeight: 42,
+  alignItems: "center",
 }
 
 type WageTypeCategoryProps = {
@@ -117,7 +114,7 @@ function WageTypeCategoryGroup({ category, rows, rowGridSx }: WageTypeCategoryPr
     <>
       {header}
       {rows.map(row => {
-        const rowSx = { ...rowGridSx, ...getRowSx(row.original) }
+        const rowSx = { ...rowGridSx, ...defaultRowSx }
         return (
           <Box key={row.id} sx={rowSx}>
             {row.getVisibleCells().map(cell => {
