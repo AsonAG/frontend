@@ -56,7 +56,7 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageT
       renderInput={(params) => {
         return (
           <Badge variant={value === null ? "dot" : "standard"} color="warning" component="div" sx={{ width: "100%" }}>
-            <TextField {...params} sx={{ backgroundColor: (theme) => value === null ? theme.palette.selectionAttention.dark : undefined }} />
+            <TextField {...params} />
           </Badge>
         )
       }}
@@ -70,6 +70,14 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageT
             <Typography display="inline-block">{option.value}</Typography>
           </Box>
         )
+      }}
+      slotProps={{
+        popper: {
+          placement: "bottom-start",
+          style: {
+            width: "fit-content"
+          }
+        }
       }}
       size="small"
     >
