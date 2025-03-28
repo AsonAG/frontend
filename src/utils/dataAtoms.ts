@@ -215,7 +215,7 @@ export const expandedControllingTasks = atomWithStorage<ExpandedState>("config.p
 export const payrollControllingDataAtom = atomWithRefresh<Promise<ControllingData>>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return [];
+	if (orgId === null || payrollId === null) return { employeeControllingCases: [], companyControllingCases: [] };
 	var controllingData = await getPayrunPeriodControllingTasks({ orgId, payrollId });
 	return controllingData;
 })
