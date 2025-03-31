@@ -25,6 +25,10 @@ export function ControllingPicker({ wageTypeNumber, controlTypes }: { wageTypeNu
     if (navigation.state !== "idle")
       return;
 
+    const isDirty = ([...activeValue?.value ?? []]).sort().toString() != ([...values]).sort().toString();
+    if (!isDirty)
+      return;
+
     if (values.length > 0) {
       submit({
         regulationId,
