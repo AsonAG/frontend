@@ -87,7 +87,6 @@ export function ControllingPicker({ wageTypeNumber, controlTypes, multiple }: { 
       onChange={handleChange}
       onClose={onClose}
       displayEmpty
-      MenuProps={menuProps}
       renderValue={(selected) => {
         let label = "No checks";
         if (selected.length === 1) {
