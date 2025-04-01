@@ -55,7 +55,7 @@ function createColumns() {
           const automaticControlling = !payrollControlling || payrollControlling === "N" || !controlTypesMap.has(wageTypeNumber);
           if (automaticControlling)
             return <Typography noWrap>{t("automatic")}</Typography>
-          return <ControllingPicker wageTypeNumber={wageTypeNumber} controlTypes={controlTypesMap.get(wageTypeNumber)!} />;
+          return <ControllingPicker wageTypeNumber={wageTypeNumber} controlTypes={controlTypesMap.get(wageTypeNumber)!} multiple={payrollControlling === "Multi"} />;
         },
         header: ({ t }) => t("payrun_period_wage_controlling"),
         size: 180

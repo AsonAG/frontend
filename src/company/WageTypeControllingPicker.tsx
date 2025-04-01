@@ -1,11 +1,11 @@
-import { MenuItem, Select, SelectChangeEvent, SxProps, Theme, Typography } from "@mui/material";
+import { ListSubheader, MenuItem, Select, SelectChangeEvent, SxProps, Theme, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import { useState } from "react";
 import { useLoaderData, useNavigation, useSubmit } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
 import { useTranslation } from "react-i18next";
 
-export function ControllingPicker({ wageTypeNumber, controlTypes }: { wageTypeNumber: string, controlTypes: Map<string, string> }) {
+export function ControllingPicker({ wageTypeNumber, controlTypes, multiple }: { wageTypeNumber: string, controlTypes: Map<string, string>, multiple: boolean }) {
   const { t } = useTranslation();
   const { regulationId, wageTypePayrollControllingLookup } = useLoaderData() as WageTypeControllingLoaderData;
   const activeValue = useMemo(() => {
@@ -21,10 +21,15 @@ export function ControllingPicker({ wageTypeNumber, controlTypes }: { wageTypeNu
   const [values, setValues] = useState<string[]>(activeValue?.value ?? []);
   const submit = useSubmit();
   const navigation = useNavigation();
-  const handleSave = () => {
+  const onClose = () => {
+    // single selection is saved in on change
+    if (!multiple)
+      return;
+    handleSave(values);
+  }
+  const handleSave = (values: string[]) => {
     if (navigation.state !== "idle")
       return;
-
     const isDirty = ([...activeValue?.value ?? []]).sort().toString() != ([...values]).sort().toString();
     if (!isDirty)
       return;
@@ -55,10 +60,13 @@ export function ControllingPicker({ wageTypeNumber, controlTypes }: { wageTypeNu
     const {
       target: { value },
     } = event;
-    setValues(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value
-    );
+    const values = value === "" ? [] :
+      typeof value === 'string' ? value.split(',') :
+        value;
+    setValues(values);
+    if (!multiple) {
+      handleSave(values);
+    }
   };
   const options = useMemo(() => {
     return [...controlTypes].map(kv => (
@@ -73,12 +81,13 @@ export function ControllingPicker({ wageTypeNumber, controlTypes }: { wageTypeNu
 
   return (
     <Select
-      multiple
+      multiple={multiple}
       value={values}
       sx={selectSx}
       onChange={handleChange}
-      onClose={handleSave}
+      onClose={onClose}
       displayEmpty
+      MenuProps={menuProps}
       renderValue={(selected) => {
         let label = "No checks";
         if (selected.length === 1) {
@@ -90,6 +99,7 @@ export function ControllingPicker({ wageTypeNumber, controlTypes }: { wageTypeNu
       }}
       size="small"
     >
+      {!multiple && <MenuItem key="" value="">{t("No checks")}</MenuItem>}
       {options}
     </Select>
   );
