@@ -29,18 +29,18 @@ function createColumns() {
           flex: 1
         }
       }),
-    columnHelper.accessor(row => row.accountLookupValue?.value?.creditAccountNumber,
-      {
-        id: "credit",
-        cell: (props) => <WageTypeAccountPicker wageType={props.row.original} accountType="creditAccountNumber" />,
-        header: ({ t }) => t("Credit"),
-        size: 180
-      }),
     columnHelper.accessor(row => row.accountLookupValue?.value?.debitAccountNumber,
       {
         id: "debit",
         cell: (props) => <WageTypeAccountPicker wageType={props.row.original} accountType="debitAccountNumber" />,
         header: ({ t }) => t("Debit"),
+        size: 180
+      }),
+    columnHelper.accessor(row => row.accountLookupValue?.value?.creditAccountNumber,
+      {
+        id: "debit",
+        cell: (props) => <WageTypeAccountPicker wageType={props.row.original} accountType="creditAccountNumber" />,
+        header: ({ t }) => t("Credit"),
         size: 180
       }),
     columnHelper.display(
