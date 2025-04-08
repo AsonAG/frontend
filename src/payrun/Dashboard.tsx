@@ -266,7 +266,7 @@ function WageControllingList({ wageControlling, companyControllingCases }: { wag
     <Stack spacing={1}>
       <Typography variant="h6">{t("payrun_period_wage_controlling")}</Typography>
       <CompanyControllingRow companyControllingCases={companyControllingCases} />
-      {wageControlling.map(entry => <ControllingRow key={entry.id} entry={entry} />)}
+      {wageControlling?.map(entry => <ControllingRow key={entry.id} entry={entry} />)}
     </Stack>
   )
 }
