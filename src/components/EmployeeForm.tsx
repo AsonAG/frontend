@@ -56,7 +56,6 @@ export function EmployeeForm() {
 					defaultValue={employee?.identifier}
 					disabled={!isNew}
 				/>
-				<Typography variant="h6">{t("Organization unit assignment")}</Typography>
 				{divisionAssignmentView}
 				<Stack direction="row" justifyContent="right" spacing={1}>
 					<Button component={RouterLink} to=".." relative="path">
@@ -73,12 +72,10 @@ export function EmployeeForm() {
 
 function PayrollAssignmentView() {
 	const { divisions, selectedDivisions } = useLoaderData() as LoaderData;
-	const isAdmin = useRole("admin");
-	if (!isAdmin)
-		return null;
-
+	const { t } = useTranslation();
 	return (
-		<Stack>
+		<Stack display="none">
+			<Typography variant="h6">{t("Organization unit assignment")}</Typography>
 			{
 				divisions.map(division => {
 					return (
