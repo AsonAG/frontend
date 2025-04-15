@@ -38,7 +38,7 @@ function createColumns() {
       }),
     columnHelper.accessor(row => row.accountLookupValue?.value?.creditAccountNumber,
       {
-        id: "debit",
+        id: "credit",
         cell: (props) => <WageTypeAccountPicker wageType={props.row.original} accountType="creditAccountNumber" />,
         header: ({ t }) => t("Credit"),
         size: 180
