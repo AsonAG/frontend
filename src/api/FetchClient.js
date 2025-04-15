@@ -220,10 +220,6 @@ class FetchRequestBuilder {
 	}
 }
 
-export function bootstrapPayrunPeriods() {
-	return new FetchRequestBuilder("/admin/bootstrapopenperiod").withMethod("POST").fetch();
-}
-
 export function getOrganizations() {
 	return new FetchRequestBuilder(organizationsUrl).fetchJson();
 }

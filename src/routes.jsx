@@ -51,7 +51,6 @@ import {
 	createPayout,
 	cancelPayout,
 	downloadData,
-	bootstrapPayrunPeriods,
 	getCompanyBankDetails as getCompanyBankAccountDetails,
 	getEmployeeSalaryType,
 	getPreviousPayrunPeriod,
@@ -502,13 +501,6 @@ const routeData = [
 						toast("error", "Import was not successful");
 					}
 					return null;
-				}
-			},
-			{
-				path: "orgs/bootstrap",
-				action: async () => {
-					await bootstrapPayrunPeriods();
-					return redirect("..");
 				}
 			}
 		],
