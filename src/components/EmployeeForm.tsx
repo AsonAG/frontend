@@ -16,7 +16,6 @@ import { useTranslation } from "react-i18next";
 import { Form, Link as RouterLink, useLoaderData } from "react-router-dom";
 import { Employee } from "../models/Employee";
 import { Division } from "../models/Division";
-import { useRole } from "../hooks/useRole";
 
 type LoaderData = {
 	employee: Employee,
@@ -45,16 +44,12 @@ export function EmployeeForm() {
 					name="lastName"
 					defaultValue={employee?.lastName}
 				/>
-				{!isNew && (
-					<input type="hidden" name="identifier" value={employee?.identifier} />
-				)}
 				{!isNew && <StatusSelect status={employee.status} />}
 				<TextField
 					label={t("Identifier")}
 					required
 					name="identifier"
 					defaultValue={employee?.identifier}
-					disabled={!isNew}
 				/>
 				{divisionAssignmentView}
 				<Stack direction="row" justifyContent="right" spacing={1}>
