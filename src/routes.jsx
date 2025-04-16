@@ -363,14 +363,13 @@ function createRouteEmployeeEdit(path, createUrlRedirect) {
 				toast("success", "Saved!");
 				const urlRedirect = createUrlRedirect(params.employeeId);
 				return redirect(urlRedirect);
-			} else {
-				let errorMessage = await response.json();
-				if (!errorMessage || typeof errorMessage !== "string") {
-					errorMessage = "Saving failed!";
-				}
-				toast("error", errorMessage);
+			} 
+			let errorMessage = await response.json();
+			if (!errorMessage || typeof errorMessage !== "string") {
+				errorMessage = "Saving failed!";
 			}
-			return response;
+			toast("error", errorMessage);
+			return null;
 		},
 	};
 }
