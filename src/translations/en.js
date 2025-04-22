@@ -24,7 +24,8 @@ const translations = {
 		"payrun_period_wage_controlling": "Wage Controlling",
 		"payrun_period_ready": "Ready to pay out",
 		"payrun_period_paid_out": "Paid out",
-		"payrun_period_without_occupation": "Without occupation",
+		"payrun_period_former_employees": "Former employees",
+		"payrun_period_no_wage": "Employed but without wage",
 		"dashboard_payout_header": "Payout",
 		"inactive_collector_chip": "{{count}} inactive collectors...",
 		"date_accounting_start_date_validation": "Date has to be greater than or equal to the payroll accounting start date ({{accountingStartDate}})"

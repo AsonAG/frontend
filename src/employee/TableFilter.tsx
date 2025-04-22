@@ -29,7 +29,7 @@ export const EmployeeTableFilter = React.forwardRef<HTMLButtonElement, IconButto
               <FormLabel>{t("Filter")}</FormLabel>
               <FormControlLabel
                 control={<Switch checked={state.onlyActive} onChange={activeChange} size="small" />}
-                label={t("Only show active employees")}
+                label={t("Hide former employees")}
               />
               <FormControlLabel
                 control={<Switch checked={state.onlyWithMissingData} onChange={missingDataChange} size="small" />}

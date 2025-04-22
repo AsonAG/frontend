@@ -7,6 +7,8 @@ export type PayrunPeriodEntry = {
   identifier: string
   lastName: string
   firstName: string
+  leavingDate: Date | null
+  isEmployed: boolean
   netWage: number | null
   grossWage: number | null
   offsetting: number | null

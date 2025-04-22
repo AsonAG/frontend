@@ -363,7 +363,7 @@ function createRouteEmployeeEdit(path, createUrlRedirect) {
 				toast("success", "Saved!");
 				const urlRedirect = createUrlRedirect(params.employeeId);
 				return redirect(urlRedirect);
-			} 
+			}
 			let errorMessage = await response.json();
 			if (!errorMessage || typeof errorMessage !== "string") {
 				errorMessage = "Saving failed!";
@@ -611,7 +611,7 @@ const routeData = [
 					const map = await store.get(missingEmployeeDataMapAtom);
 					return {
 						pageTitle: getEmployeeDisplayString(employee),
-						status: employee.status,
+						isEmployed: employee.isEmployed,
 						missingData: map.get(employee.id)
 					};
 				},

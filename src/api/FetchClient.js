@@ -25,11 +25,11 @@ const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
 const missingDataEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
 const payrollLookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
+const payrollEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
 const payrollWageTypeMasterUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
-const employeeUrl = "/tenants/:orgId/employees/:employeeId";
 const usersUrl = "/tenants/:orgId/users";
 const employeeDocumentUrl =
 	"/tenants/:orgId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
@@ -261,13 +261,12 @@ export function getDivision(routeParams, divisionId) {
 }
 
 export function getEmployees(routeParams) {
-	return new FetchRequestBuilder(employeesUrl, routeParams)
-		.withPayrollDivision()
+	return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
 		.withQueryParam("orderBy", `firstName asc`);
 }
 
 export async function getEmployee(routeParams) {
-	return new FetchRequestBuilder(employeeUrl, routeParams).fetchJson();
+	return new FetchRequestBuilder(payrollEmployeeUrl, routeParams).fetchJson();
 }
 
 export async function createEmployee(routeParams, employee) {

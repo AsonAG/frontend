@@ -36,7 +36,7 @@ function PayrunControllingTab({ label }: { label: string }) {
   const tab: Tab = "Controlling";
   const { state, dispatch } = useContext(PayrollTableContext);
   const { controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
-  const badgeCount = state.entryCountByTab[tab] + (controllingData.companyControllingCases.length > 0 ? 1 : 0);
+  const badgeCount = state.badgeCountByTab[tab] + (controllingData.companyControllingCases.length > 0 ? 1 : 0);
   return (
     <TabButton title={label} active={tab === state.selectedTab} badgeCount={badgeCount} badgeColor="warning" onClick={() => dispatch({ type: "set_tab", tab })} />
   )

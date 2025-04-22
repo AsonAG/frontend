@@ -1,6 +1,6 @@
-import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer } from "react";
+import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer, useState } from "react";
 import { Link as RouterLink, Outlet, useRouteLoaderData, LinkProps } from "react-router-dom";
-import { Stack, Typography, Button, Chip, Box, styled } from "@mui/material";
+import { Stack, Typography, Button, Chip, Box, styled, IconButton } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { DashboardHeader } from "./DashboardHeader";
@@ -12,7 +12,8 @@ import { PayrunTable } from "./PayrollTable";
 import { CalculatingIndicator } from "./CalculatingIndicator";
 import { SearchField } from "../components/SearchField";
 import { MissingDataCase } from "../models/MissingData";
-
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 
 type PayrollTableContextProps = {
@@ -76,6 +77,7 @@ function PayrunPeriodView() {
             <>
               <PayrunTabContent tab="Controlling" emptyText="Controlling completed.">
                 <ControllingList />
+                <FormerEmployeesList entries={state.entriesByState["FormerEmployee"]} />
               </PayrunTabContent>
               <PayrunTabContent tab="Payable" emptyText="All employees have been paid out.">
                 <PayrunTable entries={state.entriesByState["Payable"]} completed={false} />
@@ -94,7 +96,7 @@ function PayrunPeriodView() {
 
 
 
-type EntryState = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "WithoutOccupation";
+type EntryState = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "NoWage" | "FormerEmployee";
 
 function EmployeeTableSearchField() {
   const { t } = useTranslation();
@@ -114,6 +116,7 @@ export type DashboardState = {
   filteredEntries: Array<EntryRow>
   entriesByState: Record<EntryState, EntryRow[]>
   entryCountByTab: Record<Tab, number>
+  badgeCountByTab: Record<Tab, number>
   selectedTab: Tab,
   salaryType: string | null
   employeeFilter: string
@@ -161,7 +164,8 @@ function reducer(state: DashboardState, action: DashboardAction): DashboardState
   }
   newState.filteredEntries = newState.entries.filter(e => filterBySalaryType(e, newState.salaryType) && filterBySearch(e, newState.employeeFilter));
   newState.entriesByState = groupRows(newState.filteredEntries);
-  newState.entryCountByTab = getEntryCountByTab(newState.entriesByState);
+  newState.badgeCountByTab = getBadgeCountByTab(newState.entriesByState);
+  newState.entryCountByTab = { ...newState.badgeCountByTab, "Controlling": newState.badgeCountByTab.Controlling + (newState.entriesByState["FormerEmployee"] ?? []).length };
   if (action.type === "set_employee_filter") {
     newState.selectedTab = getSelectedTabAfterSearch(newState);
   }
@@ -181,11 +185,11 @@ function filterBySearch(entry: EntryRow, search: string) {
 }
 
 function getSelectedTabAfterSearch(state: DashboardState): Tab {
-  function hasEntries(tab: Tab) { return (state.entriesByState[tab] ?? []).length > 0; }
+  function hasEntries(tab: EntryState) { return (state.entriesByState[tab] ?? []).length > 0; }
   if (hasEntries(state.selectedTab)) {
     return state.selectedTab;
   }
-  if (hasEntries("Controlling")) {
+  if (hasEntries("Controlling") || hasEntries("NoWage") || hasEntries("FormerEmployee")) {
     return "Controlling"
   }
   if (hasEntries("Payable")) {
@@ -200,11 +204,14 @@ function getSelectedTabAfterSearch(state: DashboardState): Tab {
 
 function createInitialState(employeeRows: Array<EntryRow>): DashboardState {
   const grouped = groupRows(employeeRows);
+  const badgeCountByTab = getBadgeCountByTab(grouped);
+
   return {
     entries: employeeRows,
     filteredEntries: employeeRows,
     entriesByState: grouped,
-    entryCountByTab: getEntryCountByTab(grouped),
+    entryCountByTab: { ...badgeCountByTab, "Controlling": badgeCountByTab.Controlling + (grouped["FormerEmployee"] ?? []).length },
+    badgeCountByTab: badgeCountByTab,
     selectedTab: "Controlling",
     salaryType: null,
     employeeFilter: ""
@@ -223,16 +230,19 @@ function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
     if (!!row.openPayout) {
       return "Payable";
     }
-    if (row.openPayout === 0 && ((row.netWage ?? 0) > 0) && ((row.grossWage ?? 0) > 0)) {
+    if (row.openPayout === 0 && ((row.paidOut ?? 0) > 0) || (row.paidOutGarnishment ?? 0) > 0) {
       return "PaidOut";
     }
-    return "WithoutOccupation";
+    if (!row.isEmployed) {
+      return "FormerEmployee";
+    }
+    return "NoWage";
   }
 }
 
-function getEntryCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab, number> {
+function getBadgeCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab, number> {
   return {
-    "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["WithoutOccupation"]?.length ?? 0),
+    "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["NoWage"]?.length ?? 0),
     "Payable": (grouped["Payable"]?.length ?? 0),
     "PaidOut": (grouped["PaidOut"]?.length ?? 0)
   };
@@ -244,15 +254,17 @@ function ControllingList() {
   const { state } = useContext(PayrollTableContext);
   const { controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const wageControlling = state.entriesByState["Controlling"];
-  const withoutOccupation = state.entriesByState["WithoutOccupation"];
-  if (!wageControlling && !withoutOccupation && controllingData.companyControllingCases.length === 0) {
+  const noWage = state.entriesByState["NoWage"];
+  if (!wageControlling && !noWage && controllingData.companyControllingCases.length === 0) {
+    if (state.employeeFilter)
+      return;
     return <Typography>{t("All entries are ok.")}</Typography>
   }
 
   return (
     <Stack spacing={2}>
       <WageControllingList wageControlling={wageControlling} companyControllingCases={controllingData.companyControllingCases} />
-      <WithoutOccupationList withoutOccupation={withoutOccupation} />
+      <NoWageList entries={noWage} />
     </Stack>
   )
 }
@@ -317,17 +329,43 @@ const Link = styled(
   };
 });
 
-function WithoutOccupationList({ withoutOccupation }: { withoutOccupation: Array<EntryRow> }) {
+function NoWageList({ entries }: { entries: Array<EntryRow> }) {
   const { t } = useTranslation();
-  if (!withoutOccupation)
+  if (!entries)
     return;
 
   return (
     <Stack spacing={1}>
-      <Typography variant="h6">{t("payrun_period_without_occupation")}</Typography>
+      <Typography variant="h6">{t("payrun_period_no_wage")}</Typography>
       <Stack direction="row" spacing={0.5} flexWrap="wrap">
-        {withoutOccupation.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
+        {entries.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
       </Stack>
+    </Stack>
+  )
+}
+
+function FormerEmployeesList({ entries }: { entries: Array<EntryRow> }) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const { state } = useContext(PayrollTableContext);
+  if (!entries)
+    return;
+
+  const showList = expanded || !!state.employeeFilter;
+
+  return (
+    <Stack spacing={0.5}>
+      <Stack direction="row" spacing={1}>
+        <Typography variant="h6">{t("payrun_period_former_employees")}</Typography>
+        <IconButton size="small" onClick={() => setExpanded(o => !o)}>
+          {showList ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </IconButton>
+      </Stack>
+      {showList &&
+        <Stack direction="row" spacing={0.5} flexWrap="wrap">
+          {entries.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
+        </Stack>
+      }
     </Stack>
   )
 }
