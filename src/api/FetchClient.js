@@ -30,6 +30,7 @@ const payrollWageTypeMasterUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypema
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
+const employeeUrl = "/tenants/:orgId/employees/:employeeId";
 const usersUrl = "/tenants/:orgId/users";
 const employeeDocumentUrl =
 	"/tenants/:orgId/employees/:employeeId/cases/:caseValueId/documents/:documentId";

@@ -44,7 +44,7 @@ export function EmployeeForm() {
 					name="lastName"
 					defaultValue={employee?.lastName}
 				/>
-				{!isNew && <StatusSelect status={employee.status} />}
+				{!isNew && <input type="hidden" name="status" value={employee.status} />}
 				<TextField
 					label={t("Identifier")}
 					required
@@ -87,24 +87,4 @@ function PayrollAssignmentView() {
 			}
 		</Stack>
 	)
-}
-
-function StatusSelect({ status }) {
-	const { t } = useTranslation();
-	const label = t("Status");
-	return (
-		<FormControl fullWidth>
-			<InputLabel id="active-select-label">{label}</InputLabel>
-			<Select
-				size="small"
-				labelId="active-select-label"
-				name="status"
-				defaultValue={status}
-				label={label}
-			>
-				<MenuItem value="Active">{t("Active")}</MenuItem>
-				<MenuItem value="Inactive">{t("Inactive")}</MenuItem>
-			</Select>
-		</FormControl>
-	);
 }
