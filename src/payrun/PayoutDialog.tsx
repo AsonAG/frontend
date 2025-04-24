@@ -9,6 +9,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { BankAccountDetails } from "./BankAccountDetails";
 import { formatValue, getRowGridSx } from "./utils";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
+import { SubmissionDisabler } from "../components/SubmissionDisabler"
 
 type PayoutDialogProps = {
   employeeCount: number,
@@ -70,7 +71,9 @@ export function PayoutDialog({ employeeCount, amount, onPayout, children }: Payo
             </Box>
             <Stack direction="row" justifyContent="end" spacing={2}>
               <Button onClick={handleClose}>{t("Cancel")}</Button>
-              <Button disabled={!valueDate || !valueDateValid || !bankAccount?.iban} variant="contained" onClick={() => onPayout(valueDate!.toISOString(), bankAccount.iban!)}>{t("Confirm")}</Button>
+              <SubmissionDisabler>
+                <Button disabled={!valueDate || !valueDateValid || !bankAccount?.iban} variant="contained" onClick={() => onPayout(valueDate!.toISOString(), bankAccount.iban!)}>{t("Confirm")}</Button>
+              </SubmissionDisabler>
             </Stack>
           </Stack>
         </DialogContent>

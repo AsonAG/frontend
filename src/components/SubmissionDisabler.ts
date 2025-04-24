@@ -7,12 +7,13 @@ export const SubmissionDisabler = React.forwardRef<any, PropsWithChildren>(({ ch
   if (!React.isValidElement(children)) {
     return null;
   }
-
+  const submitting = navigation.state === "submitting";
   const content = React.cloneElement(children, {
     ref,
     ...children.props,
     ...props,
-    disabled: navigation.state === "submitting"
+    disabled: !!children.props?.disabled || submitting,
+    loading: submitting
   });
 
   return content;
