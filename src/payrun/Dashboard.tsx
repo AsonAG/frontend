@@ -35,15 +35,20 @@ function PayrunPeriodView() {
   const { payrunPeriod, previousPayrunPeriod, controllingData, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const isOpen = payrunPeriod.periodStatus === "Open";
   const rows: Array<EntryRow> = useMemo(() => {
-    var controllingDataMap = new Map(controllingData.employeeControllingCases.map(x => [x.id, x.cases]));
-    return payrunPeriod.entries.map((entry, index) => ({
+    const controllingDataMap = new Map(controllingData.employeeControllingCases.map(x => [x.id, x.cases]));
+    let entries = payrunPeriod.entries.map((entry, index) => ({
       ...entry,
       amount: entry.openPayout ?? 0,
       previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.employeeId),
       controllingTasks: isOpen ? controllingDataMap.get(entry.employeeId) : [],
-      caseValueCount: isOpen ? caseValueCounts[index] : 0,
+      caseValueCount: caseValueCounts[index],
       salaryType: salaryTypes[index]
     }));
+    // filter here, otherwise the index wont match
+    if (!isOpen) {
+      entries = entries.filter(e => e.isEmployed || ((e.openPayout ?? 0) > 0 || (e.paidOut ?? 0) > 0 || (e.paidOutGarnishment ?? 0) > 0));
+    }
+    return entries;
   }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData, caseValueCounts]);
   const [state, dispatch] = useReducer(
     reducer,

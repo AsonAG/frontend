@@ -168,6 +168,11 @@ function createThemeSettings(mode: ThemeMode): ThemeOptions {
           },
         },
       },
+      MuiTooltip: {
+        defaultProps: {
+          "disableInteractive": true
+        }
+      },
       MuiAutocomplete: {
         defaultProps: {
           size: "small",
