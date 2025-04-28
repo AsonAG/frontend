@@ -46,7 +46,7 @@ function PayrunPeriodView() {
     }));
     // filter here, otherwise the index wont match
     if (!isOpen) {
-      entries = entries.filter(e => e.isEmployed || ((e.openPayout ?? 0) > 0 || (e.paidOut ?? 0) > 0 || (e.paidOutGarnishment ?? 0) > 0));
+      entries = entries.filter(e => e.isEmployed || e.hasWage);
     }
     return entries;
   }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData, caseValueCounts]);
@@ -225,16 +225,16 @@ function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
     if ((row.controllingTasks?.length ?? 0) > 0) {
       return "Controlling";
     }
-    if (!!row.openPayout) {
-      return "Payable";
-    }
     if (row.openPayout === 0 && ((row.paidOut ?? 0) > 0) || (row.paidOutGarnishment ?? 0) > 0) {
       return "PaidOut";
     }
-    if (!row.isEmployed) {
+    if (!row.isEmployed && !row.hasWage) {
       return "FormerEmployee";
     }
-    return "NoWage";
+    if (!row.hasWage) {
+      return "NoWage";
+    }
+    return "Payable";
   }
 }
 

@@ -22,6 +22,7 @@ export type PayrunPeriodEntry = {
   openGarnishmentPayout: number | null
   openWagePayoutPreviousPeriod: number
   openGarnishmentPayoutPreviousPeriod: number
+  hasWage: boolean
   documents: Array<PayrunDocument> | null
 }
 
