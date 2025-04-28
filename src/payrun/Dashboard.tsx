@@ -1,6 +1,6 @@
-import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer, useState } from "react";
+import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer } from "react";
 import { Link as RouterLink, Outlet, useRouteLoaderData, LinkProps } from "react-router-dom";
-import { Stack, Typography, Button, Chip, Box, styled, IconButton } from "@mui/material";
+import { Stack, Typography, Button, Chip, Box, styled } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { DashboardHeader } from "./DashboardHeader";
@@ -12,8 +12,6 @@ import { PayrunTable } from "./PayrollTable";
 import { CalculatingIndicator } from "./CalculatingIndicator";
 import { SearchField } from "../components/SearchField";
 import { MissingDataCase } from "../models/MissingData";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 
 type PayrollTableContextProps = {
@@ -77,7 +75,6 @@ function PayrunPeriodView() {
             <>
               <PayrunTabContent tab="Controlling" emptyText="Controlling completed.">
                 <ControllingList />
-                <FormerEmployeesList entries={state.entriesByState["FormerEmployee"]} />
               </PayrunTabContent>
               <PayrunTabContent tab="Payable" emptyText="All employees have been paid out.">
                 <PayrunTable entries={state.entriesByState["Payable"]} completed={false} />
@@ -116,7 +113,6 @@ export type DashboardState = {
   filteredEntries: Array<EntryRow>
   entriesByState: Record<EntryState, EntryRow[]>
   entryCountByTab: Record<Tab, number>
-  badgeCountByTab: Record<Tab, number>
   selectedTab: Tab,
   salaryType: string | null
   employeeFilter: string
@@ -164,8 +160,7 @@ function reducer(state: DashboardState, action: DashboardAction): DashboardState
   }
   newState.filteredEntries = newState.entries.filter(e => filterBySalaryType(e, newState.salaryType) && filterBySearch(e, newState.employeeFilter));
   newState.entriesByState = groupRows(newState.filteredEntries);
-  newState.badgeCountByTab = getBadgeCountByTab(newState.entriesByState);
-  newState.entryCountByTab = { ...newState.badgeCountByTab, "Controlling": newState.badgeCountByTab.Controlling + (newState.entriesByState["FormerEmployee"] ?? []).length };
+  newState.entryCountByTab = getEntryCountByTab(newState.entriesByState);
   if (action.type === "set_employee_filter") {
     newState.selectedTab = getSelectedTabAfterSearch(newState);
   }
@@ -189,7 +184,7 @@ function getSelectedTabAfterSearch(state: DashboardState): Tab {
   if (hasEntries(state.selectedTab)) {
     return state.selectedTab;
   }
-  if (hasEntries("Controlling") || hasEntries("NoWage") || hasEntries("FormerEmployee")) {
+  if (hasEntries("Controlling") || hasEntries("NoWage")) {
     return "Controlling"
   }
   if (hasEntries("Payable")) {
@@ -204,14 +199,12 @@ function getSelectedTabAfterSearch(state: DashboardState): Tab {
 
 function createInitialState(employeeRows: Array<EntryRow>): DashboardState {
   const grouped = groupRows(employeeRows);
-  const badgeCountByTab = getBadgeCountByTab(grouped);
 
   return {
     entries: employeeRows,
     filteredEntries: employeeRows,
     entriesByState: grouped,
-    entryCountByTab: { ...badgeCountByTab, "Controlling": badgeCountByTab.Controlling + (grouped["FormerEmployee"] ?? []).length },
-    badgeCountByTab: badgeCountByTab,
+    entryCountByTab: getEntryCountByTab(grouped),
     selectedTab: "Controlling",
     salaryType: null,
     employeeFilter: ""
@@ -240,7 +233,7 @@ function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
   }
 }
 
-function getBadgeCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab, number> {
+function getEntryCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab, number> {
   return {
     "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["NoWage"]?.length ?? 0),
     "Payable": (grouped["Payable"]?.length ?? 0),
@@ -340,32 +333,6 @@ function NoWageList({ entries }: { entries: Array<EntryRow> }) {
       <Stack direction="row" spacing={0.5} flexWrap="wrap">
         {entries.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
       </Stack>
-    </Stack>
-  )
-}
-
-function FormerEmployeesList({ entries }: { entries: Array<EntryRow> }) {
-  const { t } = useTranslation();
-  const [expanded, setExpanded] = useState(false);
-  const { state } = useContext(PayrollTableContext);
-  if (!entries)
-    return;
-
-  const showList = expanded || !!state.employeeFilter;
-
-  return (
-    <Stack spacing={0.5}>
-      <Stack direction="row" spacing={1}>
-        <Typography variant="h6">{t("payrun_period_former_employees")}</Typography>
-        <IconButton size="small" onClick={() => setExpanded(o => !o)}>
-          {showList ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </IconButton>
-      </Stack>
-      {showList &&
-        <Stack direction="row" spacing={0.5} flexWrap="wrap">
-          {entries.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
-        </Stack>
-      }
     </Stack>
   )
 }
