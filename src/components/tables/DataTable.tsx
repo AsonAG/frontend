@@ -25,12 +25,6 @@ import { AvailableCase } from "../../models/AvailableCase";
 
 const columnHelper = createColumnHelper<CaseValue>();
 
-const renderPeriod = (caseValue: CaseValue, part: "start" | "end") => {
-  if (caseValue.valueType === "Date" || caseValue.valueType === "DateTime")
-    return "";
-  return formatDate(caseValue[part]);
-}
-
 function createColumns(t: TFunction<"translation", undefined>) {
   return [
     columnHelper.accessor("displayCaseFieldName",
@@ -42,17 +36,7 @@ function createColumns(t: TFunction<"translation", undefined>) {
       {
         cell: value => formatCaseValue(value.row.original, t),
         header: () => t("Value")
-      }),
-    columnHelper.accessor("start",
-      {
-        cell: value => renderPeriod(value.row.original, "start"),
-        header: t("Start")
-      }),
-    columnHelper.accessor("end",
-      {
-        cell: value => renderPeriod(value.row.original, "end"),
-        header: t("End")
-      }),
+      })
   ];
 }
 
@@ -245,7 +229,7 @@ function Table({ state }: { state: State }) {
 
 function Row({ children }: PropsWithChildren) {
   return (
-    <Box display="grid" gridTemplateColumns="1fr 1fr 75px 75px 40px" gridTemplateRows="auto" alignItems="start">
+    <Box display="grid" gridTemplateColumns="1fr 1.5fr 40px" gridTemplateRows="auto" alignItems="start">
       {children}
     </Box>
   )
