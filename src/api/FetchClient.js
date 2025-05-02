@@ -315,11 +315,12 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 		.fetchJson();
 }
 
-export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodStart, payrunPeriodEnd, asCount = false, evalDate = null) {
+export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodClosed, payrunPeriodStart, payrunPeriodEnd, asCount = false, evalDate = null) {
+	const closedAtFilter = payrunPeriodClosed ? `and created le '${payrunPeriodClosed}'` : '';
 	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("employeeId", routeParams.employeeId)
-		.withQueryParam("filter", `((created ge '${payrunPeriodOpened}' and start le '${payrunPeriodEnd}') or (start ge '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')) and documentCount eq 0`)
+		.withQueryParam("filter", `((created ge '${payrunPeriodOpened}' ${closedAtFilter} and start lt '${payrunPeriodEnd}') or (start ge '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')) and documentCount eq 0`)
 		.withQueryParam("orderBy", "created desc")
 		.withQueryParam("substituteLookupCodes", !asCount)
 		.withQueryParam("result", asCount ? "Count" : undefined)

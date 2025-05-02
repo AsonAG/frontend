@@ -800,7 +800,7 @@ const routeData = [
 							] = await Promise.all([
 								getPreviousPayrunPeriod(params, payrunPeriod.periodStart),
 								isOpen ? store.get(payrollControllingDataAtom) : { employeeControllingCases: [], companyControllingCases: [] },
-								Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
+								Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.closedAt, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
 								Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
 								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
 							]);
@@ -903,7 +903,7 @@ const routeData = [
 										loader: async ({ params }) => {
 											const fetcher = params.payrunPeriodId === "open" ? getOpenPayrunPeriod : getPayrunPeriod;
 											const payrunPeriod = await fetcher(params);
-											return getPayrunPeriodCaseValues(params, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd);
+											return getPayrunPeriodCaseValues(params, payrunPeriod.created, payrunPeriod.closedAt, payrunPeriod.periodStart, payrunPeriod.periodEnd);
 										}
 									}
 								]
