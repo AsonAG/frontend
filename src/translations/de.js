@@ -82,6 +82,7 @@ const translations = {
 		employee_name_selected:
 			"{{employee.firstName}} {{employee.lastName}} ({{employee.identifier}}) $t(selected)",
 		n_employees_selected: "{{count}} Mitarbeiter $t(selected)",
+
 		Payruns: "Zahlungsläufe",
 		Abort: "Abbrechen",
 		Release: "Freigeben",
@@ -113,7 +114,7 @@ const translations = {
 		Status: "Status",
 		Active: "Aktiv",
 		Inactive: "Inaktiv",
-		"Only show active employees": "Nur aktive Mitarbeiter anzeigen",
+		"Hide former employees": "Frühere Mitarbeiter ausblenden",
 		"Only show employees with missing data": "Nur Mitarbeiter mit fehlenden Daten anzeigen",
 		"New employee created": "Neueintritt erfasst",
 		"Saving failed!": "Speichern fehlgeschlagen!",
@@ -210,7 +211,8 @@ const translations = {
 		"payrun_period_wage_controlling": "Lohnkontrolle",
 		"payrun_period_ready": "Auszahlungsbereit",
 		"payrun_period_paid_out": "Ausbezahlt",
-		"payrun_period_without_occupation": "Ohne Beschäftigung",
+		"payrun_period_former_employees": "Frühere Mitarbeiter",
+		"payrun_period_no_wage": "Angestellt aber ohne Lohn",
 		"The open period is being created. Please refresh the page in a moment.": "Die offene Periode wird erstellt, bitte laden Sie die Seite nach kurzer Zeit neu.",
 		"Payout created": "Auszahlung erstellt",
 		"Error while creating the payout": "Fehler beim Erstellen der Auszahlung",
@@ -247,13 +249,15 @@ const translations = {
 		"Open": "Offen",
 		"Outstanding amount to be paid in the open period": "Ausstehender Betrag zur Zahlung der offenen Periode",
 		"Amount": "Betrag",
-		"Credit": "Soll",
-		"Debit": "Haben",
+		"Debit": "Soll",
+		"Credit": "Haben",
 		"Attributes": "Eigenschaften",
 		"Updated!": "Geändert!",
 		"Number": "Nummer",
 		"Collectors": "Basen",
 		"inactive_collector_chip": "{{count}} inaktive Basen...",
+		"{{count}} checks active": "{{count}} Kontrollen aktiv",
+		"No checks": "Keine Kontrolle",
 
 		"Column visibility": "Spaltensichtbarkeit",
 		"Table width": "Tabellenbreite",
@@ -275,6 +279,7 @@ const translations = {
 		"Do you really want to delete this value?": "Möchten Sie diesen Wert wirklich löschen?",
 		"This account is associated with a wage type": "Dieses Konto ist einer Lohnart zugewiesen",
 		"date_accounting_start_date_validation": "Datum muss grösser oder gleich dem Startdatum der Lohnbuchhaltung ({{accountingStartDate}}) sein",
+		"Without category": "Ohne Kategorie",
 
 		// Command
 		"Select event": "Ereignis auswählen",

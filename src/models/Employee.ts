@@ -10,6 +10,11 @@ export type Employee = {
 	divisions: Array<string>;
 };
 
+export type EmployeeSet = Employee & {
+	leavingDate: string | null
+	isEmployed: boolean
+}
+
 export function getEmployeeDisplayString(employee: { firstName: string, lastName: string, identifier: string }) {
 	return `${employee.firstName} ${employee.lastName} (${employee.identifier})`;
 }

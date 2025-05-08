@@ -51,7 +51,6 @@ import {
 	createPayout,
 	cancelPayout,
 	downloadData,
-	bootstrapPayrunPeriods,
 	getCompanyBankDetails as getCompanyBankAccountDetails,
 	getEmployeeSalaryType,
 	getPreviousPayrunPeriod,
@@ -85,12 +84,10 @@ import {
 	onboardingCompanyAtom,
 	payrollControllingDataAtom,
 	clientRegulationAtom,
-	payrollWageTypesAtom,
 	payrollWageTypesWithMissingAccountInfoCountAtom,
 	payrollWageTypesWithAccountingInfoAtom,
 	fibuAccountLookupAtom,
 	refreshPayrollWageTypes,
-	wageTypeControllingLookupAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -366,14 +363,13 @@ function createRouteEmployeeEdit(path, createUrlRedirect) {
 				toast("success", "Saved!");
 				const urlRedirect = createUrlRedirect(params.employeeId);
 				return redirect(urlRedirect);
-			} else {
-				let errorMessage = await response.json();
-				if (!errorMessage || typeof errorMessage !== "string") {
-					errorMessage = "Saving failed!";
-				}
-				toast("error", errorMessage);
 			}
-			return response;
+			let errorMessage = await response.json();
+			if (!errorMessage || typeof errorMessage !== "string") {
+				errorMessage = "Saving failed!";
+			}
+			toast("error", errorMessage);
+			return null;
 		},
 	};
 }
@@ -505,13 +501,6 @@ const routeData = [
 					}
 					return null;
 				}
-			},
-			{
-				path: "orgs/bootstrap",
-				action: async () => {
-					await bootstrapPayrunPeriods();
-					return redirect("..");
-				}
 			}
 		],
 	},
@@ -622,7 +611,7 @@ const routeData = [
 					const map = await store.get(missingEmployeeDataMapAtom);
 					return {
 						pageTitle: getEmployeeDisplayString(employee),
-						status: employee.status,
+						isEmployed: employee.isEmployed,
 						missingData: map.get(employee.id)
 					};
 				},
@@ -811,7 +800,7 @@ const routeData = [
 							] = await Promise.all([
 								getPreviousPayrunPeriod(params, payrunPeriod.periodStart),
 								isOpen ? store.get(payrollControllingDataAtom) : { employeeControllingCases: [], companyControllingCases: [] },
-								Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
+								Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.closedAt, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
 								Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
 								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
 							]);
@@ -914,7 +903,7 @@ const routeData = [
 										loader: async ({ params }) => {
 											const fetcher = params.payrunPeriodId === "open" ? getOpenPayrunPeriod : getPayrunPeriod;
 											const payrunPeriod = await fetcher(params);
-											return getPayrunPeriodCaseValues(params, payrunPeriod.created, payrunPeriod.periodStart, payrunPeriod.periodEnd);
+											return getPayrunPeriodCaseValues(params, payrunPeriod.created, payrunPeriod.closedAt, payrunPeriod.periodStart, payrunPeriod.periodEnd);
 										}
 									}
 								]
@@ -966,23 +955,37 @@ const routeData = [
 								fibuAccountLookup,
 								accountMaster,
 								wageTypePayrollControllingLookup,
+								wageTypeControlTypes,
 								wageTypeAttributeTranslations,
 								collectors
 							] = await Promise.all([
 								store.get(payrollWageTypesWithAccountingInfoAtom),
 								store.get(fibuAccountLookupAtom),
 								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster"),
-								store.get(wageTypeControllingLookupAtom),
+								getLookupSet({ regulationId: regulation.id, ...params }, "WageTypePayrollControlling"),
+								getLookupValues(params, "CH.Swissdec.WageTypesControlTypes"),
 								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
 								getPayrollCollectors(params)
 							]);
 							const accountMasterMap = new Map(accountMaster.values.map(x => [x.key, x]));
 							const attributeTranslationMap = new Map(wageTypeAttributeTranslations.values.map(x => [x.key, x]));
+							const controlTypesMap = new Map();
+							for (const value of wageTypeControlTypes.values) {
+								const keys = JSON.parse(value.key);
+								if (!Array.isArray(keys) || keys.length !== 2)
+									continue;
+								if (!controlTypesMap.has(keys[0])) {
+									controlTypesMap.set(keys[0], new Map());
+
+								}
+								controlTypesMap.get(keys[0]).set(keys[1], value.value);
+							}
 							return {
 								wageTypes,
 								collectors,
 								fibuAccountLookup,
 								wageTypePayrollControllingLookup,
+								controlTypesMap,
 								accountMaster,
 								accountMasterMap,
 								attributeTranslationMap,

@@ -7,17 +7,16 @@ import { PageHeaderTitle } from "../components/ContentLayout";
 import { IconButton, Stack, Tooltip } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Edit } from "@mui/icons-material";
-import { StatusChip } from "../scenes/employees/StatusChip";
-import { StatusEnum } from "../models/StatusEnum";
+import { StatusDot } from "./StatusDot";
 import { EventTabbedView } from "../components/EventTabbedView";
 
 type LoaderData = {
 	pageTitle: string
-	status: StatusEnum
+	isEmployed: boolean
 }
 
 export function EmployeeTabbedView() {
-	const { pageTitle, status } = useRouteLoaderData("employee") as LoaderData;
+	const { pageTitle, isEmployed } = useRouteLoaderData("employee") as LoaderData;
 	const { t } = useTranslation();
 
 
@@ -34,7 +33,7 @@ export function EmployeeTabbedView() {
 					<Edit />
 				</IconButton>
 			</Tooltip>
-			<StatusChip status={status} />
+			<StatusDot isEmployed={isEmployed} />
 		</Stack>
 	);
 	return <EventTabbedView title={titleComponent} />;

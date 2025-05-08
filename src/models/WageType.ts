@@ -13,7 +13,6 @@ export type WageType = {
 export type WageTypeDetailed = {
   accountLookupValue: AccountLookupValue | null
   accountAssignmentRequired: boolean
-  controllingEnabled: "system" | boolean
 
 } & WageType
 

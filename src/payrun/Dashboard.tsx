@@ -14,7 +14,6 @@ import { SearchField } from "../components/SearchField";
 import { MissingDataCase } from "../models/MissingData";
 
 
-
 type PayrollTableContextProps = {
   state: DashboardState
   dispatch: Dispatch<DashboardAction>
@@ -36,15 +35,20 @@ function PayrunPeriodView() {
   const { payrunPeriod, previousPayrunPeriod, controllingData, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const isOpen = payrunPeriod.periodStatus === "Open";
   const rows: Array<EntryRow> = useMemo(() => {
-    var controllingDataMap = new Map(controllingData.employeeControllingCases.map(x => [x.id, x.cases]));
-    return payrunPeriod.entries.map((entry, index) => ({
+    const controllingDataMap = new Map(controllingData.employeeControllingCases.map(x => [x.id, x.cases]));
+    let entries = payrunPeriod.entries.map((entry, index) => ({
       ...entry,
       amount: entry.openPayout ?? 0,
       previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.employeeId),
       controllingTasks: isOpen ? controllingDataMap.get(entry.employeeId) : [],
-      caseValueCount: isOpen ? caseValueCounts[index] : 0,
+      caseValueCount: caseValueCounts[index],
       salaryType: salaryTypes[index]
     }));
+    // filter here, otherwise the index wont match
+    if (!isOpen) {
+      entries = entries.filter(e => e.isEmployed || e.hasWage);
+    }
+    return entries;
   }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData, caseValueCounts]);
   const [state, dispatch] = useReducer(
     reducer,
@@ -94,7 +98,7 @@ function PayrunPeriodView() {
 
 
 
-type EntryState = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "WithoutOccupation";
+type EntryState = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "NoWage" | "FormerEmployee";
 
 function EmployeeTableSearchField() {
   const { t } = useTranslation();
@@ -181,11 +185,11 @@ function filterBySearch(entry: EntryRow, search: string) {
 }
 
 function getSelectedTabAfterSearch(state: DashboardState): Tab {
-  function hasEntries(tab: Tab) { return (state.entriesByState[tab] ?? []).length > 0; }
+  function hasEntries(tab: EntryState) { return (state.entriesByState[tab] ?? []).length > 0; }
   if (hasEntries(state.selectedTab)) {
     return state.selectedTab;
   }
-  if (hasEntries("Controlling")) {
+  if (hasEntries("Controlling") || hasEntries("NoWage")) {
     return "Controlling"
   }
   if (hasEntries("Payable")) {
@@ -200,6 +204,7 @@ function getSelectedTabAfterSearch(state: DashboardState): Tab {
 
 function createInitialState(employeeRows: Array<EntryRow>): DashboardState {
   const grouped = groupRows(employeeRows);
+
   return {
     entries: employeeRows,
     filteredEntries: employeeRows,
@@ -220,19 +225,22 @@ function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
     if ((row.controllingTasks?.length ?? 0) > 0) {
       return "Controlling";
     }
-    if (!!row.openPayout) {
-      return "Payable";
-    }
-    if (row.openPayout === 0 && ((row.netWage ?? 0) > 0) && ((row.grossWage ?? 0) > 0)) {
+    if (row.openPayout === 0 && ((row.paidOut ?? 0) > 0) || (row.paidOutGarnishment ?? 0) > 0) {
       return "PaidOut";
     }
-    return "WithoutOccupation";
+    if (!row.isEmployed && !row.hasWage) {
+      return "FormerEmployee";
+    }
+    if (!row.hasWage) {
+      return "NoWage";
+    }
+    return "Payable";
   }
 }
 
 function getEntryCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab, number> {
   return {
-    "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["WithoutOccupation"]?.length ?? 0),
+    "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["NoWage"]?.length ?? 0),
     "Payable": (grouped["Payable"]?.length ?? 0),
     "PaidOut": (grouped["PaidOut"]?.length ?? 0)
   };
@@ -244,15 +252,17 @@ function ControllingList() {
   const { state } = useContext(PayrollTableContext);
   const { controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const wageControlling = state.entriesByState["Controlling"];
-  const withoutOccupation = state.entriesByState["WithoutOccupation"];
-  if (!wageControlling && !withoutOccupation && controllingData.companyControllingCases.length === 0) {
+  const noWage = state.entriesByState["NoWage"];
+  if (!wageControlling && !noWage && controllingData.companyControllingCases.length === 0) {
+    if (state.employeeFilter)
+      return;
     return <Typography>{t("All entries are ok.")}</Typography>
   }
 
   return (
     <Stack spacing={2}>
       <WageControllingList wageControlling={wageControlling} companyControllingCases={controllingData.companyControllingCases} />
-      <WithoutOccupationList withoutOccupation={withoutOccupation} />
+      <NoWageList entries={noWage} />
     </Stack>
   )
 }
@@ -266,7 +276,7 @@ function WageControllingList({ wageControlling, companyControllingCases }: { wag
     <Stack spacing={1}>
       <Typography variant="h6">{t("payrun_period_wage_controlling")}</Typography>
       <CompanyControllingRow companyControllingCases={companyControllingCases} />
-      {wageControlling.map(entry => <ControllingRow key={entry.id} entry={entry} />)}
+      {wageControlling?.map(entry => <ControllingRow key={entry.id} entry={entry} />)}
     </Stack>
   )
 }
@@ -317,16 +327,16 @@ const Link = styled(
   };
 });
 
-function WithoutOccupationList({ withoutOccupation }: { withoutOccupation: Array<EntryRow> }) {
+function NoWageList({ entries }: { entries: Array<EntryRow> }) {
   const { t } = useTranslation();
-  if (!withoutOccupation)
+  if (!entries)
     return;
 
   return (
     <Stack spacing={1}>
-      <Typography variant="h6">{t("payrun_period_without_occupation")}</Typography>
+      <Typography variant="h6">{t("payrun_period_no_wage")}</Typography>
       <Stack direction="row" spacing={0.5} flexWrap="wrap">
-        {withoutOccupation.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
+        {entries.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
       </Stack>
     </Stack>
   )

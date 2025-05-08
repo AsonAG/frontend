@@ -1,4 +1,4 @@
-import { Autocomplete, Box, createFilterOptions, TextField, Typography } from "@mui/material";
+import { Autocomplete, Badge, Box, createFilterOptions, SxProps, TextField, Theme, Typography } from "@mui/material";
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControlling";
@@ -53,7 +53,13 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageT
       value={value}
       options={accountMaster.values}
       filterOptions={filterOptions}
-      renderInput={(params) => <TextField {...params} />}
+      renderInput={(params) => {
+        return (
+          <Badge variant={!(wageType.accountLookupValue?.value?.[accountType]) ? "dot" : "standard"} color="warning" component="div" sx={{ width: "100%" }}>
+            <TextField {...params} />
+          </Badge>
+        )
+      }}
       onChange={(_, value, __, ___) => onChange(value)}
       getOptionLabel={option => `${option.key} ${option.value}`}
       renderOption={(props, option) => {
@@ -65,9 +71,25 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageT
           </Box>
         )
       }}
+      slotProps={{
+        popper: {
+          placement: "bottom-start",
+          style: {
+            width: "fit-content"
+          }
+        }
+      }}
+      sx={autoCompleteSx}
       size="small"
     >
     </Autocomplete>
   )
 }
 );
+
+const autoCompleteSx: SxProps<Theme> = {
+  ".MuiAutocomplete-input": {
+    paddingTop: "0 !important",
+    paddingBottom: "0 !important"
+  }
+}

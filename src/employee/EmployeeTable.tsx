@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import WorkOutlinetIcon from "@mui/icons-material/WorkOutline";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { ContentLayout } from "../components/ContentLayout";
 import { Search } from "@mui/icons-material";
@@ -30,11 +30,11 @@ import {
 	ResponsiveDialogTrigger,
 } from "../components/ResponsiveDialog";
 import { useSearchParam } from "../hooks/useSearchParam";
-import { StatusChip } from "../scenes/employees/StatusChip";
+import { StatusDot } from "./StatusDot";
 import { useEmployeeMissingDataCount } from "../utils/dataAtoms";
 import { SearchField } from "../components/SearchField";
 import { EmployeeTableFilter } from "./TableFilter";
-import { Employee, getEmployeeDisplayString } from "../models/Employee";
+import { EmployeeSet, getEmployeeDisplayString } from "../models/Employee";
 import { IdType } from "../models/IdType";
 
 
@@ -237,7 +237,7 @@ function EmployeeTableSearchDialog() {
 }
 
 function EmployeeTable() {
-	const employees = useAsyncValue() as Employee[];
+	const employees = useAsyncValue() as EmployeeSet[];
 	return (
 		<Stack>
 			{employees.map((employee) => (
@@ -260,10 +260,10 @@ const sx: SxProps<Theme> = {
 	},
 };
 
-function EmployeeRow({ employee }: { employee: Employee }) {
+function EmployeeRow({ employee }: { employee: EmployeeSet }) {
 	const { state, variant, showButtons } = useContext(EmployeeTableContext);
 	const missingDataCount = useEmployeeMissingDataCount(employee.id);
-	if (state.onlyActive && employee.status === "Inactive")
+	if (state.onlyActive && !employee.isEmployed)
 		return;
 	if (state.onlyWithMissingData && (missingDataCount === 0))
 		return;
@@ -273,7 +273,7 @@ function EmployeeRow({ employee }: { employee: Employee }) {
 	return (
 		<Stack direction="row" alignItems="center" sx={sx} mx={-0.5} px={0.5}>
 			<Link to={employee.id}>
-				<Stack direction="row" spacing={1} flexWrap="wrap">
+				<Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
 					<Typography>
 						{employee.firstName} {employee.lastName}
 					</Typography>
@@ -283,7 +283,7 @@ function EmployeeRow({ employee }: { employee: Employee }) {
 					>
 						{employee.identifier}
 					</Typography>
-					{!state.onlyActive && <StatusChip status={employee.status} />}
+					{!state.onlyActive && <StatusDot isEmployed={employee.isEmployed} />}
 				</Stack>
 			</Link>
 			{variant === "standard" && showButtons && <EmployeeButtons employeeId={employee.id} missingDataCount={missingDataCount} />}
@@ -301,7 +301,7 @@ function EmployeeButtons({ employeeId, missingDataCount }: { employeeId: IdType,
 				title={t("Data")}
 				to={employeeId + "/data"}
 				variant={variant}
-				icon={<WorkOutlinetIcon />}
+				icon={<WorkOutlineIcon />}
 				badgeCount={missingDataCount}
 			/>
 			<TableButton

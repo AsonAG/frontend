@@ -16,7 +16,6 @@ import { useTranslation } from "react-i18next";
 import { Form, Link as RouterLink, useLoaderData } from "react-router-dom";
 import { Employee } from "../models/Employee";
 import { Division } from "../models/Division";
-import { useRole } from "../hooks/useRole";
 
 type LoaderData = {
 	employee: Employee,
@@ -45,18 +44,13 @@ export function EmployeeForm() {
 					name="lastName"
 					defaultValue={employee?.lastName}
 				/>
-				{!isNew && (
-					<input type="hidden" name="identifier" value={employee?.identifier} />
-				)}
-				{!isNew && <StatusSelect status={employee.status} />}
+				{!isNew && <input type="hidden" name="status" value={employee.status} />}
 				<TextField
 					label={t("Identifier")}
 					required
 					name="identifier"
 					defaultValue={employee?.identifier}
-					disabled={!isNew}
 				/>
-				<Typography variant="h6">{t("Organization unit assignment")}</Typography>
 				{divisionAssignmentView}
 				<Stack direction="row" justifyContent="right" spacing={1}>
 					<Button component={RouterLink} to=".." relative="path">
@@ -73,12 +67,10 @@ export function EmployeeForm() {
 
 function PayrollAssignmentView() {
 	const { divisions, selectedDivisions } = useLoaderData() as LoaderData;
-	const isAdmin = useRole("admin");
-	if (!isAdmin)
-		return null;
-
+	const { t } = useTranslation();
 	return (
-		<Stack>
+		<Stack display="none">
+			<Typography variant="h6">{t("Organization unit assignment")}</Typography>
 			{
 				divisions.map(division => {
 					return (
@@ -95,24 +87,4 @@ function PayrollAssignmentView() {
 			}
 		</Stack>
 	)
-}
-
-function StatusSelect({ status }) {
-	const { t } = useTranslation();
-	const label = t("Status");
-	return (
-		<FormControl fullWidth>
-			<InputLabel id="active-select-label">{label}</InputLabel>
-			<Select
-				size="small"
-				labelId="active-select-label"
-				name="status"
-				defaultValue={status}
-				label={label}
-			>
-				<MenuItem value="Active">{t("Active")}</MenuItem>
-				<MenuItem value="Inactive">{t("Inactive")}</MenuItem>
-			</Select>
-		</FormControl>
-	);
 }

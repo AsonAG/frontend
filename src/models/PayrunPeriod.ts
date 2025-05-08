@@ -7,6 +7,8 @@ export type PayrunPeriodEntry = {
   identifier: string
   lastName: string
   firstName: string
+  leavingDate: Date | null
+  isEmployed: boolean
   netWage: number | null
   grossWage: number | null
   offsetting: number | null
@@ -20,6 +22,7 @@ export type PayrunPeriodEntry = {
   openGarnishmentPayout: number | null
   openWagePayoutPreviousPeriod: number
   openGarnishmentPayoutPreviousPeriod: number
+  hasWage: boolean
   documents: Array<PayrunDocument> | null
   processingStatus: "Complete" | "Processing"
 }

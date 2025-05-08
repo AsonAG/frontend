@@ -25,6 +25,7 @@ const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
 const missingDataEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
 const payrollLookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
+const payrollEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
 const payrollWageTypeMasterUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
@@ -220,10 +221,6 @@ class FetchRequestBuilder {
 	}
 }
 
-export function bootstrapPayrunPeriods() {
-	return new FetchRequestBuilder("/admin/bootstrapopenperiod").withMethod("POST").fetch();
-}
-
 export function getOrganizations() {
 	return new FetchRequestBuilder(organizationsUrl).fetchJson();
 }
@@ -265,13 +262,12 @@ export function getDivision(routeParams, divisionId) {
 }
 
 export function getEmployees(routeParams) {
-	return new FetchRequestBuilder(employeesUrl, routeParams)
-		.withPayrollDivision()
+	return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
 		.withQueryParam("orderBy", `firstName asc`);
 }
 
 export async function getEmployee(routeParams) {
-	return new FetchRequestBuilder(employeeUrl, routeParams).fetchJson();
+	return new FetchRequestBuilder(payrollEmployeeUrl, routeParams).fetchJson();
 }
 
 export async function createEmployee(routeParams, employee) {
@@ -319,11 +315,12 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 		.fetchJson();
 }
 
-export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodStart, payrunPeriodEnd, asCount = false, evalDate = null) {
+export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodClosed, payrunPeriodStart, payrunPeriodEnd, asCount = false, evalDate = null) {
+	const closedAtFilter = payrunPeriodClosed ? `and created le '${payrunPeriodClosed}'` : '';
 	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("employeeId", routeParams.employeeId)
-		.withQueryParam("filter", `((created ge '${payrunPeriodOpened}' and start le '${payrunPeriodEnd}') or (start ge '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')) and documentCount eq 0`)
+		.withQueryParam("filter", `((created ge '${payrunPeriodOpened}' and start lt '${payrunPeriodEnd}') or (start ge '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')) ${closedAtFilter} and documentCount eq 0`)
 		.withQueryParam("orderBy", "created desc")
 		.withQueryParam("substituteLookupCodes", !asCount)
 		.withQueryParam("result", asCount ? "Count" : undefined)

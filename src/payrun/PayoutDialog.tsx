@@ -2,7 +2,7 @@ import { Box, Button, Dialog, DialogContent, DialogTitle, Stack, Typography } fr
 import React, { PropsWithChildren } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useRouteLoaderData } from "react-router-dom";
+import { useNavigation, useRouteLoaderData } from "react-router-dom";
 import { DatePicker } from "../components/DatePicker";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import dayjs, { Dayjs } from "dayjs";
@@ -19,6 +19,7 @@ type PayoutDialogProps = {
 
 const dialogColumns = getRowGridSx([{ width: 120 }, { width: 150, flex: 1 }], 2);
 export function PayoutDialog({ employeeCount, amount, onPayout, children }: PayoutDialogProps) {
+  const navigation = useNavigation();
   const { t } = useTranslation();
   const { bankAccountDetails } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const [open, setOpen] = useState<boolean>(false);
@@ -31,6 +32,9 @@ export function PayoutDialog({ employeeCount, amount, onPayout, children }: Payo
   }
 
   const handleClose = () => {
+    // prevent close of dialog if we are submitting
+    if (navigation.state === "submitting")
+      return;
     setOpen(false);
   }
 
@@ -39,6 +43,7 @@ export function PayoutDialog({ employeeCount, amount, onPayout, children }: Payo
   if (!React.isValidElement(children)) {
     return null;
   }
+  const submitting = navigation.state === "submitting";
 
   const trigger = React.cloneElement(children, {
     ...children.props,
@@ -69,8 +74,8 @@ export function PayoutDialog({ employeeCount, amount, onPayout, children }: Payo
               <DatePicker variant="standard" disablePast value={valueDate} onChange={(v) => setValueDate(v)} onError={(e) => setValueDateValid(!e)}></DatePicker>
             </Box>
             <Stack direction="row" justifyContent="end" spacing={2}>
-              <Button onClick={handleClose}>{t("Cancel")}</Button>
-              <Button disabled={!valueDate || !valueDateValid || !bankAccount?.iban} variant="contained" onClick={() => onPayout(valueDate!.toISOString(), bankAccount.iban!)}>{t("Confirm")}</Button>
+              <Button onClick={handleClose} disabled={submitting}>{t("Cancel")}</Button>
+              <Button disabled={!valueDate || !valueDateValid || !bankAccount?.iban} loading={submitting} variant="contained" onClick={() => onPayout(valueDate!.toISOString(), bankAccount.iban!)}>{t("Confirm")}</Button>
             </Stack>
           </Stack>
         </DialogContent>

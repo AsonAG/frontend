@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useAuth, hasAuthParams } from "react-oidc-context";
 import { Centered } from "../components/Centered";
 import { Loading } from "../components/Loading";
+import { getDefaultStore } from "jotai";
+import { authUserAtom } from "./getUser";
 
 function SignIn({ children }) {
 	const auth = useAuth();
@@ -21,6 +23,12 @@ function SignIn({ children }) {
 			setHasTriedSignin(true);
 		}
 	}, [auth, hasTriedSignin]);
+
+	useEffect(() => {
+		return auth.events.addUserLoaded(() => {
+			getDefaultStore().set(authUserAtom);
+		});
+	}, [auth.events]);
 
 	if (auth.isLoading) {
 		return <Loading />;
