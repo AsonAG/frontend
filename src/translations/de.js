@@ -258,6 +258,12 @@ const translations = {
 		"inactive_collector_chip": "{{count}} inaktive Basen...",
 		"{{count}} checks active": "{{count}} Kontrollen aktiv",
 		"No checks": "Keine Kontrolle",
+		"The generation of the documents was interrupted. This is due to a new change. Please reload the page to view the up to date documents.":
+			"Das Erstellen der Dokumente wurde unterbrochen. Es gab eine Änderung in der Zwischenzeit.",
+		"The payrun period is not processed yet. The documents cannot be generated. Please try again after.":
+			"Die Periode wurde noch nicht verarbeitet. Die Dokumente können zu diesem Zeitpunkt nicht erstellet werden. Bitte versuchen Sie es später nochmal.",
+		"There was an error generating the documents.": "Es ist ein Fehler beim Erstellen der Dokumente aufgetreten.",
+		"The documents are being generated, this can take up to a few minutes...": "Die Dokumente werden erstellt. Das kann einige Minuten dauern...",
 
 		"Column visibility": "Spaltensichtbarkeit",
 		"Table width": "Tabellenbreite",

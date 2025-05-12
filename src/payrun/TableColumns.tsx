@@ -323,7 +323,7 @@ function createColumns() {
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             {
               payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => {
-                const isGenerating = doc.documentStatus === "Generating";
+                const isGenerating = payrunEntry.state !== "Current";
                 const tooltip = isGenerating ? t("generate_document", { doc }) : doc.name;
                 return (
                   <Tooltip key={doc.id} title={tooltip} placement="left">

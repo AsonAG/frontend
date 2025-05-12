@@ -24,7 +24,7 @@ export type PayrunPeriodEntry = {
   openGarnishmentPayoutPreviousPeriod: number
   hasWage: boolean
   documents: Array<PayrunDocument> | null
-  processingStatus: "Complete" | "Processing"
+  state: "OutOfDate" | "Generating" | "Current"
 }
 
 export type PayrunPeriod = {
@@ -32,14 +32,12 @@ export type PayrunPeriod = {
   entries: Array<PayrunPeriodEntry>
   periodStart: Date
   periodStatus: "Open" | "Closed"
-  documents: Array<PayrunDocument> | null
-  processingStatus: "Complete" | "Processing"
+  processingStatus: "Complete" | "ReadyToGenerate" | "Processing"
 }
 
 export type PayrunDocument = {
   id: IdType,
   name: string,
-  documentStatus: "Ready" | "Generating"
   contentType: string,
   attributes: Record<string, string> | Record<"reports", DocumentReportDefinition>
 }

@@ -59,7 +59,8 @@ import {
 	updateLookupValue,
 	deleteLookupValue,
 	getLookupValues,
-	getPayrollCollectors
+	getPayrollCollectors,
+	getPayrunPeriodDocuments
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -847,9 +848,16 @@ const routeData = [
 									if (!params.payrunPeriodId === "open") {
 										return redirect("..");
 									}
-									return {
-										payrunPeriod: await getOpenPayrunPeriod(params)
-									};
+									async function errorHandlingPeriodDocuments() {
+										const response = await getPayrunPeriodDocuments(params);
+										if (!response.ok) {
+											throw response;
+										}
+										return response.json();
+									}
+									return defer({
+										documents: errorHandlingPeriodDocuments()
+									});
 								},
 								action: async ({ params, request }) => {
 									const formData = await request.formData();

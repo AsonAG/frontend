@@ -1,31 +1,74 @@
-import React, { useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, Outlet, useRouteLoaderData } from "react-router-dom";
-import { Chip, IconButton, Stack, Typography } from "@mui/material";
+import { Await, Link, Outlet, useAsyncError, useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Alert, Chip, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
 import { ArrowDropDown, ArrowDropUp, Code, Functions, PictureAsPdf } from "@mui/icons-material";
 import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunDocument, PayrunPeriod } from "../models/PayrunPeriod";
 import { IdType } from "../models/IdType";
 
 type LoaderData = {
+  documents: Promise<Document[]>
+}
+type PayrunPeriodLoaderData = {
   payrunPeriod: PayrunPeriod
 }
 
 export function PeriodDocuments() {
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
   return (
     <>
-      {payrunPeriod.documents?.map(doc => (
-        <DocumentSection key={doc.id} payrunPeriodId={payrunPeriod.id} document={doc} />
-      ))}
+      <PayrunPeriodDocuments />
       <WageStatementSection />
       <Outlet />
     </>
   )
 }
+
+function PayrunPeriodDocuments() {
+  const { documents } = useLoaderData() as LoaderData;
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  return (
+    <Suspense fallback={<LoadingView />}>
+      <Await resolve={documents} errorElement={<ErrorView />}>
+        {(docs) => docs.map(doc => <DocumentSection key={doc.id} payrunPeriodId={payrunPeriod.id} document={doc} />)}
+      </Await>
+    </Suspense>
+  );
+}
+
+
+function LoadingView() {
+  const { t } = useTranslation();
+  const [showText, setShowText] = useState(false);
+  useEffect(() => {
+    setTimeout(() => setShowText(true), 1000)
+  }, []);
+  const text = showText ? t("The documents are being generated, this can take up to a few minutes...") : '\u00A0'; // nbsp
+  return (
+    <Stack spacing={2}>
+      <CircularProgress />
+      <Typography>{text}</Typography>
+    </Stack>
+  )
+}
+
+const errorStates = {
+  400: { severity: "warning", text: "The payrun period is not processed yet. The documents cannot be generated. Please try again after." },
+  409: { severity: "warning", text: "The generation of the documents was interrupted. This is due to a new change. Please reload the page to view the up to date documents." }
+}
+
+function ErrorView() {
+  const error = useAsyncError() as Response;
+  const { t } = useTranslation();
+
+
+  const state = errorStates[error.status] ?? { severity: "error", text: "There was an error generating the documents." };
+  return <Alert severity={state.severity} variant="filled">{t(state.text)}</Alert>
+}
+
 function WageStatementSection() {
   const { t } = useTranslation();
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const [open, setOpen] = useState(false);
   const wageStatements = payrunPeriod.entries.map(entry => {
     const wageStatementDoc = entry?.documents?.find(doc => doc.attributes?.type === "wagestatement")
@@ -66,38 +109,31 @@ type DocumentSectionProps = {
   document: PayrunDocument
 }
 function DocumentSection({ payrunPeriodId, document }: DocumentSectionProps) {
-  const { t } = useTranslation();
   return (
     <Stack spacing={1}>
       <Typography variant="h6">{document.name}</Typography>
-      {
-        document.documentStatus === "Generating" ?
-          <Typography>{t("Generating...")}</Typography> :
-          (
-            <Stack direction="row" spacing={1} flexWrap="wrap">
-              <DocumentChip doc={document} to={`${payrunPeriodId}/doc/${document.id}`} />
-              {document.attributes?.reports?.flatMap(report => {
-                if (report.Variants) {
-                  return report.Variants.map(variant => (
-                    <PdfChip
-                      key={variant}
-                      label={report.Name.split(".").pop() + " " + variant}
-                      to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}&variant=${encodeURIComponent(variant)}`}
-                    />
-                  ));
-                }
-                return (
-                  <PdfChip
-                    key={report.Name}
-                    label={report.Name.split(".").pop()}
-                    to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}`}
-                  />
-                )
-              }
-              )}
-            </Stack>
+      <Stack direction="row" spacing={1} flexWrap="wrap">
+        <DocumentChip doc={document} to={`${payrunPeriodId}/doc/${document.id}`} />
+        {document.attributes?.reports?.flatMap(report => {
+          if (report.Variants) {
+            return report.Variants.map(variant => (
+              <PdfChip
+                key={variant}
+                label={report.Name.split(".").pop() + " " + variant}
+                to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}&variant=${encodeURIComponent(variant)}`}
+              />
+            ));
+          }
+          return (
+            <PdfChip
+              key={report.Name}
+              label={report.Name.split(".").pop()}
+              to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}`}
+            />
           )
-      }
+        }
+        )}
+      </Stack>
     </Stack >
   )
 }

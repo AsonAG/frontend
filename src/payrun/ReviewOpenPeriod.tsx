@@ -1,7 +1,7 @@
 import React from "react";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, useRouteLoaderData } from "react-router-dom";
 import { Button, Stack, Typography } from "@mui/material";
 import { PayrunPeriod } from "../models/PayrunPeriod";
 import { Employee } from "../models/Employee";
@@ -14,10 +14,11 @@ import {
 } from "../components/ResponsiveDialog";
 import { DashboardHeader } from "./DashboardHeader";
 import { PeriodDocuments } from "./PeriodDocuments";
+import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 
 export function ReviewOpenPeriod() {
   const { t } = useTranslation();
-  const { payrunPeriod } = useLoaderData() as LoaderData;
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   return (
     <>
       <ContentLayout title={<DashboardHeader />}>
