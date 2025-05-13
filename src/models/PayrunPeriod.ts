@@ -24,7 +24,7 @@ export type PayrunPeriodEntry = {
   openGarnishmentPayoutPreviousPeriod: number
   hasWage: boolean
   documents: Array<PayrunDocument> | null
-  state: "OutOfDate" | "Generating" | "Current"
+  state: "OutOfDate" | "Generating" | "Current" | "Error"
 }
 
 export type PayrunPeriod = {

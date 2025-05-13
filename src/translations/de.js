@@ -213,6 +213,7 @@ const translations = {
 		"payrun_period_paid_out": "Ausbezahlt",
 		"payrun_period_former_employees": "Frühere Mitarbeiter",
 		"payrun_period_no_wage": "Angestellt aber ohne Lohn",
+		"payrun_period_error": "Mit Fehlern (der Support wurde informiert)",
 		"The open period is being created. Please refresh the page in a moment.": "Die offene Periode wird erstellt, bitte laden Sie die Seite nach kurzer Zeit neu.",
 		"Payout created": "Auszahlung erstellt",
 		"Error while creating the payout": "Fehler beim Erstellen der Auszahlung",
