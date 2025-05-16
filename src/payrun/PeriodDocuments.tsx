@@ -41,7 +41,7 @@ function LoadingView() {
   const { t } = useTranslation();
   const [showText, setShowText] = useState(false);
   useEffect(() => {
-    setTimeout(() => setShowText(true), 1000)
+    setTimeout(() => setShowText(true), 1500)
   }, []);
   const text = showText ? t("The documents are being generated, this can take up to a few minutes...") : '\u00A0'; // nbsp
   return (
@@ -63,7 +63,7 @@ function ErrorView() {
 
 
   const state = errorStates[error.status] ?? { severity: "error", text: "There was an error generating the documents." };
-  return <Alert severity={state.severity} variant="filled">{t(state.text)}</Alert>
+  return <Alert severity={state.severity} variant="filled"><Typography>{t(state.text)}</Typography></Alert>
 }
 
 function WageStatementSection() {

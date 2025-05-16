@@ -1,7 +1,7 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
-import { Form, useRouteLoaderData } from "react-router-dom";
+import { Await, Form, useLoaderData, useRouteLoaderData } from "react-router-dom";
 import { Button, Stack, Typography } from "@mui/material";
 import { PayrunPeriod } from "../models/PayrunPeriod";
 import { Employee } from "../models/Employee";
@@ -18,6 +18,7 @@ import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 
 export function ReviewOpenPeriod() {
   const { t } = useTranslation();
+  const { documents } = useLoaderData();
   const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   return (
     <>
@@ -25,9 +26,15 @@ export function ReviewOpenPeriod() {
         <PeriodDocuments />
         <Stack direction="row" justifyContent="end">
           <ResponsiveDialog>
-            <ResponsiveDialogTrigger>
-              <Button variant="contained" color="primary">{t("Close period")}</Button>
-            </ResponsiveDialogTrigger>
+            <Suspense fallback={<Button variant="contained" color="primary" disabled>{t("Close period")}</Button>}>
+              <Await resolve={documents} errorElement={<Button variant="contained" color="primary" disabled>{t("Close period")}</Button>}>
+                {() =>
+                  <ResponsiveDialogTrigger>
+                    <Button variant="contained" color="primary">{t("Close period")}</Button>
+                  </ResponsiveDialogTrigger>
+                }
+              </Await>
+            </Suspense>
             <ResponsiveDialogContent>
               <Typography variant="h6">{t("Close period")}</Typography>
               <Typography>{t("Upon closing the period, these documents will be sent to swissdec.")}</Typography>
@@ -53,3 +60,4 @@ type LoaderData = {
   employees: Array<Employee>
   payrunPeriod: PayrunPeriod
 }
+
