@@ -28,7 +28,7 @@ const tableHeaderHeight = 36;
 const headerStickySx = getStickySx(10, { top: 0 });
 export function WageTypeControlling() {
   const { t } = useTranslation();
-  const { wageTypes } = useLoaderData() as WageTypeControllingLoaderData;
+  const { wageTypes, attributeTranslationMap } = useLoaderData() as WageTypeControllingLoaderData;
   const table = useReactTable({
     columns: columns,
     data: wageTypes,
@@ -76,7 +76,7 @@ export function WageTypeControlling() {
       )}
       {
         Object.entries(rowsByCategory).map(([category, rows]) =>
-          <WageTypeCategoryGroup key={category} category={category} rows={rows} rowGridSx={rowGridSx} />
+          <WageTypeCategoryGroup key={category} category={attributeTranslationMap.get(category)?.value ?? category} rows={rows} rowGridSx={rowGridSx} />
         )
 
       }
