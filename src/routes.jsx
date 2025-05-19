@@ -897,6 +897,12 @@ const routeData = [
 								id: "payrunperioddocuments",
 								path: "documents",
 								Component: ClosedPeriodDocuments,
+								loader: async ({ params }) => {
+									const response = await getPayrunPeriodDocuments(params);
+									return {
+										documents: await response.json()
+									}
+								},
 								children: [
 									createRoutePayrunPeriodDocument(),
 								]

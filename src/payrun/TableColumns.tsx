@@ -12,6 +12,7 @@ import { TableSettingsButton } from "./TableSettings";
 import { AmountInput } from "./AmountInput";
 import { RowSelectionButton } from "./RowSelectionButton";
 import { EntryRow } from "./types";
+import { PayslipButton } from "./PayslipButton";
 
 const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
 function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefined>, wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
@@ -317,23 +318,10 @@ function createColumns() {
       }),
     columnHelper.display({
       id: "documents",
-      cell: ({ row, t }) => {
-        const payrunEntry = row.original;
+      cell: ({ row }) => {
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
-            {
-              payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => {
-                const isGenerating = payrunEntry.state !== "Current";
-                const tooltip = isGenerating ? t("generate_document", { doc }) : doc.name;
-                return (
-                  <Tooltip key={doc.id} title={tooltip} placement="left">
-                    <span>
-                      <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation} loading={isGenerating}><FilePresentRoundedIcon /></IconButton>
-                    </span>
-                  </Tooltip>
-                );
-              })
-            }
+            <PayslipButton payrunPeriodEntry={row.original} />
           </Stack>
         )
       },
