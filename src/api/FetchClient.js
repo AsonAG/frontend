@@ -70,6 +70,8 @@ class FetchRequestBuilder {
 	addPayrollDivision = false;
 	ignoreErrors = false;
 	fallbackValue = null;
+	timeout = 60000;
+	retries = 0;
 
 	constructor(url, routeParams) {
 		if (!url) {
@@ -143,7 +145,13 @@ class FetchRequestBuilder {
 	}
 
 	withTimout(timeout) {
+		this.timeout = timeout;
 		this.signal = AbortSignal.timeout(timeout);
+		return this;
+	}
+
+	withRetries(retry) {
+		this.retries = retry;
 		return this;
 	}
 
@@ -198,6 +206,13 @@ class FetchRequestBuilder {
 			url = `${url}?${this.searchParams}`;
 		}
 
+		if (this.retries > 0) {
+			return fetchWithTimeoutAndRetry(url, {
+				method: this.method,
+				headers: this.headers,
+				body: this.body,
+			}, this.timeout, this.retries);
+		}
 		return fetch(url, {
 			method: this.method,
 			headers: this.headers,
@@ -523,7 +538,8 @@ export function createOpenPayrunPeriod(routeParams) {
 
 export function getPayrunPeriodDocuments(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodDocumentsUrl, routeParams)
-		.withTimout(5 * 60 * 1000)
+		.withTimout(2 * 60 * 1000)
+		.withRetries(10)
 		.fetch();
 }
 
@@ -723,4 +739,45 @@ export async function requestPainFileDownload(routeParams, name) {
 	const response = await builder.fetch();
 	const blob = await response.blob();
 	await downloadData(blob, name);
+}
+
+async function fetchWithTimeoutAndRetry(url, options = {}, timeout = 5000, maxRetries = 3) {
+	let attempt = 0;
+
+	const fetchWithTimeout = (url, options, timeout) => {
+		return new Promise((resolve, reject) => {
+			const controller = new AbortController();
+			const timer = setTimeout(() => {
+				controller.abort();
+				reject(new Error('Timeout'));
+			}, timeout);
+
+			fetch(url, { ...options, signal: controller.signal })
+				.then(response => {
+					clearTimeout(timer);
+					resolve(response);
+				})
+				.catch(err => {
+					clearTimeout(timer);
+					reject(err);
+				});
+		});
+	};
+
+	while (attempt < maxRetries) {
+		try {
+			const response = await fetchWithTimeout(url, options, timeout);
+			return response; // success
+		} catch (err) {
+			if (err.name === 'AbortError' || err.message === 'Timeout') {
+				attempt++;
+				if (attempt >= maxRetries) {
+					throw new Error(`Failed after ${maxRetries} retries due to timeout.`);
+				}
+			} else {
+				// For other errors, don't retry
+				throw err;
+			}
+		}
+	}
 }
