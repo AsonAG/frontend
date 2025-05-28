@@ -32,7 +32,7 @@ export function PayrunDashboard() {
 }
 
 function PayrunPeriodView() {
-  const { payrunPeriod, previousPayrunPeriod, controllingData, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  const { payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const isOpen = payrunPeriod.periodStatus === "Open";
   const rows: Array<EntryRow> = useMemo(() => {
     const controllingDataMap = new Map(controllingData.employeeControllingCases.map(x => [x.id, x.cases]));
@@ -41,7 +41,6 @@ function PayrunPeriodView() {
       amount: entry.openPayout ?? 0,
       previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.employeeId),
       controllingTasks: isOpen ? controllingDataMap.get(entry.employeeId) : [],
-      caseValueCount: caseValueCounts[index],
       salaryType: salaryTypes[index]
     }));
     // filter here, otherwise the index wont match
@@ -49,7 +48,7 @@ function PayrunPeriodView() {
       entries = entries.filter(e => e.isEmployed || e.hasWage);
     }
     return entries;
-  }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData, caseValueCounts]);
+  }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData]);
   const [state, dispatch] = useReducer(
     reducer,
     rows,

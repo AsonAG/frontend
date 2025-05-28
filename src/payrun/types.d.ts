@@ -50,7 +50,6 @@ export type EntryRow = PayrunPeriodEntry & {
   previousEntry: PayrunPeriodEntry | undefined
   amount: number | undefined
   controllingTasks: Array<MissingDataCase> | undefined
-  caseValueCount: number,
   salaryType: string | null
 }
 

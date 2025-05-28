@@ -333,8 +333,8 @@ function createColumns() {
     columnHelper.display({
       id: "events",
       cell: ({ row, t }) => {
-        const { employeeId, caseValueCount } = row.original;
-        if (caseValueCount === 0)
+        const { employeeId, relevantEventCount } = row.original;
+        if (relevantEventCount === 0)
           return <div></div>;
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>

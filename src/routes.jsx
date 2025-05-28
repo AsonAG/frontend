@@ -795,18 +795,16 @@ const routeData = [
 							const [
 								previousPayrunPeriod,
 								controllingData,
-								caseValueCounts,
 								salaryTypes,
 								bankAccountDetails
 							] = await Promise.all([
 								getPreviousPayrunPeriod(params, payrunPeriod.periodStart),
 								isOpen ? store.get(payrollControllingDataAtom) : { employeeControllingCases: [], companyControllingCases: [] },
-								Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.closedAt, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
 								Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
 								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
 							]);
 							const salaryTypesSet = [...new Set(salaryTypes)].filter(Boolean).sort();
-							return { payrunPeriod, previousPayrunPeriod, controllingData, caseValueCounts, salaryTypes, salaryTypesSet, bankAccountDetails };
+							return { payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes, salaryTypesSet, bankAccountDetails };
 						},
 						children: [
 							{

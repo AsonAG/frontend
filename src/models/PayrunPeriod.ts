@@ -25,6 +25,7 @@ export type PayrunPeriodEntry = {
   hasWage: boolean
   documents: Array<PayrunDocument> | null
   state: "OutOfDate" | "Generating" | "Current" | "Error"
+  relevantEventCount: number
 }
 
 export type PayrunPeriod = {
