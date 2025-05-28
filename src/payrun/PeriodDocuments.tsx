@@ -54,7 +54,7 @@ function LoadingView() {
 
 const errorStates = {
   400: { severity: "warning", text: "The payrun period is not processed yet. The documents cannot be generated. Please try again after." },
-  409: { severity: "warning", text: "The generation of the documents was interrupted. This is due to a new change. Please reload the page to view the up to date documents." }
+  409: { severity: "warning", text: "In the meantime, there have been changes that require the documents to be reprocessed. Visit this page again as soon as the period has been processed." }
 }
 
 function ErrorView() {
@@ -62,7 +62,7 @@ function ErrorView() {
   const { t } = useTranslation();
 
 
-  const state = errorStates[error.status] ?? { severity: "error", text: "There was an error generating the documents." };
+  const state = errorStates[error.status] ?? { severity: "error", text: "There was an error generating the documents. The support has been informed and we will fix the problem as soon as possible." };
   return <Alert severity={state.severity} variant="filled"><Typography>{t(state.text)}</Typography></Alert>
 }
 
