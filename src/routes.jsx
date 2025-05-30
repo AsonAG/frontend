@@ -906,16 +906,19 @@ const routeData = [
 								]
 							},
 							{
-								path: "employees/:employeeId/events",
+								path: "entries/:payrunPeriodEntryId/events",
 								Component: PayrunDashboard,
 								children: [
 									{
 										index: true,
 										Component: PeriodCaseValueDialog,
 										loader: async ({ params }) => {
-											const fetcher = params.payrunPeriodId === "open" ? getOpenPayrunPeriod : getPayrunPeriod;
-											const payrunPeriod = await fetcher(params);
-											return getPayrunPeriodCaseValues(params, payrunPeriod.created, payrunPeriod.closedAt, payrunPeriod.periodStart, payrunPeriod.periodEnd);
+											let payrunPeriodId = params.payrunPeriodId;
+											if (payrunPeriodId === "open") {
+												const payrunPeriod = await getOpenPayrunPeriod(params);
+												payrunPeriodId = payrunPeriod.id;
+											}
+											return getPayrunPeriodCaseValues({ ...params, payrunPeriodId });
 										}
 									}
 								]

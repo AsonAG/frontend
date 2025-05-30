@@ -2,7 +2,6 @@ import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import React, { MouseEventHandler } from "react";
 import { formatValue } from "./utils";
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
-import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import { TrendingDown, TrendingUp } from "@mui/icons-material";
 import { Link } from "react-router-dom";
@@ -333,13 +332,13 @@ function createColumns() {
     columnHelper.display({
       id: "events",
       cell: ({ row, t }) => {
-        const { employeeId, relevantEventCount } = row.original;
+        const { id, relevantEventCount } = row.original;
         if (relevantEventCount === 0)
           return <div></div>;
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             <Tooltip title={t("Events")} placement="left">
-              <IconButton size="small" component={Link} to={`employees/${employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
+              <IconButton size="small" component={Link} to={`entries/${id}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
             </Tooltip>
           </Stack>
         )

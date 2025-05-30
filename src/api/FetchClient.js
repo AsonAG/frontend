@@ -42,8 +42,8 @@ const payrunsUrl = "/tenants/:orgId/payruns";
 const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods";
 const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId";
 const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/close";
+const payrunPeriodEntryRelevantEventValues = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/entries/:payrunPeriodEntryId/relevantEventValues";
 const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents";
-const payrunPeriodDocumentsGenerateUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/generate";
 const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
 const payrunPeriodControllingUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/open/controlling";
 const payoutsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts";
@@ -331,16 +331,8 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 		.fetchJson();
 }
 
-export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodClosed, payrunPeriodStart, payrunPeriodEnd, asCount = false, evalDate = null) {
-	const closedAtFilter = payrunPeriodClosed ? `and created le '${payrunPeriodClosed}'` : '';
-	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
-		.withQueryParam("caseType", "Employee")
-		.withQueryParam("employeeId", routeParams.employeeId)
-		.withQueryParam("filter", `((created ge '${payrunPeriodOpened}' and start lt '${payrunPeriodEnd}') or (start ge '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')) ${closedAtFilter} and documentCount eq 0`)
-		.withQueryParam("orderBy", "created desc")
-		.withQueryParam("substituteLookupCodes", !asCount)
-		.withQueryParam("result", asCount ? "Count" : undefined)
-		.withQueryParam("evaluationDate", evalDate)
+export function getPayrunPeriodCaseValues(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodEntryRelevantEventValues, routeParams)
 		.withLocalization()
 		.withUser()
 		.fetchJson();

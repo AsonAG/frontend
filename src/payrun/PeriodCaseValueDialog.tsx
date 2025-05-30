@@ -19,6 +19,7 @@ import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent } from
 
 type EventValue = {
   id: IdType
+  displayCaseFieldName: string
   caseFieldName: string
   valueType: string
   value: string
@@ -96,7 +97,7 @@ function Table() {
   const items = useLoaderData() as Array<EventValue>;
   const e: Array<EventRow> = useMemo(() => items.map(v => ({
     id: v.id,
-    eventFieldName: v.caseFieldName,
+    eventFieldName: v.displayCaseFieldName,
     value: formatCaseValue(v, t),
     start: v.start,
     end: v.end,
