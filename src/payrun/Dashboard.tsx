@@ -32,7 +32,7 @@ export function PayrunDashboard() {
 }
 
 function PayrunPeriodView() {
-  const { payrunPeriod, previousPayrunPeriod, controllingData, caseValueCounts, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  const { payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const isOpen = payrunPeriod.periodStatus === "Open";
   const rows: Array<EntryRow> = useMemo(() => {
     const controllingDataMap = new Map(controllingData.employeeControllingCases.map(x => [x.id, x.cases]));
@@ -41,7 +41,6 @@ function PayrunPeriodView() {
       amount: entry.openPayout ?? 0,
       previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.employeeId),
       controllingTasks: isOpen ? controllingDataMap.get(entry.employeeId) : [],
-      caseValueCount: caseValueCounts[index],
       salaryType: salaryTypes[index]
     }));
     // filter here, otherwise the index wont match
@@ -49,7 +48,7 @@ function PayrunPeriodView() {
       entries = entries.filter(e => e.isEmployed || e.hasWage);
     }
     return entries;
-  }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData, caseValueCounts]);
+  }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData]);
   const [state, dispatch] = useReducer(
     reducer,
     rows,
@@ -98,7 +97,7 @@ function PayrunPeriodView() {
 
 
 
-type EntryState = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "NoWage" | "FormerEmployee";
+type EntryState = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "NoWage" | "FormerEmployee" | "Error";
 
 function EmployeeTableSearchField() {
   const { t } = useTranslation();
@@ -189,7 +188,7 @@ function getSelectedTabAfterSearch(state: DashboardState): Tab {
   if (hasEntries(state.selectedTab)) {
     return state.selectedTab;
   }
-  if (hasEntries("Controlling") || hasEntries("NoWage")) {
+  if (hasEntries("Controlling") || hasEntries("NoWage") || hasEntries("Error")) {
     return "Controlling"
   }
   if (hasEntries("Payable")) {
@@ -219,8 +218,11 @@ function createInitialState(employeeRows: Array<EntryRow>): DashboardState {
 function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
   return Object.groupBy(rows, groupingFn);
   function groupingFn(row: EntryRow): EntryState {
-    if (!row.payrunJobId) {
+    if (row.state === "OutOfDate") {
       return "Calculating";
+    }
+    if (row.state === "Error") {
+      return "Error";
     }
     if ((row.controllingTasks?.length ?? 0) > 0) {
       return "Controlling";
@@ -240,7 +242,7 @@ function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
 
 function getEntryCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab, number> {
   return {
-    "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["NoWage"]?.length ?? 0),
+    "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["NoWage"]?.length ?? 0) + (grouped["Error"]?.length ?? 0),
     "Payable": (grouped["Payable"]?.length ?? 0),
     "PaidOut": (grouped["PaidOut"]?.length ?? 0)
   };
@@ -253,7 +255,8 @@ function ControllingList() {
   const { controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const wageControlling = state.entriesByState["Controlling"];
   const noWage = state.entriesByState["NoWage"];
-  if (!wageControlling && !noWage && controllingData.companyControllingCases.length === 0) {
+  const errors = state.entriesByState["Error"];
+  if (!wageControlling && !noWage && !errors && controllingData.companyControllingCases.length === 0) {
     if (state.employeeFilter)
       return;
     return <Typography>{t("All entries are ok.")}</Typography>
@@ -263,6 +266,7 @@ function ControllingList() {
     <Stack spacing={2}>
       <WageControllingList wageControlling={wageControlling} companyControllingCases={controllingData.companyControllingCases} />
       <NoWageList entries={noWage} />
+      <ErrorList entries={errors} />
     </Stack>
   )
 }
@@ -341,5 +345,21 @@ function NoWageList({ entries }: { entries: Array<EntryRow> }) {
     </Stack>
   )
 }
+
+function ErrorList({ entries }: { entries: Array<EntryRow> }) {
+  const { t } = useTranslation();
+  if (!entries)
+    return;
+
+  return (
+    <Stack spacing={1}>
+      <Typography variant="h6">{t("payrun_period_error")}</Typography>
+      <Stack direction="row" spacing={0.5} flexWrap="wrap">
+        {entries.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="error" />)}
+      </Stack>
+    </Stack>
+  )
+}
+
 
 const noop = () => { };

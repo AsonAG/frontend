@@ -1,30 +1,74 @@
-import React, { useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, Outlet, useRouteLoaderData } from "react-router-dom";
-import { Chip, IconButton, Stack, Typography } from "@mui/material";
+import { Await, Link, Outlet, useAsyncError, useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Alert, Chip, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
 import { ArrowDropDown, ArrowDropUp, Code, Functions, PictureAsPdf } from "@mui/icons-material";
 import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunDocument, PayrunPeriod } from "../models/PayrunPeriod";
+import { IdType } from "../models/IdType";
 
 type LoaderData = {
+  documents: Promise<Document[]>
+}
+type PayrunPeriodLoaderData = {
   payrunPeriod: PayrunPeriod
 }
 
 export function PeriodDocuments() {
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
   return (
     <>
-      {payrunPeriod.documents?.map(doc => (
-        <DocumentSection key={doc.id} payrunPeriodId={payrunPeriod.id} document={doc} />
-      ))}
+      <PayrunPeriodDocuments />
       <WageStatementSection />
       <Outlet />
     </>
   )
 }
+
+function PayrunPeriodDocuments() {
+  const { documents } = useLoaderData() as LoaderData;
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  return (
+    <Suspense fallback={<LoadingView />}>
+      <Await resolve={documents} errorElement={<ErrorView />}>
+        {(docs) => docs.map(doc => <DocumentSection key={doc.id} payrunPeriodId={payrunPeriod.id} document={doc} />)}
+      </Await>
+    </Suspense>
+  );
+}
+
+
+function LoadingView() {
+  const { t } = useTranslation();
+  const [showText, setShowText] = useState(false);
+  useEffect(() => {
+    setTimeout(() => setShowText(true), 1500)
+  }, []);
+  const text = showText ? t("The documents are being generated, this can take up to a few minutes...") : '\u00A0'; // nbsp
+  return (
+    <Stack spacing={2}>
+      <CircularProgress />
+      <Typography>{text}</Typography>
+    </Stack>
+  )
+}
+
+const errorStates = {
+  400: { severity: "warning", text: "The payrun period is not processed yet. The documents cannot be generated. Please try again after." },
+  409: { severity: "warning", text: "In the meantime, there have been changes that require the documents to be reprocessed. Visit this page again as soon as the period has been processed." }
+}
+
+function ErrorView() {
+  const error = useAsyncError() as Response;
+  const { t } = useTranslation();
+
+
+  const state = errorStates[error.status] ?? { severity: "error", text: "There was an error generating the documents. The support has been informed and we will fix the problem as soon as possible." };
+  return <Alert severity={state.severity} variant="filled"><Typography>{t(state.text)}</Typography></Alert>
+}
+
 function WageStatementSection() {
   const { t } = useTranslation();
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as LoaderData;
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const [open, setOpen] = useState(false);
   const wageStatements = payrunPeriod.entries.map(entry => {
     const wageStatementDoc = entry?.documents?.find(doc => doc.attributes?.type === "wagestatement")
@@ -60,7 +104,11 @@ function WageStatements({ wageStatements }) {
 }
 
 const noop = () => { };
-function DocumentSection({ payrunPeriodId, document }) {
+type DocumentSectionProps = {
+  payrunPeriodId: IdType,
+  document: PayrunDocument
+}
+function DocumentSection({ payrunPeriodId, document }: DocumentSectionProps) {
   return (
     <Stack spacing={1}>
       <Typography variant="h6">{document.name}</Typography>

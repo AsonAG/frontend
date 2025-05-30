@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useMemo } from "react";
-import { Link, useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { Link, useLoaderData, useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Stack,
@@ -16,9 +16,11 @@ import { IdType } from "../models/IdType";
 import { createColumnHelper, useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
 import { TFunction } from "i18next";
 import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent } from "../components/ResponsiveDialog";
+import { PayrunPeriod } from "../models/PayrunPeriod";
 
 type EventValue = {
   id: IdType
+  displayCaseFieldName: string
   caseFieldName: string
   valueType: string
   value: string
@@ -72,8 +74,10 @@ function createColumns(t: TFunction<"translation", undefined>) {
 }
 export function PeriodCaseValueDialog() {
   const { t } = useTranslation();
-  const params = useParams();
+  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as { payrunPeriod: PayrunPeriod };
   const navigate = useNavigate();
+  const params = useParams();
+  const employeeId = useMemo(() => payrunPeriod.entries.find(entry => entry.id === params.payrunPeriodEntryId)?.employeeId, [params, payrunPeriod]);
   const onClose = () => navigate("..");
   return (
     <ResponsiveDialog open onOpenChange={onClose}>
@@ -81,7 +85,7 @@ export function PeriodCaseValueDialog() {
         <Typography variant="h6">{t("New relevant values in open period")}</Typography>
         <Table />
         <Stack direction="row" justifyContent="end" spacing={2}>
-          <Button to={`../../../hr/employees/${params.employeeId}`} component={Link}>{t("Go to employee data")}</Button>
+          <Button to={`../../../hr/employees/${employeeId}`} component={Link}>{t("Go to employee data")}</Button>
           <ResponsiveDialogClose>
             <Button variant="outlined">{t("Close")}</Button>
           </ResponsiveDialogClose>
@@ -96,7 +100,7 @@ function Table() {
   const items = useLoaderData() as Array<EventValue>;
   const e: Array<EventRow> = useMemo(() => items.map(v => ({
     id: v.id,
-    eventFieldName: v.caseFieldName,
+    eventFieldName: v.displayCaseFieldName,
     value: formatCaseValue(v, t),
     start: v.start,
     end: v.end,

@@ -48,9 +48,7 @@ export function DashboardHeader({ index, children }: DashboardHeaderProps) {
           </Tooltip>
           {
             periodOpen ?
-              <Tooltip title={t("Go to period completion...")}>
-                <IconButton component={Link} to="review" color="primary"><NextPlan /></IconButton>
-              </Tooltip> :
+              <ReviewButton payrunPeriod={payrunPeriod} /> :
               <Tooltip title={t("Documents")}>
                 <IconButton component={Link} to="documents"><Receipt /></IconButton>
               </Tooltip>
@@ -58,5 +56,18 @@ export function DashboardHeader({ index, children }: DashboardHeaderProps) {
         </>
       }
     </Stack>
+  );
+}
+
+function ReviewButton({ payrunPeriod }: { payrunPeriod: PayrunPeriod }) {
+  const { t } = useTranslation();
+  const isProcessing = payrunPeriod.processingStatus === "Processing";
+  const tooltip = isProcessing ? "The period is being processed..." : "Go to period completion...";
+  return (
+    <Tooltip title={t(tooltip)}>
+      <span>
+        <IconButton component={Link} to="review" color="primary" disabled={isProcessing}><NextPlan /></IconButton>
+      </span>
+    </Tooltip>
   );
 }

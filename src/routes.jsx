@@ -59,7 +59,8 @@ import {
 	updateLookupValue,
 	deleteLookupValue,
 	getLookupValues,
-	getPayrollCollectors
+	getPayrollCollectors,
+	getPayrunPeriodDocuments
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -794,18 +795,16 @@ const routeData = [
 							const [
 								previousPayrunPeriod,
 								controllingData,
-								caseValueCounts,
 								salaryTypes,
 								bankAccountDetails
 							] = await Promise.all([
 								getPreviousPayrunPeriod(params, payrunPeriod.periodStart),
 								isOpen ? store.get(payrollControllingDataAtom) : { employeeControllingCases: [], companyControllingCases: [] },
-								Promise.all(payrunPeriod.entries.map(e => getPayrunPeriodCaseValues({ ...params, employeeId: e.employeeId }, payrunPeriod.created, payrunPeriod.closedAt, payrunPeriod.periodStart, payrunPeriod.periodEnd, true, evalDate))),
 								Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
 								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
 							]);
 							const salaryTypesSet = [...new Set(salaryTypes)].filter(Boolean).sort();
-							return { payrunPeriod, previousPayrunPeriod, controllingData, caseValueCounts, salaryTypes, salaryTypesSet, bankAccountDetails };
+							return { payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes, salaryTypesSet, bankAccountDetails };
 						},
 						children: [
 							{
@@ -847,9 +846,16 @@ const routeData = [
 									if (!params.payrunPeriodId === "open") {
 										return redirect("..");
 									}
-									return {
-										payrunPeriod: await getOpenPayrunPeriod(params)
-									};
+									async function errorHandlingPeriodDocuments() {
+										const response = await getPayrunPeriodDocuments(params);
+										if (!response.ok) {
+											throw response;
+										}
+										return response.json();
+									}
+									return defer({
+										documents: errorHandlingPeriodDocuments()
+									});
 								},
 								action: async ({ params, request }) => {
 									const formData = await request.formData();
@@ -889,21 +895,30 @@ const routeData = [
 								id: "payrunperioddocuments",
 								path: "documents",
 								Component: ClosedPeriodDocuments,
+								loader: async ({ params }) => {
+									const response = await getPayrunPeriodDocuments(params);
+									return {
+										documents: await response.json()
+									}
+								},
 								children: [
 									createRoutePayrunPeriodDocument(),
 								]
 							},
 							{
-								path: "employees/:employeeId/events",
+								path: "entries/:payrunPeriodEntryId/events",
 								Component: PayrunDashboard,
 								children: [
 									{
 										index: true,
 										Component: PeriodCaseValueDialog,
 										loader: async ({ params }) => {
-											const fetcher = params.payrunPeriodId === "open" ? getOpenPayrunPeriod : getPayrunPeriod;
-											const payrunPeriod = await fetcher(params);
-											return getPayrunPeriodCaseValues(params, payrunPeriod.created, payrunPeriod.closedAt, payrunPeriod.periodStart, payrunPeriod.periodEnd);
+											let payrunPeriodId = params.payrunPeriodId;
+											if (payrunPeriodId === "open") {
+												const payrunPeriod = await getOpenPayrunPeriod(params);
+												payrunPeriodId = payrunPeriod.id;
+											}
+											return getPayrunPeriodCaseValues({ ...params, payrunPeriodId });
 										}
 									}
 								]

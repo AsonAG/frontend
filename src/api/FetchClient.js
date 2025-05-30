@@ -42,6 +42,7 @@ const payrunsUrl = "/tenants/:orgId/payruns";
 const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods";
 const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId";
 const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/close";
+const payrunPeriodEntryRelevantEventValues = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/entries/:payrunPeriodEntryId/relevantEventValues";
 const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents";
 const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
 const payrunPeriodControllingUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/open/controlling";
@@ -69,6 +70,8 @@ class FetchRequestBuilder {
 	addPayrollDivision = false;
 	ignoreErrors = false;
 	fallbackValue = null;
+	timeout = 60000;
+	retries = 0;
 
 	constructor(url, routeParams) {
 		if (!url) {
@@ -142,7 +145,13 @@ class FetchRequestBuilder {
 	}
 
 	withTimout(timeout) {
+		this.timeout = timeout;
 		this.signal = AbortSignal.timeout(timeout);
+		return this;
+	}
+
+	withRetries(retry) {
+		this.retries = retry;
 		return this;
 	}
 
@@ -197,6 +206,13 @@ class FetchRequestBuilder {
 			url = `${url}?${this.searchParams}`;
 		}
 
+		if (this.retries > 0) {
+			return fetchWithTimeoutAndRetry(url, {
+				method: this.method,
+				headers: this.headers,
+				body: this.body,
+			}, this.timeout, this.retries);
+		}
 		return fetch(url, {
 			method: this.method,
 			headers: this.headers,
@@ -315,16 +331,8 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 		.fetchJson();
 }
 
-export function getPayrunPeriodCaseValues(routeParams, payrunPeriodOpened, payrunPeriodClosed, payrunPeriodStart, payrunPeriodEnd, asCount = false, evalDate = null) {
-	const closedAtFilter = payrunPeriodClosed ? `and created le '${payrunPeriodClosed}'` : '';
-	return new FetchRequestBuilder(caseChangeCaseValuesUrl, routeParams)
-		.withQueryParam("caseType", "Employee")
-		.withQueryParam("employeeId", routeParams.employeeId)
-		.withQueryParam("filter", `((created ge '${payrunPeriodOpened}' and start lt '${payrunPeriodEnd}') or (start ge '${payrunPeriodStart}' and start le '${payrunPeriodEnd}')) ${closedAtFilter} and documentCount eq 0`)
-		.withQueryParam("orderBy", "created desc")
-		.withQueryParam("substituteLookupCodes", !asCount)
-		.withQueryParam("result", asCount ? "Count" : undefined)
-		.withQueryParam("evaluationDate", evalDate)
+export function getPayrunPeriodCaseValues(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodEntryRelevantEventValues, routeParams)
 		.withLocalization()
 		.withUser()
 		.fetchJson();
@@ -521,7 +529,10 @@ export function createOpenPayrunPeriod(routeParams) {
 }
 
 export function getPayrunPeriodDocuments(routeParams) {
-	return new FetchRequestBuilder(payrunPeriodDocumentsUrl, routeParams).fetchJson();
+	return new FetchRequestBuilder(payrunPeriodDocumentsUrl, routeParams)
+		.withTimout(2 * 60 * 1000)
+		.withRetries(10)
+		.fetch();
 }
 
 export function getPayrunPeriodControllingTasks(routeParams) {
@@ -720,4 +731,45 @@ export async function requestPainFileDownload(routeParams, name) {
 	const response = await builder.fetch();
 	const blob = await response.blob();
 	await downloadData(blob, name);
+}
+
+async function fetchWithTimeoutAndRetry(url, options = {}, timeout = 5000, maxRetries = 3) {
+	let attempt = 0;
+
+	const fetchWithTimeout = (url, options, timeout) => {
+		return new Promise((resolve, reject) => {
+			const controller = new AbortController();
+			const timer = setTimeout(() => {
+				controller.abort();
+				reject(new Error('Timeout'));
+			}, timeout);
+
+			fetch(url, { ...options, signal: controller.signal })
+				.then(response => {
+					clearTimeout(timer);
+					resolve(response);
+				})
+				.catch(err => {
+					clearTimeout(timer);
+					reject(err);
+				});
+		});
+	};
+
+	while (attempt < maxRetries) {
+		try {
+			const response = await fetchWithTimeout(url, options, timeout);
+			return response; // success
+		} catch (err) {
+			if (err.name === 'AbortError' || err.message === 'Timeout') {
+				attempt++;
+				if (attempt >= maxRetries) {
+					throw new Error(`Failed after ${maxRetries} retries due to timeout.`);
+				}
+			} else {
+				// For other errors, don't retry
+				throw err;
+			}
+		}
+	}
 }

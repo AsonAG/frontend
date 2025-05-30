@@ -2,7 +2,6 @@ import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import React, { MouseEventHandler } from "react";
 import { formatValue } from "./utils";
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
-import FilePresentRoundedIcon from '@mui/icons-material/FilePresentRounded';
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import { TrendingDown, TrendingUp } from "@mui/icons-material";
 import { Link } from "react-router-dom";
@@ -12,6 +11,7 @@ import { TableSettingsButton } from "./TableSettings";
 import { AmountInput } from "./AmountInput";
 import { RowSelectionButton } from "./RowSelectionButton";
 import { EntryRow } from "./types";
+import { PayslipButton } from "./PayslipButton";
 
 const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
 function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefined>, wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
@@ -317,17 +317,10 @@ function createColumns() {
       }),
     columnHelper.display({
       id: "documents",
-      cell: (props) => {
-        const payrunEntry = props.row.original;
+      cell: ({ row }) => {
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
-            {
-              payrunEntry?.documents?.filter(doc => doc.attributes?.type === "payslip").map(doc => (
-                <Tooltip key={doc.id} title={doc.name} placement="left">
-                  <IconButton size="small" component={Link} to={`${payrunEntry.id}/doc/${doc.id}`} onClick={stopPropagation}><FilePresentRoundedIcon /></IconButton>
-                </Tooltip>
-              ))
-            }
+            <PayslipButton payrunPeriodEntry={row.original} />
           </Stack>
         )
       },
@@ -339,13 +332,13 @@ function createColumns() {
     columnHelper.display({
       id: "events",
       cell: ({ row, t }) => {
-        const { employeeId, caseValueCount } = row.original;
-        if (caseValueCount === 0)
+        const { id, relevantEventCount } = row.original;
+        if (relevantEventCount === 0)
           return <div></div>;
         return (
           <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
             <Tooltip title={t("Events")} placement="left">
-              <IconButton size="small" component={Link} to={`employees/${employeeId}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
+              <IconButton size="small" component={Link} to={`entries/${id}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
             </Tooltip>
           </Stack>
         )
