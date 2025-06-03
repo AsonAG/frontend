@@ -9,17 +9,17 @@ export type PayrunPeriodEntry = {
   firstName: string
   leavingDate: Date | null
   isEmployed: boolean
-  netWage: number | null
-  grossWage: number | null
-  offsetting: number | null
-  employerCost: number | null
-  paidOut: number | null
-  paidOutGarnishment: number | null
+  netWage: number
+  grossWage: number
+  offsetting: number
+  employerCost: number
+  paidOut: number
+  paidOutGarnishment: number
   garnishment: number
   retro: number
-  openPayout: number | null
-  openWagePayout: number | null
-  openGarnishmentPayout: number | null
+  openPayout: number
+  openWagePayout: number
+  openGarnishmentPayout: number
   openWagePayoutPreviousPeriod: number
   openGarnishmentPayoutPreviousPeriod: number
   hasWage: boolean

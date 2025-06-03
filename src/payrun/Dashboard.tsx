@@ -306,7 +306,7 @@ function ControllingRow({ entry }: { entry: EntryRow }) {
       <Link to={`../../hr/employees/${entry.employeeId}`} >{getEmployeeDisplayString(entry)}</Link>
       <Stack direction="row" spacing={0.5} flexWrap="wrap">
         {
-          entry?.controllingTasks?.map(task => <Button key={task.id} component={RouterLink} to={`employees/${entry.employeeId}/new/${encodeURIComponent(task.name)}`} variant="outlined" color="warning" size="small">{task.displayName}</Button>)
+          entry?.controllingTasks?.map(task => <Button key={task.name} component={RouterLink} to={`employees/${entry.employeeId}/new/${encodeURIComponent(task.name)}`} variant="outlined" color="warning" size="small">{task.displayName}</Button>)
         }
       </Stack>
     </Stack>
