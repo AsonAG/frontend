@@ -292,8 +292,16 @@ function createColumns() {
             meta: {
               alignment: "right",
               headerTooltip: t => t("Outstanding amount to be paid in the open period")
+            },
+            sortingFn: (rowA, rowB) => {
+              const aNegative = rowA.original.openPayout < 0;
+              const bNegative = rowB.original.openPayout < 0;
+              if (aNegative && !bNegative) return -1;
+              if (!aNegative && bNegative) return 1;
+              return 0;
             }
-          }),
+          }
+        )
       ]
     }),
     columnHelper.accessor("amount",
