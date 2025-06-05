@@ -265,7 +265,7 @@ const translations = {
 		"There was an error generating the documents. The support has been informed and we will fix the problem as soon as possible.": "Es ist ein Fehler beim Erstellen der Dokumente aufgetreten. Der Support wurde informiert und wir werden das Problem so schnell wie möglich beheben.",
 		"The documents are being generated, this can take up to a few minutes...": "Die Dokumente werden erstellt. Das kann einige Minuten dauern...",
 		"There are employees with open payouts!": "Es gibt noch Mitarbeiter mit offenen Auszahlungen!",
-		"Do you want to move all open payout to the next period?": "Möchten Sie die offenen Beiträge in die nächste Periode übernehmen?",
+		"Do you want to move all open payout to the next period?": "Möchten Sie die offenen Beträge in die nächste Periode übernehmen?",
 		"The wage controlling has not been completed yet. The period cannot be closed.": "Die Lohnkontrolle wurde noch nicht beendet. Die Periode kann nicht geschlossen werden.",
 
 		"Column visibility": "Spaltensichtbarkeit",
