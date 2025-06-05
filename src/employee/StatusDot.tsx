@@ -6,12 +6,13 @@ type StatusDotProps = BoxProps & {
 }
 
 export const StatusDot = styled(Box, {
-	shouldForwardProp: (prop) => (prop !== "isEmployed"),
+	shouldForwardProp: (prop) => (prop !== "isEmployed")
 })<StatusDotProps>(({ theme, isEmployed }) => {
 	return {
 		width: 10,
 		height: 10,
 		backgroundColor: isEmployed ? theme.palette.success.main : theme.palette.error.main,
-		borderRadius: 6
+		borderRadius: 6,
+		display: "inline-block"
 	};
 });
