@@ -3,7 +3,7 @@ import { useRouteLoaderData, useSubmit } from "react-router-dom";
 import { Stack, Typography, Tooltip, SxProps, Theme, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Payout } from "./Payouts";
-import { Column, flexRender, getCoreRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { Column, flexRender, getCoreRowModel, getSortedRowModel, Row, RowSelectionState, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { IdType } from "../models/IdType";
 import { useAtomValue } from "jotai";
 import { columnVisibilityAtom, fullWidthTableAtom } from "./TableSettings";
@@ -54,11 +54,20 @@ export const PayrunTable = memo(function PayrunTable({ entries, completed }: Pay
     columnVisibility.open = false;
     columnVisibility.amount = false
   }
+
   const periodTotals = useMemo(() => getPeriodTotals(entries), [entries]);
 
   const table = useReactTable({
     columns: columns,
     data: entries,
+    initialState: {
+      sorting: [
+        {
+          id: 'openPayout',
+          desc: false
+        },
+      ],
+    },
     state: {
       periodTotals: periodTotals,
       payoutTotals: state.payoutTotals,
@@ -70,6 +79,7 @@ export const PayrunTable = memo(function PayrunTable({ entries, completed }: Pay
       }
     },
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     enableRowSelection: (row) => !completed && isRowSelectionEnabled(row.original),
     getRowId: originalRow => originalRow.id,
   });
