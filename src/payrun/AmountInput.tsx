@@ -12,7 +12,7 @@ type AmountInputProps = {
 }
 
 export function AmountInput({ entry, dispatch, onClick }: AmountInputProps) {
-  if (!entry.openPayout)
+  if (!entry.openPayout || entry.openPayout < 0)
     return;
 
   const handleChange = ({ floatValue }) => {

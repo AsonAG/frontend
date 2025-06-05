@@ -273,13 +273,15 @@ function createColumns() {
             id: "openPayout",
             cell: context => {
               const { hasDetails, popover, openPopover, closePopover } = useOpenAmountDetails(context);
-              let value = formatValue(context.getValue());
+              const openAmount = context.getValue();
+              let value = formatValue(openAmount);
               if (value !== null) {
                 value = value + (hasDetails ? "*" : "")
               }
+              const color = !!openAmount && openAmount < 0 ? "red" : undefined;
               return (
                 <>
-                  <Typography onMouseOver={openPopover} onMouseLeave={closePopover}>{value}</Typography>
+                  <Typography onMouseOver={openPopover} onMouseLeave={closePopover} color={color}>{value}</Typography>
                   {popover}
                 </>
               )
@@ -298,9 +300,6 @@ function createColumns() {
       {
         id: "amount",
         cell: function({ row, dispatch }) {
-          if (row.getCanExpand()) {
-            return;
-          }
           const onClick: MouseEventHandler = (event) => {
             if (row.getIsSelected()) {
               event.stopPropagation();
@@ -336,7 +335,7 @@ function createColumns() {
         if (relevantEventCount === 0)
           return <div></div>;
         return (
-          <Stack direction="row" sx={{ width: 35, justifyContent: "end" }}>
+          <Stack direction="row" sx={{ justifyContent: "end" }}>
             <Tooltip title={t("Events")} placement="left">
               <IconButton size="small" component={Link} to={`entries/${id}/events`} onClick={stopPropagation}><WorkHistoryOutlinedIcon /></IconButton>
             </Tooltip>
