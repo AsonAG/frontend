@@ -12,6 +12,7 @@ import { AmountInput } from "./AmountInput";
 import { RowSelectionButton } from "./RowSelectionButton";
 import { EntryRow } from "./types";
 import { PayslipButton } from "./PayslipButton";
+import { StatusDot } from "../employee/StatusDot";
 
 const stopPropagation: MouseEventHandler = (event) => event?.stopPropagation();
 function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefined>, wageType: string, context: CellContext<EntryRow, number | null>, previousValueColumnName: string | undefined = undefined) {
@@ -21,6 +22,11 @@ function getWageTypeTooltipForPreviousValue(t: TFunction<"translation", undefine
   return `${t("Value from previous period")} ${previousValue ?? "-"}`;
 }
 
+function TableStatusDot({ row }: { row: EntryRow }) {
+  if (row.isEmployed)
+    return;
+  return <StatusDot isEmployed={false} />
+}
 
 const columnHelper = createColumnHelper<EntryRow>();
 function createColumns() {
@@ -32,7 +38,9 @@ function createColumns() {
         columnHelper.accessor("identifier",
           {
             id: "identifier",
-            cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+            cell: (props) => {
+              return <Typography noWrap>{props.getValue()}<>&nbsp;</><TableStatusDot row={props.row.original} /></Typography>;
+            },
             header: ({ t }) => t("Id"),
             footer: ({ t }) => t("Total"),
             size: 150,
@@ -45,7 +53,11 @@ function createColumns() {
         columnHelper.accessor(row => `${row.lastName} ${row.firstName}`,
           {
             id: "employee",
-            cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+            cell: (props) => {
+              const idColumnVisible = props.table.getState().columnVisibility.identifier;
+              const statusDot = !idColumnVisible ? <>&nbsp;<TableStatusDot row={props.row.original} /></> : null;
+              return <Typography noWrap>{props.getValue()}{statusDot}</Typography>;
+            },
             header: ({ t }) => t("Name"),
             footer: ({ table, t }) => !table.getState().columnVisibility.identifier ? t("Total") : null,
             size: 150,
