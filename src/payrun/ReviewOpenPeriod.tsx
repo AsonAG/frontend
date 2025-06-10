@@ -1,7 +1,7 @@
 import React, { Suspense, useMemo, useState } from "react";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
-import { Await, Form, useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Await, Form, useLoaderData, useNavigation, useRouteLoaderData } from "react-router-dom";
 import { Alert, Button, Checkbox, FormControlLabel, FormGroup, Stack, Typography } from "@mui/material";
 import { PayrunPeriod } from "../models/PayrunPeriod";
 import { Employee } from "../models/Employee";
@@ -20,6 +20,7 @@ export function ReviewOpenPeriod() {
   const { t } = useTranslation();
   const { documents } = useLoaderData();
   const { payrunPeriod, controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  const navigation = useNavigation();
   const hasOpenPayouts = useMemo(() => payrunPeriod.entries.some(entry => entry.openPayout > 0), [payrunPeriod.entries]);
   const [openPayoutConfirmation, setOpenPayoutConfirmation] = useState(false);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +65,7 @@ export function ReviewOpenPeriod() {
                 </ResponsiveDialogClose>
                 <Form method="post">
                   <input type="hidden" name="payrunPeriodId" value={payrunPeriod.id} />
-                  <Button variant="contained" type="submit" color="primary" disabled={hasOpenPayouts && !openPayoutConfirmation}>{t("Close period")}</Button>
+                  <Button variant="contained" type="submit" color="primary" disabled={hasOpenPayouts && !openPayoutConfirmation} loading={navigation.state === "submitting"}>{t("Close period")}</Button>
                 </Form>
               </Stack>
             </ResponsiveDialogContent>
