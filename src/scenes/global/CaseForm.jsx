@@ -43,6 +43,7 @@ function CaseForm() {
 		attachments,
 		loading,
 		submitting,
+		isReadonlyCase,
 		buildCase,
 		startDate,
 		setStartDate,
@@ -73,10 +74,9 @@ function CaseForm() {
 					<Stack alignItems="stretch" spacing={4}>
 						{caseData && <CaseComponent _case={caseData} />}
 						<CaseErrorComponent errors={caseErrors} />
-						{/* row-reverse, wrap reverse to make the items stick to the right side when wrapped*/}
-						<Stack direction="row-reverse" spacing={2} alignSelf="end" alignItems="end" flexWrap="wrap-reverse">
-							<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} submitting={submitting} />
+						<Stack spacing={2} justifyContent="end" alignItems="end" direction="row" flexWrap="wrap">
 							<PeriodPicker variant={caseData.attributes?.["input.datePicker"] === "month" ? "month-short" : "standard"} inputMode={caseData.periodInputMode} startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
+							<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} submitting={submitting} isReadonlyCase={isReadonlyCase} />
 						</Stack >
 						{caseFieldDetails && <CaseFieldDetails caseField={caseFieldDetails} onClose={() => setCaseFieldDetails(null)} />}
 					</Stack>

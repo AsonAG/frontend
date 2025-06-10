@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Box, Typography, Link, Stack } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { FieldValueFileComponent } from "./FieldValueFileComponent";
 import {
 	FieldValueLookupComponent,
@@ -10,6 +10,7 @@ import { FieldValueTextComponent } from "./FieldValueTextComponent";
 import { FieldValueDateComponent, getDatePickerVariant } from "./FieldValueDateComponent";
 import { FieldValueBooleanComponent } from "./FieldValueBooleanComponent";
 import { FieldContext } from "../Field";
+import { FieldValueLinkComponent } from "./FieldValueLinkComponent";
 
 export function FieldValueComponent() {
 	const { field } = useContext(FieldContext);
@@ -45,18 +46,7 @@ export function FieldValueComponent() {
 		case "Boolean":
 			return <FieldValueBooleanComponent />;
 		case "WebResource":
-			return (
-				<Stack flex={1}>
-					<FieldValueTextComponent />
-					{field.value && (
-						<Box m={0.75}>
-							<Link href={field.value} target="_blank" rel="noopener">
-								{field.value}
-							</Link>
-						</Box>
-					)}
-				</Stack>
-			);
+			return <FieldValueLinkComponent />;
 		case "Integer":
 		case "NumericBoolean":
 		case "Week":

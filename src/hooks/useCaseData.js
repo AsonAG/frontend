@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { buildCase, addCase } from "../api/FetchClient";
 
 function mapCase(_case, attachments) {
@@ -26,6 +26,9 @@ export function useCaseData(params, user, payroll) {
 	const [submitting, setSubmitting] = useState(false);
 	let [startDate, setStartDate] = useState(null);
 	let [endDate, setEndDate] = useState(null);
+
+	const isReadonlyCase = useMemo(
+		() => caseData?.fields.every(field => field.valueType === "None" || field.valueType === "WebResource") ?? true, [caseData]);
 
 
 	useEffect(() => {
@@ -100,6 +103,7 @@ export function useCaseData(params, user, payroll) {
 		attachments,
 		loading,
 		submitting,
+		isReadonlyCase,
 		startDate,
 		endDate,
 		setStartDate: (updatedStartDate) => {

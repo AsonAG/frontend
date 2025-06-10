@@ -12,7 +12,7 @@ const iconProps = {
 	},
 };
 
-export function CaseFormButtons({ backPath, onSubmit, submitting }) {
+export function CaseFormButtons({ backPath, onSubmit, submitting, isReadonlyCase }) {
 	const navigation = useNavigation();
 	const redirecting = navigation.state === "loading" && navigation.location.state === "case_added";
 	const processing = submitting || redirecting;
@@ -28,19 +28,21 @@ export function CaseFormButtons({ backPath, onSubmit, submitting }) {
 			<Button disableRipple LinkComponent={Link} to={backPath} relative="path">
 				<Typography>{t("Cancel")}</Typography>
 			</Button>
-			<Button
-				disabled={processing}
-				disableRipple
-				variant="contained"
-				color="primary"
-				size="large"
-				onClick={onSubmit}
-				endIcon={icon}
-			>
-				<Typography fontWeight="bold" color="common.white">
-					{t("Save")}
-				</Typography>
-			</Button>
+			{!isReadonlyCase &&
+				<Button
+					disabled={processing}
+					disableRipple
+					variant="contained"
+					color="primary"
+					size="large"
+					onClick={onSubmit}
+					endIcon={icon}
+				>
+					<Typography fontWeight="bold" color="common.white">
+						{t("Save")}
+					</Typography>
+				</Button>
+			}
 		</Stack>
 	);
 }
