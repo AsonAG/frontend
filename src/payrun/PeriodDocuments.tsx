@@ -1,14 +1,14 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Await, Link, Outlet, useAsyncError, useLoaderData, useRouteLoaderData } from "react-router-dom";
-import { Alert, Chip, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
-import { ArrowDropDown, ArrowDropUp, Code, Functions, PictureAsPdf } from "@mui/icons-material";
+import { Await, Link as RouterLink, Outlet, useAsyncError, useLoaderData, useParams, useRouteLoaderData } from "react-router-dom";
+import { Alert, Chip, CircularProgress, IconButton, Link, Stack, Typography } from "@mui/material";
+import { ArrowDropDown, ArrowDropUp, Code, Functions, PictureAsPdf, Warning } from "@mui/icons-material";
 import { getEmployeeDisplayString } from "../models/Employee";
 import { PayrunDocument, PayrunPeriod } from "../models/PayrunPeriod";
 import { IdType } from "../models/IdType";
 
 type LoaderData = {
-  documents: Promise<Document[]>
+  documents: Promise<PayrunDocument[]>
 }
 type PayrunPeriodLoaderData = {
   payrunPeriod: PayrunPeriod
@@ -30,7 +30,7 @@ function PayrunPeriodDocuments() {
   return (
     <Suspense fallback={<LoadingView />}>
       <Await resolve={documents} errorElement={<ErrorView />}>
-        {(docs) => docs.map(doc => <DocumentSection key={doc.id} payrunPeriodId={payrunPeriod.id} document={doc} />)}
+        {(docs: PayrunDocument[]) => docs.map(doc => <DocumentSection key={doc.id} payrunPeriodId={payrunPeriod.id} document={doc} />)}
       </Await>
     </Suspense>
   );
@@ -109,6 +109,10 @@ type DocumentSectionProps = {
   document: PayrunDocument
 }
 function DocumentSection({ payrunPeriodId, document }: DocumentSectionProps) {
+  const errorDoc = renderDocumentWithError(document);
+  if (errorDoc) {
+    return errorDoc;
+  }
   return (
     <Stack spacing={1}>
       <Typography variant="h6">{document.name}</Typography>
@@ -142,9 +146,6 @@ type ChipProps = {
   to: string,
   label?: string
 }
-
-
-
 function DocumentChip({ doc, ...chipProps }: { doc: PayrunDocument } & ChipProps) {
   switch (doc.contentType) {
     case "application/xml":
@@ -160,7 +161,7 @@ function XmlChip({ to, label }: ChipProps) {
   label ??= "XML";
   return (
     <Chip
-      component={Link}
+      component={RouterLink}
       variant="outlined"
       to={to}
       label={label}
@@ -176,7 +177,7 @@ function PdfChip({ to, label }: ChipProps) {
   return (
     <Chip
       variant="outlined"
-      component={Link}
+      component={RouterLink}
       to={to}
       label={label}
       size="small"
@@ -191,7 +192,7 @@ function ExcelChip({ to, label }: ChipProps) {
   return (
     <Chip
       variant="outlined"
-      component={Link}
+      component={RouterLink}
       to={to}
       label={label}
       size="small"
@@ -199,4 +200,35 @@ function ExcelChip({ to, label }: ChipProps) {
       onClick={noop}
       color="green" />
   )
+}
+
+function renderDocumentWithError(document: PayrunDocument) {
+  const errorCode = document.attributes?.["errorCode"];
+  if (!errorCode) {
+    return null;
+  }
+  var Component = errorMap[errorCode];
+  return (
+    <Stack spacing={1}>
+      <Typography variant="h6" color="textDisabled">{document.name}</Typography>
+      <Stack spacing={1} direction="row">
+        <Warning color="warning" />
+        <Component />
+      </Stack>
+    </Stack>
+  );
+}
+
+const errorMap = {};
+errorMap[-10000] = WageTypeAccountMappingError;
+
+function WageTypeAccountMappingError() {
+  const { orgId, payrollId } = useParams();
+  const { t } = useTranslation();
+  const to = `/orgs/${orgId}/payrolls/${payrollId}/company/wagetypemaster`;
+  return <>
+    <Typography>{t("The wagetype to account mapping is incomplete.")}</Typography>
+    <Typography>{t("You can update it here: ")}</Typography>
+    <Link component={RouterLink} to={to}>{t("Wagetypes")}</Link>
+  </>
 }
