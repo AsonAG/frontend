@@ -527,9 +527,6 @@ const routeData = [
 
 				}
 			},
-			createRouteEmployeeTable("employees", false),
-			createRouteEmployeeNew("employees/new", () => "../employees"),
-			createRouteEmployeeEdit("employees/:employeeId", () => "../employees"),
 			{
 				path: "settings",
 				Component: OrganizationSettings,

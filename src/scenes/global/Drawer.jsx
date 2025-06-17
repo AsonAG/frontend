@@ -174,11 +174,6 @@ function MenuItemsOrganization() {
 	return (
 		<NavigationGroup>
 			<NavigationItem
-				label={t("Employees")}
-				to="employees"
-				icon={<PeopleOutlinedIcon />}
-			/>
-			<NavigationItem
 				label={t("Settings")}
 				to="settings"
 				icon={<SettingsIcon />}
