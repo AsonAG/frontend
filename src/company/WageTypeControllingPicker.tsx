@@ -1,72 +1,21 @@
-import { ListSubheader, MenuItem, Select, SelectChangeEvent, SxProps, Theme, Typography } from "@mui/material";
-import React, { useMemo } from "react";
-import { useState } from "react";
-import { useLoaderData, useNavigation, useSubmit } from "react-router-dom";
-import { WageTypeControllingLoaderData } from "./WageTypeControlling";
+import { MenuItem, Select, SelectChangeEvent, SxProps, Theme, Typography } from "@mui/material";
+import React, { useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { WageTypeSettingsContext } from "./WageTypeControlling";
 
 export function ControllingPicker({ wageTypeNumber, controlTypes, multiple }: { wageTypeNumber: string, controlTypes: Map<string, string>, multiple: boolean }) {
   const { t } = useTranslation();
-  const { regulationId, wageTypePayrollControllingLookup } = useLoaderData() as WageTypeControllingLoaderData;
-  const activeValue = useMemo(() => {
-    const value = wageTypePayrollControllingLookup.values.find(x => x.key === wageTypeNumber);
-    if (!value)
-      return value;
+  const { state, dispatch } = useContext(WageTypeSettingsContext);
+  const value = state.payrollControlling[wageTypeNumber];
 
-    return {
-      ...value,
-      value: JSON.parse(value.value)
-    };
-  }, [wageTypeNumber, wageTypePayrollControllingLookup]);
-  const [values, setValues] = useState<string[]>(activeValue?.value ?? []);
-  const submit = useSubmit();
-  const navigation = useNavigation();
-  const onClose = () => {
-    // single selection is saved in on change
-    if (!multiple)
-      return;
-    handleSave(values);
-  }
-  const handleSave = (values: string[]) => {
-    if (navigation.state !== "idle")
-      return;
-    const isDirty = ([...activeValue?.value ?? []]).sort().toString() != ([...values]).sort().toString();
-    if (!isDirty)
-      return;
-
-    if (values.length > 0) {
-      submit({
-        regulationId,
-        lookupId: wageTypePayrollControllingLookup.id,
-        lookupValue: {
-          ...activeValue,
-          key: wageTypeNumber,
-          value: JSON.stringify(values)
-        }
-      },
-        { method: !activeValue ? "POST" : "PUT", encType: "application/json" });
-    }
-
-    if (values.length === 0 && !!activeValue) {
-      submit({
-        regulationId,
-        lookupId: wageTypePayrollControllingLookup.id,
-        lookupValue: activeValue
-      },
-        { method: "DELETE", encType: "application/json" });
-    }
-  }
-  const handleChange = (event: SelectChangeEvent<typeof values>) => {
+  const handleChange = (event: SelectChangeEvent<typeof value>) => {
     const {
       target: { value },
     } = event;
     const values = value === "" ? [] :
       typeof value === 'string' ? value.split(',') :
         value;
-    setValues(values);
-    if (!multiple) {
-      handleSave(values);
-    }
+    dispatch({ type: "set_controlling", wageTypeNumber, value: values });
   };
   const options = useMemo(() => {
     return [...controlTypes].map(kv => (
@@ -82,10 +31,9 @@ export function ControllingPicker({ wageTypeNumber, controlTypes, multiple }: { 
   return (
     <Select
       multiple={multiple}
-      value={values}
+      value={value}
       sx={selectSx}
       onChange={handleChange}
-      onClose={onClose}
       displayEmpty
       renderValue={(selected) => {
         let label = "No checks";

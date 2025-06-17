@@ -1,12 +1,13 @@
 import { Autocomplete, Badge, Box, createFilterOptions, SxProps, TextField, Theme, Typography } from "@mui/material";
-import React, { memo, useEffect, useMemo, useState } from "react";
-import { useFetcher, useLoaderData } from "react-router-dom";
-import { WageTypeControllingLoaderData } from "./WageTypeControlling";
+import React, { memo, useContext, useMemo } from "react";
+import { useLoaderData } from "react-router-dom";
+import { WageTypeControllingLoaderData } from "./WageTypeControllingLoaderData";
 import { LookupValue } from "../models/LookupSet";
-import { AccountLookupValue, WageTypeDetailed } from "../models/WageType";
+import { WageTypeSettingsContext } from "./WageTypeControlling";
+import { WageType } from "../models/WageType";
 
 type WageTypeAccountPickerProps = {
-  wageType: WageTypeDetailed
+  wageType: WageType
   accountType: "debitAccountNumber" | "creditAccountNumber"
 }
 
@@ -16,33 +17,15 @@ const filterOptions = createFilterOptions({
 
 
 export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageType, accountType }: WageTypeAccountPickerProps) {
-  const { accountMaster, accountMasterMap, regulationId, fibuAccountLookup } = useLoaderData() as WageTypeControllingLoaderData;
-  const [value, setValue] = useState<LookupValue | null>(null);
-  const fetcher = useFetcher();
+  const { accountMaster } = useLoaderData() as WageTypeControllingLoaderData;
+  const { state, dispatch } = useContext(WageTypeSettingsContext);
+  const wageTypeNumber = wageType.wageTypeNumber.toString();
+  const assignment = state.accountAssignments[wageTypeNumber]?.[accountType];
 
+  const value = useMemo(() => accountMaster.values.find(x => x.key === assignment) ?? null, [assignment, accountMaster.values]);
   const onChange = (value: LookupValue | null) => {
-    const accountLookupValue: LookupValue = {
-      ...wageType.accountLookupValue,
-      key: wageType.wageTypeNumber.toString(),
-      value: JSON.stringify({
-        creditAccountNumber: wageType.accountLookupValue?.value?.creditAccountNumber,
-        debitAccountNumber: wageType.accountLookupValue?.value?.debitAccountNumber,
-        [accountType]: value?.key ?? ""
-      })
-    };
-    setValue(value);
-    fetcher.submit({
-      regulationId,
-      lookupId: fibuAccountLookup.id,
-      lookupValue: accountLookupValue
-    },
-      { method: accountLookupValue.id ? "PUT" : "POST", encType: "application/json" });
+    dispatch({ type: "set_account", wageTypeNumber, value: value?.key ?? null, kind: accountType })
   }
-
-  useEffect(() => {
-    const lookupValue = accountMasterMap.get(wageType.accountLookupValue?.value?.[accountType] ?? "") ?? null;
-    setValue(lookupValue);
-  }, [wageType.accountLookupValue?.value?.[accountType], accountMasterMap]);
 
   if (wageType.attributes?.["Accounting.Relevant"] !== "Y") {
     return null;
@@ -55,7 +38,7 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({ wageT
       filterOptions={filterOptions}
       renderInput={(params) => {
         return (
-          <Badge variant={!(wageType.accountLookupValue?.value?.[accountType]) ? "dot" : "standard"} color="warning" component="div" sx={{ width: "100%" }}>
+          <Badge variant={!assignment ? "dot" : "standard"} color="warning" component="div" sx={{ width: "100%" }}>
             <TextField {...params} />
           </Badge>
         )

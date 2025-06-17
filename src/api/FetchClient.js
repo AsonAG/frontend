@@ -27,6 +27,7 @@ const payrollLookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/valu
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
 const payrollEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
 const payrollWageTypeMasterUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
+const payrollWageTypeSettingsUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
@@ -690,6 +691,16 @@ export function getPayrollWageTypes(routeParams) {
 	return new FetchRequestBuilder(payrollWageTypeMasterUrl, routeParams)
 		.withLocalization()
 		.fetchJson();
+}
+export function getPayrollWageTypeSettings(routeParams) {
+	return new FetchRequestBuilder(payrollWageTypeSettingsUrl, routeParams)
+		.fetchJson();
+}
+export function setPayrollWageTypeSettings(routeParams, settings) {
+	return new FetchRequestBuilder(payrollWageTypeSettingsUrl, routeParams)
+		.withMethod("POST")
+		.withBody(settings)
+		.fetch();
 }
 export function getPayrollCollectors(routeParams) {
 	return new FetchRequestBuilder(payrollCollectorsUrl, routeParams)

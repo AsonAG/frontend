@@ -10,20 +10,16 @@ export type WageType = {
   attributes: Record<string, string>
 }
 
-export type WageTypeDetailed = {
-  accountLookupValue: AccountLookupValue | null
+export type WageTypeDetailed = WageType & {
   accountAssignmentRequired: boolean
-
-} & WageType
-
-export type AccountLookupValue = {
-  id?: IdType
-  key: string
-  created?: string
-  value: WageTypeAccounts
 }
+
 type WageTypeAccounts = {
-  debitAccountNumber: string
-  creditAccountNumber: string
+  debitAccountNumber: string | null
+  creditAccountNumber: string | null
 }
 
+export type WageTypeSettings = {
+  accountAssignments: Record<string, WageTypeAccounts>,
+  payrollControlling: Record<string, string[]>
+}

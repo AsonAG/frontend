@@ -60,7 +60,8 @@ import {
 	deleteLookupValue,
 	getLookupValues,
 	getPayrollCollectors,
-	getPayrunPeriodDocuments
+	getPayrunPeriodDocuments,
+	setPayrollWageTypeSettings
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -86,9 +87,9 @@ import {
 	payrollControllingDataAtom,
 	clientRegulationAtom,
 	payrollWageTypesWithMissingAccountInfoCountAtom,
-	payrollWageTypesWithAccountingInfoAtom,
-	fibuAccountLookupAtom,
 	refreshPayrollWageTypes,
+	payrollWageTypesAtom,
+	payrollWageTypeSettingsAtom,
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -964,22 +965,19 @@ const routeData = [
 								return null;
 							const [
 								wageTypes,
-								fibuAccountLookup,
+								wageTypeSettings,
 								accountMaster,
-								wageTypePayrollControllingLookup,
 								wageTypeControlTypes,
 								wageTypeAttributeTranslations,
 								collectors
 							] = await Promise.all([
-								store.get(payrollWageTypesWithAccountingInfoAtom),
-								store.get(fibuAccountLookupAtom),
+								store.get(payrollWageTypesAtom),
+								store.get(payrollWageTypeSettingsAtom),
 								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster"),
-								getLookupSet({ regulationId: regulation.id, ...params }, "WageTypePayrollControlling"),
 								getLookupValues(params, "CH.Swissdec.WageTypesControlTypes"),
 								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
 								getPayrollCollectors(params)
 							]);
-							const accountMasterMap = new Map(accountMaster.values.map(x => [x.key, x]));
 							const attributeTranslationMap = new Map(wageTypeAttributeTranslations.values.map(x => [x.key, x]));
 							const controlTypesMap = new Map();
 							for (const value of wageTypeControlTypes.values) {
@@ -994,31 +992,16 @@ const routeData = [
 							}
 							return {
 								wageTypes,
+								wageTypeSettings,
 								collectors,
-								fibuAccountLookup,
-								wageTypePayrollControllingLookup,
 								controlTypesMap,
 								accountMaster,
-								accountMasterMap,
-								attributeTranslationMap,
-								regulationId: regulation.id
+								attributeTranslationMap
 							}
 						},
 						action: async ({ params, request }) => {
-							const { lookupValue, ...requestParams } = await request.json();
-							let action;
-							switch (request.method) {
-								case "POST":
-									action = addLookupValue;
-									break;
-								case "PUT":
-									action = updateLookupValue;
-									break;
-								case "DELETE":
-									action = deleteLookupValue;
-									break;
-							}
-							const response = await action({ ...params, ...requestParams, lookupValueId: lookupValue.id }, lookupValue);
+							const settings = await request.json();
+							const response = await setPayrollWageTypeSettings({ ...params, }, settings);
 							if (response.ok) {
 								toast("success", "Updated!");
 								return { success: true };
@@ -1029,10 +1012,10 @@ const routeData = [
 						}
 					},
 					createRouteLookupForm("accountmaster", "AccountMaster", "Account number", async (data, { params }) => {
-						const wageTypes = await store.get(payrollWageTypesWithAccountingInfoAtom);
+						const wageTypeSettings = await store.get(payrollWageTypeSettingsAtom);
 						const canDelete = (key) => {
-							for (const wt of wageTypes) {
-								if (wt.accountLookupValue?.value?.creditAccountNumber === key || wt.accountLookupValue?.value?.debitAccountNumber === key) {
+							for (const assignment of Object.values(wageTypeSettings?.accountAssignments ?? [])) {
+								if (assignment.creditAccountNumber === key || assignment.debitAccountNumber === key) {
 									return [false, "This account is associated with a wage type"];
 								}
 							}

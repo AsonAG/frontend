@@ -1,12 +1,12 @@
 
-import { Checkbox, IconButton, Tooltip, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { IconButton, Tooltip, Typography } from "@mui/material";
+import React, { useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import { WageTypeDetailed } from "../models/WageType";
 import { useTranslation } from "react-i18next";
 import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
-import { useLoaderData, useNavigation, useSubmit } from "react-router-dom";
-import { WageTypeControllingLoaderData } from "./WageTypeControlling";
+import { useLoaderData } from "react-router-dom";
+import { WageTypeControllingLoaderData } from "./WageTypeControllingLoaderData";
 import { WageTypeDetails } from "./WageTypeDetails";
 import { Info } from "@mui/icons-material";
 import { ControllingPicker } from "./WageTypeControllingPicker";
@@ -29,14 +29,14 @@ function createColumns() {
           flex: 1
         }
       }),
-    columnHelper.accessor(row => row.accountLookupValue?.value?.debitAccountNumber,
+    columnHelper.display(
       {
         id: "debit",
         cell: (props) => <WageTypeAccountPicker wageType={props.row.original} accountType="debitAccountNumber" />,
         header: ({ t }) => t("Debit"),
         size: 180
       }),
-    columnHelper.accessor(row => row.accountLookupValue?.value?.creditAccountNumber,
+    columnHelper.display(
       {
         id: "credit",
         cell: (props) => <WageTypeAccountPicker wageType={props.row.original} accountType="creditAccountNumber" />,
@@ -85,41 +85,3 @@ function createColumns() {
   ];
 }
 export const columns = createColumns();
-
-
-function ControllingCell({ checked, wageTypeNumber }: { checked: boolean, wageTypeNumber: string }) {
-  const { regulationId, wageTypePayrollControllingLookup } = useLoaderData() as WageTypeControllingLoaderData;
-  const [value, setValue] = useState<boolean>(checked);
-  const submit = useSubmit();
-  const navigation = useNavigation();
-  const onChange = (_, checked: boolean) => {
-    if (navigation.state !== "idle")
-      return;
-    setValue(checked);
-    const payrollControllingLookupValue = wageTypePayrollControllingLookup.values.find(x => x.key === wageTypeNumber);
-    if (checked && !payrollControllingLookupValue) {
-      submit({
-        regulationId,
-        lookupId: wageTypePayrollControllingLookup.id,
-        lookupValue: {
-          key: wageTypeNumber,
-          value: "true"
-        }
-      },
-        { method: "POST", encType: "application/json" });
-    }
-
-    if (!checked && !!payrollControllingLookupValue) {
-      submit({
-        regulationId,
-        lookupId: wageTypePayrollControllingLookup.id,
-        lookupValue: payrollControllingLookupValue
-      },
-        { method: "DELETE", encType: "application/json" });
-    }
-  }
-  useEffect(() => {
-    setValue(checked);
-  }, [checked]);
-  return <Checkbox checked={value} size="small" onChange={onChange} />
-}
