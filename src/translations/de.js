@@ -267,7 +267,10 @@ const translations = {
 		"There are employees with open payouts!": "Es gibt noch Mitarbeiter mit offenen Auszahlungen!",
 		"Do you want to move all open payout to the next period?": "Möchten Sie die offenen Beträge in die nächste Periode übernehmen?",
 		"The wage controlling has not been completed yet. The period cannot be closed.": "Die Lohnkontrolle wurde noch nicht beendet. Die Periode kann nicht geschlossen werden.",
-
+		"Unsaved changes": "Nicht gespeicherte Änderungen",
+		"The settings have not been saved. Do you want to discard them?": "Die Einstellungen wurden nicht gespeichert. Möchten Sie die Änderungen verwerfen?",
+		"Go back": "Zurück",
+		"Discard": "Verwerfen",
 		"Column visibility": "Spaltensichtbarkeit",
 		"Table width": "Tabellenbreite",
 		"Full width": "Ganze Breite",

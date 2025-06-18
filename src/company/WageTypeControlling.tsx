@@ -1,6 +1,6 @@
-import { Badge, Box, Button, Stack, SxProps, Theme, Typography } from "@mui/material";
+import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, SxProps, Theme, Typography } from "@mui/material";
 import React, { createContext, Dispatch, useMemo, useReducer, useState, useEffect } from "react";
-import { useActionData, useLoaderData, useNavigation, useSubmit } from "react-router-dom";
+import { useActionData, useBlocker, useLoaderData, useNavigation, useSubmit } from "react-router-dom";
 import { columns } from "./WageTypeColumns";
 import { flexRender, getCoreRowModel, Row, useReactTable } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
@@ -55,6 +55,12 @@ export function WageTypeControlling() {
       dispatch({ type: "reset_dirty" });
     }
   }, [actionData]);
+
+  let blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      state.dirty &&
+      currentLocation.pathname !== nextLocation.pathname
+  );
   const rowGridSx = getRowGridSx(table.getVisibleLeafColumns().map(col => ({
     width: col.getSize(),
     flex: col.columnDef.meta?.flex
@@ -126,6 +132,18 @@ export function WageTypeControlling() {
             </Typography>
           </Button>
         </Stack>
+        {blocker.state === "blocked" ? (
+          <Dialog open onClose={() => blocker.reset()}>
+            <DialogTitle>{t("Unsaved changes")}</DialogTitle>
+            <DialogContent >
+              <Typography>{t("The settings have not been saved. Do you want to discard them?")}</Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => blocker.reset()}>{t("Go back")}</Button>
+              <Button variant="contained" color="destructive" onClick={() => blocker.proceed()}>{t("Discard")}</Button>
+            </DialogActions>
+          </Dialog>
+        ) : null}
       </Stack>
     </WageTypeSettingsContext.Provider>
   )
