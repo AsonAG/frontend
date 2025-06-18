@@ -227,7 +227,7 @@ function WageTypeAccountMappingError() {
   const { t } = useTranslation();
   const to = `/orgs/${orgId}/payrolls/${payrollId}/company/wagetypemaster`;
   return <>
-    <Typography>{t("In order for the accounting document to be prepared, the wage type account assignments have to be completed.")}</Typography>
+    <Typography>{t("In order for the accounting document to be prepared, the wage type account assignments have to be complete.")}</Typography>
     <Link component={RouterLink} to={to}>{t("Go to account assignments")}</Link>
   </>
 }
