@@ -220,6 +220,9 @@ const translations = {
 		"Being calculated...": "Werden berechnet...",
 		"Generating...": "Wird generiert...",
 		"The period is being processed...": "Die Periode wird aufbereitet...",
+		"In order for the accounting document to be prepared, the wage type account assignments have to be complete.":
+			"Damit der Buchungsbeleg aufbereitet werden kann, muss die Lohnartenkontierung vollständig sein.",
+		"Go to account assignments": "Zur Lohnartenkontierung",
 
 		// Headers
 		"Id of the employee": "Id des Mitarbeiters",
