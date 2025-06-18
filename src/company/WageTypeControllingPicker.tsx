@@ -6,7 +6,7 @@ import { WageTypeSettingsContext } from "./WageTypeControlling";
 export function ControllingPicker({ wageTypeNumber, controlTypes, multiple }: { wageTypeNumber: string, controlTypes: Map<string, string>, multiple: boolean }) {
   const { t } = useTranslation();
   const { state, dispatch } = useContext(WageTypeSettingsContext);
-  const value = state.payrollControlling[wageTypeNumber];
+  const value = state.payrollControlling[wageTypeNumber] ?? [];
 
   const handleChange = (event: SelectChangeEvent<typeof value>) => {
     const {
