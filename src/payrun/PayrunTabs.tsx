@@ -13,7 +13,7 @@ export function PayrunTabs() {
 
   return (
     <Stack direction="row" spacing={2} px={1} alignSelf="end" >
-      <PayrunControllingTab label={t("payrun_period_controlling")} />
+      <PayrunTab label={t("payrun_period_controlling")} tab="Controlling" />
       <PayrunTab label={t("payrun_period_ready")} tab="Payable" />
       <PayrunTab label={t("payrun_period_paid_out")} tab="PaidOut" />
     </Stack>
@@ -27,27 +27,30 @@ type PayrunTabProps = {
 
 function PayrunTab({ label, tab }: PayrunTabProps) {
   const { state, dispatch } = useContext(PayrollTableContext);
-  return (
-    <TabButton title={label} active={tab === state.selectedTab} badgeCount={state.entryCountByTab[tab]} badgeColor="primary" onClick={() => dispatch({ type: "set_tab", tab })} />
-  )
-}
-
-function PayrunControllingTab({ label }: { label: string }) {
-  const tab: Tab = "Controlling";
-  const { state, dispatch } = useContext(PayrollTableContext);
   const { controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
-  const badgeCount = state.entryCountByTab[tab] + (controllingData.companyControllingCases.length > 0 ? 1 : 0);
+  let itemCount = state.entryCountByTab[tab]
+  let badgeColor = "primary";
+  if (tab === "Controlling") {
+    itemCount += (controllingData.companyControllingCases.length > 0 ? 1 : 0);
+    badgeColor = "warning";
+  }
   return (
-    <TabButton title={label} active={tab === state.selectedTab} badgeCount={badgeCount} badgeColor="warning" onClick={() => dispatch({ type: "set_tab", tab })} />
+    <TabButton title={label} active={tab === state.selectedTab} badgeCount={itemCount} badgeColor={badgeColor} onClick={() => dispatch({ type: "set_tab", tab })} />
   )
 }
 
 export function PayrunTabContent({ tab, emptyText, children }: { tab: Tab, emptyText: string } & PropsWithChildren) {
   const { t } = useTranslation();
   const { state } = useContext(PayrollTableContext);
+  const { controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   if (tab !== state.selectedTab)
     return;
-  if (state.entryCountByTab[tab] === 0) {
+
+  let itemCount = state.entryCountByTab[tab]
+  if (tab === "Controlling") {
+    itemCount += (controllingData.companyControllingCases.length > 0 ? 1 : 0);
+  }
+  if (itemCount === 0) {
     const text = state.employeeFilter ? "No matches." : emptyText;
     return <Typography>{t(text)}</Typography>
   }
