@@ -4,6 +4,7 @@ const translations = {
 		Organizations: "Organisationen",
 		"Organization unit": "Organisationseinheit",
 		"Organization unit assignment": "Organisationseinheitszugehörigkeit",
+		"Organization unit name": "Organisationseinheitsname",
 		Employees: "Mitarbeiter",
 		Company: "Firma",
 		"New event": "Neues Ereignis",
@@ -82,6 +83,15 @@ const translations = {
 		employee_name_selected:
 			"{{employee.firstName}} {{employee.lastName}} ({{employee.identifier}}) $t(selected)",
 		n_employees_selected: "{{count}} Mitarbeiter $t(selected)",
+		"Regulations": "Regelwerke",
+		"Country": "Land",
+		"Industry": "Branche",
+		"Accounting document": "Buchungsbeleg",
+		"Payroll accounting start date": "Startdatum der Lohnbuchhaltung",
+		"Loaded industry regulations cannot be removed!": "Geladene Branchen Regelwerke können nicht entfernt werden!",
+		"Loaded ERP regulations cannot be removed!": "Geladene ERP Regelwerke können nicht entfernt werden!",
+		"Save regulations": "Regelwerke speichern",
+		"Regulations saved!": "Regelwerke gespeichert!",
 
 		Payruns: "Zahlungsläufe",
 		Abort: "Abbrechen",

@@ -61,7 +61,11 @@ import {
 	getLookupValues,
 	getPayrollCollectors,
 	getPayrunPeriodDocuments,
-	setPayrollWageTypeSettings
+	setPayrollWageTypeSettings,
+	getPayroll,
+	getAvailableRegulations,
+	getPayrollRegulations,
+	updatePayrollRegulations
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -114,6 +118,8 @@ import { CompanyTabbedView } from "./company/CompanyTabbedView";
 import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
 import { WageTypeControlling } from "./company/WageTypeControlling";
+import { PayrollSettings } from "./payroll/Settings";
+import { UpdateRounded } from "@mui/icons-material";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -560,6 +566,25 @@ const routeData = [
 						default:
 							throw new Error("Invalid intent");
 					}
+				}
+			},
+			{
+				path: "settings/:payrollId",
+				Component: PayrollSettings,
+				loader: async ({ params }) => {
+					const [payroll, payrollRegulations, availableRegulations] = await Promise.all([getPayroll(params), getPayrollRegulations(params), getAvailableRegulations()]);
+					return { payroll, payrollRegulations, availableRegulations };
+				},
+				action: async ({ params, request }) => {
+					const task = await request.json();
+					const response = await updatePayrollRegulations(params, task);
+					if (!response.ok) {
+						toast("success", "Saving failed!");
+						return response;
+					}
+					toast("success", "Regulations saved!");
+
+					return response;
 				}
 			}
 		]

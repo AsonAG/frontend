@@ -5,6 +5,7 @@ import { payrollAtom, userAtom } from "../utils/dataAtoms";
 import { useOidc } from "../auth/authConfig";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
+const availableRegulationsUrl = "/regulations/available";
 const organizationsUrl = "/tenants";
 const organizationImportUrl = "/tenants/import";
 const organizationUrl = "/tenants/:orgId";
@@ -262,8 +263,21 @@ export function getPayroll(routeParams) {
 	return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
 }
 
-export function getRegulations(routeParams) {
+export function getPayrollRegulations(routeParams) {
 	return new FetchRequestBuilder(payrollRegulationsUrl, routeParams).fetchJson();
+}
+
+export function updatePayrollRegulations(routeParams, regulations) {
+	return new FetchRequestBuilder(payrollRegulationsUrl, routeParams)
+		.withMethod("PUT")
+		.withBody(regulations)
+		.fetch();
+}
+
+export function getAvailableRegulations(routeParams) {
+	return new FetchRequestBuilder(availableRegulationsUrl, routeParams)
+		.withLocalization()
+		.fetchJson();
 }
 
 export function getDivisions(routeParams) {

@@ -9,16 +9,16 @@ import { payrollAtom } from "../utils/dataAtoms";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
 import { getCompanyCases, getEmployeeCases, getEmployees } from "../api/FetchClient";
-import { generatePath, useMatches, useNavigate, useParams } from "react-router-dom";
+import { generatePath, useMatch, useMatches, useNavigate, useParams } from "react-router-dom";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { AvailableCase } from "../models/AvailableCase";
 import { useIsESS } from "../hooks/useRole";
 
 export function NewEventCommand() {
-  const params = useParams();
   const isMobile = useIsMobile();
   const isESS = useIsESS();
-  if (!params.orgId || !params.payrollId || isMobile || isESS) {
+  const payrollViewMatch = useMatch("/orgs/:orgId/payrolls/:payrollId/*");
+  if (!payrollViewMatch || isMobile || isESS) {
     return;
   }
   return <InternalNewEventCommand />;

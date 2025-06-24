@@ -11,6 +11,7 @@ import {
 	NavLink as RouterLink,
 	useLoaderData,
 	useLocation,
+	useMatch,
 	useMatches,
 	useParams,
 } from "react-router-dom";
@@ -32,6 +33,7 @@ import { useAtomValue } from "jotai";
 import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom } from "../../utils/dataAtoms";
 import { useRole } from "../../hooks/useRole";
 import { unwrap } from "jotai/utils";
+import { Business } from "@mui/icons-material";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {
@@ -171,14 +173,29 @@ function NavigationGroup({ name, children, hidden = false }) {
 
 function MenuItemsOrganization() {
 	const { t } = useTranslation();
+	const { payrolls } = useLoaderData()
 	return (
-		<NavigationGroup>
-			<NavigationItem
-				label={t("Settings")}
-				to="settings"
-				icon={<SettingsIcon />}
-			/>
-		</NavigationGroup>
+		<>
+			<NavigationGroup>
+				<NavigationItem
+					label={t("Settings")}
+					to="settings"
+					icon={<SettingsIcon />}
+					end
+				/>
+			</NavigationGroup>
+			<NavigationGroup name={t("Organization unit")}>
+				{payrolls.map(x => (
+					<NavigationItem
+						key={x.id}
+						label={x.name}
+						to={`settings/${x.id}`}
+						icon={<Business />}
+					/>
+
+				))}
+			</NavigationGroup>
+		</>
 	);
 }
 
@@ -241,16 +258,16 @@ function MenuItemsUnknown() {
 
 function MenuItems() {
 	const { employee } = useLoaderData();
-	const { payrollId } = useParams();
+	const payrollViewMatch = useMatch("/orgs/:orgId/payrolls/:payrollId/*");
 	const isAdmin = useRole("admin");
 	const isEmployee = useRole("user");
-	if (!payrollId && isAdmin) {
+	if (!payrollViewMatch && isAdmin) {
 		return <MenuItemsOrganization />;
 	}
-	else if (payrollId && isAdmin) {
+	else if (payrollViewMatch && isAdmin) {
 		return <MenuItemsPayrollAdmin />;
 	}
-	else if (payrollId && isEmployee && employee) {
+	else if (payrollViewMatch && isEmployee && employee) {
 		return <MenuItemsPayrollEmployee employee={employee} />;
 	}
 	else {

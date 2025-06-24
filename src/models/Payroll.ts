@@ -4,4 +4,6 @@ export type Payroll = {
   id: IdType;
   name: string;
   divisionId: IdType;
+  accountingStartDate: Date,
+  transmissionStartDate: Date
 }
