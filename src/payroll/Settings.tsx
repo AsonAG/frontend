@@ -119,7 +119,7 @@ function RegulationSelect({ label, items, multiple, value, onChange, disabled }:
       renderValue={(selected) => (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
           {selected.map((value) => (
-            <Chip key={value} label={items.find(r => r.name === value)!.displayName} size="small" sx={{ height: 20 }} />
+            <Chip key={value} label={items.find(r => r.name === value)?.displayName ?? value} size="small" sx={{ height: 20 }} />
           ))}
         </Box>
       )}
