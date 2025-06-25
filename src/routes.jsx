@@ -65,7 +65,8 @@ import {
 	getPayroll,
 	getAvailableRegulations,
 	getPayrollRegulations,
-	updatePayrollRegulations
+	updatePayrollRegulations,
+	updatePayroll
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -119,7 +120,6 @@ import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
 import { WageTypeControlling } from "./company/WageTypeControlling";
 import { PayrollSettings } from "./payroll/Settings";
-import { UpdateRounded } from "@mui/icons-material";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -573,16 +573,34 @@ const routeData = [
 				Component: PayrollSettings,
 				loader: async ({ params }) => {
 					const [payroll, payrollRegulations, availableRegulations] = await Promise.all([getPayroll(params), getPayrollRegulations(params), getAvailableRegulations()]);
-					return { payroll, payrollRegulations, availableRegulations };
+					const loadKey = Date.now().toString();
+					return { payroll, payrollRegulations, availableRegulations, loadKey };
 				},
 				action: async ({ params, request }) => {
-					const task = await request.json();
-					const response = await updatePayrollRegulations(params, task);
-					if (!response.ok) {
-						toast("success", "Saving failed!");
+					const contentType = request.headers.get("content-type");
+					if (contentType === "application/json") {
+						const task = await request.json();
+						const response = await updatePayrollRegulations(params, task);
+						if (!response.ok) {
+							toast("error", "Saving failed!");
+							return response;
+						}
+						toast("success", "Regulations saved!");
+
 						return response;
 					}
-					toast("success", "Regulations saved!");
+
+					const form = await request.formData();
+					const payroll = await getPayroll(params);
+					payroll.name = form.get("payrollName");
+					payroll.language = form.get("language");
+					const response = await updatePayroll(params, payroll);
+					if (!response.ok) {
+						toast("error", "Saving failed!");
+						return response;
+					}
+					toast("success", "Data saved!");
+					store.set(payrollsAtom);
 
 					return response;
 				}

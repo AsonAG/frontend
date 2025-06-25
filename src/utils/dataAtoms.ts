@@ -13,7 +13,6 @@ import {
 	getPayrunPeriodControllingTasks,
 	getClientRegulation,
 	getPayrollWageTypes,
-	getLookupSet,
 	getPayrollWageTypeSettings,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
@@ -27,8 +26,7 @@ import { ExpandedState } from "@tanstack/react-table";
 import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 import { AvailableCase } from "../models/AvailableCase";
 import { ControllingData } from "../payrun/types";
-import { AccountLookupValue, WageType, WageTypeDetailed, WageTypeSettings } from "../models/WageType";
-import { LookupSet } from "../models/LookupSet";
+import { WageType, WageTypeDetailed, WageTypeSettings } from "../models/WageType";
 
 export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
@@ -41,7 +39,7 @@ export const orgAtom = atom((get) => {
 	return getOrganization({ orgId });
 });
 
-export const payrollsAtom = atom((get) => {
+export const payrollsAtom = atomWithRefresh((get) => {
 	const orgId = get(orgIdAtom);
 	if (orgId == null) return [];
 	return getPayrolls({ orgId });

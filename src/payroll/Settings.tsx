@@ -1,37 +1,56 @@
 
 import React, { useEffect, useReducer } from "react";
 import { ContentLayout } from "../components/ContentLayout";
-import { Box, Button, Chip, FormControl, FormLabel, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
-import { useLoaderData, useSubmit } from "react-router-dom";
+import { Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Form, useLoaderData, useSubmit } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Payroll } from "../models/Payroll";
 import { formatDate } from "../utils/DateUtils";
 import { AvailableRegulation, AvailableRegulations, CountrySpecificRegulations } from "../models/AvailableRegulations";
 import { PayrollRegulations, RegulationName } from "../models/PayrollRegulations";
 import { toast } from "../utils/dataAtoms";
-import { useUpdateEffect } from "usehooks-ts";
 
 type LoaderData = {
   payroll: Payroll,
   payrollRegulations: PayrollRegulations
   availableRegulations: AvailableRegulations
+  loadKey: string
 }
 
 export function PayrollSettings() {
-  const { payroll } = useLoaderData() as LoaderData;
-  const { t } = useTranslation();
   return (
     <ContentLayout title="Settings">
-      <TextField value={payroll.name} label={t("Organization unit name")} />
-      <FormControl fullWidth variant="standard">
-        <FormLabel>{t("Payroll accounting start date")}</FormLabel>
-        <Typography>{formatDate(payroll.accountingStartDate)}</Typography>
-      </FormControl>
+      <PayrollDataSettings />
       <PayrollRegulationSettings />
     </ContentLayout>
   );
 }
 
+function PayrollDataSettings() {
+  const { payroll } = useLoaderData() as LoaderData;
+  const { t } = useTranslation();
+
+  return (
+    <Form method="POST">
+      <Stack spacing={2}>
+        <TextField name="payrollName" defaultValue={payroll.name} label={t("Organization unit name")} />
+        <TextField name="accoutingStartDate" value={formatDate(payroll.accountingStartDate)} label={t("Payroll accounting start date")} disabled />
+        <FormControl fullWidth variant="outlined" size="small">
+          <InputLabel>{t("Language")}</InputLabel>
+          <Select name="language" defaultValue={payroll.language} label={t("Language")}>
+            <MenuItem value="German">{t("German")}</MenuItem>
+            <MenuItem value="English">{t("English")}</MenuItem>
+            <MenuItem value="French">{t("French")}</MenuItem>
+            <MenuItem value="Italian">{t("Italian")}</MenuItem>
+          </Select>
+        </FormControl>
+        <Stack alignItems="end">
+          <Button variant="contained" type="submit">{t("Save")}</Button>
+        </Stack>
+      </Stack>
+    </Form>
+  );
+}
 
 function PayrollRegulationSettings() {
   const { t } = useTranslation();
@@ -44,10 +63,6 @@ function PayrollRegulationSettings() {
       toast("error", state.error.message)
     }
   }, [state.error]);
-
-  useEffect(() => {
-    dispatch({ type: "reset_state", state: createInitialState({ payrollRegulations, availableRegulations }) });
-  }, [payrollRegulations, availableRegulations]);
 
   const onSubmit = () => {
     submit(state.selectedRegulations, { method: "POST", encType: "application/json" });
@@ -230,6 +245,7 @@ function reducer(state: RegulationSelectionState, action: RegulationSelectionAct
 
 
 function createInitialState({ availableRegulations, payrollRegulations }: { availableRegulations: AvailableRegulations, payrollRegulations: PayrollRegulations }): RegulationSelectionState {
+  console.log("creating inital state");
   const countryRegulations = availableRegulations.find(r => r.name === payrollRegulations.countryRegulationName) ?? {
     name: "",
     displayName: "",

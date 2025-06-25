@@ -263,6 +263,13 @@ export function getPayroll(routeParams) {
 	return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
 }
 
+export function updatePayroll(routeParams, payroll) {
+	return new FetchRequestBuilder(payrollUrl, routeParams)
+		.withMethod("PUT")
+		.withBody(payroll)
+		.fetch();
+}
+
 export function getPayrollRegulations(routeParams) {
 	return new FetchRequestBuilder(payrollRegulationsUrl, routeParams).fetchJson();
 }
