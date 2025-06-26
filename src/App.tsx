@@ -119,7 +119,7 @@ function Snackbar() {
 			autoHideDuration={5000}
 		>
 			<Alert severity={toastNotification.severity} variant="filled">
-				<Typography>{t(toastNotification.message)}</Typography>
+				<Typography>{t(toastNotification.message, toastNotification.messageArgs)}</Typography>
 			</Alert>
 		</MuiSnackbar>
 	);

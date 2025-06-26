@@ -98,6 +98,13 @@ const translations = {
 		"Save regulations": "Regelwerke speichern",
 		"Regulations saved!": "Regelwerke gespeichert!",
 		"Data saved!": "Daten gespeichert!",
+		"Transmission": "Übermittlung",
+		"Start transmission": "Übermittlung starten",
+		"{{name}} is live. Closing a period will transmit the documents to swissdec.": "{{name}} ist live. Beim Schliessen der Periode werden die relevanten Dokumente swissdec übermittelt.",
+		"{{name}} is not live. Documents will not be sent to swissdec.": "{{name}} ist nicht live. Die Dokumente werden swissdec nicht übermittelt.",
+		"{{name}} is now live!": "{{name}} ist jetzt live!",
+		"Starting with the currently open period {{periodDate}} the relevant documents will be sent to swissdec.":
+			"Beginnend mit der aktuell offenen Periode {{periodDate}} werden die relevanten Dokumente swissdec übermittelt.",
 
 		Payruns: "Zahlungsläufe",
 		Abort: "Abbrechen",
@@ -284,7 +291,7 @@ const translations = {
 		"There was an error generating the documents. The support has been informed and we will fix the problem as soon as possible.": "Es ist ein Fehler beim Erstellen der Dokumente aufgetreten. Der Support wurde informiert und wir werden das Problem so schnell wie möglich beheben.",
 		"The documents are being generated, this can take up to a few minutes...": "Die Dokumente werden erstellt. Das kann einige Minuten dauern...",
 		"There are employees with open payouts!": "Es gibt noch Mitarbeiter mit offenen Auszahlungen!",
-		"Do you want to move all open payout to the next period?": "Möchten Sie die offenen Beträge in die nächste Periode übernehmen?",
+		"Do you want to move all open payouts to the next period?": "Möchten Sie die offenen Beträge in die nächste Periode übernehmen?",
 		"The wage controlling has not been completed yet. The period cannot be closed.": "Die Lohnkontrolle wurde noch nicht beendet. Die Periode kann nicht geschlossen werden.",
 		"Unsaved changes": "Nicht gespeicherte Änderungen",
 		"The settings have not been saved. Do you want to discard them?": "Die Einstellungen wurden nicht gespeichert. Möchten Sie die Änderungen verwerfen?",

@@ -171,13 +171,14 @@ type ToastSeverity = 'error' | 'info' | 'success' | 'warning';
 
 export type Toast = {
 	severity: ToastSeverity,
-	message: string
+	message: string,
+	messageArgs?: Record<string, string>
 };
 
 export const toastNotificationAtom = atom<Toast | null>(null);
 
-export function toast(severity: ToastSeverity, message: string) {
-	getDefaultStore().set(toastNotificationAtom, { severity, message });
+export function toast(severity: ToastSeverity, message: string, messageArgs?: Record<string, string>) {
+	getDefaultStore().set(toastNotificationAtom, { severity, message, messageArgs });
 }
 
 export function useEmployeeMissingDataCount(objectId: IdType) {

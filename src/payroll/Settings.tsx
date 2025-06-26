@@ -1,14 +1,15 @@
 
 import React, { useEffect, useReducer } from "react";
 import { ContentLayout } from "../components/ContentLayout";
-import { Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
-import { Form, useLoaderData, useSubmit } from "react-router-dom";
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Form, Link, Navigate, Outlet, useLoaderData, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Payroll } from "../models/Payroll";
 import { formatDate } from "../utils/DateUtils";
 import { AvailableRegulation, AvailableRegulations, CountrySpecificRegulations } from "../models/AvailableRegulations";
 import { PayrollRegulations, RegulationName } from "../models/PayrollRegulations";
 import { toast } from "../utils/dataAtoms";
+import { PayrunPeriod } from "../models/PayrunPeriod";
 
 type LoaderData = {
   payroll: Payroll,
@@ -22,6 +23,8 @@ export function PayrollSettings() {
     <ContentLayout title="Settings">
       <PayrollDataSettings />
       <PayrollRegulationSettings />
+      <PayrollTransmissionState />
+      <Outlet />
     </ContentLayout>
   );
 }
@@ -245,7 +248,6 @@ function reducer(state: RegulationSelectionState, action: RegulationSelectionAct
 
 
 function createInitialState({ availableRegulations, payrollRegulations }: { availableRegulations: AvailableRegulations, payrollRegulations: PayrollRegulations }): RegulationSelectionState {
-  console.log("creating inital state");
   const countryRegulations = availableRegulations.find(r => r.name === payrollRegulations.countryRegulationName) ?? {
     name: "",
     displayName: "",
@@ -260,4 +262,52 @@ function createInitialState({ availableRegulations, payrollRegulations }: { avai
     selectedRegulations: payrollRegulations,
     error: null
   };
+}
+
+
+function PayrollTransmissionState() {
+  const { payroll } = useLoaderData() as LoaderData;
+  const { t } = useTranslation();
+  const text = !!payroll.transmissionStartDate ?
+    t("{{name}} is live. Closing a period will transmit the documents to swissdec.", { name: payroll.name }) :
+    t("{{name}} is not live. Documents will not be sent to swissdec.", { name: payroll.name });
+  return (
+    <Form method="POST">
+      <Stack spacing={2}>
+        <Typography variant="h6">{t("Transmission")}</Typography>
+        <Typography>{text}</Typography>
+        {
+          !payroll.transmissionStartDate &&
+          <Stack alignItems="end">
+            <Button component={Link} to="golive" variant="contained" color="primary" >{t("Go live")}</Button>
+          </Stack>
+        }
+      </Stack>
+    </Form>
+  );
+}
+
+
+export function ConfirmTransmissionDialog() {
+  const { payroll } = useRouteLoaderData("payrollSettings") as LoaderData;
+  const openPayrunPeriod = useLoaderData() as PayrunPeriod;
+  const { t } = useTranslation();
+  if (payroll.transmissionStartDate) {
+    return <Navigate to=".." />
+  }
+  return (
+    <Dialog open>
+      <DialogTitle>{t("Start transmission")}</DialogTitle>
+      <DialogContent>
+        <Typography>{t("Starting with the currently open period {{periodDate}} the relevant documents will be sent to swissdec.", { periodDate: formatDate(openPayrunPeriod.periodStart) })}</Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button component={Link} to="..">{t("Back")}</Button>
+        <Form method="POST">
+          <input type="hidden" name="transmissionStartDate" value={openPayrunPeriod.periodStart as unknown as string} />
+          <Button type="submit" variant="contained">{t("Go live")}</Button>
+        </Form>
+      </DialogActions>
+    </Dialog>
+  )
 }

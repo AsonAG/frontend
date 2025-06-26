@@ -19,7 +19,7 @@ import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 export function ReviewOpenPeriod() {
   const { t } = useTranslation();
   const { documents } = useLoaderData();
-  const { payrunPeriod, controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+  const { payroll, payrunPeriod, controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
   const navigation = useNavigation();
   const hasOpenPayouts = useMemo(() => payrunPeriod.entries.some(entry => entry.openPayout > 0), [payrunPeriod.entries]);
   const [openPayoutConfirmation, setOpenPayoutConfirmation] = useState(false);
@@ -48,14 +48,14 @@ export function ReviewOpenPeriod() {
             </Suspense>
             <ResponsiveDialogContent>
               <Typography variant="h6">{t("Close period")}</Typography>
-              <Typography>{t("Upon closing the period, these documents will be sent to swissdec.")}</Typography>
+              {!!payroll.transmissionStartDate &&              <Typography>{t("Upon closing the period, these documents will be sent to swissdec.")}</Typography> }
               <Typography>{t("A closed period cannot be reopened.")}</Typography>
               {
                 hasOpenPayouts &&
                 <>
                   <Alert severity="warning"><Typography>{t("There are employees with open payouts!")}</Typography></Alert>
                   <FormGroup>
-                    <FormControlLabel control={<Checkbox checked={openPayoutConfirmation} onChange={handleChange} />} label={t("Do you want to move all open payout to the next period?")} />
+                    <FormControlLabel control={<Checkbox checked={openPayoutConfirmation} onChange={handleChange} />} label={t("Do you want to move all open payouts to the next period?")} />
                   </FormGroup>
                 </>
               }

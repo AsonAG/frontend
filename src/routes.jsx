@@ -119,7 +119,7 @@ import { CompanyTabbedView } from "./company/CompanyTabbedView";
 import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
 import { WageTypeControlling } from "./company/WageTypeControlling";
-import { PayrollSettings } from "./payroll/Settings";
+import { PayrollSettings, ConfirmTransmissionDialog } from "./payroll/Settings";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -571,6 +571,7 @@ const routeData = [
 			{
 				path: "settings/:payrollId",
 				Component: PayrollSettings,
+				id: "payrollSettings",
 				loader: async ({ params }) => {
 					const [payroll, payrollRegulations, availableRegulations] = await Promise.all([getPayroll(params), getPayrollRegulations(params), getAvailableRegulations()]);
 					const loadKey = Date.now().toString();
@@ -603,7 +604,31 @@ const routeData = [
 					store.set(payrollsAtom);
 
 					return response;
-				}
+				},
+				children: [
+					{
+						path: "golive",
+						Component: ConfirmTransmissionDialog,
+						loader: ({ params }) => {
+							return getOpenPayrunPeriod(params);
+						},
+						action: async ({ params, request }) => {
+							const payroll = await getPayroll(params);
+							if (payroll.transmissionStartDate) {
+								return redirect("..");
+							}
+							const form = await request.formData();
+							payroll.transmissionStartDate = form.get("transmissionStartDate");
+							const response = await updatePayroll(params, payroll);
+							if (!response.ok) {
+								toast("error", "Saving failed!");
+							} else {
+								toast("success", "{{name}} is now live!", { name: payroll.name });
+							}
+							return redirect("..");
+						}
+					}
+				]
 			}
 		]
 	},
@@ -845,7 +870,8 @@ const routeData = [
 								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
 							]);
 							const salaryTypesSet = [...new Set(salaryTypes)].filter(Boolean).sort();
-							return { payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes, salaryTypesSet, bankAccountDetails };
+							const payroll = await store.get(payrollAtom);
+							return { payroll, payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes, salaryTypesSet, bankAccountDetails };
 						},
 						children: [
 							{
