@@ -105,6 +105,7 @@ const translations = {
 		"{{name}} is now live!": "{{name}} ist jetzt live!",
 		"Starting with the currently open period {{periodDate}} the relevant documents will be sent to swissdec.":
 			"Beginnend mit der aktuell offenen Periode {{periodDate}} werden die relevanten Dokumente swissdec übermittelt.",
+		"The organisation unit is not live. Documents will not be sent to swissdec.": "Die Organisationseinheit ist nicht live. Die Dokumente werden swissdec nicht übermittelt.",
 
 		Payruns: "Zahlungsläufe",
 		Abort: "Abbrechen",

@@ -48,8 +48,14 @@ export function ReviewOpenPeriod() {
             </Suspense>
             <ResponsiveDialogContent>
               <Typography variant="h6">{t("Close period")}</Typography>
-              {!!payroll.transmissionStartDate &&              <Typography>{t("Upon closing the period, these documents will be sent to swissdec.")}</Typography> }
               <Typography>{t("A closed period cannot be reopened.")}</Typography>
+              {
+                !!payroll.transmissionStartDate ?
+                  <Typography>{t("Upon closing the period, these documents will be sent to swissdec.")}</Typography> :
+                  <Alert severity="warning"><Typography>{t("The organisation unit is not live. Documents will not be sent to swissdec.")}</Typography></Alert>
+
+
+              }
               {
                 hasOpenPayouts &&
                 <>
