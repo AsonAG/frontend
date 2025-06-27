@@ -190,8 +190,12 @@ function createRouteLookupForm(path, lookupName, keyName, loader) {
 		if (!regulation)
 			return null;
 		const lookup = await getLookupSet({ regulationId: regulation.id, ...params }, lookupName);
+		const payrollLookup = await getLookupValues(params, lookupName);
+		const clientLookupMap = new Map((lookup.values ?? []).map(value => [value.key, value]));
 		return {
 			lookup,
+			clientLookupMap,
+			payrollLookup,
 			keyName,
 			regulationId: regulation.id,
 		};
@@ -1042,7 +1046,7 @@ const routeData = [
 							] = await Promise.all([
 								store.get(payrollWageTypesAtom),
 								store.get(payrollWageTypeSettingsAtom),
-								getLookupSet({ regulationId: regulation.id, ...params }, "AccountMaster"),
+								getLookupValues(params, "AccountMaster"),
 								getLookupValues(params, "CH.Swissdec.WageTypesControlTypes"),
 								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
 								getPayrollCollectors(params)

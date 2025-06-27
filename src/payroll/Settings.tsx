@@ -93,6 +93,11 @@ function PayrollRegulationSettings() {
         onChange={(values) => dispatch({ type: "set_erp", erp: values })}
         value={state.selectedRegulations.erp} />
       <RegulationSelect
+        label={t("accounting_data_regulation")}
+        items={state.countryRegulations.accountingData}
+        value={state.selectedRegulations.accountingData}
+        onChange={(value) => dispatch({ type: "set_accounting_data", accountingData: value })} />
+      <RegulationSelect
         label={t("Accounting document")}
         items={state.countryRegulations.accountingDocument}
         value={state.selectedRegulations.accountingDocument}
@@ -184,6 +189,9 @@ type RegulationSelectionAction = {
   type: "set_accounting_document"
   accountingDocument: RegulationName
 } | {
+  type: "set_accounting_data"
+  accountingData: RegulationName
+} | {
   type: "reset_state",
   state: RegulationSelectionState
 }
@@ -198,7 +206,8 @@ function reducer(state: RegulationSelectionState, action: RegulationSelectionAct
           countryRegulationName: action.countryRegulation,
           industries: [],
           erp: [],
-          accountingDocument: null
+          accountingDocument: null,
+          accountingData: null
         }
       };
     case "set_industries":
@@ -241,6 +250,14 @@ function reducer(state: RegulationSelectionState, action: RegulationSelectionAct
           accountingDocument: action.accountingDocument
         }
       };
+    case "set_accounting_data":
+      return {
+        ...state,
+        selectedRegulations: {
+          ...state.selectedRegulations,
+          accountingData: action.accountingData
+        }
+      };
     case "reset_state":
       return action.state;
   }
@@ -253,7 +270,8 @@ function createInitialState({ availableRegulations, payrollRegulations }: { avai
     displayName: "",
     industries: [],
     erp: [],
-    accountingDocument: []
+    accountingDocument: [],
+    accountingData: []
   };
   return {
     availableRegulations,

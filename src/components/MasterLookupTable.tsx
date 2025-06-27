@@ -9,31 +9,35 @@ import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, Respo
 
 type LoaderData = {
   lookup: LookupSet
+  clientLookupMap: Map<string, LookupValue>
+  payrollLookup: LookupSet
   regulationId: IdType
   keyName: string
   canDelete: (key: string) => [boolean, string]
 }
 
 export function MasterLookupTable() {
-  const { lookup } = useLoaderData() as LoaderData;
+  const { payrollLookup } = useLoaderData() as LoaderData;
   return (
     <Stack spacing={1}>
       <TableHeader />
-      {lookup.values.map(value => <ValueRow key={value.id} value={value} />)}
+      {(payrollLookup.values ?? []).map(value => <ValueRow key={value.key} value={value} />)}
       <NewValueRow />
     </Stack>
   )
 }
 
 function ValueRow({ value }: { value: LookupValue }) {
+  const { clientLookupMap } = useLoaderData() as LoaderData;
   const [lookupData, setLookupData] = useState(value ? { ...value } : { key: "", value: "" });
 
+  const clientLookupValue = clientLookupMap.get(value.key);
   const isDirty = lookupData.key !== value.key || lookupData.value !== value.value;
-  const idElements = <HiddenIdElements value={value} />
+  const idElements = <HiddenIdElements value={clientLookupValue} />
 
   return (
     <Stack direction="row">
-      <Form method={"PUT"} style={{ flex: 1 }}>
+      <Form method={!!clientLookupValue ? "PUT" : "POST"} style={{ flex: 1 }}>
         {idElements}
         <Stack direction="row" spacing={1}>
           <TextField name="key" value={lookupData.key} sx={{ width: 120 }} size="small" disabled slotProps={{ htmlInput: { readOnly: true, disabled: false } }} />
@@ -41,21 +45,21 @@ function ValueRow({ value }: { value: LookupValue }) {
           <IconButton type="submit" tabIndex={-1} color="primary" disabled={!isDirty}><Save /></IconButton>
         </Stack>
       </Form>
-      <DeleteButton value={value}>
+      <DeleteButton value={value} disabled={!clientLookupValue}>
         {idElements}
       </DeleteButton>
     </Stack>
   )
 }
 
-function DeleteButton({ children, value }) {
+function DeleteButton({ children, value, disabled }) {
   const { t } = useTranslation();
   const { canDelete } = useLoaderData() as LoaderData;
   const [deletable, reason] = useMemo(() => canDelete?.(value.key) ?? [true, null], [canDelete, value.key]);
   return (
     <ResponsiveDialog>
       <ResponsiveDialogTrigger>
-        <IconButton type="submit" tabIndex={-1}>
+        <IconButton type="submit" tabIndex={-1} disabled={disabled}>
           <Delete />
         </IconButton>
       </ResponsiveDialogTrigger>

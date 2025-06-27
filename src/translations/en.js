@@ -17,6 +17,7 @@ const translations = {
 		"PayrunJobStatus.Forecast": "Forecast",
 		"PayrunJobStatus.Abort": "Aborted",
 		"PayrunJobStatus.Cancel": "Cancelled",
+		"accounting_data_regulation": "Chart of accounts",
 
 		payout_sum: "Payout {{amount}}",
 		"payrun_period_calculating": "Calculating",

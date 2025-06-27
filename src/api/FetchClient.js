@@ -719,7 +719,7 @@ export function getPayrollWageTypeSettings(routeParams) {
 }
 export function setPayrollWageTypeSettings(routeParams, settings) {
 	return new FetchRequestBuilder(payrollWageTypeSettingsUrl, routeParams)
-		.withMethod("POST")
+		.withMethod("PATCH")
 		.withBody(settings)
 		.fetch();
 }

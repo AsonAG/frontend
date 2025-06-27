@@ -6,6 +6,7 @@ export type CountrySpecificRegulations = AvailableRegulation & {
   industries: AvailableRegulation[]
   erp: AvailableRegulation[]
   accountingDocument: AvailableRegulation[]
+  accountingData: AvailableRegulation[]
 }
 
 export type AvailableRegulation = {
