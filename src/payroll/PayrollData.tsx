@@ -1,7 +1,7 @@
 import { Stack, TextField, FormControl, InputLabel, Select, SelectChangeEvent, MenuItem, Typography, Button, Box, Chip } from "@mui/material";
 import React, { useRef, useState, useReducer, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, useLoaderData, useSubmit } from "react-router-dom";
+import { Form, useLoaderData, useNavigation, useSubmit } from "react-router-dom";
 import { PayrollSettingsLoaderData } from "./Settings";
 import { toast } from "../utils/dataAtoms";
 import { DatePicker } from "../components/DatePicker";
@@ -16,6 +16,7 @@ export function PayrollData() {
   const [payrollName, setPayrollName] = useState(payroll?.name ?? "");
   const [accountingStartDate, setAccountingStartDate] = useState((!!payroll && payroll.accountingStartDate) ? dayjs.utc(payroll.accountingStartDate) : dayjs().utc().startOf('year'));
   const [language, setLanguage] = useState(payroll?.language ?? "German");
+  const { state: navigationState } = useNavigation();
 
   const createInitialStateArgs = {
     payrollRegulations: payrollRegulations ?? {
@@ -117,7 +118,7 @@ export function PayrollData() {
           value={state.selectedRegulations.accountingDocument}
           onChange={(value) => dispatch({ type: "set_accounting_document", accountingDocument: value })} />
         <Stack alignItems="end">
-          <Button variant="contained" onClick={onSubmit}>{t(!payroll ? "Create" : "Save")}</Button>
+          <Button variant="contained" onClick={onSubmit} loading={navigationState === "submitting"} loadingPosition="start">{t(!payroll ? "Create" : "Save")}</Button>
         </Stack>
       </Stack>
     </Form>
