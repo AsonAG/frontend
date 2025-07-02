@@ -10,7 +10,6 @@ import {
 	Alert,
 	Typography,
 	Box,
-	Breakpoint,
 } from "@mui/material";
 import Topbar from "./scenes/global/Topbar";
 import Drawer from "./scenes/global/Drawer";
@@ -18,7 +17,7 @@ import Drawer from "./scenes/global/Drawer";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import { Outlet, useLoaderData, useMatches } from "react-router-dom";
+import { Outlet, useLoaderData } from "react-router-dom";
 import { Container } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "./components/Logo";
@@ -32,11 +31,12 @@ dayjs.extend(localizedFormat);
 // dynamically load these when we support more locales
 import "dayjs/locale/de";
 import "dayjs/locale/en";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { toastNotificationAtom } from "./utils/dataAtoms";
 import { User } from "./models/User";
 import { useRole } from "./hooks/useRole";
-import { atomWithStorage, createJSONStorage } from "jotai/utils";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 type LoaderData = {
 	user: User
@@ -68,29 +68,31 @@ export function App({ renderDrawer = false }) {
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
-			<Stack className="app" direction="row">
-				{renderDrawer && (
-					<Drawer
-						temporary={useTemporaryDrawer}
-						open={drawerOpen}
-						onClose={() => setDrawerOpen(false)}
-					/>
-				)}
-				<Stack sx={{ flex: 1, minWidth: 0 }}>
-					<Topbar>
-						{drawerButton}
-						{topbarLogo}
-					</Topbar>
-					<Stack id="content" direction="row" sx={{ flex: 1, minWidth: 0 }}>
-						<MainContainer />
-						<Box id="sidebar-container" sx={{ px: 3, maxWidth: 485, borderLeftColor: "divider", borderLeftStyle: "solid", borderLeftWidth: "thin" }} />
+			<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
+				<Stack className="app" direction="row">
+					{renderDrawer && (
+						<Drawer
+							temporary={useTemporaryDrawer}
+							open={drawerOpen}
+							onClose={() => setDrawerOpen(false)}
+						/>
+					)}
+					<Stack sx={{ flex: 1, minWidth: 0 }}>
+						<Topbar>
+							{drawerButton}
+							{topbarLogo}
+						</Topbar>
+						<Stack id="content" direction="row" sx={{ flex: 1, minWidth: 0 }}>
+							<MainContainer />
+							<Box id="sidebar-container" sx={{ px: 3, maxWidth: 485, borderLeftColor: "divider", borderLeftStyle: "solid", borderLeftWidth: "thin" }} />
+						</Stack>
 					</Stack>
+					<Snackbar />
+					<Suspense>
+						<RenderProductionBanner />
+					</Suspense>
 				</Stack>
-				<Snackbar />
-				<Suspense>
-					<RenderProductionBanner />
-				</Suspense>
-			</Stack>
+			</LocalizationProvider>
 		</ThemeProvider>
 	);
 }

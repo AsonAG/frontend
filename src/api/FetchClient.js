@@ -10,6 +10,7 @@ const organizationsUrl = "/tenants";
 const organizationImportUrl = "/tenants/import";
 const organizationUrl = "/tenants/:orgId";
 const payrollsUrl = "/tenants/:orgId/payrolls";
+const payrollsSimpleUrl = "/tenants/:orgId/payrolls/simple";
 const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
 const payrollRegulationsUrl = "/tenants/:orgId/payrolls/:payrollId/regulations";
 const divisionsUrl = "/tenants/:orgId/divisions";
@@ -261,6 +262,13 @@ export function getPayrolls(routeParams) {
 
 export function getPayroll(routeParams) {
 	return new FetchRequestBuilder(payrollUrl, routeParams).fetchJson();
+}
+
+export function createPayroll(routeParams, payroll) {
+	return new FetchRequestBuilder(payrollsSimpleUrl, routeParams)
+		.withMethod("POST")
+		.withBody(payroll)
+		.fetch();
 }
 
 export function updatePayroll(routeParams, payroll) {

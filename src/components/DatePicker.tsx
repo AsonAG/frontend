@@ -1,16 +1,12 @@
 import {
 	DatePicker as MuiDatePicker,
 	DateTimePicker as MuiDateTimePicker,
-	LocalizationProvider,
 	DatePickerProps as MuiDatePickerProps,
 	DateTimePickerProps as MuiDateTimePickerProps,
 	DateValidationError,
 	PickerChangeHandlerContext,
 	DateTimeValidationError,
 } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useRouteLoaderData } from "react-router-dom";
-import { getDateLocale } from "../services/converters/DateLocaleExtractor";
 import { InputAdornment, InputAdornmentProps, IconButton } from "@mui/material";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
 import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
@@ -18,22 +14,24 @@ import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 
 type DatePickerInputAdornmentProps = {
-	handleBack: MouseEventHandler;
-	handleForward: MouseEventHandler;
+	handleBack: MouseEventHandler
+	handleForward: MouseEventHandler
+	disabled?: boolean
 } & InputAdornmentProps;
 
 function DatePickerInputAdornment({
 	children,
 	handleBack,
 	handleForward,
+	disabled,
 	...props
 }: DatePickerInputAdornmentProps) {
 	return (
 		<InputAdornment {...props}>
-			<IconButton onClick={handleBack}>
+			<IconButton onClick={handleBack} disabled={disabled}>
 				<NavigateBefore />
 			</IconButton>
-			<IconButton onClick={handleForward}>
+			<IconButton onClick={handleForward} disabled={disabled}>
 				<NavigateNext />
 			</IconButton>
 			{children}
@@ -65,7 +63,6 @@ export function DatePicker<T extends DatePickerVariants>({
 	minDateErrorMessage,
 	...datePickerProps
 }: Props<T>) {
-	const { user } = useRouteLoaderData("root") as any;
 	const { t } = useTranslation();
 	const inputRef = useRef<HTMLInputElement | null>();
 	const Picker = variant === "datetime" ? MuiDateTimePicker : MuiDatePicker;
@@ -116,6 +113,7 @@ export function DatePicker<T extends DatePickerVariants>({
 					// @ts-ignore
 					handleBack: () => setNewValue(value?.subtract(1, "month")),
 					handleForward: () => setNewValue(value?.add(1, "month")),
+					disabled: datePickerProps.disabled
 				},
 			};
 		}
@@ -150,22 +148,17 @@ export function DatePicker<T extends DatePickerVariants>({
 	}, [value?.toISOString(), inputRef.current, required, validationError]);
 
 	return (
-		<LocalizationProvider
-			dateAdapter={AdapterDayjs}
-			adapterLocale={getDateLocale(user)}
-		>
-			<Picker
-				{...datePickerProps}
-				{...pickerProps}
-				inputRef={inputRef}
-				timezone="UTC"
-				onChange={handleDateChange}
-				// @ts-ignore
-				slots={slots}
-				// @ts-ignore
-				slotProps={slotProps}
-			/>
-		</LocalizationProvider>
+		<Picker
+			{...datePickerProps}
+			{...pickerProps}
+			inputRef={inputRef}
+			timezone="UTC"
+			onChange={handleDateChange}
+			// @ts-ignore
+			slots={slots}
+			// @ts-ignore
+			slotProps={slotProps}
+		/>
 	);
 }
 

@@ -66,7 +66,8 @@ import {
 	getAvailableRegulations,
 	getPayrollRegulations,
 	updatePayrollRegulations,
-	updatePayroll
+	updatePayroll,
+	createPayroll
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -120,6 +121,7 @@ import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
 import { WageTypeControlling } from "./company/WageTypeControlling";
 import { PayrollSettings, ConfirmTransmissionDialog } from "./payroll/Settings";
+import { NewPayrollView } from "./payroll/NewPayrollView";
 const store = getDefaultStore();
 
 async function getOrganizationData() {
@@ -578,36 +580,24 @@ const routeData = [
 				id: "payrollSettings",
 				loader: async ({ params }) => {
 					const [payroll, payrollRegulations, availableRegulations] = await Promise.all([getPayroll(params), getPayrollRegulations(params), getAvailableRegulations()]);
-					const loadKey = Date.now().toString();
-					return { payroll, payrollRegulations, availableRegulations, loadKey };
+					return { payroll, payrollRegulations, availableRegulations };
 				},
 				action: async ({ params, request }) => {
-					const contentType = request.headers.get("content-type");
-					if (contentType === "application/json") {
-						const task = await request.json();
-						const response = await updatePayrollRegulations(params, task);
-						if (!response.ok) {
-							toast("error", "Saving failed!");
-							return response;
-						}
-						toast("success", "Regulations saved!");
-
-						return response;
-					}
-
-					const form = await request.formData();
-					const payroll = await getPayroll(params);
-					payroll.name = form.get("payrollName");
-					payroll.language = form.get("language");
-					const response = await updatePayroll(params, payroll);
-					if (!response.ok) {
+					const updatePayrollRequest = await request.json();
+					const updatePayrollResponse = await updatePayroll(params, updatePayrollRequest.payroll);
+					if (!updatePayrollResponse.ok) {
 						toast("error", "Saving failed!");
-						return response;
+						return null;
+					}
+					store.set(payrollsAtom);
+					const payroll = await updatePayrollResponse.json();
+					const setRegulationResponse = await updatePayrollRegulations({ ...params, payrollId: payroll.id }, updatePayrollRequest.regulations);
+					if (!setRegulationResponse.ok) {
+						toast("warning", "Organization unit updated, but setting regulations failed");
+						return null;
 					}
 					toast("success", "Data saved!");
-					store.set(payrollsAtom);
-
-					return response;
+					return null;
 				},
 				children: [
 					{
@@ -633,6 +623,31 @@ const routeData = [
 						}
 					}
 				]
+			},
+			{
+				path: "settings/newpayroll",
+				Component: NewPayrollView,
+				loader: async () => {
+					const availableRegulations = await getAvailableRegulations();
+					return { availableRegulations };
+				},
+				action: async ({ params, request }) => {
+					const createPayrollRequest = await request.json();
+					const createPayrollResponse = await createPayroll(params, createPayrollRequest.payroll);
+					if (!createPayrollResponse.ok) {
+						toast("error", "Create of organization unit failed");
+						return response;
+					}
+					store.set(payrollsAtom);
+					const payroll = await createPayrollResponse.json();
+					const setRegulationResponse = await updatePayrollRegulations({ ...params, payrollId: payroll.id }, createPayrollRequest.regulations);
+					if (!setRegulationResponse.ok) {
+						toast("warning", "Organization unit created, but setting regulations failed");
+						return redirect(payroll.id);
+					}
+					toast("success", "Organization unit created");
+					return redirect(`../payrolls/${payroll.id}/company`);
+				}
 			}
 		]
 	},

@@ -13,7 +13,6 @@ import {
 	useLocation,
 	useMatch,
 	useMatches,
-	useParams,
 } from "react-router-dom";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -33,7 +32,7 @@ import { useAtomValue } from "jotai";
 import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom } from "../../utils/dataAtoms";
 import { useRole } from "../../hooks/useRole";
 import { unwrap } from "jotai/utils";
-import { Business } from "@mui/icons-material";
+import { Add, Business } from "@mui/icons-material";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {
@@ -192,8 +191,12 @@ function MenuItemsOrganization() {
 						to={`settings/${x.id}`}
 						icon={<Business />}
 					/>
-
 				))}
+				<NavigationItem
+					label={t("Create")}
+					to="settings/newpayroll"
+					icon={<Add />}
+				/>
 			</NavigationGroup>
 		</>
 	);

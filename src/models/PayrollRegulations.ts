@@ -1,6 +1,6 @@
 
 export type PayrollRegulations = {
-  countryRegulationName: RegulationName | null
+  countryRegulation: RegulationName | null
   industries: RegulationName[]
   erp: RegulationName[]
   accountingDocument: RegulationName | null
