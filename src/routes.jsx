@@ -928,6 +928,7 @@ const routeData = [
 								children: [
 									createRoutePayrunPeriodDocument(),
 								],
+								shouldRevalidate: () => false,
 								loader: async ({ params }) => {
 									if (!params.payrunPeriodId === "open") {
 										return redirect("..");

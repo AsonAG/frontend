@@ -79,8 +79,8 @@ export function PayrollData() {
           required
           disabled={!!payroll} />
         <FormControl fullWidth variant="outlined" size="small" required>
-          <InputLabel>{t("Language")}</InputLabel>
-          <Select value={language} onChange={(e: SelectChangeEvent) => setLanguage(e.target.value)} label={t("Language")}>
+          <InputLabel>{t("Language for documents")}</InputLabel>
+          <Select value={language} onChange={(e: SelectChangeEvent) => setLanguage(e.target.value)} label={t("Language for documents")}>
             <MenuItem value="German">{t("German")}</MenuItem>
             <MenuItem value="English">{t("English")}</MenuItem>
             <MenuItem value="French">{t("French")}</MenuItem>

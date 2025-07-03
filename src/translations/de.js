@@ -25,6 +25,7 @@ const translations = {
 		"Last name": "Nachname",
 		Description: "Beschreibung",
 		"Language": "Sprache",
+		"Language for documents": "Sprache für Dokumente",
 		"German": "Deutsch",
 		"English": "Englisch",
 		"French": "Französisch",
