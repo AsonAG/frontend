@@ -9,7 +9,7 @@ import {
 } from "@mui/x-date-pickers";
 import { InputAdornment, InputAdornmentProps, IconButton } from "@mui/material";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
-import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
+import React, { MouseEventHandler, useRef, useState } from "react";
 import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 
@@ -92,42 +92,32 @@ export function DatePicker<T extends DatePickerVariants>({
 
 	const handleBlur = () => {
 		const isValid = !localValue || localValue.isValid();
+
+		if (inputRef.current) {
+			if (validationError) {
+				inputRef.current.setCustomValidity(t(validationError));
+			} else if (!required) {
+				inputRef.current.setCustomValidity("");
+			} else if (!localValue) {
+				inputRef.current.setCustomValidity(t("Please enter a date"));
+			} else {
+				inputRef.current.setCustomValidity("");
+			}
+		}
+
 		if (isValid && onChange) {
 			// @ts-ignore
 			onChange(localValue);
 		}
 	};
 
-	useEffect(() => {
-		if (!inputRef.current) return;
-		inputRef.current.onblur = handleBlur;
-	}, [localValue]);
-
-	useEffect(() => {
-		setLocalValue(value ?? null);
-	}, [value?.toISOString()]);
-
-	useEffect(() => {
-		if (validationError) {
-			inputRef.current?.setCustomValidity(t(validationError));
-			return;
-		}
-		if (!required) {
-			inputRef.current?.setCustomValidity("");
-			return;
-		}
-		let error = "";
-		if (!value) {
-			error = t("Please enter a date");
-		}
-		inputRef.current?.setCustomValidity(error);
-	}, [value?.toISOString(), inputRef.current, required, validationError]);
-
 	slotProps = {
 		...slotProps,
 		textField: {
 			...slotProps?.textField,
 			required,
+			inputRef,
+			onBlur: handleBlur,
 		},
 		openPickerButton: { tabIndex: -1 },
 	};
@@ -151,6 +141,12 @@ export function DatePicker<T extends DatePickerVariants>({
 
 			slotProps = {
 				...slotProps,
+				textField: {
+					...slotProps?.textField,
+					required,
+					inputRef,
+					onBlur: handleBlur,
+				},
 				inputAdornment: {
 					// @ts-ignore
 					handleBack: () => setNewValue(localValue?.subtract(1, "month")),
@@ -169,25 +165,6 @@ export function DatePicker<T extends DatePickerVariants>({
 			views: ["year"],
 		};
 	}
-
-	// We need to set the validity ourselves, because the MUI Datepicker
-	// populates the input field with a placeholder.
-	// The default HTML Form validation error message won't display because of that.
-	useEffect(() => {
-		if (validationError) {
-			inputRef.current?.setCustomValidity(t(validationError));
-			return;
-		}
-		if (!required) {
-			inputRef.current?.setCustomValidity("");
-			return;
-		}
-		let error = "";
-		if (!value) {
-			error = t("Please enter a date");
-		}
-		inputRef.current?.setCustomValidity(error);
-	}, [value?.toISOString(), inputRef.current, required, validationError]);
 
 	return (
 		<Picker
