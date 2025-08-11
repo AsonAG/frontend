@@ -5,7 +5,10 @@ import {
 } from "./value/FieldValueDateComponent";
 import { useAccountingPeriodDateLimit } from "../useAccountingPeriodDateLimit";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { useMemo } from "react";
+
+dayjs.extend(utc);
 
 export function FieldPeriodSelector({ field }) {
 	const { t } = useTranslation();
@@ -49,9 +52,12 @@ export function FieldPeriodSelector({ field }) {
 			} else {
 				props.minDate = startValue;
 			}
+			props.minDateErrorMessage = t("date_start_before_end_validation", {
+				defaultValue: "Startdatum muss vor dem Enddatum liegen",
+			});
 		}
 		return props;
-	}, [endPickerProps, startValue]);
+	}, [endPickerProps, startValue, t]);
 
 	if (
 		field.timeType === "Timeless" ||
@@ -60,7 +66,7 @@ export function FieldPeriodSelector({ field }) {
 		return null;
 	}
 
-	const periodPickers = (
+	return (
 		<>
 			<FieldValueDateComponent
 				propertyName="start"
@@ -88,6 +94,4 @@ export function FieldPeriodSelector({ field }) {
 			)}
 		</>
 	);
-
-	return periodPickers;
 }
