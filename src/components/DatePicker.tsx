@@ -67,9 +67,7 @@ export function DatePicker<T extends DatePickerVariants>({
 }: Props<T>) {
 	const { t } = useTranslation();
 	const inputRef = useRef<HTMLInputElement | null>(null);
-	const Picker = (
-		variant === "datetime" ? MuiDateTimePicker : MuiDatePicker
-	) as React.FC<any>;
+	const Picker = variant === "datetime" ? MuiDateTimePicker : MuiDatePicker;
 	let pickerProps = {};
 	const { value } = datePickerProps;
 	const [localValue, setLocalValue] = useState<Dayjs | null>(value ?? null);
@@ -141,7 +139,7 @@ export function DatePicker<T extends DatePickerVariants>({
 
 			slotProps = {
 				...slotProps,
-			
+
 				inputAdornment: {
 					// @ts-ignore
 					handleBack: () => setNewValue(localValue?.subtract(1, "month")),
