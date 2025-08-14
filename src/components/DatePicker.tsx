@@ -141,12 +141,7 @@ export function DatePicker<T extends DatePickerVariants>({
 
 			slotProps = {
 				...slotProps,
-				textField: {
-					...slotProps?.textField,
-					required,
-					inputRef,
-					onBlur: handleBlur,
-				},
+			
 				inputAdornment: {
 					// @ts-ignore
 					handleBack: () => setNewValue(localValue?.subtract(1, "month")),

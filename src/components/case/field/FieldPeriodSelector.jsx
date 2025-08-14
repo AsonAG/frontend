@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import {
-	FieldValueDateComponent,
-	getDatePickerVariant,
+  FieldValueDateComponent,
+  getDatePickerVariant,
 } from "./value/FieldValueDateComponent";
 import { useAccountingPeriodDateLimit } from "../useAccountingPeriodDateLimit";
 import dayjs from "dayjs";
@@ -11,87 +11,72 @@ import { useMemo } from "react";
 dayjs.extend(utc);
 
 export function FieldPeriodSelector({ field }) {
-	const { t } = useTranslation();
-	const startPickerProps = useAccountingPeriodDateLimit();
-	const endPickerProps = useAccountingPeriodDateLimit();
+  const { t } = useTranslation();
 
-	const startValue = useMemo(() => {
-		const value = field?.start;
-		if (!value) return null;
-		try {
-			return dayjs.utc(value);
-		} catch {
-			return null;
-		}
-	}, [field?.start]);
+  const startValue = useMemo(() => {
+    const value = field?.start;
+    if (!value) return null;
+    try {
+      return dayjs.utc(value);
+    } catch {
+      return null;
+    }
+  }, [field?.start]);
 
-	const endValue = useMemo(() => {
-		const value = field?.end;
-		if (!value) return null;
-		try {
-			return dayjs.utc(value);
-		} catch {
-			return null;
-		}
-	}, [field?.end]);
+  const endValue = useMemo(() => {
+    const value = field?.end;
+    if (!value) return null;
+    try {
+      return dayjs.utc(value);
+    } catch {
+      return null;
+    }
+  }, [field?.end]);
 
-	const computedStartPickerProps = useMemo(() => {
-		const props = { ...startPickerProps };
-		if (endValue) {
-			props.maxDate = endValue;
-		}
-		return props;
-	}, [startPickerProps, endValue]);
+  const startPickerProps = useAccountingPeriodDateLimit({
+    picker: "start",
+    start: startValue,
+    end: endValue,
+  });
+  const endPickerProps = useAccountingPeriodDateLimit({
+    picker: "end",
+    start: startValue,
+    end: endValue,
+  });
 
-	const computedEndPickerProps = useMemo(() => {
-		const props = { ...endPickerProps };
-		if (startValue) {
-			const baseMin = endPickerProps.minDate;
-			if (baseMin) {
-				props.minDate = startValue.isAfter(baseMin) ? startValue : baseMin;
-			} else {
-				props.minDate = startValue;
-			}
-			props.minDateErrorMessage = t("date_start_before_end_validation", {
-				defaultValue: "Startdatum muss vor dem Enddatum liegen",
-			});
-		}
-		return props;
-	}, [endPickerProps, startValue, t]);
+  if (
+    field.timeType === "Timeless" ||
+    field.attributes?.["input.hideStartEnd"]
+  ) {
+    return null;
+  }
 
-	if (
-		field.timeType === "Timeless" ||
-		field.attributes?.["input.hideStartEnd"]
-	) {
-		return null;
-	}
-
-	return (
-		<>
-			<FieldValueDateComponent
-				propertyName="start"
-				variant={getDatePickerVariant(
-					field.attributes?.["input.datePickerStart"],
-					undefined,
-					"month-short",
-				)}
-				displayName={t("Start")}
-				required={!field.optional}
-				{...computedStartPickerProps}
-			/>
-			{field.timeType !== "Moment" && (
-				<FieldValueDateComponent
-					propertyName="end"
-					variant={getDatePickerVariant(
-						field.attributes?.["input.datePickerEnd"],
-						undefined,
-						"month-short",
-					)}
-					displayName={t("End")}
-					required={!field.optional && field.endMandatory}
-					{...computedEndPickerProps}
-				/>
-			)}
-		</>
-	);
+  return (
+    <>
+      <FieldValueDateComponent
+        propertyName="start"
+        variant={getDatePickerVariant(
+          field.attributes?.["input.datePickerStart"],
+          undefined,
+          "month-short",
+        )}
+        displayName={t("Start")}
+        required={!field.optional}
+        {...startPickerProps}
+      />
+      {field.timeType !== "Moment" && (
+        <FieldValueDateComponent
+          propertyName="end"
+          variant={getDatePickerVariant(
+            field.attributes?.["input.datePickerEnd"],
+            undefined,
+            "month-short",
+          )}
+          displayName={t("End")}
+          required={!field.optional && field.endMandatory}
+          {...endPickerProps}
+        />
+      )}
+    </>
+  );
 }
