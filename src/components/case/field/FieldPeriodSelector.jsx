@@ -3,7 +3,7 @@ import {
   FieldValueDateComponent,
   getDatePickerVariant,
 } from "./value/FieldValueDateComponent";
-import { useAccountingPeriodDateLimit } from "../useAccountingPeriodDateLimit";
+import { usePeriodDateLimit } from "../usePeriodDateLimit";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useMemo } from "react";
@@ -33,12 +33,12 @@ export function FieldPeriodSelector({ field }) {
     }
   }, [field?.end]);
 
-  const startPickerProps = useAccountingPeriodDateLimit({
+  const startPickerProps = usePeriodDateLimit({
     picker: "start",
     start: startValue,
     end: endValue,
   });
-  const endPickerProps = useAccountingPeriodDateLimit({
+  const endPickerProps = usePeriodDateLimit({
     picker: "end",
     start: startValue,
     end: endValue,

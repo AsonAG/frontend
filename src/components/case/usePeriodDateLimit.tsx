@@ -1,4 +1,3 @@
-// useAccountingPeriodDateLimit.ts
 import { DateValidationError } from "@mui/x-date-pickers";
 import { unwrap } from "jotai/utils";
 import { useMemo, useState } from "react";
@@ -15,7 +14,7 @@ type Options = {
 
 const unwrappedPayrollAtom = unwrap(payrollAtom, (prev) => prev ?? null);
 
-export function useAccountingPeriodDateLimit(opts?: Options) {
+export function usePeriodDateLimit(opts?: Options) {
 	const { t } = useTranslation();
 	const [error, setError] = useState<DateValidationError | null>(null);
 	const payroll = useAtomValue(unwrappedPayrollAtom);

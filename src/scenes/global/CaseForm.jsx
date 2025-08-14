@@ -18,7 +18,7 @@ import { toast } from "../../utils/dataAtoms";
 import { CaseFieldDetails } from "../../components/CaseFieldDetails";
 import { DatePicker } from "../../components/DatePicker";
 import { useTranslation } from "react-i18next";
-import { useAccountingPeriodDateLimit } from "../../components/case/useAccountingPeriodDateLimit";
+import { usePeriodDateLimit } from "../../components/case/usePeriodDateLimit";
 
 export const CaseFormContext = createContext();
 
@@ -94,8 +94,8 @@ function CaseForm() {
 
 function PeriodPicker({ inputMode, variant, startDate, setStartDate, endDate, setEndDate }) {
 	const { t } = useTranslation();
-	const startPickerProps = useAccountingPeriodDateLimit();
-	const endPickerProps = useAccountingPeriodDateLimit();
+	const startPickerProps = usePeriodDateLimit();
+	const endPickerProps = usePeriodDateLimit();
 	if (inputMode === "Individual") {
 		return;
 	}
