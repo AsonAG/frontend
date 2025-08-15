@@ -41,7 +41,6 @@ const companyDocumentUrl =
 	"/tenants/:orgId/companycases/:caseValueId/documents/:documentId";
 const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
-const payrunsUrl = "/tenants/:orgId/payruns";
 const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods";
 const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId";
 const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/close";
@@ -52,10 +51,6 @@ const payrunPeriodControllingUrl = "/tenants/:orgId/payrolls/:payrollId/payrunpe
 const payoutsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts";
 const payoutUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
 const payoutDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId/document";
-const payrollResultsUrl =
-	"/tenants/:orgId/payrollresults";
-const wageTypesUrl =
-	"/tenants/:orgId/payrollresults/:payrollResultId/wagetypes";
 const exportUrl = "/tenants/:orgId/export";
 
 const store = getDefaultStore();
@@ -512,12 +507,6 @@ export function updateTask(routeParams, task) {
 		.fetch();
 }
 
-export function getPayrun(routeParams) {
-	return new FetchRequestBuilder(payrunsUrl, routeParams)
-		.withQueryParam("filter", `payrollId eq '${routeParams.payrollId}'`)
-		.fetchSingle();
-}
-
 export function getClosedPayrunPeriods(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
 		.withQueryParam("orderBy", "periodStart desc")
@@ -652,19 +641,6 @@ export function deleteDocument(routeParams) {
 	return new FetchRequestBuilder(url, routeParams)
 		.withMethod("DELETE")
 		.fetch();
-}
-
-export function getPayrollResult(routeParams, period, employeeId) {
-	return new FetchRequestBuilder(payrollResultsUrl, routeParams)
-		.withQueryParam("filter", `PayrollId eq '${routeParams.payrollId}' and EmployeeId eq '${employeeId}' and PeriodName eq '${period}'`)
-		.withQueryParam("orderBy", "created desc")
-		.withQueryParam("top", 1)
-		.fetchSingle();
-}
-
-export function getWageTypes(routeParams, payrollResultId) {
-	return new FetchRequestBuilder(wageTypesUrl, { ...routeParams, payrollResultId })
-		.fetchJson();
 }
 
 export function getPayouts(routeParams) {
