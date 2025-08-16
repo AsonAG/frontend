@@ -19,8 +19,9 @@ import { App } from "./App";
 
 // TODO AJO error states when network requests fail
 import {
-	getEmployees,
+	getPayrollEmployees,
 	getEmployee,
+	getEmployees,
 	getEmployeeCases,
 	getEmployeeCaseChanges,
 	getCompanyCases,
@@ -67,7 +68,10 @@ import {
 	getPayrollRegulations,
 	updatePayrollRegulations,
 	updatePayroll,
-	createPayroll
+	createPayroll,
+	getOrganizationUsers as getOrgUserMemberships,
+	saveOrganizationUserRole,
+	getPayrolls
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -96,6 +100,7 @@ import {
 	refreshPayrollWageTypes,
 	payrollWageTypesAtom,
 	payrollWageTypeSettingsAtom,
+	userMembershipAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -122,15 +127,19 @@ import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
 import { WageTypeControlling } from "./company/WageTypeControlling";
 import { PayrollSettings, ConfirmTransmissionDialog } from "./payroll/Settings";
 import { NewPayrollView } from "./payroll/NewPayrollView";
+import { UserMembershipTable } from "./user/UserMembershipTable";
+import { UserMembershipEditDialog } from "./user/UserMembershipEditDialog";
+import { isPayrollAdmin } from "./user/utils";
+
 const store = getDefaultStore();
 
 async function getOrganizationData() {
-	const [org, payrolls, user] = await Promise.all([
+	const [org, payrolls, userMembership] = await Promise.all([
 		store.get(orgAtom),
 		store.get(payrollsAtom),
-		store.get(userAtom),
+		store.get(userMembershipAtom),
 	]);
-	return { org, payrolls, user };
+	return { org, payrolls, userMembership };
 }
 
 function getQueryParam(request, name, defaultValue = null) {
@@ -348,7 +357,7 @@ function createRouteEmployeeTable(path, showButtons = true) {
 		loader: async ({ params }) => {
 			return defer({
 				showButtons,
-				data: getEmployees(params).fetchJson(),
+				data: getPayrollEmployees(params).fetchJson(),
 			});
 		}
 	};
@@ -523,9 +532,9 @@ const routeData = [
 		element: <App renderDrawer />,
 		ErrorBoundary: ErrorView,
 		loader: async () => {
-			const { org, payrolls, user } = await getOrganizationData();
+			const { org, payrolls, userMembership } = await getOrganizationData();
 			const employee = await store.get(selfServiceEmployeeAtom);
-			return { org, user, payrolls, employee };
+			return { org, userMembership, payrolls, employee };
 		},
 		id: "orgRoot",
 		children: [
@@ -648,20 +657,54 @@ const routeData = [
 					toast("success", "Organization unit created");
 					return redirect(`../payrolls/${payroll.id}/company`);
 				}
-			}
+			},
+			{
+				path: "users",
+				Component: UserMembershipTable,
+				id: "userTable",
+				loader: async ({ params }) => {
+					const userMemberships = await getOrgUserMemberships(params);
+					return { userMemberships };
+				},
+				children: [
+					{
+						path: ":userId/edit",
+						Component: UserMembershipEditDialog,
+						loader: async ({ params }) => {
+							const payrolls = await getPayrolls(params);
+							const employees = await getEmployees(params).fetchJson();
+							return {
+								payrolls,
+								employees
+							};
+						},
+						action: async ({ params, request }) => {
+							const role = await request.json();
+							const response = await saveOrganizationUserRole(params, role);
+							if (response.ok) {
+								toast("success", "Saved!");
+								return redirect("..");
+							} else {
+								toast("error", "Something went wrong");
+							}
+							return null;
+						}
+					}
+				]
+			},
 		]
 	},
 	{
 		path: "orgs/:orgId/payrolls/:payrollId?",
 		element: <App renderDrawer />,
 		loader: async ({ params }) => {
-			const { org, payrolls, user } = await getOrganizationData();
+			const { org, payrolls, userMembership } = await getOrganizationData();
 			if (!params.payrollId) {
 				return redirect(payrolls[0].id);
 			}
 			const payroll = payrolls.find((p) => p.id === params.payrollId);
 			const employee = await store.get(selfServiceEmployeeAtom);
-			return { org, user, payrolls, payroll, employee };
+			return { org, userMembership, payrolls, payroll, employee };
 		},
 		shouldRevalidate: ({ currentParams, nextParams }) =>
 			currentParams.orgId !== nextParams.orgId ||
@@ -672,10 +715,10 @@ const routeData = [
 			{
 				index: true,
 				Component: Dashboard,
-				loader: async () => {
-					const { user } = await getOrganizationData();
-					const isHrUser = user?.attributes.roles?.includes("hr");
-					if (isHrUser) {
+				loader: async ({params}) => {
+					const { userMembership } = await getOrganizationData();
+					const payrollAdmin = isPayrollAdmin(userMembership.role, params.payrollId);
+					if (payrollAdmin) {
 						return redirect("hr/employees");
 					}
 					const employee = await store.get(selfServiceEmployeeAtom);
@@ -772,7 +815,7 @@ const routeData = [
 			{
 				path: "hr/tasks/new",
 				Component: NewTaskView,
-				loader: ({ params }) => getEmployees(params).fetchJson(),
+				loader: ({ params }) => getPayrollEmployees(params).fetchJson(),
 				action: async ({ params, request }) => {
 					const task = await request.json();
 					const response = await addTask(params, task);

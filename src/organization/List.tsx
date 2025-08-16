@@ -8,7 +8,7 @@ import { Link, useLoaderData } from "react-router-dom";
 import { useDocumentTitle } from "usehooks-ts";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../components/ContentLayout";
-import { useRole } from "../hooks/useRole";
+import { useRole } from "../user/utils";
 import { IconButton, Stack, Tooltip } from "@mui/material";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { Organization } from "../models/Organization";
@@ -50,8 +50,8 @@ function ButtonStack() {
 
 function ImportButton() {
 	const { t } = useTranslation();
-	const isProvider = useRole("provider");
-	if (!isProvider)
+	const isInstanceAdmin = useRole("InstanceAdmin");
+	if (!isInstanceAdmin)
 		return null;
 
 	return (

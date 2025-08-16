@@ -8,15 +8,15 @@ import { useAtomValue } from "jotai";
 import { payrollAtom } from "../utils/dataAtoms";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
-import { getCompanyCases, getEmployeeCases, getEmployees } from "../api/FetchClient";
+import { getCompanyCases, getEmployeeCases, getPayrollEmployees } from "../api/FetchClient";
 import { generatePath, useMatch, useMatches, useNavigate, useParams } from "react-router-dom";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { AvailableCase } from "../models/AvailableCase";
-import { useIsESS } from "../hooks/useRole";
+import { useRole } from "../user/utils";
 
 export function NewEventCommand() {
   const isMobile = useIsMobile();
-  const isESS = useIsESS();
+  const isESS = useRole("SelfService");
   const payrollViewMatch = useMatch("/orgs/:orgId/payrolls/:payrollId/*");
   if (!payrollViewMatch || isMobile || isESS) {
     return;
@@ -84,7 +84,7 @@ function NewEventDialogContent({ close }: { close: () => void }) {
     async function fetchInitialState() {
       try {
 
-        const employeePromise = getEmployees(params).withActive().withSignal(controller.signal).fetchJson();
+        const employeePromise = getPayrollEmployees(params).withActive().withSignal(controller.signal).fetchJson();
         if (params.employeeId) {
           const casesPromise = getEmployeeCases(params, "NewEvent", controller.signal);
           const [employees, cases]: [Array<Employee>, Array<any>] = await Promise.all([employeePromise, casesPromise]);

@@ -39,7 +39,7 @@ function TaskView() {
 	const task = useAsyncValue();
 	const { t } = useTranslation();
 	const submit = useSubmit();
-	const { user } = useRouteLoaderData("root");
+	const { userMembership } = useRouteLoaderData("root");
 	const taskCompleted = task.completed !== null;
 	const taskComment = task.comment || "";
 	const [comment, setComment] = useState(taskComment);
@@ -59,7 +59,7 @@ function TaskView() {
 		primaryAction = saveComment;
 		buttonText = saveCommentText;
 	}
-	else if (task.assignedUserId !== user.id) {
+	else if (task.assignedUserId !== userMembership.userId) {
 		primaryAction = () => submitPost({ task, action: "accept" });
 		buttonText = t("Accept task");
 	}

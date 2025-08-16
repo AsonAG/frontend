@@ -34,7 +34,7 @@ import "dayjs/locale/en";
 import { useAtom } from "jotai";
 import { toastNotificationAtom } from "./utils/dataAtoms";
 import { User } from "./models/User";
-import { useRole } from "./hooks/useRole";
+import { useRole } from "./user/utils";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
@@ -131,10 +131,10 @@ function RenderProductionBanner() {
 	if (!import.meta.env.PROD) {
 		return null;
 	}
-	const isProvider = useRole("provider");
+	const isInstanceAdmin = useRole("InstanceAdmin");
 	useEffect(() => {
-		const value = isProvider ? "' '" : null;
+		const value = isInstanceAdmin ? "' '" : null;
 		document.documentElement.style.setProperty('--production', value);
-	}, [isProvider]);
+	}, [isInstanceAdmin]);
 	return null;
 }

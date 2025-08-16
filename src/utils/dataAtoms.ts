@@ -3,7 +3,6 @@ import {
 	getTasks,
 	getOrganization,
 	getUser,
-	getEmployeeByIdentifier,
 	getEmployeeMissingData,
 	getOrganizations,
 	getCompanyMissingDataCases,
@@ -13,6 +12,8 @@ import {
 	getClientRegulation,
 	getPayrollWageTypes,
 	getPayrollWageTypeSettings,
+	getOrganizationUserMembership,
+	getEmployee,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
@@ -26,6 +27,7 @@ import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 import { AvailableCase } from "../models/AvailableCase";
 import { ControllingData } from "../payrun/types";
 import { WageType, WageTypeDetailed, WageTypeSettings } from "../models/WageType";
+import { UserMembership } from "../models/User";
 
 export const orgsAtom = atomWithRefresh((get => {
 	const _ = get(authUserAtom);
@@ -54,18 +56,27 @@ export const payrollAtom = atom(async (get) => {
 });
 
 export const userAtom = atom((get) => {
-	const orgId = get(orgIdAtom);
-	if (orgId == null) return null;
-	const authUserEmail = get(authUserAtom)?.profile.email;
-	return getUser({ orgId }, authUserEmail);
+	const _ = get(authUserAtom); // subscribe to the value
+	return getUser();
 });
 
-export const selfServiceEmployeeAtom = atom((get) => {
+export const userMembershipAtom = atom(async (get) => {
+	const orgId = get(orgIdAtom);
+	const user = await get(userAtom);
+	if (orgId === null || user === null)
+		return null;
+	return (await getOrganizationUserMembership({orgId, userId: user.id})) as UserMembership;
+});
+
+export const selfServiceEmployeeAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return null;
-	const authUserEmail = get(authUserAtom)?.profile.email;
-	return getEmployeeByIdentifier({ orgId, payrollId }, authUserEmail);
+	const userMembership = await get(userMembershipAtom);
+	if (userMembership?.role.$type !== "SelfService")
+		return null;
+
+	return await getEmployee({orgId, payrollId, employeeId: userMembership.role.employeeId});
 });
 
 export const openTasksAtom = atomWithRefresh(async (get) => {
