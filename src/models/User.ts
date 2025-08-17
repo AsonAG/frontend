@@ -26,6 +26,7 @@ export type UserMembershipInvitation = {
   tenantIdentifier: string
   email: string
   role: UserRole
+  expiresAt: string
 }
 
 export type UserRole = {

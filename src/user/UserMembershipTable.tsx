@@ -1,5 +1,6 @@
 import {
   Button,
+  Chip,
   IconButton,
   Stack,
   Typography,
@@ -12,6 +13,7 @@ import { Edit } from "@mui/icons-material";
 import { Employee } from "../models/Employee";
 import { useMemo } from "react";
 import { IdType } from "../models/IdType";
+import dayjs from "dayjs";
 
 type LoaderData = {
   userMemberships: Array<UserMembership>
@@ -82,15 +84,21 @@ function UserMembershipRow({ membership }: { membership: UserMembership }) {
   );
 }
 function UserMembershipInvitationRow({ invitation }: { invitation: UserMembershipInvitation }) {
+  const { t } = useTranslation();
   const { employeeMap } = useLoaderData() as LoaderData;
   let display = invitation.email;
   if (invitation.role.$type === "SelfService") {
     const employee = employeeMap.get(invitation.role.employeeId);
     display = `${employee?.firstName} ${employee?.lastName}`;
   }
+  const isExpired = useMemo(() => dayjs.utc(invitation.expiresAt).isBefore(dayjs.utc()), [invitation.expiresAt]);
+  const chip = isExpired ?
+    <Chip variant="outlined" label={t("expired")} size="small"/> :
+    <Chip variant="outlined" label={t("pending")} size="small" color="warning" />
+
   return (
     <Stack direction="row" spacing={2} alignItems="center">
-      <Typography variant="body1" flex={1}>{display}</Typography>
+      <Typography variant="body1" flex={1}>{display} {chip}</Typography>
       <UserRoles role={invitation.role} />
 
       <IconButton disabled size="small">
