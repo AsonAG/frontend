@@ -179,6 +179,19 @@ const translations = {
 		"Grants access to the whole organization": "Gewährt Zugriff auf die ganze Organisation",
 		"Grant access to specific payrolls": "Gewährt Zugriff auf ausgewählte Organisationseinheiten",
 		"Grants restricted access to the specific employee": "Gewährt eingeschränkten Zugriff auf einen Mitarbeiter",
+		"Invitation": "Einladung",
+		"You have been invited to join the organization {{orgName}}.": "Sie sind eingeladen der Organiation {{orgName}} beizutreten.",
+		"The invitation is invalid": "Die Einladung ist ungültig",
+		"Join": "Beitreten",
+		"User has been invited!": "Der Benutzer wurde eingeladen!",
+		"The user has been sent an invitation link to {{email}}": "Dem Benutzer wurde ein Einladungslink auf die Adresse {{email}} gesendet.",
+		"Invitation link": "Einladungslink",
+		"Copied to clipboard": "In die Zwischenablage kopiert",
+		"Invite": "Einladen",
+		"Employees without access": "Benutzer ohne Zugriff",
+		"Users": "Benutzer",
+		"Invite to organization": "In die Organisation einladen",
+
 
 		// compliance
 		Submit: "Übermitteln",

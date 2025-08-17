@@ -1,8 +1,5 @@
-import React, { Suspense, useEffect, useState } from "react";
-import { useCreateTheme } from "./theme";
+import { Suspense, useEffect, useState } from "react";
 import {
-	CssBaseline,
-	ThemeProvider,
 	Stack,
 	useMediaQuery,
 	IconButton,
@@ -17,13 +14,11 @@ import Drawer from "./scenes/global/Drawer";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import { Outlet, useLoaderData } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { Container } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "./components/Logo";
 import { useTranslation } from "react-i18next";
-import { getLanguageCode } from "./services/converters/LanguageConverter";
-import { getDateLocale } from "./services/converters/DateLocaleExtractor";
 
 dayjs.extend(utc);
 dayjs.extend(localizedFormat);
@@ -31,24 +26,12 @@ dayjs.extend(localizedFormat);
 // dynamically load these when we support more locales
 import "dayjs/locale/de";
 import "dayjs/locale/en";
-import { useAtom, useAtomValue } from "jotai";
-import { toastNotificationAtom, userAtom } from "./utils/dataAtoms";
-import { User } from "./models/User";
+import { useAtom } from "jotai";
+import { toastNotificationAtom } from "./utils/dataAtoms";
 import { useRole } from "./user/utils";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export function App({ renderDrawer = false }) {
-	const theme = useCreateTheme();
-	const useTemporaryDrawer = useMediaQuery(theme.breakpoints.down("lg"));
-	const user = useAtomValue(userAtom) as User | null;
-	const { i18n } = useTranslation();
-
-	useEffect(() => {
-		dayjs.locale(getDateLocale(user));
-		const languageCode = getLanguageCode(user?.language);
-		i18n.changeLanguage(languageCode);
-	}, [user?.culture, user?.language]);
+	const useTemporaryDrawer = useMediaQuery(theme => theme.breakpoints.down("lg"));
 
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -62,34 +45,29 @@ export function App({ renderDrawer = false }) {
 	);
 
 	return (
-		<ThemeProvider theme={theme}>
-			<CssBaseline />
-			<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
-				<Stack className="app" direction="row">
-					{renderDrawer && (
-						<Drawer
-							temporary={useTemporaryDrawer}
-							open={drawerOpen}
-							onClose={() => setDrawerOpen(false)}
-						/>
-					)}
-					<Stack sx={{ flex: 1, minWidth: 0 }}>
-						<Topbar>
-							{drawerButton}
-							{topbarLogo}
-						</Topbar>
-						<Stack id="content" direction="row" sx={{ flex: 1, minWidth: 0 }}>
-							<MainContainer />
-							<Box id="sidebar-container" sx={{ px: 3, maxWidth: 485, borderLeftColor: "divider", borderLeftStyle: "solid", borderLeftWidth: "thin" }} />
-						</Stack>
-					</Stack>
-					<Snackbar />
-					<Suspense>
-						<RenderProductionBanner />
-					</Suspense>
+		<Stack className="app" direction="row">
+			{renderDrawer && (
+				<Drawer
+					temporary={useTemporaryDrawer}
+					open={drawerOpen}
+					onClose={() => setDrawerOpen(false)}
+				/>
+			)}
+			<Stack sx={{ flex: 1, minWidth: 0 }}>
+				<Topbar>
+					{drawerButton}
+					{topbarLogo}
+				</Topbar>
+				<Stack id="content" direction="row" sx={{ flex: 1, minWidth: 0 }}>
+					<MainContainer />
+					<Box id="sidebar-container" sx={{ px: 3, maxWidth: 485, borderLeftColor: "divider", borderLeftStyle: "solid", borderLeftWidth: "thin" }} />
 				</Stack>
-			</LocalizationProvider>
-		</ThemeProvider>
+			</Stack>
+			<Snackbar />
+			<Suspense>
+				<RenderProductionBanner />
+			</Suspense>
+		</Stack>
 	);
 }
 

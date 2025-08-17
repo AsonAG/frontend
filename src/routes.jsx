@@ -72,7 +72,12 @@ import {
 	getOrganizationUsers as getOrgUserMemberships,
 	saveOrganizationUserRole,
 	getPayrolls,
-	createOrganization
+	createOrganization,
+	getOrganizationUserMembershipInvitations,
+	getEmployeeEmail,
+	inviteUserToOrganization,
+	getInvitation,
+	acceptInvitation
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -131,6 +136,8 @@ import { NewPayrollView } from "./payroll/NewPayrollView";
 import { UserMembershipTable } from "./user/UserMembershipTable";
 import { UserMembershipEditDialog } from "./user/UserMembershipEditDialog";
 import { isPayrollAdmin } from "./user/utils";
+import { UserMembershipInviteDialog } from "./user/UserMembershipInviteDialog";
+import { InvitationView } from "./user/InvitationView";
 
 const store = getDefaultStore();
 
@@ -673,8 +680,17 @@ const routeData = [
 				Component: UserMembershipTable,
 				id: "userTable",
 				loader: async ({ params }) => {
-					const userMemberships = await getOrgUserMemberships(params);
-					return { userMemberships };
+					const [
+						userMemberships,
+						userMembershipInvitations,
+						employees
+					] = await Promise.all([
+						getOrgUserMemberships(params),
+						getOrganizationUserMembershipInvitations(params),
+						getEmployees(params).fetchJson()
+					]);
+					const employeeMap = new Map(employees.map(x => [x.id, x]));
+					return { userMemberships, userMembershipInvitations, employees, employeeMap };
 				},
 				children: [
 					{
@@ -696,6 +712,32 @@ const routeData = [
 								return redirect("..");
 							} else {
 								toast("error", "Something went wrong");
+							}
+							return null;
+						}
+					},
+					{
+						path: "invite/:employeeId?",
+						Component: UserMembershipInviteDialog,
+						loader: async ({ params }) => {
+							const payrolls = await getPayrolls(params);
+							let employeeEmail = null;
+							if (params.employeeId) {
+								employeeEmail = await getEmployeeEmail(params);
+							}
+							return {
+								payrolls,
+								employeeEmail
+							};
+						},
+						action: async ({params, request}) => {
+							const invitationRequest = await request.json();
+							const response = await inviteUserToOrganization(params, invitationRequest);
+							if (response.ok) {
+								const invitation = await response.json();
+								return invitation;
+							} else {
+								toast("error", "Could not invite user to organization");
 							}
 							return null;
 						}
@@ -1238,6 +1280,22 @@ const routeData = [
 			},
 		],
 	},
+	{
+		path: "invitation/:invitationId",
+		Component: InvitationView,
+		loader: ({params}) => getInvitation(params),
+		action: async ({params, request}) => {
+			const invitation = await request.json();
+			const response = await acceptInvitation(params);
+			if (response.ok) {
+				toast("success", "Invitation accepted")
+				return redirect(`/orgs/${invitation.tenantId}`);
+			} else {
+				toast("error", "Error accepting invitation");
+			}
+			return null;
+		}
+	}
 ];
 
 const updateParamsAtom = (state) => {

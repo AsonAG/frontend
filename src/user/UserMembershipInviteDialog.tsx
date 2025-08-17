@@ -1,5 +1,5 @@
 
-import React, { Dispatch, useMemo, useReducer } from "react";
+import React, { Dispatch, useMemo, useReducer, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -7,6 +7,7 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
+  IconButton,
   RadioGroup,
   Stack,
   SxProps,
@@ -15,15 +16,18 @@ import {
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { Link, useLoaderData, useParams, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { UserMembership, UserRole, UserRoleName } from "../models/User";
+import { Link, useActionData, useLoaderData, useParams, useRouteLoaderData, useSubmit } from "react-router-dom";
+import { UserMembership, UserMembershipInvitation, UserRole, UserRoleName } from "../models/User";
 import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogDescription, ResponsiveDialogTitle } from "../components/ResponsiveDialog";
 import { Employee, getEmployeeDisplayString } from "../models/Employee";
 import { IdType } from "../models/IdType";
 import { Payroll } from "../models/Payroll";
+import { Share } from "@mui/icons-material";
+import { toast } from "../utils/dataAtoms";
 
 type LoaderData = {
   payrolls: Array<Payroll>
+  employeeEmail: string | null
 }
 
 type UserTableData = {
@@ -31,20 +35,21 @@ type UserTableData = {
   employees: Array<Employee>
 }
 
-export function UserMembershipEditDialog() {
+export function UserMembershipInviteDialog() {
   const { t } = useTranslation();
   const submit = useSubmit();
-  const { userMembershipId } = useParams();
-  const { userMemberships } = useRouteLoaderData("userTable") as UserTableData;
-
-  const user = useMemo(() => userMemberships.find(user => user.id === userMembershipId)!, [userMembershipId, userMemberships]);
+  const { employeeId } = useParams();
+  const { employeeEmail } = useLoaderData() as LoaderData;
+  const [email, setEmail] = useState<string>(employeeEmail ?? "");
+  const invitation = useActionData() as UserMembershipInvitation | undefined;
 
   const [state, dispatch] = useReducer(
     reducer,
-    user,
+    employeeId as IdType,
     createInitialState
   );
-  const onSave = () => {
+
+  const onInvite = () => {
     function getUserRole(): UserRole {
       switch (state.role) {
         case "Admin":
@@ -63,14 +68,44 @@ export function UserMembershipEditDialog() {
           };
       }
     }
-    submit(getUserRole(), { method: "post", encType: "application/json" });
+    submit({
+      email,
+      role: getUserRole()
+    }, { method: "post", encType: "application/json" });
   };
+
+  if (invitation) {
+    const link = `${window.location.origin}/invitation/${invitation.id}`;
+    function onShare() {
+      navigator.clipboard.writeText(link);
+      toast("success", "Copied to clipboard");
+    }
+    return (
+      <ResponsiveDialog open>
+        <ResponsiveDialogContent>
+          <ResponsiveDialogTitle asChild>
+            <Typography variant="h6">{t("User has been invited!")}</Typography>
+          </ResponsiveDialogTitle>
+          <Typography>{t("The user has been sent an invitation link to {{email}}", {email: invitation.email})}</Typography>
+          <Stack direction="row" spacing={1}>
+            <TextField value={link} label={t("Invitation link")} fullWidth disabled/>
+            <IconButton onClick={onShare}><Share /></IconButton>
+          </Stack>
+          <Stack direction="row" justifyContent="end" spacing={1}>
+            <Button component={Link} to="..">{t("Go back")}</Button>
+          </Stack>
+        </ResponsiveDialogContent>
+      </ResponsiveDialog>
+    );
+  }
+
   return (
     <ResponsiveDialog open>
       <ResponsiveDialogContent>
         <ResponsiveDialogTitle asChild>
-          <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
+          <Typography variant="h6">{t("Invite to organization")}</Typography>
         </ResponsiveDialogTitle>
+        <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <ResponsiveDialogDescription asChild>
           <Typography>{t("Choose a role")}:</Typography>
         </ResponsiveDialogDescription>
@@ -83,7 +118,7 @@ export function UserMembershipEditDialog() {
         </RadioGroup>
         <Stack direction="row" justifyContent="end" spacing={1}>
           <Button component={Link} to="..">{t("Cancel")}</Button>
-          <Button variant="contained" color="primary" onClick={onSave}>{t("Save")}</Button>
+          <Button variant="contained" color="primary" onClick={onInvite}>{t("Invite")}</Button>
         </Stack>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
@@ -209,11 +244,11 @@ function SelfServiceSection({ state, dispatch }: { state: RoleState, dispatch: D
 }
 
 
-function createInitialState(userMembership: UserMembership): RoleState {
+function createInitialState(employeeId?: IdType): RoleState {
   return {
-    role: userMembership.role["$type"],
-    employee: userMembership.role["employeeId"] ?? null,
-    payrollIds: userMembership.role["payrollIds"] ?? null
+    role: "SelfService",
+    employee: employeeId ?? null,
+    payrollIds: []
   }
 }
 

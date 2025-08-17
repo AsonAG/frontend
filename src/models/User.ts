@@ -20,6 +20,14 @@ export type UserMembership = {
   role: UserRole
 }
 
+export type UserMembershipInvitation = {
+  id: IdType
+  tenantId: IdType
+  tenantIdentifier: string
+  email: string
+  role: UserRole
+}
+
 export type UserRole = {
   "$type": "Admin"
 } | {

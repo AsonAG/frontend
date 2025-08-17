@@ -12,6 +12,7 @@ const organizationUrl = "/tenants/:orgId";
 const organizationUserMembershipsUrl = "/tenants/:orgId/user_memberships";
 const organizationUserMembershipUrl = "/tenants/:orgId/user_memberships/:userId";
 const organizationUserMembershipRoleUrl = "/tenants/:orgId/user_memberships/:userId/role";
+const organizationUserMembershipInviteUrl = "/tenants/:orgId/user_memberships/invite";
 const payrollsUrl = "/tenants/:orgId/payrolls";
 const payrollsSimpleUrl = "/tenants/:orgId/payrolls/simple";
 const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
@@ -38,6 +39,8 @@ const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
 const employeeUrl = "/tenants/:orgId/employees/:employeeId";
 const usersUrl = "/users";
+const employeeCaseValuesUrl =
+	"/tenants/:orgId/employees/:employeeId/cases";
 const employeeDocumentUrl =
 	"/tenants/:orgId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
 const companyDocumentUrl =
@@ -55,6 +58,7 @@ const payoutsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPer
 const payoutUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
 const payoutDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId/document";
 const exportUrl = "/tenants/:orgId/export";
+const invitationUrl = "/user_membership_invitations/:invitationId"
 
 const store = getDefaultStore();
 
@@ -252,6 +256,12 @@ export function getOrganizationUsers(routeParams) {
 	return new FetchRequestBuilder(organizationUserMembershipsUrl, routeParams).fetchJson();
 }
 
+
+export function getOrganizationUserMembershipInvitations(routeParams) {
+	return new FetchRequestBuilder(organizationUserMembershipsUrl + "/invitations", routeParams).fetchJson();
+}
+
+
 export function getOrganizationUser(routeParams) {
 	return new FetchRequestBuilder(organizationUserMembershipsUrl, routeParams)
 		.withQueryParam("filter", `id eq '${routeParams.userId}'`)
@@ -266,6 +276,24 @@ export function saveOrganizationUserRole(routeParams, userRole) {
 	return new FetchRequestBuilder(organizationUserMembershipRoleUrl, routeParams)
 		.withMethod("PUT")
 		.withBody(userRole)
+		.fetch();
+}
+
+export function inviteUserToOrganization(routeParams, inviteRequest) {
+	return new FetchRequestBuilder(organizationUserMembershipInviteUrl, routeParams)
+		.withMethod("POST")
+		.withBody(inviteRequest)
+		.fetch();
+}
+export function getInvitation(routeParams) {
+	return new FetchRequestBuilder(invitationUrl, routeParams)
+		.withIgnoreErrors(null)
+		.fetchJson();
+}
+
+export function acceptInvitation(routeParams) {
+	return new FetchRequestBuilder(invitationUrl, routeParams)
+		.withMethod("POST")
 		.fetch();
 }
 
@@ -458,6 +486,19 @@ export async function getEmployeeSalaryType(routeParams, evalDate = null) {
 		.withQueryParams("caseFieldNames", salaryType)
 		.withQueryParam("valueDate", evalDate)
 		.withQueryParam("substituteLookupCodes", true)
+		.withLocalization()
+		.fetchSingle();
+
+	return caseValue?.value;
+}
+
+export async function getEmployeeEmail(routeParams) {
+	const emailCaseField = "CH.Swissdec.EmployeeEmail"
+	const caseValue = await new FetchRequestBuilder(employeeCaseValuesUrl, routeParams)
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParams("caseFieldName", emailCaseField)
+		.withQueryParam("orderBy", "created desc")
+		.withQueryParam("top", 1)
 		.withLocalization()
 		.fetchSingle();
 
