@@ -67,7 +67,6 @@ class FetchRequestBuilder {
 	body = null;
 	url = null;
 	routeParams = {};
-	addUserQueryParam = false;
 	addPayrollDivision = false;
 	ignoreErrors = false;
 	fallbackValue = null;
@@ -156,11 +155,6 @@ class FetchRequestBuilder {
 		return this;
 	}
 
-	withUser() {
-		this.addUserQueryParam = true;
-		return this;
-	}
-
 	withPayrollDivision() {
 		this.addPayrollDivision = true;
 		return this;
@@ -191,10 +185,6 @@ class FetchRequestBuilder {
 		if (this.localizeRequest) {
 			const user = await store.get(userAtom);
 			if (user !== null) this.searchParams.set("language", user.language);
-		}
-		if (this.addUserQueryParam) {
-			const user = await store.get(userAtom);
-			if (user !== null) this.searchParams.set("userId", user.id);
 		}
 		if (this.addPayrollDivision) {
 			const payroll = await store.get(payrollAtom);
@@ -371,7 +361,6 @@ export function getEmployeeCases(routeParams, clusterSetName, signal, evalDate =
 		.withQueryParam("evaluationDate", evalDate)
 		.withSignal(signal)
 		.withLocalization()
-		.withUser()
 		.withIgnoreErrors([])
 		.fetchJson();
 }
@@ -388,7 +377,6 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 export function getPayrunPeriodCaseValues(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodEntryRelevantEventValues, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -403,7 +391,6 @@ export function getCaseChangeCaseValues(routeParams, top) {
 		.withQueryParam("top", top)
 		.withQueryParam("result", !!top ? "ItemsWithCount" : undefined)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 export function getCaseValueCount(routeParams, minCount) {
@@ -412,7 +399,6 @@ export function getCaseValueCount(routeParams, minCount) {
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", caseType)
 		.withQueryParam("minCount", minCount)
-		.withUser()
 		.fetchJson();
 }
 export function getCurrentValues(routeParams) {
@@ -422,7 +408,6 @@ export function getCurrentValues(routeParams) {
 		.withQueryParam("caseType", caseType)
 		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
-		.withUser()
 		.fetchJson()
 }
 
@@ -432,7 +417,6 @@ export function getEmployeeCaseChanges(routeParams) {
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", "Employee")
 		.withLocalization()
-		.withUser();
 }
 
 export function getCompanyCases(routeParams, clusterSetName, signal) {
@@ -442,7 +426,6 @@ export function getCompanyCases(routeParams, clusterSetName, signal) {
 		.withQueryParam("orderBy", `nameLocalizationsde asc`)
 		.withSignal(signal)
 		.withLocalization()
-		.withUser()
 		.withIgnoreErrors([])
 		.fetchJson();
 }
@@ -454,14 +437,12 @@ export function getCompanyCaseChanges(routeParams, search, orderBy) {
 		.withQueryParam("searchTerm", search)
 		.withQueryParam("orderBy", orderBy)
 		.withQueryParam("substituteLookupCodes", true)
-		.withLocalization()
-		.withUser();
+		.withLocalization();
 }
 
 export function getCompanyMissingDataCases(routeParams) {
 	return new FetchRequestBuilder(missingDataCompanyUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -474,7 +455,6 @@ export async function getEmployeeSalaryType(routeParams, evalDate = null) {
 		.withQueryParam("valueDate", evalDate)
 		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
-		.withUser()
 		.fetchSingle();
 
 	return caseValue?.value;
@@ -488,7 +468,6 @@ export async function getCompanyBankDetails(routeParams, evalDate = null) {
 		.withQueryParams("caseFieldNames", ibanFieldName)
 		.withQueryParams("caseFieldNames", accountFieldName)
 		.withQueryParam("evaluationDate", evalDate)
-		.withUser()
 		.fetchJson();
 
 	const iban = values.find(v => v.caseFieldName === ibanFieldName)?.value;
@@ -503,7 +482,6 @@ export async function getCompanyBankDetails(routeParams, evalDate = null) {
 export function getEmployeeMissingData(routeParams) {
 	return new FetchRequestBuilder(missingDataEmployeeUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -565,14 +543,12 @@ export function getOpenPayrunPeriod(routeParams) {
 export function closePayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodCloseUrl, routeParams)
 		.withMethod("POST")
-		.withUser()
 		.fetch();
 }
 
 export function createOpenPayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl + "/open", routeParams)
 		.withMethod("POST")
-		.withUser()
 		.fetch();
 }
 
@@ -586,7 +562,6 @@ export function getPayrunPeriodDocuments(routeParams) {
 export function getPayrunPeriodControllingTasks(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodControllingUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -605,7 +580,6 @@ export function buildCase(routeParams, caseChangeSetup) {
 		.withBody(caseChangeSetup)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withLocalization()
-		.withUser()
 		.fetch();
 }
 
@@ -615,7 +589,6 @@ export function addCase(routeParams, caseChangeSetup) {
 		.withBody(caseChangeSetup)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withLocalization()
-		.withUser()
 		.fetch();
 }
 
@@ -651,7 +624,6 @@ export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
 		.withQueryParam("top", top)
 		.withQueryParam("filter", `CaseFieldName eq '${caseFieldName}' and DocumentCount gt 0`)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 

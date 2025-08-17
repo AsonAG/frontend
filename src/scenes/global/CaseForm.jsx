@@ -31,7 +31,7 @@ export function Component() {
 
 function CaseForm() {
 	const navigate = useNavigate();
-	const { user, payroll } = useRouteLoaderData("root");
+	const { payroll } = useRouteLoaderData("root");
 	const loaderData = useLoaderData();
 	const [caseFieldDetails, setCaseFieldDetails] = useState(null);
 	const redirectPath = loaderData?.redirect || "../..";
@@ -50,7 +50,7 @@ function CaseForm() {
 		endDate,
 		setEndDate,
 		addCase,
-	} = useCaseData(params, user, payroll);
+	} = useCaseData(params, payroll);
 	const formRef = useRef();
 
 	const handleSubmit = async () => {

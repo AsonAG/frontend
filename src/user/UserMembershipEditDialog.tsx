@@ -34,7 +34,7 @@ type UserTableData = {
 export function UserMembershipEditDialog() {
   const { t } = useTranslation();
   const submit = useSubmit();
-  const { userId: userMembershipId } = useParams();
+  const { userMembershipId } = useParams();
   const { userMemberships } = useRouteLoaderData("userTable") as UserTableData;
 
   const user = useMemo(() => userMemberships.find(user => user.id === userMembershipId)!, [userMembershipId, userMemberships]);
