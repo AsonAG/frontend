@@ -31,21 +31,17 @@ dayjs.extend(localizedFormat);
 // dynamically load these when we support more locales
 import "dayjs/locale/de";
 import "dayjs/locale/en";
-import { useAtom } from "jotai";
-import { toastNotificationAtom } from "./utils/dataAtoms";
+import { useAtom, useAtomValue } from "jotai";
+import { toastNotificationAtom, userAtom } from "./utils/dataAtoms";
 import { User } from "./models/User";
 import { useRole } from "./user/utils";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-type LoaderData = {
-	user: User
-};
-
 export function App({ renderDrawer = false }) {
 	const theme = useCreateTheme();
 	const useTemporaryDrawer = useMediaQuery(theme.breakpoints.down("lg"));
-	const { user } = useLoaderData() as LoaderData;
+	const user = useAtomValue(userAtom) as User | null;
 	const { i18n } = useTranslation();
 
 	useEffect(() => {

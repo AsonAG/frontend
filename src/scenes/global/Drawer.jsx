@@ -269,7 +269,7 @@ function MenuItems() {
 	const payrollViewMatch = useMatch("/orgs/:orgId/payrolls/:payrollId/*");
 	var userMembership = useAtomValue(userMembershipAtom);
 	const payrollAdmin = !!payrollViewMatch && isPayrollAdmin(userMembership.role, payrollViewMatch.params.payrollId);
-	const isAdmin = userMembership.role.$type === "Admin";
+	const isAdmin = userMembership.role.$type === "Admin" || userMembership.role.$type === "Owner";
 	const isSelfService = userMembership.role.$type === "SelfService";
 	if (!payrollViewMatch && isAdmin) {
 		return <MenuItemsOrganization />;

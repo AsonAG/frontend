@@ -232,6 +232,10 @@ export function getOrganizations() {
 	return new FetchRequestBuilder(organizationsUrl).fetchJson();
 }
 
+export function createOrganization(name) {
+	return new FetchRequestBuilder(organizationsUrl).withMethod("POST").withBody({identifier: name}).fetch();
+}
+
 export function importOrganization(body) {
 	return new FetchRequestBuilder(organizationImportUrl).withMethod("POST").withTimout(600000).withFileBody(body).fetch();
 }

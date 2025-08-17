@@ -71,7 +71,8 @@ import {
 	createPayroll,
 	getOrganizationUsers as getOrgUserMemberships,
 	saveOrganizationUserRole,
-	getPayrolls
+	getPayrolls,
+	createOrganization
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -483,9 +484,6 @@ const routeData = [
 	{
 		path: "/",
 		element: <App />,
-		loader: () => {
-			return { user: null };
-		},
 		ErrorBoundary: ErrorView,
 		children: [
 			{
@@ -502,6 +500,18 @@ const routeData = [
 						return redirect(`../orgs/${orgs[0].id}`);
 					}
 					return orgs;
+				},
+				action: async ({request}) => {
+					const formData = await request.formData();
+					const response = await createOrganization(formData.get("org_name"));
+					if (response.ok) {
+						toast("success", "Organization created");
+						const org = await response.json();
+						return redirect(org.id)
+					} else {
+						toast("error", "Organization creation failed");
+					}
+					return null;
 				}
 			},
 			{
@@ -541,10 +551,10 @@ const routeData = [
 			{
 				index: true,
 				loader: async () => {
-					// const { user } = await getOrganizationData();
-					// const isAdmin = user?.attributes.roles?.includes("admin");
-					// if (isAdmin)
-					// 	return redirect("employees");
+					const {payrolls} = await getOrganizationData();
+					if (!payrolls || payrolls.length === 0) {
+						return redirect("settings/newpayroll");
+					}
 					return redirect("payrolls");
 
 				}

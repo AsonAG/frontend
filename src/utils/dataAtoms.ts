@@ -55,10 +55,10 @@ export const payrollAtom = atom(async (get) => {
 	return payrolls.find((p) => p.id === payrollId);
 });
 
-export const userAtom = atom((get) => {
+export const userAtom = unwrap(atom((get) => {
 	const _ = get(authUserAtom); // subscribe to the value
 	return getUser();
-});
+}), prev => prev ?? null);
 
 export const userMembershipAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);
