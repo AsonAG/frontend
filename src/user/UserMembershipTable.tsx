@@ -18,7 +18,9 @@ export function UserMembershipTable() {
   const { t } = useTranslation();
   return (
     <ContentLayout title={t("Users")}>
-      {userMemberships.map(membership => <UserMembershipRow key={membership.id} membership={membership} />)}
+      <Stack spacing={1}>
+        {userMemberships.map(membership => <UserMembershipRow key={membership.id} membership={membership} />)}
+      </Stack>
       <Outlet />
     </ContentLayout>
   );
@@ -27,10 +29,7 @@ export function UserMembershipTable() {
 function UserMembershipRow({ membership }: { membership: UserMembership }) {
   return (
     <Stack direction="row" spacing={2} alignItems="center">
-      <Stack flex={1}>
-        <Typography variant="body1">{membership.firstName} {membership.lastName}</Typography>
-        <Typography variant="body2">{membership.email}</Typography>
-      </Stack>
+      <Typography variant="body1" flex={1}>{membership.firstName} {membership.lastName}</Typography>
       <UserRoles membership={membership} />
 
       <EditUserRolesButton membership={membership} />
@@ -48,8 +47,9 @@ function UserRoles({ membership }: { membership: UserMembership }) {
 }
 
 function EditUserRolesButton({ membership }: { membership: UserMembership }) {
+  const disabled = membership.role.$type === "Owner";
   return (
-    <IconButton component={Link} to={`${membership.id}/edit`}>
+    <IconButton component={Link} to={`${membership.id}/edit`} disabled={disabled} size="small">
       <Edit />
     </IconButton>
   );

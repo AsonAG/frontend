@@ -69,10 +69,10 @@ export function UserMembershipEditDialog() {
     <ResponsiveDialog open>
       <ResponsiveDialogContent>
         <ResponsiveDialogTitle asChild>
-          <Typography variant="h6">{t("Edit role")}: {user.firstName} {user.lastName}</Typography>
+          <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
         </ResponsiveDialogTitle>
         <ResponsiveDialogDescription asChild>
-          <Typography>Select the access from the options below:</Typography>
+          <Typography>{t("Choose a role")}:</Typography>
         </ResponsiveDialogDescription>
         <RadioGroup name="role" defaultValue="self-service">
           <Stack spacing={1}>
@@ -132,7 +132,7 @@ function AdminRoleOption({ state, dispatch }: { state: RoleState, dispatch: Disp
   return (
     <RoleOption active={active} onSelect={() => dispatch({ type: "set_selected_role", value: "Admin" })}>
       <Typography>{t("Administrator")}</Typography>
-      <Typography variant="body2">{t("Grants access to the whole tenant")}</Typography>
+      <Typography variant="body2">{t("Grants access to the whole organization")}</Typography>
     </RoleOption>
   )
 }
@@ -190,6 +190,7 @@ function SelfServiceRoleOption({ state, dispatch }: { state: RoleState, dispatch
 }
 
 function SelfServiceSection({ state, dispatch }: { state: RoleState, dispatch: Dispatch<ReducerAction> }) {
+  const { t } = useTranslation();
   const { employees } = useLoaderData() as LoaderData;
   const value = useMemo(() => employees.find(employee => employee.id === state.employee) ?? null, [employees, state.employee]);
 
@@ -202,7 +203,7 @@ function SelfServiceSection({ state, dispatch }: { state: RoleState, dispatch: D
       id="select_employee"
       options={employees}
       sx={{ py: 1 }}
-      renderInput={(params) => <TextField {...params} label="Employee" />}
+      renderInput={(params) => <TextField {...params} label={t("Employee")} />}
     />
   );
 }

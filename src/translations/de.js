@@ -175,6 +175,10 @@ const translations = {
 		"Organization deleted": "Organisation gelöscht",
 		"Organization could not be deleted": "Die Organisation konnte nicht gelöscht werden",
 		"No features available for this user": "Keine Funktionen verfügbar für diesen User",
+		"Choose a role": "Wählen Sie eine Rolle aus",
+		"Grants access to the whole organization": "Gewährt Zugriff auf die ganze Organisation",
+		"Grant access to specific payrolls": "Gewährt Zugriff auf ausgewählte Organisationseinheiten",
+		"Grants restricted access to the specific employee": "Gewährt eingeschränkten Zugriff auf einen Mitarbeiter",
 
 		// compliance
 		Submit: "Übermitteln",

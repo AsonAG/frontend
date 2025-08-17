@@ -678,7 +678,7 @@ const routeData = [
 				},
 				children: [
 					{
-						path: ":userId/edit",
+						path: ":userMembershipId/edit",
 						Component: UserMembershipEditDialog,
 						loader: async ({ params }) => {
 							const payrolls = await getPayrolls(params);
