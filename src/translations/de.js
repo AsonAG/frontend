@@ -192,6 +192,7 @@ const translations = {
 		"Users": "Benutzer",
 		"Invite to organization": "In die Organisation einladen",
 		"Change role of {{name}}": "Role von {{name}} ändern",
+		"rolename_Owner": "Besitzer",
 		"rolename_Admin": "Administrator",
 		"rolename_PayrollManager": "Manager",
 		"rolename_SelfService": "Self Service",

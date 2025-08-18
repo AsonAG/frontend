@@ -18,6 +18,7 @@ const translations = {
 		"PayrunJobStatus.Abort": "Aborted",
 		"PayrunJobStatus.Cancel": "Cancelled",
 		"accounting_data_regulation": "Chart of accounts",
+		"rolename_Owner": "Owner",
 		"rolename_Admin": "Administrator",
 		"rolename_PayrollManager": "Manager",
 		"rolename_SelfService": "Self Service",
