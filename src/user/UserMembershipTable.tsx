@@ -13,6 +13,7 @@ import { Employee } from "../models/Employee";
 import { useMemo } from "react";
 import { IdType } from "../models/IdType";
 import dayjs from "dayjs";
+import { getInvitationDisplayName } from "./utils";
 
 type LoaderData = {
   userMemberships: Array<UserMembership>
@@ -79,18 +80,14 @@ function UserMembershipRow({ membership }: { membership: UserMembership }) {
     <Stack direction="row" spacing={1} alignItems="center">
       <Typography variant="body1" flex={1}>{membership.firstName} {membership.lastName}</Typography>
       <EditUserRolesButton membership={membership} />
-      <Button component={Link} variant="outlined" to={`${membership.id}/remove`} size="small" color="destructive">{t("Remove")}</Button>
+      <Button component={Link} variant="outlined" to={`memberships/${membership.id}/remove`} size="small" color="destructive">{t("Remove")}</Button>
     </Stack>
   );
 }
 function UserMembershipInvitationRow({ invitation }: { invitation: UserMembershipInvitation }) {
   const { t } = useTranslation();
   const { employeeMap } = useLoaderData() as LoaderData;
-  let display = invitation.email;
-  if (invitation.role.$type === "SelfService") {
-    const employee = employeeMap.get(invitation.role.employeeId);
-    display = `${employee?.firstName} ${employee?.lastName}`;
-  }
+  const displayName = getInvitationDisplayName(invitation, employeeMap);
   const isExpired = useMemo(() => dayjs.utc(invitation.expiresAt).isBefore(dayjs.utc()), [invitation.expiresAt]);
   const chip = isExpired ?
     <Chip variant="outlined" label={t("expired")} size="small"/> :
@@ -99,12 +96,13 @@ function UserMembershipInvitationRow({ invitation }: { invitation: UserMembershi
   return (
     <Stack direction="row" spacing={1} alignItems="center">
       <Stack direction="row" flex={1} spacing={1.5}>
-        <Typography variant="body1">{display}</Typography>
+        <Typography variant="body1">{displayName}</Typography>
         {chip}
       </Stack>
       <Button variant="outlined" disabled size="small">
         <Typography>{t(invitation.role.$type)}</Typography>
       </Button>
+      {!isExpired && <Button component={Link} variant="outlined" to={`invitations/${invitation.id}/withdraw`} size="small" color="destructive">{t("Withdraw")}</Button>}
     </Stack>
   );
 }
@@ -123,7 +121,7 @@ function EditUserRolesButton({ membership }: { membership: UserMembership }) {
   const { t } = useTranslation();
   const disabled = membership.role.$type === "Owner";
   return (
-    <Button component={Link} variant="outlined" to={`${membership.id}/edit`} disabled={disabled} size="small" startIcon={!disabled && <Edit/>}>
+    <Button component={Link} variant="outlined" to={`memberships/${membership.id}/edit`} disabled={disabled} size="small" startIcon={!disabled && <Edit/>}>
       <Typography>{t("rolename_" + membership.role.$type)}</Typography>
     </Button>
   );

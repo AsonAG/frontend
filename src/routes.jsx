@@ -78,7 +78,8 @@ import {
 	inviteUserToOrganization,
 	getInvitation,
 	acceptInvitation,
-	removeUserFromOrganization
+	removeUserFromOrganization,
+	withdrawUserMembershipInvitationToOrganization
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -140,6 +141,7 @@ import { isPayrollAdmin } from "./user/utils";
 import { UserMembershipInviteDialog } from "./user/UserMembershipInviteDialog";
 import { UserMembershipRemoveDialog } from "./user/UserMembershipRemoveDialog";
 import { InvitationView } from "./user/InvitationView";
+import { UserMembershipInvitationWithdrawDialogy } from "./user/UserMembershipInvitationWithdrawDialog";
 
 const store = getDefaultStore();
 
@@ -698,7 +700,7 @@ const routeData = [
 				},
 				children: [
 					{
-						path: ":userMembershipId/edit",
+						path: "memberships/:userMembershipId/edit",
 						Component: UserMembershipEditDialog,
 						action: async ({ params, request }) => {
 							const role = await request.json();
@@ -713,12 +715,26 @@ const routeData = [
 						}
 					},
 					{
-						path: ":userMembershipId/remove",
+						path: "memberships/:userMembershipId/remove",
 						Component: UserMembershipRemoveDialog,
 						action: async ({ params }) => {
 							const response = await removeUserFromOrganization(params);
 							if (response.ok) {
 								toast("success", "User has been removed");
+								return redirect("..");
+							} else {
+								toast("error", "Something went wrong");
+							}
+							return null;
+						}
+					},
+					{
+						path: "invitations/:invitationId/withdraw",
+						Component: UserMembershipInvitationWithdrawDialogy,
+						action: async ({ params }) => {
+							const response = await withdrawUserMembershipInvitationToOrganization(params);
+							if (response.ok) {
+								toast("success", "Invitation has been withdrawn");
 								return redirect("..");
 							} else {
 								toast("error", "Something went wrong");

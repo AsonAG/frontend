@@ -202,6 +202,10 @@ const translations = {
 		"Do you want to remove {{name}} from the organization?": "Möchten Sie den Benutzer {{name}} aus der Organisation entfernen?",
 		"Remove": "Entfernen",
 		"User has been removed": "Benutzer wurde entfernt",
+		"Withdraw": "Zurückziehen",
+		"Withdraw invitation": "Einladung zurückziehen",
+		"Do you want to withdraw the invitation for {{name}} to join the organization?": "Möchten Sie die Einladung für {{name}} zum Beitritt zur Organisation zurückziehen?",
+		"Invitation has been withdrawn": "Einladung wurde zurückgezogen",
 
 		// compliance
 		Submit: "Übermitteln",

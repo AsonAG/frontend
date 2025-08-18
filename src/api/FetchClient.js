@@ -12,7 +12,7 @@ const organizationUrl = "/tenants/:orgId";
 const organizationUserMembershipsUrl = "/tenants/:orgId/user_memberships";
 const organizationUserMembershipUrl = "/tenants/:orgId/user_memberships/:userMembershipId";
 const organizationUserMembershipRoleUrl = "/tenants/:orgId/user_memberships/:userMembershipId/role";
-const organizationUserMembershipInviteUrl = "/tenants/:orgId/user_memberships/invite";
+const organizationUserMembershipWithdrawInvitationUrl = "/tenants/:orgId/user_memberships/invitations/:invitationId";
 const payrollsUrl = "/tenants/:orgId/payrolls";
 const payrollsSimpleUrl = "/tenants/:orgId/payrolls/simple";
 const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
@@ -280,11 +280,19 @@ export function inviteUserToOrganization(routeParams, inviteRequest) {
 		.withBody(inviteRequest)
 		.fetch();
 }
+
+export function withdrawUserMembershipInvitationToOrganization(routeParams) {
+	return new FetchRequestBuilder(organizationUserMembershipWithdrawInvitationUrl, routeParams)
+		.withMethod("DELETE")
+		.fetch();
+}
+
 export function removeUserFromOrganization(routeParams) {
 	return new FetchRequestBuilder(organizationUserMembershipUrl, routeParams)
 		.withMethod("DELETE")
 		.fetch();
 }
+
 export function getInvitation(routeParams) {
 	return new FetchRequestBuilder(invitationUrl, routeParams)
 		.withIgnoreErrors(null)

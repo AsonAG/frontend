@@ -1,8 +1,9 @@
 import { useAtomValue } from "jotai";
 import { IdType } from "../models/IdType";
-import { UserRole, UserRoleName } from "../models/User";
+import { UserMembershipInvitation, UserRole, UserRoleName } from "../models/User";
 import { userMembershipAtom } from "../utils/dataAtoms";
 import { authUserRolesAtom } from "../auth/getUser";
+import { Employee } from "../models/Employee";
 
 
 export function useRole(role: UserRoleName | "InstanceAdmin"): Boolean {
@@ -24,4 +25,12 @@ export function isPayrollAdmin(role: UserRole, payrollId: IdType) {
         case "SelfService":
             return false;
     }
+}
+
+export function getInvitationDisplayName(invitation: UserMembershipInvitation, employeeMap: Map<IdType, Employee>) {
+  if (invitation.role.$type === "SelfService") {
+    const employee = employeeMap.get(invitation.role.employeeId);
+    return `${employee?.firstName} ${employee?.lastName}`;
+  }
+  return invitation.email;
 }
