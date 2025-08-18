@@ -9,7 +9,7 @@ import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLoaderData } from "react-router-dom";
 import { UserMembership, UserMembershipInvitation, UserRole } from "../models/User";
-import { Edit } from "@mui/icons-material";
+import { Add, Edit } from "@mui/icons-material";
 import { Employee } from "../models/Employee";
 import { useMemo } from "react";
 import { IdType } from "../models/IdType";
@@ -51,7 +51,7 @@ export function UserMembershipTable() {
 
   }, [userMemberships, userMembershipInvitations, employees]);
   return (
-    <ContentLayout title={t("Users")}>
+    <ContentLayout title={t("Users")} buttons={<InviteButton />}>
       <Stack spacing={1}>
         {userMemberships.map(membership => <UserMembershipRow key={membership.id} membership={membership} />)}
         {userMembershipInvitations.map(invitation => <UserMembershipInvitationRow key={invitation.id} invitation={invitation} />)}
@@ -65,12 +65,19 @@ export function UserMembershipTable() {
   );
 }
 
+function InviteButton() {
+  const { t } = useTranslation();
+  return (
+    <Button variant="outlined" component={Link} to="invite" startIcon={<Add />} size="small">
+      <Typography>{t("Invite")}</Typography>
+    </Button>
+  );
+}
+
 function UserMembershipRow({ membership }: { membership: UserMembership }) {
   return (
     <Stack direction="row" spacing={2} alignItems="center">
       <Typography variant="body1" flex={1}>{membership.firstName} {membership.lastName}</Typography>
-      <UserRoles role={membership.role} />
-
       <EditUserRolesButton membership={membership} />
     </Stack>
   );
@@ -91,11 +98,9 @@ function UserMembershipInvitationRow({ invitation }: { invitation: UserMembershi
   return (
     <Stack direction="row" spacing={2} alignItems="center">
       <Typography variant="body1" flex={1}>{display} {chip}</Typography>
-      <UserRoles role={invitation.role} />
-
-      <IconButton disabled size="small">
-        <Edit />
-      </IconButton>
+      <Button variant="outlined" disabled size="small">
+        <Typography>{t(invitation.role.$type)}</Typography>
+      </Button>
     </Stack>
   );
 }
@@ -105,7 +110,7 @@ function EmployeeInvitationRow({ employee }: {employee: Employee}) {
   return (
     <Stack direction="row" spacing={2} alignItems="center">
       <Typography variant="body1" flex={1}>{employee.firstName} {employee.lastName}</Typography>
-      <Button component={Link} variant="outlined" to={`invite/${employee.id}`}>{t("Invite")}</Button>
+      <Button component={Link} variant="outlined" to={`invite/${employee.id}`} size="small">{t("Invite")}</Button>
     </Stack>
   );
 }
@@ -119,10 +124,11 @@ function UserRoles({ role }: { role: UserRole }) {
 }
 
 function EditUserRolesButton({ membership }: { membership: UserMembership }) {
+  const { t } = useTranslation();
   const disabled = membership.role.$type === "Owner";
   return (
-    <IconButton component={Link} to={`${membership.id}/edit`} disabled={disabled} size="small">
-      <Edit />
-    </IconButton>
+    <Button component={Link} variant="outlined" to={`${membership.id}/edit`} disabled={disabled} size="small" startIcon={!disabled && <Edit/>}>
+      <Typography>{t("rolename_" + membership.role.$type)}</Typography>
+    </Button>
   );
 }

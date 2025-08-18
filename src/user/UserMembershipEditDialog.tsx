@@ -34,7 +34,7 @@ export function UserMembershipEditDialog() {
     <ResponsiveDialog open>
       <ResponsiveDialogContent>
         <ResponsiveDialogTitle asChild>
-          <Typography variant="h6">{user.firstName} {user.lastName}</Typography>
+          <Typography variant="h6">{t("Change role of {{name}}", {name: `${user.firstName} ${user.lastName}`})}</Typography>
         </ResponsiveDialogTitle>
         <ResponsiveDialogDescription asChild>
           <Typography>{t("Choose a role")}</Typography>

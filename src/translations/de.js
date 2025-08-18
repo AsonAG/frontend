@@ -191,6 +191,10 @@ const translations = {
 		"Employees without access": "Mitarbeiter ohne Zugriff",
 		"Users": "Benutzer",
 		"Invite to organization": "In die Organisation einladen",
+		"Change role of {{name}}": "Role von {{name}} ändern",
+		"rolename_Admin": "Administrator",
+		"rolename_PayrollManager": "Manager",
+		"rolename_SelfService": "Self Service",
 
 
 		// compliance
