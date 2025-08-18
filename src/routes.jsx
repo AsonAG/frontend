@@ -69,7 +69,7 @@ import {
 	updatePayrollRegulations,
 	updatePayroll,
 	createPayroll,
-	getOrganizationUsers as getOrgUserMemberships,
+	getOrganizationUserMemberships,
 	saveOrganizationUserRole,
 	getPayrolls,
 	createOrganization,
@@ -77,7 +77,8 @@ import {
 	getEmployeeEmail,
 	inviteUserToOrganization,
 	getInvitation,
-	acceptInvitation
+	acceptInvitation,
+	removeUserFromOrganization
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -137,6 +138,7 @@ import { UserMembershipTable } from "./user/UserMembershipTable";
 import { UserMembershipEditDialog } from "./user/UserMembershipEditDialog";
 import { isPayrollAdmin } from "./user/utils";
 import { UserMembershipInviteDialog } from "./user/UserMembershipInviteDialog";
+import { UserMembershipRemoveDialog } from "./user/UserMembershipRemoveDialog";
 import { InvitationView } from "./user/InvitationView";
 
 const store = getDefaultStore();
@@ -686,7 +688,7 @@ const routeData = [
 						employees,
 						payrolls
 					] = await Promise.all([
-						getOrgUserMemberships(params),
+						getOrganizationUserMemberships(params),
 						getOrganizationUserMembershipInvitations(params),
 						getEmployees(params).fetchJson(),
 						getPayrolls(params)
@@ -703,6 +705,20 @@ const routeData = [
 							const response = await saveOrganizationUserRole(params, role);
 							if (response.ok) {
 								toast("success", "Saved!");
+								return redirect("..");
+							} else {
+								toast("error", "Something went wrong");
+							}
+							return null;
+						}
+					},
+					{
+						path: ":userMembershipId/remove",
+						Component: UserMembershipRemoveDialog,
+						action: async ({ params }) => {
+							const response = await removeUserFromOrganization(params);
+							if (response.ok) {
+								toast("success", "User has been removed");
 								return redirect("..");
 							} else {
 								toast("error", "Something went wrong");

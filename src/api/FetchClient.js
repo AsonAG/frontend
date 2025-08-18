@@ -10,7 +10,7 @@ const organizationsUrl = "/tenants";
 const organizationImportUrl = "/tenants/import";
 const organizationUrl = "/tenants/:orgId";
 const organizationUserMembershipsUrl = "/tenants/:orgId/user_memberships";
-const organizationUserMembershipUrl = "/tenants/:orgId/user_memberships/:userId";
+const organizationUserMembershipUrl = "/tenants/:orgId/user_memberships/:userMembershipId";
 const organizationUserMembershipRoleUrl = "/tenants/:orgId/user_memberships/:userMembershipId/role";
 const organizationUserMembershipInviteUrl = "/tenants/:orgId/user_memberships/invite";
 const payrollsUrl = "/tenants/:orgId/payrolls";
@@ -252,24 +252,19 @@ export function deleteOrganization(routeParams) {
 	return new FetchRequestBuilder(organizationUrl, routeParams).withMethod("DELETE").fetch();
 }
 
-export function getOrganizationUsers(routeParams) {
+export function getOrganizationUserMemberships(routeParams) {
 	return new FetchRequestBuilder(organizationUserMembershipsUrl, routeParams).fetchJson();
 }
-
 
 export function getOrganizationUserMembershipInvitations(routeParams) {
 	return new FetchRequestBuilder(organizationUserMembershipsUrl + "/invitations", routeParams).fetchJson();
 }
 
 
-export function getOrganizationUser(routeParams) {
+export function getOrganizationUserMembership(routeParams, userId) {
 	return new FetchRequestBuilder(organizationUserMembershipsUrl, routeParams)
-		.withQueryParam("filter", `id eq '${routeParams.userId}'`)
+		.withQueryParam("filter", `userId eq '${userId}'`)
 		.fetchSingle();
-}
-
-export function getOrganizationUserMembership(routeParams) {
-	return new FetchRequestBuilder(organizationUserMembershipUrl, routeParams).fetchJson();
 }
 
 export function saveOrganizationUserRole(routeParams, userRole) {
@@ -283,6 +278,11 @@ export function inviteUserToOrganization(routeParams, inviteRequest) {
 	return new FetchRequestBuilder(organizationUserMembershipInviteUrl, routeParams)
 		.withMethod("POST")
 		.withBody(inviteRequest)
+		.fetch();
+}
+export function removeUserFromOrganization(routeParams) {
+	return new FetchRequestBuilder(organizationUserMembershipUrl, routeParams)
+		.withMethod("DELETE")
 		.fetch();
 }
 export function getInvitation(routeParams) {

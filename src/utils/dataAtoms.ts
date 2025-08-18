@@ -65,7 +65,7 @@ export const userMembershipAtom = atom(async (get) => {
 	const user = await get(userAtom);
 	if (orgId === null || user === null)
 		return null;
-	return (await getOrganizationUserMembership({orgId, userId: user.id})) as UserMembership;
+	return (await getOrganizationUserMembership({orgId}, user.id)) as UserMembership;
 });
 
 export const selfServiceEmployeeAtom = atom(async (get) => {

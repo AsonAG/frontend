@@ -196,7 +196,12 @@ const translations = {
 		"rolename_Admin": "Administrator",
 		"rolename_PayrollManager": "Manager",
 		"rolename_SelfService": "Self Service",
-
+		"pending": "ausstehend",
+		"expired": "abgelaufen",
+		"Remove user": "Benutzer entfernen",
+		"Do you want to remove {{name}} from the organization?": "Möchten Sie den Benutzer {{name}} aus der Organisation entfernen?",
+		"Remove": "Entfernen",
+		"User has been removed": "Benutzer wurde entfernt",
 
 		// compliance
 		Submit: "Übermitteln",

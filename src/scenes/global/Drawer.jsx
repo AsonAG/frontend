@@ -182,12 +182,12 @@ function MenuItemsOrganization() {
 					icon={<SettingsIcon />}
 					end
 				/>
+				<NavigationItem
+					label={t("Users")}
+					to="users"
+					icon={<ManageAccounts />}
+				/>
 			</NavigationGroup>
-			<NavigationItem
-				label={t("Users")}
-				to="users"
-				icon={<ManageAccounts />}
-			/>
 			<NavigationGroup name={t("Organization unit")}>
 				{payrolls.map(x => (
 					<NavigationItem

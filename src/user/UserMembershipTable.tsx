@@ -1,7 +1,6 @@
 import {
   Button,
   Chip,
-  IconButton,
   Stack,
   Typography,
 } from "@mui/material";
@@ -75,10 +74,12 @@ function InviteButton() {
 }
 
 function UserMembershipRow({ membership }: { membership: UserMembership }) {
+  const { t } = useTranslation();
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
+    <Stack direction="row" spacing={1} alignItems="center">
       <Typography variant="body1" flex={1}>{membership.firstName} {membership.lastName}</Typography>
       <EditUserRolesButton membership={membership} />
+      <Button component={Link} variant="outlined" to={`${membership.id}/remove`} size="small" color="destructive">{t("Remove")}</Button>
     </Stack>
   );
 }
@@ -96,8 +97,11 @@ function UserMembershipInvitationRow({ invitation }: { invitation: UserMembershi
     <Chip variant="outlined" label={t("pending")} size="small" color="warning" />
 
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
-      <Typography variant="body1" flex={1}>{display} {chip}</Typography>
+    <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" flex={1} spacing={1.5}>
+        <Typography variant="body1">{display}</Typography>
+        {chip}
+      </Stack>
       <Button variant="outlined" disabled size="small">
         <Typography>{t(invitation.role.$type)}</Typography>
       </Button>
@@ -111,14 +115,6 @@ function EmployeeInvitationRow({ employee }: {employee: Employee}) {
     <Stack direction="row" spacing={2} alignItems="center">
       <Typography variant="body1" flex={1}>{employee.firstName} {employee.lastName}</Typography>
       <Button component={Link} variant="outlined" to={`invite/${employee.id}`} size="small">{t("Invite")}</Button>
-    </Stack>
-  );
-}
-
-function UserRoles({ role }: { role: UserRole }) {
-  return (
-    <Stack>
-      <Typography fontWeight={500}>{role.$type}</Typography>
     </Stack>
   );
 }
