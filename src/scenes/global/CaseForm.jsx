@@ -94,8 +94,9 @@ function CaseForm() {
 
 function PeriodPicker({ inputMode, variant, startDate, setStartDate, endDate, setEndDate }) {
 	const { t } = useTranslation();
-	const startPickerProps = usePeriodDateLimit();
-	const endPickerProps = usePeriodDateLimit();
+	const startPickerProps = usePeriodDateLimit({ picker: "start", end: endDate });
+	const endPickerProps = usePeriodDateLimit({ picker: "end", start: startDate });
+
 	if (inputMode === "Individual") {
 		return;
 	}
@@ -122,13 +123,12 @@ function PeriodPicker({ inputMode, variant, startDate, setStartDate, endDate, se
 				name="case_change_valid_until"
 				{...endPickerProps}
 			/>
-		)
+		);
 	}
 	return (
 		<Stack direction="row" spacing={2}>
 			{startPicker}
 			{endPicker}
 		</Stack>
-	)
-
+	);
 }

@@ -1,6 +1,9 @@
-import { DateValidationError } from "@mui/x-date-pickers";
+import {
+	DateValidationError,
+	DateTimeValidationError,
+} from "@mui/x-date-pickers";
 import { unwrap } from "jotai/utils";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { payrollAtom } from "../../utils/dataAtoms";
 import { useAtomValue } from "jotai";
@@ -16,7 +19,6 @@ const unwrappedPayrollAtom = unwrap(payrollAtom, (prev) => prev ?? null);
 
 export function usePeriodDateLimit(opts?: Options) {
 	const { t } = useTranslation();
-	const [error, setError] = useState<DateValidationError | null>(null);
 	const payroll = useAtomValue(unwrappedPayrollAtom);
 
 	const baseMin = useMemo(
@@ -38,7 +40,9 @@ export function usePeriodDateLimit(opts?: Options) {
 		return undefined;
 	}, [picker, end]);
 
-	const minDateErrorMessage = useMemo(() => {
+	const getValidationErrorMessage = (
+		error: DateValidationError | DateTimeValidationError | null | undefined,
+	): string | undefined => {
 		if (error === "minDate") {
 			const startIsEffectiveMin =
 				picker === "end" && start && start.isAfter(baseMin);
@@ -50,13 +54,15 @@ export function usePeriodDateLimit(opts?: Options) {
 				accountingStartDate: baseMin.format("L"),
 			});
 		}
-		return "";
-	}, [error, picker, start, baseMin, t]);
+		if (error === "maxDate") {
+			return t("date_start_before_end_validation", {});
+		}
+		return undefined;
+	};
 
 	return {
 		minDate,
 		maxDate,
-		minDateErrorMessage,
-		onError: setError,
+		getValidationErrorMessage,
 	};
 }

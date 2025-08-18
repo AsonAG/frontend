@@ -53,7 +53,9 @@ type DatePickerVariants = "standard" | "datetime" | "month" | "year";
 type Props<T> = (T extends "datetime"
 	? DateTimePickerProps
 	: DatePickerProps) & {
-	minDateErrorMessage?: string;
+	getValidationErrorMessage?: (
+		error: DateValidationError | DateTimeValidationError | null | undefined,
+	) => string | undefined;
 };
 
 export function DatePicker<T extends DatePickerVariants>({
@@ -62,7 +64,7 @@ export function DatePicker<T extends DatePickerVariants>({
 	slotProps,
 	required = false,
 	onChange,
-	minDateErrorMessage,
+	getValidationErrorMessage,
 	...datePickerProps
 }: Props<T>) {
 	const { t } = useTranslation();
@@ -71,7 +73,9 @@ export function DatePicker<T extends DatePickerVariants>({
 	let pickerProps = {};
 	const { value } = datePickerProps;
 	const [localValue, setLocalValue] = useState<Dayjs | null>(value ?? null);
-	const [validationError, setValidationError] = useState<string>("");
+	const lastValidationError = useRef<
+		DateValidationError | DateTimeValidationError | null
+	>(null);
 
 	const handleDateChange = (
 		newDate: Dayjs | null,
@@ -80,20 +84,26 @@ export function DatePicker<T extends DatePickerVariants>({
 		>,
 	) => {
 		setLocalValue(newDate);
-		setValidationError(
-			getValidationError({
-				validationError: context.validationError,
-				minDateErrorMessage,
-			}),
-		);
+		lastValidationError.current = context.validationError;
 	};
 
 	const handleBlur = () => {
 		const isValid = !localValue || localValue.isValid();
+		const err = lastValidationError.current;
+		let message: string | undefined;
+
+		if (getValidationErrorMessage) {
+			message = getValidationErrorMessage(err);
+		}
+		if (!message && err) {
+			message = getValidationError({
+				validationError: err,
+			});
+		}
 
 		if (inputRef.current) {
-			if (validationError) {
-				inputRef.current.setCustomValidity(t(validationError));
+			if (message) {
+				inputRef.current.setCustomValidity(t(message));
 			} else if (!required) {
 				inputRef.current.setCustomValidity("");
 			} else if (!localValue) {
@@ -139,7 +149,6 @@ export function DatePicker<T extends DatePickerVariants>({
 
 			slotProps = {
 				...slotProps,
-
 				inputAdornment: {
 					// @ts-ignore
 					handleBack: () => setNewValue(localValue?.subtract(1, "month")),
@@ -154,9 +163,7 @@ export function DatePicker<T extends DatePickerVariants>({
 	}
 
 	if (variant === "year") {
-		pickerProps = {
-			views: ["year"],
-		};
+		pickerProps = { views: ["year"] };
 	}
 
 	return (
@@ -176,16 +183,16 @@ export function DatePicker<T extends DatePickerVariants>({
 }
 
 type GetValidationErrorProps = {
-	validationError: DateTimeValidationError;
-	minDateErrorMessage?: string;
+	validationError:
+		| DateTimeValidationError
+		| DateValidationError
+		| null
+		| undefined;
 };
 
-function getValidationError({
-	validationError,
-	minDateErrorMessage,
-}: GetValidationErrorProps) {
+function getValidationError({ validationError }: GetValidationErrorProps) {
 	if (validationError === "minDate") {
-		return minDateErrorMessage ?? "Date is not in the valid range.";
+		return "Date is not in the valid range.";
 	}
 	if (validationError === "maxDate") {
 		return "Date is not in the valid range.";

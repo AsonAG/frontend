@@ -16,21 +16,11 @@ export function FieldPeriodSelector({ field }) {
   const startValue = useMemo(() => {
     const value = field?.start;
     if (!value) return null;
-    try {
-      return dayjs.utc(value);
-    } catch {
-      return null;
-    }
   }, [field?.start]);
 
   const endValue = useMemo(() => {
     const value = field?.end;
     if (!value) return null;
-    try {
-      return dayjs.utc(value);
-    } catch {
-      return null;
-    }
   }, [field?.end]);
 
   const startPickerProps = usePeriodDateLimit({
