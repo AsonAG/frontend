@@ -36,26 +36,18 @@ export function UserMembershipTable() {
     return new Map(invitations);
   }, [userMembershipInvitations]);
 
-  const [
-    invitedEmployees,
-    employeesWithoutAccess
-  ] = useMemo(() => {
-    const invitedEmployees: Array<Employee> = [];
+  const employeesWithoutAccess = useMemo(() => {
     const employeesWithoutAccess: Array<Employee> = [];
     
     const selfServiceMemberships = new Set(userMemberships.filter(x => x.role.$type === "SelfService").map(x => x.role.$type === "SelfService" ? x.role.employeeId : undefined));
 
     for (const employee of employees) {
-      if (selfServiceMemberships.has(employee.id))
+      if (selfServiceMemberships.has(employee.id) || selfServiceInvitations.has(employee.id))
         continue;
 
-      if (selfServiceInvitations.has(employee.id)) {
-        invitedEmployees.push(employee);
-        continue;
-      }
       employeesWithoutAccess.push(employee);
     }
-    return [invitedEmployees, employeesWithoutAccess];
+    return employeesWithoutAccess;
 
   }, [userMemberships, userMembershipInvitations, employees]);
   return (

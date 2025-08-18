@@ -683,27 +683,21 @@ const routeData = [
 					const [
 						userMemberships,
 						userMembershipInvitations,
-						employees
+						employees,
+						payrolls
 					] = await Promise.all([
 						getOrgUserMemberships(params),
 						getOrganizationUserMembershipInvitations(params),
-						getEmployees(params).fetchJson()
+						getEmployees(params).fetchJson(),
+						getPayrolls(params)
 					]);
 					const employeeMap = new Map(employees.map(x => [x.id, x]));
-					return { userMemberships, userMembershipInvitations, employees, employeeMap };
+					return { userMemberships, userMembershipInvitations, employees, employeeMap, payrolls };
 				},
 				children: [
 					{
 						path: ":userMembershipId/edit",
 						Component: UserMembershipEditDialog,
-						loader: async ({ params }) => {
-							const payrolls = await getPayrolls(params);
-							const employees = await getEmployees(params).fetchJson();
-							return {
-								payrolls,
-								employees
-							};
-						},
 						action: async ({ params, request }) => {
 							const role = await request.json();
 							const response = await saveOrganizationUserRole(params, role);
@@ -720,13 +714,11 @@ const routeData = [
 						path: "invite/:employeeId?",
 						Component: UserMembershipInviteDialog,
 						loader: async ({ params }) => {
-							const payrolls = await getPayrolls(params);
 							let employeeEmail = null;
 							if (params.employeeId) {
 								employeeEmail = await getEmployeeEmail(params);
 							}
 							return {
-								payrolls,
 								employeeEmail
 							};
 						},

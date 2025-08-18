@@ -188,7 +188,7 @@ const translations = {
 		"Invitation link": "Einladungslink",
 		"Copied to clipboard": "In die Zwischenablage kopiert",
 		"Invite": "Einladen",
-		"Employees without access": "Benutzer ohne Zugriff",
+		"Employees without access": "Mitarbeiter ohne Zugriff",
 		"Users": "Benutzer",
 		"Invite to organization": "In die Organisation einladen",
 
