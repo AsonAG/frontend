@@ -40,6 +40,7 @@ const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
 const employeeUrl = "/tenants/:orgId/employees/:employeeId";
 const usersUrl = "/users";
+const userUrl = "/users/:userId";
 const employeeCaseValuesUrl =
 	"/tenants/:orgId/employees/:employeeId/cases";
 const employeeDocumentUrl =
@@ -649,6 +650,13 @@ export function addCase(routeParams, caseChangeSetup) {
 export async function getUser() {
 	return await new FetchRequestBuilder(usersUrl)
 		.fetchSingle();
+}
+
+export async function updateUser(userId, user) {
+	return await new FetchRequestBuilder(userUrl, {userId})
+		.withMethod("PUT")
+		.withBody(user)
+		.fetch();
 }
 
 export function getLookupValues(routeParams, lookupName) {

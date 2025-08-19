@@ -15,7 +15,7 @@ import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";
 import { localUserEmailAtom } from "../../auth/getUser";
-import { userInformationAtom } from "../../utils/dataAtoms";
+import { toast, userAtom, userInformationAtom } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
 import * as Popover from '@radix-ui/react-popover';
 import { AccountCircle } from "@mui/icons-material";
@@ -24,6 +24,8 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import ContrastIcon from '@mui/icons-material/Contrast';
 import ErrorIcon from '@mui/icons-material/Error';
+import { LanguagePicker } from "../../components/LanguagePicker";
+import { getUser, updateUser } from "../../api/FetchClient";
 
 const buttonSx = {
 	flexGrow: 1,
@@ -103,16 +105,36 @@ function UserInformation() {
 		name: t("User does not exist!"),
 		email: "<MISSING EMAIL>"
 	};
+	const user = useAtomValue(userAtom);
 
+	const onUpdateLanguage = async (lang) => {
+		const user = await getUser();
+		if (!user) {
+			toast("error", "Could not update user language");
+			return;
+		}
+		user.language = lang;
+		const response = await updateUser(user.id, user);
+		if (response.ok) {
+			toast("success", "User language updated");
+			window.location.reload();
+			return;
+		} else {
+			toast("error", "Could not update user language");
+		}
+	}
 
 	return (
-		<Stack alignItems="center" width="100%">
-			<Typography variant="h6" gutterBottom>{userInformation.name}</Typography>
-			{
-				useOidc ?
-					<Typography variant="body2">{userInformation.email}</Typography> :
-					<UserEdit />
-			}
+		<Stack alignItems="center" width="100%" spacing={1}>
+			<Stack alignItems="center" width="100%">
+				<Typography variant="h6" gutterBottom>{userInformation.name}</Typography>
+				{
+					useOidc ?
+						<Typography variant="body2">{userInformation.email}</Typography> :
+						<UserEdit />
+				}
+			</Stack>
+			<LanguagePicker label={t("Language")} language={user.language} onChange={onUpdateLanguage} variant="standard" />
 		</Stack>
 	);
 }

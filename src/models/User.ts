@@ -1,4 +1,5 @@
 import { IdType } from "./IdType";
+import { Language } from "./Language";
 import { StatusEnum } from "./StatusEnum";
 
 export type User = {
@@ -8,7 +9,7 @@ export type User = {
   lastName: string;
   identifier: string;
   culture: string;
-  language: string;
+  language: Language | null;
 };
 
 export type UserMembership = {
