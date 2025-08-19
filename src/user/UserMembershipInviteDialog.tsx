@@ -16,6 +16,7 @@ import { Payroll } from "../models/Payroll";
 import { Share } from "@mui/icons-material";
 import { toast } from "../utils/dataAtoms";
 import { RoleSelection, useRoleSelection } from "./RoleSelection";
+import { IdType } from "../models/IdType";
 
 type LoaderData = {
   employeeEmail: string | null
@@ -29,7 +30,7 @@ type UserTableData = {
 export function UserMembershipInviteDialog() {
   const { t } = useTranslation();
   const submit = useSubmit();
-  const { employeeId } = useParams();
+  const { employeeId } = useParams() as {employeeId: IdType};
   const { employeeEmail } = useLoaderData() as LoaderData;
   const { employees, payrolls } = useRouteLoaderData("userTable") as UserTableData;
   const [email, setEmail] = useState<string>(employeeEmail ?? "");
@@ -76,14 +77,14 @@ export function UserMembershipInviteDialog() {
         <ResponsiveDialogTitle asChild>
           <Typography variant="h6">{t("Invite to organization")}</Typography>
         </ResponsiveDialogTitle>
-        <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <ResponsiveDialogDescription asChild>
           <Typography>{t("Choose a role")}:</Typography>
         </ResponsiveDialogDescription>
         <RoleSelection state={state} dispatch={dispatch} payrolls={payrolls} employees={employees} />
         <Stack direction="row" justifyContent="end" spacing={1}>
           <Button component={Link} to="..">{t("Cancel")}</Button>
-          <Button variant="contained" color="primary" onClick={onInvite} disabled={state.role === null}>{t("Invite")}</Button>
+          <Button variant="contained" color="primary" onClick={onInvite} disabled={!email || state.role === null}>{t("Invite")}</Button>
         </Stack>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
