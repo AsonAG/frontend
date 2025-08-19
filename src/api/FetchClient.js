@@ -12,6 +12,7 @@ const organizationUrl = "/tenants/:orgId";
 const organizationUserMembershipsUrl = "/tenants/:orgId/user_memberships";
 const organizationUserMembershipUrl = "/tenants/:orgId/user_memberships/:userMembershipId";
 const organizationUserMembershipRoleUrl = "/tenants/:orgId/user_memberships/:userMembershipId/role";
+const organizationUserMembershipInviteUrl = "/tenants/:orgId/user_memberships/invite";
 const organizationUserMembershipWithdrawInvitationUrl = "/tenants/:orgId/user_memberships/invitations/:invitationId";
 const payrollsUrl = "/tenants/:orgId/payrolls";
 const payrollsSimpleUrl = "/tenants/:orgId/payrolls/simple";
