@@ -70,6 +70,7 @@ export const userMembershipAtom = atom(async (get) => {
 	const userMembership = await getOrganizationUserMembership({orgId}, user.id);
 	return userMembership as UserMembership;
 });
+export const unwrappedUserMembershipAtom = unwrap(userMembershipAtom, prev => prev ?? null);
 
 export const selfServiceEmployeeAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);

@@ -29,7 +29,7 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom, userMembershipAtom } from "../../utils/dataAtoms";
+import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom, unwrappedUserMembershipAtom } from "../../utils/dataAtoms";
 import { unwrap } from "jotai/utils";
 import { Add, Business, ManageAccounts } from "@mui/icons-material";
 import { useRole, isPayrollAdmin } from "../../user/utils";
@@ -267,7 +267,10 @@ function MenuItemsUnknown() {
 function MenuItems() {
 	const { employee } = useLoaderData();
 	const payrollViewMatch = useMatch("/orgs/:orgId/payrolls/:payrollId/*");
-	var userMembership = useAtomValue(userMembershipAtom);
+	var userMembership = useAtomValue(unwrappedUserMembershipAtom);
+	if (!userMembership) {
+		return;
+	}
 	const payrollAdmin = !!payrollViewMatch && isPayrollAdmin(userMembership.role, payrollViewMatch.params.payrollId);
 	const isAdmin = userMembership.role.$type === "Admin" || userMembership.role.$type === "Owner";
 	const isSelfService = userMembership.role.$type === "SelfService";

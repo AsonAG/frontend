@@ -1,13 +1,12 @@
 import { useAtomValue } from "jotai";
 import { IdType } from "../models/IdType";
 import { UserMembershipInvitation, UserRole, UserRoleName } from "../models/User";
-import { userMembershipAtom } from "../utils/dataAtoms";
+import { unwrappedUserMembershipAtom } from "../utils/dataAtoms";
 import { authUserRolesAtom } from "../auth/getUser";
 import { Employee } from "../models/Employee";
 
-
 export function useRole(role: UserRoleName | "InstanceAdmin"): Boolean {
-    const userMembership = useAtomValue(userMembershipAtom);
+    const userMembership = useAtomValue(unwrappedUserMembershipAtom);
     const authUserRoles = useAtomValue(authUserRolesAtom);
     if (role === "InstanceAdmin" && authUserRoles.includes("provider"))
         return true;
