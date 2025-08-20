@@ -4,18 +4,14 @@ import {
 	ButtonGroup,
 	Button,
 	TextField,
-	IconButton,
-	FormGroup,
-	FormControlLabel,
-	Switch
-} from "@mui/material";
+	IconButton} from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
 import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";
 import { localUserEmailAtom } from "../../auth/getUser";
-import { toast, userAtom, userInformationAtom } from "../../utils/dataAtoms";
+import { toast, unwrappedUserAtom, userInformationAtom } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
 import * as Popover from '@radix-ui/react-popover';
 import { AccountCircle } from "@mui/icons-material";
@@ -105,7 +101,7 @@ function UserInformation() {
 		name: t("User does not exist!"),
 		email: "<MISSING EMAIL>"
 	};
-	const user = useAtomValue(userAtom);
+	const user = useAtomValue(unwrappedUserAtom);
 
 	const onUpdateLanguage = async (lang) => {
 		const user = await getUser();

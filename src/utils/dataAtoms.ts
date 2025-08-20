@@ -55,17 +55,20 @@ export const payrollAtom = atom(async (get) => {
 	return payrolls.find((p) => p.id === payrollId);
 });
 
-export const userAtom = unwrap(atom((get) => {
+
+export const userAtom = atom((get) => {
 	const _ = get(authUserAtom); // subscribe to the value
 	return getUser();
-}), prev => prev ?? null);
+});
+export const unwrappedUserAtom = unwrap(userAtom, prev => prev ?? null);
 
 export const userMembershipAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);
 	const user = await get(userAtom);
 	if (orgId === null || user === null)
 		return null;
-	return (await getOrganizationUserMembership({orgId}, user.id)) as UserMembership;
+	const userMembership = await getOrganizationUserMembership({orgId}, user.id);
+	return userMembership as UserMembership;
 });
 
 export const selfServiceEmployeeAtom = atom(async (get) => {
@@ -191,7 +194,7 @@ export function useEmployeeMissingDataCount(objectId: IdType) {
 	return missingData.cases.length;
 }
 
-export const userInformationAtom = atom((async get => {
+export const userInformationAtom = unwrap(atom((async get => {
 	if (useOidc) {
 		const authUser = get(authUserAtom);
 		if (!authUser) return null;
@@ -208,7 +211,7 @@ export const userInformationAtom = atom((async get => {
 		};
 	}
 	return null;
-}));
+})), prev => prev ?? null);
 
 const jsonSessionStorage = createJSONStorage(() => sessionStorage) as SyncStorage<ExpandedState>;
 export const documentRecentSettingAtom = atomWithStorage<boolean>("setting.document.recent", true, undefined, { getOnInit: true });

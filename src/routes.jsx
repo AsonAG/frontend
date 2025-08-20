@@ -872,7 +872,7 @@ const routeData = [
 				path: "hr/tasks",
 				Component: AsyncTaskTable,
 				loader: async ({ params, request }) => {
-					const { user } = await getOrganizationData();
+					const user = await store.get(userAtom);
 					const searchParams = new URL(request.url).searchParams;
 					let dataPromise = null;
 					if (searchParams.has("completed")) {
