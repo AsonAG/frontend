@@ -183,11 +183,7 @@ export function DatePicker<T extends DatePickerVariants>({
 }
 
 type GetValidationErrorProps = {
-	validationError:
-		| DateTimeValidationError
-		| DateValidationError
-		| null
-		| undefined;
+	validationError?: DateTimeValidationError | DateValidationError | null;
 };
 
 function getValidationError({ validationError }: GetValidationErrorProps) {

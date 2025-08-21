@@ -10,14 +10,14 @@ import { useAtomValue } from "jotai";
 import dayjs, { Dayjs } from "dayjs";
 
 type Options = {
-	picker?: "start" | "end";
-	start?: Dayjs | null;
-	end?: Dayjs | null;
+	picker: "start" | "end";
+	start: Dayjs | null;
+	end: Dayjs | null;
 };
 
 const unwrappedPayrollAtom = unwrap(payrollAtom, (prev) => prev ?? null);
 
-export function usePeriodDateLimit(opts?: Options) {
+export function usePeriodDateLimit({ picker, start, end }: Options) {
 	const { t } = useTranslation();
 	const payroll = useAtomValue(unwrappedPayrollAtom);
 
@@ -25,8 +25,6 @@ export function usePeriodDateLimit(opts?: Options) {
 		() => dayjs.utc(payroll?.accountingStartDate ?? "1900-01-01"),
 		[payroll?.accountingStartDate],
 	);
-
-	const { picker = "start", start, end } = opts ?? {};
 
 	const minDate = useMemo(() => {
 		if (picker === "end" && start) {

@@ -13,15 +13,15 @@ dayjs.extend(utc);
 export function FieldPeriodSelector({ field }) {
   const { t } = useTranslation();
 
-  const startValue = useMemo(() => {
-    const value = field?.start;
-    if (!value) return null;
-  }, [field?.start]);
+  const startValue = useMemo(
+    () => dayjs.utc(field?.start ?? null),
+    [field?.start]
+  );
 
-  const endValue = useMemo(() => {
-    const value = field?.end;
-    if (!value) return null;
-  }, [field?.end]);
+  const endValue = useMemo(
+    () => dayjs.utc(field?.end ?? null),
+    [field?.end]
+  );
 
   const startPickerProps = usePeriodDateLimit({
     picker: "start",
