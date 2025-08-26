@@ -2,54 +2,32 @@ import {
   Button,
   Chip,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLoaderData } from "react-router-dom";
-import { UserMembership, UserMembershipInvitation, UserRole } from "../models/User";
+import { UserMembership, UserMembershipInvitation } from "../models/User";
 import { Add, Edit } from "@mui/icons-material";
 import { Employee } from "../models/Employee";
 import { useMemo } from "react";
 import { IdType } from "../models/IdType";
 import dayjs from "dayjs";
-import { getInvitationDisplayName } from "./utils";
+import { getDisplayName } from "./utils";
 
 type LoaderData = {
   userMemberships: Array<UserMembership>
   userMembershipInvitations: Array<UserMembershipInvitation>
   employees: Array<Employee>
   employeeMap: Map<IdType, Employee>
+  employeesWithoutMemberships: Array<Employee>
 }
 
 export function UserMembershipTable() {
-  const { userMemberships, userMembershipInvitations, employees } = useLoaderData() as LoaderData;
+  const { userMemberships, userMembershipInvitations, employeesWithoutMemberships } = useLoaderData() as LoaderData;
   const { t } = useTranslation();
 
-  const selfServiceInvitations = useMemo(() => {
-    const invitations: Array<[IdType, UserMembershipInvitation]> = [];
-    for (const inv of userMembershipInvitations) {
-      if (inv.role.$type !== "SelfService")
-        continue;
-      invitations.push([inv.role.employeeId, inv]);
-    }
-    return new Map(invitations);
-  }, [userMembershipInvitations]);
-
-  const employeesWithoutAccess = useMemo(() => {
-    const employeesWithoutAccess: Array<Employee> = [];
-    
-    const selfServiceMemberships = new Set(userMemberships.filter(x => x.role.$type === "SelfService").map(x => x.role.$type === "SelfService" ? x.role.employeeId : undefined));
-
-    for (const employee of employees) {
-      if (selfServiceMemberships.has(employee.id) || selfServiceInvitations.has(employee.id))
-        continue;
-
-      employeesWithoutAccess.push(employee);
-    }
-    return employeesWithoutAccess;
-
-  }, [userMemberships, userMembershipInvitations, employees]);
   return (
     <ContentLayout title={t("Users")} buttons={<InviteButton />}>
       <Stack spacing={1}>
@@ -58,7 +36,7 @@ export function UserMembershipTable() {
       </Stack>
       <Stack spacing={1}>
         <Typography variant="h6">{t("Employees without access")}</Typography>
-        {employeesWithoutAccess.map(employee => <EmployeeInvitationRow key={employee.id} employee={employee} />)}
+        {employeesWithoutMemberships.map(employee => <EmployeeInvitationRow key={employee.id} employee={employee} />)}
       </Stack>
       <Outlet />
     </ContentLayout>
@@ -76,9 +54,18 @@ function InviteButton() {
 
 function UserMembershipRow({ membership }: { membership: UserMembership }) {
   const { t } = useTranslation();
+  const { employeeMap } = useLoaderData() as LoaderData;
+  const displayName = getDisplayName(employeeMap.get(membership.employeeId)) ?? getDisplayName(membership);
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Typography variant="body1" flex={1}>{membership.firstName} {membership.lastName}</Typography>
+      <Stack direction="row" flex={1} spacing={1.5} alignItems="center">
+        <Typography variant="body1">{displayName}</Typography>
+        {!membership.employeeId && (
+          <Tooltip title={t("This user is not assigned to an employee of the organization")}>
+            <Chip variant="outlined" label={t("external")} size="small"/> 
+          </Tooltip>
+        )}
+      </Stack>
       <EditUserRolesButton membership={membership} />
       <Button component={Link} variant="outlined" to={`memberships/${membership.id}/remove`} size="small" color="destructive">{t("Remove")}</Button>
     </Stack>
@@ -87,7 +74,7 @@ function UserMembershipRow({ membership }: { membership: UserMembership }) {
 function UserMembershipInvitationRow({ invitation }: { invitation: UserMembershipInvitation }) {
   const { t } = useTranslation();
   const { employeeMap } = useLoaderData() as LoaderData;
-  const displayName = getInvitationDisplayName(invitation, employeeMap);
+  const displayName = getDisplayName(employeeMap.get(invitation.employeeId)) ?? invitation.email;
   const isExpired = useMemo(() => dayjs.utc(invitation.expiresAt).isBefore(dayjs.utc()), [invitation.expiresAt]);
   const chip = isExpired ?
     <Chip variant="outlined" label={t("expired")} size="small"/> :
@@ -95,12 +82,12 @@ function UserMembershipInvitationRow({ invitation }: { invitation: UserMembershi
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Stack direction="row" flex={1} spacing={1.5}>
+      <Stack direction="row" flex={1} spacing={1.5} alignItems="center">
         <Typography variant="body1">{displayName}</Typography>
         {chip}
       </Stack>
       <Button variant="outlined" disabled size="small">
-        <Typography>{t(invitation.role.$type)}</Typography>
+        <Typography>{t("rolename_" + invitation.role.$type)}</Typography>
       </Button>
       {!isExpired && <Button component={Link} variant="outlined" to={`invitations/${invitation.id}/withdraw`} size="small" color="destructive">{t("Withdraw")}</Button>}
     </Stack>

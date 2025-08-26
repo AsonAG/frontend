@@ -1,10 +1,11 @@
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Button,
   IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -15,15 +16,17 @@ import { Employee } from "../models/Employee";
 import { Payroll } from "../models/Payroll";
 import { Share } from "@mui/icons-material";
 import { toast } from "../utils/dataAtoms";
-import { RoleSelection, useRoleSelection } from "./RoleSelection";
+import { RoleSelection, RoleSelectionState, useRoleSelection } from "./RoleSelection";
 import { IdType } from "../models/IdType";
+import { EmployeeSelection } from "./EmployeeSelection";
 
 type LoaderData = {
   employeeEmail: string | null
 }
 
 type UserTableData = {
-  employees: Array<Employee>
+  employeeMap: Map<IdType, Employee>
+  employeesWithoutMemberships: Array<Employee>
   payrolls: Array<Payroll>
 }
 
@@ -32,17 +35,19 @@ export function UserMembershipInviteDialog() {
   const submit = useSubmit();
   const { employeeId } = useParams() as {employeeId: IdType};
   const { employeeEmail } = useLoaderData() as LoaderData;
-  const { employees, payrolls } = useRouteLoaderData("userTable") as UserTableData;
+  const { employeesWithoutMemberships, payrolls, employeeMap } = useRouteLoaderData("userTable") as UserTableData;
   const [email, setEmail] = useState<string>(employeeEmail ?? "");
   const invitation = useActionData() as UserMembershipInvitation | undefined;
 
-  const initialRole: UserRole = !!employeeId ? {"$type": "SelfService", employeeId} : {"$type": "Admin"};
+  const selectedEmployee = useMemo(() => employeeMap.get(employeeId) ?? null, [employeeMap, employeeId]);
+  const initialRole: UserRole = !!selectedEmployee ? {"$type": "SelfService"} : {"$type": "Admin"};
   const [state, dispatch] = useRoleSelection(initialRole);
 
   const onInvite = () => {
     submit({
       email,
-      role: state.role
+      role: state.role,
+      employeeId: selectedEmployee?.id ?? null
     }, { method: "post", encType: "application/json" });
   };
 
@@ -71,22 +76,40 @@ export function UserMembershipInviteDialog() {
     );
   }
 
+  const disabledText = getDisabledText(state, email);
   return (
     <ResponsiveDialog open>
       <ResponsiveDialogContent>
         <ResponsiveDialogTitle asChild>
           <Typography variant="h6">{t("Invite to organization")}</Typography>
         </ResponsiveDialogTitle>
+        {!!selectedEmployee && <EmployeeSelection employee={selectedEmployee} onChange={() => {}} employees={[]} disabled />}
         <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <ResponsiveDialogDescription asChild>
           <Typography>{t("Choose a role")}:</Typography>
         </ResponsiveDialogDescription>
-        <RoleSelection state={state} dispatch={dispatch} payrolls={payrolls} employees={employees} />
+        <RoleSelection state={state} dispatch={dispatch} payrolls={payrolls} />
         <Stack direction="row" justifyContent="end" spacing={1}>
           <Button component={Link} to="..">{t("Cancel")}</Button>
-          <Button variant="contained" color="primary" onClick={onInvite} disabled={!email || state.role === null}>{t("Invite")}</Button>
+          <Tooltip title={t(disabledText)}>
+            <span>
+              <Button variant="contained" color="primary" onClick={onInvite} disabled={!!disabledText}>{t("Invite")}</Button>
+            </span>
+          </Tooltip>
         </Stack>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
   );
+}
+
+function getDisabledText(state: RoleSelectionState, email: string): string {
+  if (state.role === null) {
+    if (state.selectedRole === "PayrollManager") {
+      return "Select at least one payroll";
+    }
+  }
+  if (!email) {
+    return "Email is required";
+  }
+  return "";
 }

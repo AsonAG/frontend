@@ -70,7 +70,6 @@ import {
 	updatePayroll,
 	createPayroll,
 	getOrganizationUserMemberships,
-	saveOrganizationUserRole,
 	getPayrolls,
 	createOrganization,
 	getOrganizationUserMembershipInvitations,
@@ -79,7 +78,8 @@ import {
 	getInvitation,
 	acceptInvitation,
 	removeUserFromOrganization,
-	withdrawUserMembershipInvitationToOrganization
+	withdrawUserMembershipInvitationToOrganization,
+	saveOrganizationUserMembership
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -696,15 +696,17 @@ const routeData = [
 						getPayrolls(params)
 					]);
 					const employeeMap = new Map(employees.map(x => [x.id, x]));
-					return { userMemberships, userMembershipInvitations, employees, employeeMap, payrolls };
+					const employeesWithMemberships = new Set([...userMemberships.map(x => x.employeeId), ...userMembershipInvitations.map(x => x.employeeId)]);
+					const employeesWithoutMemberships = employees.filter(x => !employeesWithMemberships.has(x.id));
+					return { userMemberships, userMembershipInvitations, employees, employeeMap, payrolls, employeesWithoutMemberships };
 				},
 				children: [
 					{
 						path: "memberships/:userMembershipId/edit",
 						Component: UserMembershipEditDialog,
 						action: async ({ params, request }) => {
-							const role = await request.json();
-							const response = await saveOrganizationUserRole(params, role);
+							const membership = await request.json();
+							const response = await saveOrganizationUserMembership(params, membership);
 							if (response.ok) {
 								toast("success", "Saved!");
 								return redirect("..");

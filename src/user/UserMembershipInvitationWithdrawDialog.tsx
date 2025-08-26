@@ -11,7 +11,7 @@ import { UserMembershipInvitation } from "../models/User";
 import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogDescription, ResponsiveDialogTitle } from "../components/ResponsiveDialog";
 import { Employee } from "../models/Employee";
 import { Payroll } from "../models/Payroll";
-import { getInvitationDisplayName } from "./utils";
+import { getDisplayName } from "./utils";
 import { IdType } from "../models/IdType";
 
 type UserTableData = {
@@ -30,7 +30,7 @@ export function UserMembershipInvitationWithdrawDialogy() {
 
   const name = useMemo(() => {
     const invitation = userMembershipInvitations.find(inv => inv.id === invitationId)!;
-    return getInvitationDisplayName(invitation, employeeMap);
+    return getDisplayName(employeeMap.get(invitation.employeeId)) ?? invitation.email;
   }, [invitationId, userMembershipInvitations, employeeMap]);
 
   const onRemove = () => {submit(null, { method: "post", encType: "application/json" })};

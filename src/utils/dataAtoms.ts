@@ -80,7 +80,7 @@ export const selfServiceEmployeeAtom = atom(async (get) => {
 	if (userMembership?.role.$type !== "SelfService")
 		return null;
 
-	return await getEmployee({orgId, payrollId, employeeId: userMembership.role.employeeId});
+	return await getEmployee({orgId, payrollId, employeeId: userMembership.employeeId});
 });
 
 export const openTasksAtom = atomWithRefresh(async (get) => {

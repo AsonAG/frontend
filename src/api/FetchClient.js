@@ -11,7 +11,6 @@ const organizationImportUrl = "/tenants/import";
 const organizationUrl = "/tenants/:orgId";
 const organizationUserMembershipsUrl = "/tenants/:orgId/user_memberships";
 const organizationUserMembershipUrl = "/tenants/:orgId/user_memberships/:userMembershipId";
-const organizationUserMembershipRoleUrl = "/tenants/:orgId/user_memberships/:userMembershipId/role";
 const organizationUserMembershipInviteUrl = "/tenants/:orgId/user_memberships/invite";
 const organizationUserMembershipWithdrawInvitationUrl = "/tenants/:orgId/user_memberships/invitations/:invitationId";
 const payrollsUrl = "/tenants/:orgId/payrolls";
@@ -269,10 +268,10 @@ export function getOrganizationUserMembership(routeParams, userId) {
 		.fetchSingle();
 }
 
-export function saveOrganizationUserRole(routeParams, userRole) {
-	return new FetchRequestBuilder(organizationUserMembershipRoleUrl, routeParams)
+export function saveOrganizationUserMembership(routeParams, userMembership) {
+	return new FetchRequestBuilder(organizationUserMembershipUrl, routeParams)
 		.withMethod("PUT")
-		.withBody(userRole)
+		.withBody(userMembership)
 		.fetch();
 }
 

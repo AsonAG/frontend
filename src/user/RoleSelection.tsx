@@ -1,7 +1,6 @@
 
-import { Dispatch, useMemo, useReducer } from "react";
+import { Dispatch, useReducer } from "react";
 import {
-  Autocomplete,
   Box,
   Checkbox,
   FormControl,
@@ -9,13 +8,11 @@ import {
   RadioGroup,
   Stack,
   SxProps,
-  TextField,
   Theme,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { UserRole, UserRoleName } from "../models/User";
-import { Employee, getEmployeeDisplayString } from "../models/Employee";
 import { IdType } from "../models/IdType";
 import { Payroll } from "../models/Payroll";
 
@@ -23,7 +20,6 @@ type RoleSelectionProps = {
   state: RoleSelectionState,
   dispatch: Dispatch<RoleSelectionReducerAction>
   payrolls: Array<Payroll>
-  employees: Array<Employee>
 }
 
 export function useRoleSelection(initialRole: UserRole | null): [RoleSelectionState, Dispatch<RoleSelectionReducerAction>] {
@@ -139,33 +135,10 @@ function SelfServiceRoleOption(props: RoleSelectionProps) {
   return (
     <RoleOption active={active} onSelect={() => !active && props.dispatch({ type: "set_selected_role", value: "SelfService" })}>
       <Typography>{t("Self Service")}</Typography>
-      <Typography variant="body2">{t("Grants restricted access to the specific employee")}</Typography>
-      {active && <SelfServiceSection {...props} />}
+      <Typography variant="body2">{t("Grants restricted access to the employee")}</Typography>
     </RoleOption>
   )
 }
-
-function SelfServiceSection({ state, dispatch, employees }: RoleSelectionProps) {
-  const { t } = useTranslation();
-  const selectedEmployeeId = state.role?.$type === "SelfService" ? state.role.employeeId : undefined;
-  const value = useMemo(
-    () => employees.find(employee => employee.id === selectedEmployeeId) ?? null,
-    [employees, selectedEmployeeId]);
-
-  return (
-    <Autocomplete
-      disablePortal
-      value={value}
-      onChange={(event, newValue) => dispatch({ type: "set_employee", value: newValue?.id ?? null })}
-      getOptionLabel={getEmployeeDisplayString}
-      id="select_employee"
-      options={employees}
-      sx={{ py: 1 }}
-      renderInput={(params) => <TextField {...params} label={t("Employee")} />}
-    />
-  );
-}
-
 
 function createInitialState(initialRole: UserRole): RoleSelectionState {
   return {
@@ -174,7 +147,7 @@ function createInitialState(initialRole: UserRole): RoleSelectionState {
   };
 }
 
-type RoleSelectionState = {
+export type RoleSelectionState = {
   selectedRole: UserRoleName;
   role: UserRole | null
 };
@@ -182,9 +155,6 @@ type RoleSelectionState = {
 type RoleSelectionReducerAction = {
   type: "set_selected_role"
   value: UserRoleName
-} | {
-  type: "set_employee"
-  value: IdType | null
 } | {
   type: "remove_manager_payroll"
   value: IdType
@@ -194,24 +164,14 @@ type RoleSelectionReducerAction = {
 };
 
 function reducer(state: RoleSelectionState, action: RoleSelectionReducerAction): RoleSelectionState {
-      console.log(state, action)
   switch (action.type) {
     case "set_selected_role":
       if (state.selectedRole === action.value)
         return state;
-      const newSelectedRole: UserRole | null = action.value === "Admin" ? {"$type": "Admin"} : null;
+      const newSelectedRole: UserRole | null = action.value === "PayrollManager" ? null : {"$type": action.value};
       return {
         role: newSelectedRole,
         selectedRole: action.value,
-      };
-    case "set_employee":
-      if (state.selectedRole !== "SelfService")
-        throw new Error("invalid set_self_service_employee call");
-      const selfServiceRole: UserRole | null = action.value ?
-        {"$type": "SelfService", employeeId: action.value} : null;
-      return {
-        ...state,
-        role: selfServiceRole
       };
     case "remove_manager_payroll":
       if (state.role?.$type !== "PayrollManager")

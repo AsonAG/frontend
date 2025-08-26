@@ -16,6 +16,7 @@ export type UserMembership = {
   id: IdType
   tenantId: IdType
   userId: IdType
+  employeeId: IdType | null
   firstName: string
   lastName: string
   role: UserRole
@@ -25,6 +26,7 @@ export type UserMembershipInvitation = {
   id: IdType
   tenantId: IdType
   tenantIdentifier: string
+  employeeId: IdType | null
   email: string
   role: UserRole
   expiresAt: string
@@ -36,7 +38,6 @@ export type UserRole = {
   "$type": "Owner"
 } | {
   "$type": "SelfService",
-  employeeId: IdType
 } | {
   "$type": "PayrollManager",
   payrollIds: Array<IdType>

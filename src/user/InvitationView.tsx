@@ -13,7 +13,6 @@ export function InvitationView() {
   const { t } = useTranslation();
   const submit = useSubmit();
   const invitation = useLoaderData() as UserMembershipInvitation;
-  console.log(invitation);
 
 
   const onAccept = () => {
