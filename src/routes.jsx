@@ -763,7 +763,9 @@ const routeData = [
 								const invitation = await response.json();
 								return invitation;
 							} else {
-								toast("error", "Could not invite user to organization");
+								response.status === 409 ?
+									toast("error", "{{email}} already belongs to a member of the organization", {email: invitationRequest.email}) :
+									toast("error", "Could not invite user to organization");
 							}
 							return null;
 						}

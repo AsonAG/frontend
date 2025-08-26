@@ -211,6 +211,8 @@ const translations = {
 		"Select at least one payroll": "Wählen Sie mindestens eine Organisationseinheit aus",
 		"Email is required": "Email ist erforderlich",
 		"Employee is required": "Mitarbeiter ist erforderlich",
+		"Could not invite user to organization": "Der Benutzer konnte nicht in die Organisation eingeladen werden",
+		"{{email}} already belongs to a member of the organization": "{{email}} gehört schon einem Mitglied der Organisation",
 
 		// compliance
 		Submit: "Übermitteln",
