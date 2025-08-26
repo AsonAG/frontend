@@ -49,6 +49,7 @@ import { SearchField } from "../components/SearchField";
 import { EmployeeTableFilter } from "./TableFilter";
 import { EmployeeSet, getEmployeeDisplayString } from "../models/Employee";
 import { IdType } from "../models/IdType";
+import { UIFeature } from "../utils/UIFeature";
 
 type EmployeeTableContextProps = {
 	state: TableState;
@@ -186,12 +187,14 @@ function EmployeeTableButtons() {
 		<Stack direction="row" spacing={2}>
 			<EmployeeTableSearch />
 			<EmployeeTableFilter />
-			<TableButton
-				title={t("New employee")}
-				to="new"
-				icon={<AddOutlinedIcon />}
-				variant={variant}
-			/>
+			<UIFeature feature="hr.employees.new">
+				<TableButton
+					title={t("New employee")}
+					to="new"
+					icon={<AddOutlinedIcon />}
+					variant={variant}
+				/>
+			</UIFeature>
 		</Stack>
 	);
 }
