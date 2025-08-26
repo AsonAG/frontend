@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { ThemeOptions, createTheme } from "@mui/material/styles";
 import { useLocalStorage } from "usehooks-ts";
-import { darken, lighten, useMediaQuery } from "@mui/material";
+import { alpha, darken, lighten, useMediaQuery } from "@mui/material";
+import { lightColors, darkColors } from './colors'
 
 declare module '@mui/material/styles' {
   interface Palette {
@@ -57,19 +58,19 @@ const lightModeDesignTokens = {
   palette: {
     mode: "light",
     primary: {
-      main: "#461eb7",
-      hover: "rgba(70, 30, 183, 0.05)",
-      active: "rgba(70, 30, 183, 0.15)",
+      main: lightColors.primary,
+      hover: alpha(lightColors.primary, 0.05),
+      active: alpha(lightColors.primary, 0.15),
     },
     selection: {
-      main: "#e3ddf4",
-      light: lighten("#e3ddf4", 0.3),
-      dark: darken("#e3ddf4", 0.05),
+      main: lightColors.selection,
+      light: lighten(lightColors.selection, 0.3),
+      dark: darken(lightColors.selection, 0.05),
     },
     selectionAttention: {
-      main: "#fdf0e5",
-      light: lighten("#fdf0e5", 0.3),
-      dark: darken("#fdf0e5", 0.01),
+      main: lightColors.selectionAttention,
+      light: lighten(lightColors.selectionAttention, 0.3),
+      dark: darken(lightColors.selectionAttention, 0.01),
     },
     text: {
       secondary: "rgba(0, 0, 0, 0.4)",
@@ -99,19 +100,19 @@ const darkModeDesignTokens = {
   palette: {
     mode: "dark",
     primary: {
-      main: "#4985e2",
-      hover: "rgba(73, 133, 226, 0.075)",
-      active: "rgba(73, 133, 226, 0.15)",
+      main: darkColors.primary,
+      hover: alpha(darkColors.primary, 0.075),
+      active: alpha(darkColors.primary, 0.15),
     },
     selection: {
-      main: "#1a2331",
-      light: lighten("#1a2331", 0.05),
-      dark: darken("#1a2331", 0.15),
+      main: darkColors.selection,
+      light: lighten(darkColors.selection, 0.05),
+      dark: darken(darkColors.selection, 0.15),
     },
     selectionAttention: {
-      main: "#352c1f",
-      light: lighten("#352c1f", 0.05),
-      dark: darken("#352c1f", 0.25),
+      main: darkColors.selectionAttention,
+      light: lighten(darkColors.selectionAttention, 0.05),
+      dark: darken(darkColors.selectionAttention, 0.25),
     },
     text: {
       secondary: "rgba(255, 255, 255, 0.4)",
