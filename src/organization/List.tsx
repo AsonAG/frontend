@@ -5,7 +5,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { Form, Link, useLoaderData } from "react-router-dom";
-import { useDocumentTitle } from "usehooks-ts";
+import { useAppDocumentTitle } from "../hooks/useAppDocumentTitle";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../components/ContentLayout";
 import { useRole } from "../user/utils";
@@ -18,7 +18,7 @@ import { Add } from "@mui/icons-material";
 export function OrganizationList() {
 	const organizations = useLoaderData() as Array<Organization>;
 	const { t } = useTranslation();
-	useDocumentTitle(`Ason - ${t("Organizations")}`);
+	useAppDocumentTitle(t("Organizations"));
 	return (
 		<ContentLayout title={t("Select an organization")} buttons={<ButtonStack />}>
 			<Paper>
