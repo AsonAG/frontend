@@ -1,19 +1,16 @@
 import React, { useState, MouseEvent } from "react";
 import { Button, Typography, Menu, MenuItem } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import {
-	Link,
-	useLoaderData,
-} from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { Organization } from "../../models/Organization";
 import { Payroll } from "../../models/Payroll";
 import { useTranslation } from "react-i18next";
 import { useRole } from "../../user/utils";
 
 type LoaderData = {
-	org: Organization,
-	payroll?: Payroll,
-	payrolls: Array<Payroll>
+	org: Organization;
+	payroll?: Payroll;
+	payrolls: Array<Payroll>;
 };
 
 export function PayrollSelector() {
@@ -21,7 +18,8 @@ export function PayrollSelector() {
 	const { org, payroll, payrolls } = useLoaderData() as LoaderData;
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 	const open = Boolean(anchorEl);
-	const handleClick = (event: MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+	const handleClick = (event: MouseEvent<HTMLElement>) =>
+		setAnchorEl(event.currentTarget);
 	const handleClose = () => setAnchorEl(null);
 	const adminTitle = t("Admin");
 	const currentSelection = payroll?.name ?? adminTitle;
@@ -44,23 +42,30 @@ export function PayrollSelector() {
 					},
 				}}
 			>
-				<Typography
-					variant="button"
-					textOverflow="ellipsis"
-					overflow="hidden"
-				>
+				<Typography variant="button" textOverflow="ellipsis" overflow="hidden">
 					{currentSelection}
 				</Typography>
 			</Button>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-				{(isAdmin || isOwner) && <MenuItem component={Link} to={`/orgs/${org.id}/settings`} onClick={handleClose}>{adminTitle}</MenuItem>}
-				{
-					payrolls.map(payroll => (
-						<MenuItem key={payroll.id} component={Link} to={`/orgs/${org.id}/payrolls/${payroll.id}`} onClick={handleClose}>
-							{payroll.name}
-						</MenuItem>
-					))
-				}
+				{(isAdmin || isOwner) && (
+					<MenuItem
+						component={Link}
+						to={`/orgs/${org.id}/settings`}
+						onClick={handleClose}
+					>
+						{adminTitle}
+					</MenuItem>
+				)}
+				{payrolls.map((payroll) => (
+					<MenuItem
+						key={payroll.id}
+						component={Link}
+						to={`/orgs/${org.id}/payrolls/${payroll.id}`}
+						onClick={handleClose}
+					>
+						{payroll.name}
+					</MenuItem>
+				))}
 			</Menu>
 		</>
 	);

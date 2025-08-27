@@ -14,9 +14,9 @@ import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 
 type DatePickerInputAdornmentProps = {
-	handleBack: MouseEventHandler
-	handleForward: MouseEventHandler
-	disabled?: boolean
+	handleBack: MouseEventHandler;
+	handleForward: MouseEventHandler;
+	disabled?: boolean;
 } & InputAdornmentProps;
 
 function DatePickerInputAdornment({
@@ -50,8 +50,10 @@ interface DateTimePickerProps extends MuiDateTimePickerProps<Dayjs> {
 
 type DatePickerVariants = "standard" | "datetime" | "month" | "year";
 
-type Props<T> = (T extends "datetime" ? DateTimePickerProps : DatePickerProps) & {
-	minDateErrorMessage?: string
+type Props<T> = (T extends "datetime"
+	? DateTimePickerProps
+	: DatePickerProps) & {
+	minDateErrorMessage?: string;
 };
 
 export function DatePicker<T extends DatePickerVariants>({
@@ -75,7 +77,12 @@ export function DatePicker<T extends DatePickerVariants>({
 			DateValidationError | DateTimeValidationError
 		>,
 	) => {
-		setValidationError(getValidationError({ validationError: context.validationError, minDateErrorMessage }));
+		setValidationError(
+			getValidationError({
+				validationError: context.validationError,
+				minDateErrorMessage,
+			}),
+		);
 		const isValid = newDate === null || newDate.isValid();
 		if (isValid && onChange) {
 			// @ts-ignore
@@ -113,11 +120,10 @@ export function DatePicker<T extends DatePickerVariants>({
 					// @ts-ignore
 					handleBack: () => setNewValue(value?.subtract(1, "month")),
 					handleForward: () => setNewValue(value?.add(1, "month")),
-					disabled: datePickerProps.disabled
+					disabled: datePickerProps.disabled,
 				},
 			};
-		}
-		else {
+		} else {
 			// @ts-ignore
 			pickerProps.format = "MMM YYYY";
 		}
@@ -140,7 +146,7 @@ export function DatePicker<T extends DatePickerVariants>({
 			inputRef.current?.setCustomValidity("");
 			return;
 		}
-		let error = ""
+		let error = "";
 		if (!value) {
 			error = t("Please enter a date");
 		}
@@ -163,10 +169,13 @@ export function DatePicker<T extends DatePickerVariants>({
 }
 
 type GetValidationErrorProps = {
-	validationError: DateTimeValidationError
-	minDateErrorMessage?: string
-}
-function getValidationError({ validationError, minDateErrorMessage }: GetValidationErrorProps) {
+	validationError: DateTimeValidationError;
+	minDateErrorMessage?: string;
+};
+function getValidationError({
+	validationError,
+	minDateErrorMessage,
+}: GetValidationErrorProps) {
 	if (validationError === "minDate") {
 		return minDateErrorMessage ?? "Date is not in the valid range.";
 	}

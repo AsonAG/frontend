@@ -14,7 +14,7 @@ function usePageSearchParam(): [number, (number: number) => void] {
 	const setPage = (pageNumber: number) =>
 		setSearchParams((o) => {
 			const updated = new URLSearchParams(o);
-			updated.set(parameterName, pageNumber + '');
+			updated.set(parameterName, pageNumber + "");
 			return updated;
 		});
 	const page = searchParams.get(parameterName) || 1;

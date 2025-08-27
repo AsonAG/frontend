@@ -13,7 +13,7 @@ function mapCase(_case, attachments) {
 			documents: attachments[f.id],
 			tags: f.valueTags,
 			attributes: f.valueAttributes,
-		}))
+		})),
 	};
 }
 
@@ -28,8 +28,13 @@ export function useCaseData(params, payroll) {
 	let [endDate, setEndDate] = useState(null);
 
 	const isReadonlyCase = useMemo(
-		() => caseData?.fields.every(field => field.valueType === "None" || field.valueType === "WebResource") ?? true, [caseData]);
-
+		() =>
+			caseData?.fields.every(
+				(field) =>
+					field.valueType === "None" || field.valueType === "WebResource",
+			) ?? true,
+		[caseData],
+	);
 
 	useEffect(() => {
 		const loadData = async () => {
@@ -47,7 +52,7 @@ export function useCaseData(params, payroll) {
 			divisionId: payroll.divisionId,
 			case: mapCase(caseData, attachments),
 			start: startDate?.toISOString(),
-			end: endDate?.toISOString()
+			end: endDate?.toISOString(),
 		};
 		if (params.employeeId) {
 			caseChangeSetup.employeeId = params.employeeId;
@@ -57,7 +62,9 @@ export function useCaseData(params, payroll) {
 
 	async function handleError(caseResponse) {
 		if (caseResponse.status === 404) {
-			setFatalError(new Error("The event does not exist or you do not have permission."));
+			setFatalError(
+				new Error("The event does not exist or you do not have permission."),
+			);
 			return;
 		}
 		const response = await caseResponse.json();

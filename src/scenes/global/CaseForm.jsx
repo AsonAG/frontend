@@ -21,11 +21,10 @@ import { useAccountingPeriodDateLimit } from "../../components/case/useAccountin
 
 export const CaseFormContext = createContext();
 
-
 export function Component() {
 	const params = useParams();
 	const key = `${params.tenantId}-${params.payrollId}-${params.employeeId}-${params.caseName}`;
-	return <CaseForm key={key} />
+	return <CaseForm key={key} />;
 }
 
 function CaseForm() {
@@ -58,7 +57,7 @@ function CaseForm() {
 			addCase(() => {
 				toast("success", "Saved!");
 				navigate(redirectPath, { relative: "path", state: "case_added" });
-			})
+			});
 		}
 	};
 	const renderFieldPeriods = caseData?.periodInputMode === "Individual";
@@ -69,16 +68,50 @@ function CaseForm() {
 		content = <Loading />;
 	} else {
 		content = (
-			<CaseFormContext.Provider value={{ buildCase, attachments, setCaseFieldDetails, renderFieldPeriods }}>
+			<CaseFormContext.Provider
+				value={{
+					buildCase,
+					attachments,
+					setCaseFieldDetails,
+					renderFieldPeriods,
+				}}
+			>
 				<Form method="post" ref={formRef} id="case_form" autoComplete="off">
 					<Stack alignItems="stretch" spacing={4}>
 						{caseData && <CaseComponent _case={caseData} />}
 						<CaseErrorComponent errors={caseErrors} />
-						<Stack spacing={2} justifyContent="end" alignItems="end" direction="row" flexWrap="wrap">
-							<PeriodPicker variant={caseData.attributes?.["input.datePicker"] === "month" ? "month-short" : "standard"} inputMode={caseData.periodInputMode} startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
-							<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} submitting={submitting} isReadonlyCase={isReadonlyCase} />
-						</Stack >
-						{caseFieldDetails && <CaseFieldDetails caseField={caseFieldDetails} onClose={() => setCaseFieldDetails(null)} />}
+						<Stack
+							spacing={2}
+							justifyContent="end"
+							alignItems="end"
+							direction="row"
+							flexWrap="wrap"
+						>
+							<PeriodPicker
+								variant={
+									caseData.attributes?.["input.datePicker"] === "month"
+										? "month-short"
+										: "standard"
+								}
+								inputMode={caseData.periodInputMode}
+								startDate={startDate}
+								setStartDate={setStartDate}
+								endDate={endDate}
+								setEndDate={setEndDate}
+							/>
+							<CaseFormButtons
+								onSubmit={handleSubmit}
+								backPath={redirectPath}
+								submitting={submitting}
+								isReadonlyCase={isReadonlyCase}
+							/>
+						</Stack>
+						{caseFieldDetails && (
+							<CaseFieldDetails
+								caseField={caseFieldDetails}
+								onClose={() => setCaseFieldDetails(null)}
+							/>
+						)}
 					</Stack>
 				</Form>
 			</CaseFormContext.Provider>
@@ -92,7 +125,14 @@ function CaseForm() {
 	);
 }
 
-function PeriodPicker({ inputMode, variant, startDate, setStartDate, endDate, setEndDate }) {
+function PeriodPicker({
+	inputMode,
+	variant,
+	startDate,
+	setStartDate,
+	endDate,
+	setEndDate,
+}) {
 	const { t } = useTranslation();
 	const startPickerProps = useAccountingPeriodDateLimit();
 	const endPickerProps = useAccountingPeriodDateLimit();
@@ -105,7 +145,9 @@ function PeriodPicker({ inputMode, variant, startDate, setStartDate, endDate, se
 			value={startDate}
 			variant={variant}
 			required
-			onChange={(s => setStartDate(variant === "month-short" ? s.startOf("month") : s))}
+			onChange={(s) =>
+				setStartDate(variant === "month-short" ? s.startOf("month") : s)
+			}
 			name="case_change_valid_from"
 			{...startPickerProps}
 		/>
@@ -118,17 +160,18 @@ function PeriodPicker({ inputMode, variant, startDate, setStartDate, endDate, se
 				value={endDate}
 				variant={variant}
 				required
-				onChange={(e => setEndDate(variant === "month-short" ? e.endOf("month") : e))}
+				onChange={(e) =>
+					setEndDate(variant === "month-short" ? e.endOf("month") : e)
+				}
 				name="case_change_valid_until"
 				{...endPickerProps}
 			/>
-		)
+		);
 	}
 	return (
 		<Stack direction="row" spacing={2}>
 			{startPicker}
 			{endPicker}
 		</Stack>
-	)
-
+	);
 }

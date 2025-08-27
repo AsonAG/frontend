@@ -4,9 +4,9 @@ import { DashboardHeader } from "./DashboardHeader";
 import { PeriodDocuments } from "./PeriodDocuments";
 
 export function ClosedPeriodDocuments() {
-  return (
-    <ContentLayout title={<DashboardHeader />}>
-      <PeriodDocuments />
-    </ContentLayout>
-  )
+	return (
+		<ContentLayout title={<DashboardHeader />}>
+			<PeriodDocuments />
+		</ContentLayout>
+	);
 }

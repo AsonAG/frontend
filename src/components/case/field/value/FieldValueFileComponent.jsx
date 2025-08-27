@@ -60,16 +60,16 @@ export function FieldValueFileComponent() {
 					),
 					classes: {
 						adornedStart: "file-upload-adorned-start",
-					}
+					},
 				},
 				htmlInput: {
 					multiple: true,
 					accept: extensions,
-					id: fileUploadId
+					id: fileUploadId,
 				},
 				inputLabel: {
-					shrink: true
-				}
+					shrink: true,
+				},
 			}}
 			sx={{
 				flex: 1,

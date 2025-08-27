@@ -116,7 +116,7 @@ function GeneralPreview({ url }) {
 				border: "none",
 				objectFit: "contain",
 				...layoutSx,
-				p: 0
+				p: 0,
 			}}
 		>
 			<Centered>

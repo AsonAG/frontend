@@ -1,4 +1,11 @@
-import { FormControl, FormControlLabel, Checkbox, Switch as MuiSwitch, styled, Box } from "@mui/material";
+import {
+	FormControl,
+	FormControlLabel,
+	Checkbox,
+	Switch as MuiSwitch,
+	styled,
+	Box,
+} from "@mui/material";
 import { useContext } from "react";
 import { FieldContext } from "../Field";
 import { useTranslation } from "react-i18next";
@@ -44,56 +51,67 @@ function Switch({ checked, disabled, ...props }) {
 				disableRipple
 				{...props}
 			/>
-			<Box component="span" sx={getLabelSx("right", disabled)}>{checked ? '' : t("No")}</Box>
-			<Box component="span" sx={getLabelSx("left", disabled)}>{checked ? t("Yes") : ''}</Box>
-		</Box>)
+			<Box component="span" sx={getLabelSx("right", disabled)}>
+				{checked ? "" : t("No")}
+			</Box>
+			<Box component="span" sx={getLabelSx("left", disabled)}>
+				{checked ? t("Yes") : ""}
+			</Box>
+		</Box>
+	);
 }
-
 
 const LabelSwitch = styled(MuiSwitch)(({ theme, disabled }) => ({
 	height: 22,
 	padding: 0,
-	position: 'relative',
-	'& .MuiSwitch-switchBase': {
+	position: "relative",
+	"& .MuiSwitch-switchBase": {
 		padding: 0,
 		margin: 2,
-		transitionDuration: '300ms',
-		'&.Mui-checked': {
-			transform: 'translateX(36px)',
-			'& + .MuiSwitch-track': {
-				backgroundColor: disabled ? theme.palette.action.disabledBackground : theme.palette.primary.main,
+		transitionDuration: "300ms",
+		"&.Mui-checked": {
+			transform: "translateX(36px)",
+			"& + .MuiSwitch-track": {
+				backgroundColor: disabled
+					? theme.palette.action.disabledBackground
+					: theme.palette.primary.main,
 				opacity: 1,
 				border: 0,
 			},
 		},
 	},
-	'& .MuiSwitch-thumb': {
-		backgroundColor: disabled ? theme.palette.action.disabled : theme.palette.common.white,
+	"& .MuiSwitch-thumb": {
+		backgroundColor: disabled
+			? theme.palette.action.disabled
+			: theme.palette.common.white,
 		width: 18,
 		height: 18,
 		borderRadius: "50%",
-		position: 'relative',
+		position: "relative",
 		zIndex: 1,
 	},
-	'& .MuiSwitch-track': {
+	"& .MuiSwitch-track": {
 		borderRadius: 30,
-		backgroundColor: disabled ? theme.palette.action.disabledBackground : `rgba(${theme.vars.palette.common.onBackgroundChannel} / 0.35)`,
+		backgroundColor: disabled
+			? theme.palette.action.disabledBackground
+			: `rgba(${theme.vars.palette.common.onBackgroundChannel} / 0.35)`,
 		opacity: "1 !important",
-		transition: theme.transitions.create(['background-color'], {
+		transition: theme.transitions.create(["background-color"], {
 			duration: 300,
 		}),
-		position: 'relative',
-	}
+		position: "relative",
+	},
 }));
 
 function getLabelSx(edge, disabled) {
 	return {
 		[edge]: 0,
-		position: 'absolute',
+		position: "absolute",
 		px: 1,
 		lineHeight: "22px",
-		fontSize: '12px',
-		color: theme => disabled ? theme.palette.action.disabled : theme.palette.common.white,
-		pointerEvents: 'none'
+		fontSize: "12px",
+		color: (theme) =>
+			disabled ? theme.palette.action.disabled : theme.palette.common.white,
+		pointerEvents: "none",
 	};
 }

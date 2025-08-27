@@ -7,37 +7,46 @@ import { MissingData } from "../models/MissingData";
 import { useTranslation } from "react-i18next";
 
 export function DataView() {
-  return (
-    <Stack spacing={2}>
-      <MissingDataButtons />
-      <DataTable />
-    </Stack>
-  )
+	return (
+		<Stack spacing={2}>
+			<MissingDataButtons />
+			<DataTable />
+		</Stack>
+	);
 }
 
 type LoaderData = {
-  missingData?: MissingData
-}
+	missingData?: MissingData;
+};
 
 function MissingDataButtons() {
-  const { t } = useTranslation();
-  const { missingData } = useLoaderData() as LoaderData;
+	const { t } = useTranslation();
+	const { missingData } = useLoaderData() as LoaderData;
 
-  const missingDataCount = missingData?.cases?.length ?? 0;
-  if (missingDataCount === 0) {
-    return;
-  }
+	const missingDataCount = missingData?.cases?.length ?? 0;
+	if (missingDataCount === 0) {
+		return;
+	}
 
-  return (
-    <Stack direction="row" spacing={1}>
-      <Tooltip title={t("Missing data")}>
-        <Warning color="warning" sx={{ height: 28, width: 23, mr: 0.25 }} />
-      </Tooltip>
-      <Stack direction="row" flexWrap="wrap" spacing={1}>
-        {missingData?.cases?.map(_case => (
-          <Button key={_case.id} component={Link} to={`../missingdata/${encodeURIComponent(_case.name)}`} variant="outlined" color="warning" size="small">{_case.displayName}</Button>
-        ))}
-      </Stack>
-    </Stack>
-  );
+	return (
+		<Stack direction="row" spacing={1}>
+			<Tooltip title={t("Missing data")}>
+				<Warning color="warning" sx={{ height: 28, width: 23, mr: 0.25 }} />
+			</Tooltip>
+			<Stack direction="row" flexWrap="wrap" spacing={1}>
+				{missingData?.cases?.map((_case) => (
+					<Button
+						key={_case.id}
+						component={Link}
+						to={`../missingdata/${encodeURIComponent(_case.name)}`}
+						variant="outlined"
+						color="warning"
+						size="small"
+					>
+						{_case.displayName}
+					</Button>
+				))}
+			</Stack>
+		</Stack>
+	);
 }

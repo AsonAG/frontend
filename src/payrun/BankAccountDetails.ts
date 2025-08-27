@@ -1,5 +1,4 @@
 export type BankAccountDetails = {
-  iban: string | undefined
-  accountName: string | undefined
-}
-
+	iban: string | undefined;
+	accountName: string | undefined;
+};

@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { FieldValueDateComponent, getDatePickerVariant } from "./value/FieldValueDateComponent";
+import {
+	FieldValueDateComponent,
+	getDatePickerVariant,
+} from "./value/FieldValueDateComponent";
 import { useAccountingPeriodDateLimit } from "../useAccountingPeriodDateLimit";
 
 export function FieldPeriodSelector({ field }) {
@@ -17,7 +20,11 @@ export function FieldPeriodSelector({ field }) {
 		<>
 			<FieldValueDateComponent
 				propertyName="start"
-				variant={getDatePickerVariant(field.attributes?.["input.datePickerStart"], undefined, "month-short")}
+				variant={getDatePickerVariant(
+					field.attributes?.["input.datePickerStart"],
+					undefined,
+					"month-short",
+				)}
 				displayName={t("Start")}
 				required={!field.optional}
 				{...startPickerProps}
@@ -25,7 +32,11 @@ export function FieldPeriodSelector({ field }) {
 			{field.timeType !== "Moment" && (
 				<FieldValueDateComponent
 					propertyName="end"
-					variant={getDatePickerVariant(field.attributes?.["input.datePickerEnd"], undefined, "month-short")}
+					variant={getDatePickerVariant(
+						field.attributes?.["input.datePickerEnd"],
+						undefined,
+						"month-short",
+					)}
 					displayName={t("End")}
 					required={!field.optional && field.endMandatory}
 					{...endPickerProps}

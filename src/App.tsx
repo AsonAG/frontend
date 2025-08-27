@@ -31,7 +31,9 @@ import { toastNotificationAtom } from "./utils/dataAtoms";
 import { useRole } from "./user/utils";
 
 export function App({ renderDrawer = false }) {
-	const useTemporaryDrawer = useMediaQuery(theme => theme.breakpoints.down("lg"));
+	const useTemporaryDrawer = useMediaQuery((theme) =>
+		theme.breakpoints.down("lg"),
+	);
 
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -60,7 +62,16 @@ export function App({ renderDrawer = false }) {
 				</Topbar>
 				<Stack id="content" direction="row" sx={{ flex: 1, minWidth: 0 }}>
 					<MainContainer />
-					<Box id="sidebar-container" sx={{ px: 3, maxWidth: 485, borderLeftColor: "divider", borderLeftStyle: "solid", borderLeftWidth: "thin" }} />
+					<Box
+						id="sidebar-container"
+						sx={{
+							px: 3,
+							maxWidth: 485,
+							borderLeftColor: "divider",
+							borderLeftStyle: "solid",
+							borderLeftWidth: "thin",
+						}}
+					/>
 				</Stack>
 			</Stack>
 			<Snackbar />
@@ -77,12 +88,14 @@ function MainContainer() {
 		<Container component="main" maxWidth="lg" sx={mainContainerProps}>
 			<Outlet />
 		</Container>
-	)
+	);
 }
 
 function Snackbar() {
 	const { t } = useTranslation();
-	const [toastNotification, setToastNotification] = useAtom(toastNotificationAtom);
+	const [toastNotification, setToastNotification] = useAtom(
+		toastNotificationAtom,
+	);
 	const handleClose = () => setToastNotification(null);
 
 	if (toastNotification === null) return null;
@@ -95,7 +108,9 @@ function Snackbar() {
 			autoHideDuration={5000}
 		>
 			<Alert severity={toastNotification.severity} variant="filled">
-				<Typography>{t(toastNotification.message, toastNotification.messageArgs)}</Typography>
+				<Typography>
+					{t(toastNotification.message, toastNotification.messageArgs)}
+				</Typography>
 			</Alert>
 		</MuiSnackbar>
 	);
@@ -108,7 +123,7 @@ function RenderProductionBanner() {
 	const isInstanceAdmin = useRole("InstanceAdmin");
 	useEffect(() => {
 		const value = isInstanceAdmin ? "' '" : null;
-		document.documentElement.style.setProperty('--production', value);
+		document.documentElement.style.setProperty("--production", value);
 	}, [isInstanceAdmin]);
 	return null;
 }

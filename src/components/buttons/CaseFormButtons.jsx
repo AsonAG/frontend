@@ -12,9 +12,16 @@ const iconProps = {
 	},
 };
 
-export function CaseFormButtons({ backPath, onSubmit, submitting, isReadonlyCase }) {
+export function CaseFormButtons({
+	backPath,
+	onSubmit,
+	submitting,
+	isReadonlyCase,
+}) {
 	const navigation = useNavigation();
-	const redirecting = navigation.state === "loading" && navigation.location.state === "case_added";
+	const redirecting =
+		navigation.state === "loading" &&
+		navigation.location.state === "case_added";
 	const processing = submitting || redirecting;
 	const icon = processing ? (
 		<CircularProgress {...iconProps} />
@@ -28,7 +35,7 @@ export function CaseFormButtons({ backPath, onSubmit, submitting, isReadonlyCase
 			<Button disableRipple LinkComponent={Link} to={backPath} relative="path">
 				<Typography>{t("Cancel")}</Typography>
 			</Button>
-			{!isReadonlyCase &&
+			{!isReadonlyCase && (
 				<Button
 					disabled={processing}
 					disableRipple
@@ -42,7 +49,7 @@ export function CaseFormButtons({ backPath, onSubmit, submitting, isReadonlyCase
 						{t("Save")}
 					</Typography>
 				</Button>
-			}
+			)}
 		</Stack>
 	);
 }

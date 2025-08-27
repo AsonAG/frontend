@@ -43,7 +43,7 @@ root.render(
 	</React.StrictMode>,
 );
 
-function AppScaffold({children}: PropsWithChildren) {
+function AppScaffold({ children }: PropsWithChildren) {
 	const theme = useCreateTheme();
 	const user = useAtomValue(userAtom);
 	const { i18n } = useTranslation();
@@ -57,12 +57,14 @@ function AppScaffold({children}: PropsWithChildren) {
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
-			<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale(user)}>
+			<LocalizationProvider
+				dateAdapter={AdapterDayjs}
+				adapterLocale={getDateLocale(user)}
+			>
 				{children}
 			</LocalizationProvider>
 		</ThemeProvider>
-
-	)
+	);
 }
 
 // If you want to start measuring performance in your app, pass a function

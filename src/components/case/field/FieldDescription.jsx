@@ -17,7 +17,7 @@ const ButtonBox = styled("button")(({ theme }) =>
 		alignItems: "center",
 		color: theme.palette.text.secondary,
 		backgroundColor: theme.palette.background.default,
-		cursor: "pointer"
+		cursor: "pointer",
 	}),
 );
 
@@ -34,12 +34,12 @@ export function FieldDetails() {
 	}
 
 	return (
-		<Tooltip
-			arrow
-			title={t("Details")}
-			placement="right"
-		>
-			<ButtonBox type="button" tabIndex={-1} onClick={() => setCaseFieldDetails(field)}>
+		<Tooltip arrow title={t("Details")} placement="right">
+			<ButtonBox
+				type="button"
+				tabIndex={-1}
+				onClick={() => setCaseFieldDetails(field)}
+			>
 				<Info />
 			</ButtonBox>
 		</Tooltip>

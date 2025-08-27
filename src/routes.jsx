@@ -79,7 +79,7 @@ import {
 	acceptInvitation,
 	removeUserFromOrganization,
 	withdrawUserMembershipInvitationToOrganization,
-	saveOrganizationUserMembership
+	saveOrganizationUserMembership,
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -108,13 +108,17 @@ import {
 	refreshPayrollWageTypes,
 	payrollWageTypesAtom,
 	payrollWageTypeSettingsAtom,
-	userMembershipAtom
+	userMembershipAtom,
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
 import { MissingDataView } from "./components/MissingDataView";
 import { EmployeeForm } from "./components/EmployeeForm";
-import { ContentLayout, withPage, withSuspense } from "./components/ContentLayout";
+import {
+	ContentLayout,
+	withPage,
+	withSuspense,
+} from "./components/ContentLayout";
 import { NewTaskView } from "./components/NewTaskView";
 import { OrganizationImport } from "./organization/Import";
 import { OrganizationSettings } from "./organization/Settings";
@@ -201,20 +205,24 @@ function createRouteCaseForm(path, data) {
 				loader: ({ request, params }) => {
 					const top = getQueryParam(request, "top");
 					return getCaseChangeCaseValues(params, top);
-				}
-			}
-		]
+				},
+			},
+		],
 	};
 }
 
 function createRouteLookupForm(path, lookupName, keyName, loader) {
 	const defaultLoader = async ({ params }) => {
 		const regulation = await store.get(clientRegulationAtom);
-		if (!regulation)
-			return null;
-		const lookup = await getLookupSet({ regulationId: regulation.id, ...params }, lookupName);
+		if (!regulation) return null;
+		const lookup = await getLookupSet(
+			{ regulationId: regulation.id, ...params },
+			lookupName,
+		);
 		const payrollLookup = await getLookupValues(params, lookupName);
-		const clientLookupMap = new Map((lookup.values ?? []).map(value => [value.key, value]));
+		const clientLookupMap = new Map(
+			(lookup.values ?? []).map((value) => [value.key, value]),
+		);
 		return {
 			lookup,
 			clientLookupMap,
@@ -245,7 +253,7 @@ function createRouteLookupForm(path, lookupName, keyName, loader) {
 				case "POST":
 					action = addLookupValue(actionParams, {
 						key: formData.get("key"),
-						value: formData.get("value")
+						value: formData.get("value"),
 					});
 					successMessage = "Created!";
 					break;
@@ -253,7 +261,7 @@ function createRouteLookupForm(path, lookupName, keyName, loader) {
 					action = updateLookupValue(actionParams, {
 						id: formData.get("lookupValueId"),
 						key: formData.get("key"),
-						value: formData.get("value")
+						value: formData.get("value"),
 					});
 					successMessage = "Updated!";
 					break;
@@ -278,13 +286,23 @@ function createRouteLookupForm(path, lookupName, keyName, loader) {
 }
 
 function createRouteDocument(showTitle) {
-	const Component = showTitle ? withPage("Documents", DocumentTable) : DocumentTable;
+	const Component = showTitle
+		? withPage("Documents", DocumentTable)
+		: DocumentTable;
 	const loader = async ({ params }) => {
-		const documentCases = await (params.employeeId ? getEmployeeCases : getCompanyCases)(params, "DOC");
+		const documentCases = await (
+			params.employeeId ? getEmployeeCases : getCompanyCases
+		)(params, "DOC");
 		if (documentCases) {
-			documentCases.sort(((a, b) => a.attributes?.["tag.order"] - b.attributes?.["tag.order"]));
-			const caseFieldNames = documentCases.flatMap(c => c.caseFields.map(cf => cf.name));
-			const caseValues = await Promise.all(caseFieldNames.map(name => getDocumentsOfCaseField(params, name)));
+			documentCases.sort(
+				(a, b) => a.attributes?.["tag.order"] - b.attributes?.["tag.order"],
+			);
+			const caseFieldNames = documentCases.flatMap((c) =>
+				c.caseFields.map((cf) => cf.name),
+			);
+			const caseValues = await Promise.all(
+				caseFieldNames.map((name) => getDocumentsOfCaseField(params, name)),
+			);
 			let values = {};
 			for (let i = 0; i < caseFieldNames.length; i++) {
 				values[caseFieldNames[i]] = caseValues[i];
@@ -292,12 +310,12 @@ function createRouteDocument(showTitle) {
 
 			return {
 				values,
-				data: documentCases
-			}
+				data: documentCases,
+			};
 		}
 		return {
 			data: documentCases,
-			values: []
+			values: [],
 		};
 	};
 	return {
@@ -310,7 +328,7 @@ function createRouteDocument(showTitle) {
 				loader: ({ params, request }) => {
 					const top = getQueryParam(request, "top");
 					return getDocumentsOfCaseField(params, params.caseFieldName, top);
-				}
+				},
 			},
 			{
 				path: ":caseValueId/i/:documentId",
@@ -318,7 +336,7 @@ function createRouteDocument(showTitle) {
 				action: async ({ params }) => {
 					const response = await deleteDocument(params);
 					if (response.ok) {
-						toast("success", "Document deleted")
+						toast("success", "Document deleted");
 					} else {
 						toast("error", "Could not delete document");
 					}
@@ -330,7 +348,7 @@ function createRouteDocument(showTitle) {
 					});
 				},
 			},
-		]
+		],
 	};
 }
 
@@ -340,14 +358,20 @@ function createRouteDataView(path, getData) {
 		Component: DataView,
 		loader: async (props) => {
 			const { params } = props;
-			const dataCasesPromise = (params.employeeId ? getEmployeeCases(params, "ED") : getCompanyCases(params, "CD"));
-			const [values, valueCounts, dataCases] = await Promise.all([getCurrentValues(params), getCaseValueCount(params, 2), dataCasesPromise]);
+			const dataCasesPromise = params.employeeId
+				? getEmployeeCases(params, "ED")
+				: getCompanyCases(params, "CD");
+			const [values, valueCounts, dataCases] = await Promise.all([
+				getCurrentValues(params),
+				getCaseValueCount(params, 2),
+				dataCasesPromise,
+			]);
 			const injectedData = await getData(props);
 			return {
 				...injectedData,
 				values,
 				valueCounts,
-				dataCases
+				dataCases,
 			};
 		},
 		children: [
@@ -356,9 +380,9 @@ function createRouteDataView(path, getData) {
 				Component: DataValueHistory,
 				loader: ({ params }) => {
 					return getCaseChangeCaseValues(params);
-				}
-			}
-		]
+				},
+			},
+		],
 	};
 }
 
@@ -371,7 +395,7 @@ function createRouteEmployeeTable(path, showButtons = true) {
 				showButtons,
 				data: getPayrollEmployees(params).fetchJson(),
 			});
-		}
+		},
 	};
 }
 
@@ -416,7 +440,9 @@ function createRouteEmployeeNew(path, createUrlRedirect) {
 		loader: async ({ params }) => {
 			const divisions = await getDivisions(params);
 			const payroll = await store.get(payrollAtom);
-			const selectedDivisions = !!payroll ? [divisions.find(d => d.id === payroll.divisionId).name] : [];
+			const selectedDivisions = !!payroll
+				? [divisions.find((d) => d.id === payroll.divisionId).name]
+				: [];
 			return { divisions, selectedDivisions };
 		},
 		action: async ({ params, request }) => {
@@ -425,7 +451,7 @@ function createRouteEmployeeNew(path, createUrlRedirect) {
 				identifier: formData.get("identifier"),
 				firstName: formData.get("firstName"),
 				lastName: formData.get("lastName"),
-				divisions: formData.getAll("divisions")
+				divisions: formData.getAll("divisions"),
 			});
 
 			if (response.status === 201) {
@@ -449,15 +475,14 @@ function createRoutePayrunPeriodDocument() {
 		path: ":payrunPeriodId/doc/:documentId",
 		Component: CaseValueDocumentDialog,
 		loader: async ({ params, request }) => {
-			const report = getQueryParam(request, "report")
-			const variant = getQueryParam(request, "variant")
+			const report = getQueryParam(request, "report");
+			const variant = getQueryParam(request, "variant");
 			return defer({
 				document: getPayrunPeriodDocument(params, report, variant),
 			});
-		}
-	}
+		},
+	};
 }
-
 
 function createRouteCaseForms(path) {
 	return [
@@ -467,28 +492,28 @@ function createRouteCaseForms(path) {
 			loader: async ({ params }) => {
 				const employee = await getEmployee(params);
 				return {
-					title: getEmployeeDisplayString(employee)
+					title: getEmployeeDisplayString(employee),
 				};
 			},
 			children: [
 				createRouteCaseForm("new/:caseName", {
-					redirect: "../../../.."
-				})
+					redirect: "../../../..",
+				}),
 			],
 		},
 		{
 			path: `${path}/company`,
 			Component: ContentLayout,
 			loader: () => ({
-				title: "Company"
+				title: "Company",
 			}),
 			children: [
 				createRouteCaseForm("new/:caseName", {
-					redirect: "../../.."
-				})
+					redirect: "../../..",
+				}),
 			],
 		},
-	]
+	];
 }
 
 const routeData = [
@@ -512,18 +537,18 @@ const routeData = [
 					}
 					return orgs;
 				},
-				action: async ({request}) => {
+				action: async ({ request }) => {
 					const formData = await request.formData();
 					const response = await createOrganization(formData.get("org_name"));
 					if (response.ok) {
 						toast("success", "Organization created");
 						const org = await response.json();
-						return redirect(org.id)
+						return redirect(org.id);
 					} else {
 						toast("error", "Organization creation failed");
 					}
 					return null;
-				}
+				},
 			},
 			{
 				path: "orgs/import",
@@ -535,8 +560,7 @@ const routeData = [
 						const body = await response.json();
 						toast("success", "Organization imported");
 						return redirect(`../orgs/${body}/payrolls`);
-					}
-					else if (response.status === 500) {
+					} else if (response.status === 500) {
 						const body = await response.json();
 						const error = JSON.parse(body);
 						toast("error", error.Message);
@@ -544,8 +568,8 @@ const routeData = [
 						toast("error", "Import was not successful");
 					}
 					return null;
-				}
-			}
+				},
+			},
 		],
 	},
 	{
@@ -562,13 +586,12 @@ const routeData = [
 			{
 				index: true,
 				loader: async () => {
-					const {payrolls} = await getOrganizationData();
+					const { payrolls } = await getOrganizationData();
 					if (!payrolls || payrolls.length === 0) {
 						return redirect("settings/newpayroll");
 					}
 					return redirect("payrolls");
-
-				}
+				},
 			},
 			{
 				path: "settings",
@@ -582,8 +605,7 @@ const routeData = [
 								const name = `${org.identifier}_export.zip`;
 								await requestExportDataDownload({ orgId: params.orgId }, name);
 								toast("success", "Exported organization");
-							}
-							catch {
+							} catch {
 								toast("error", "Organization could not be exported");
 							}
 							return null;
@@ -594,36 +616,49 @@ const routeData = [
 									toast("success", "Organization deleted");
 									return redirect("/orgs");
 								}
-							}
-							catch {
+							} catch {
 								toast("error", "Organization could not be deleted");
 							}
 							return null;
 						default:
 							throw new Error("Invalid intent");
 					}
-				}
+				},
 			},
 			{
 				path: "settings/:payrollId",
 				Component: PayrollSettings,
 				id: "payrollSettings",
 				loader: async ({ params }) => {
-					const [payroll, payrollRegulations, availableRegulations] = await Promise.all([getPayroll(params), getPayrollRegulations(params), getAvailableRegulations()]);
+					const [payroll, payrollRegulations, availableRegulations] =
+						await Promise.all([
+							getPayroll(params),
+							getPayrollRegulations(params),
+							getAvailableRegulations(),
+						]);
 					return { payroll, payrollRegulations, availableRegulations };
 				},
 				action: async ({ params, request }) => {
 					const updatePayrollRequest = await request.json();
-					const updatePayrollResponse = await updatePayroll(params, updatePayrollRequest.payroll);
+					const updatePayrollResponse = await updatePayroll(
+						params,
+						updatePayrollRequest.payroll,
+					);
 					if (!updatePayrollResponse.ok) {
 						toast("error", "Saving failed!");
 						return null;
 					}
 					store.set(payrollsAtom);
 					const payroll = await updatePayrollResponse.json();
-					const setRegulationResponse = await updatePayrollRegulations({ ...params, payrollId: payroll.id }, updatePayrollRequest.regulations);
+					const setRegulationResponse = await updatePayrollRegulations(
+						{ ...params, payrollId: payroll.id },
+						updatePayrollRequest.regulations,
+					);
 					if (!setRegulationResponse.ok) {
-						toast("warning", "Organization unit updated, but setting regulations failed");
+						toast(
+							"warning",
+							"Organization unit updated, but setting regulations failed",
+						);
 						return null;
 					}
 					toast("success", "Data saved!");
@@ -647,12 +682,14 @@ const routeData = [
 							if (!response.ok) {
 								toast("error", "Saving failed!");
 							} else {
-								toast("success", "{{name}} is now live!", { name: payroll.name });
+								toast("success", "{{name}} is now live!", {
+									name: payroll.name,
+								});
 							}
 							return redirect("..");
-						}
-					}
-				]
+						},
+					},
+				],
 			},
 			{
 				path: "settings/newpayroll",
@@ -663,21 +700,30 @@ const routeData = [
 				},
 				action: async ({ params, request }) => {
 					const createPayrollRequest = await request.json();
-					const createPayrollResponse = await createPayroll(params, createPayrollRequest.payroll);
+					const createPayrollResponse = await createPayroll(
+						params,
+						createPayrollRequest.payroll,
+					);
 					if (!createPayrollResponse.ok) {
 						toast("error", "Create of organization unit failed");
 						return response;
 					}
 					store.set(payrollsAtom);
 					const payroll = await createPayrollResponse.json();
-					const setRegulationResponse = await updatePayrollRegulations({ ...params, payrollId: payroll.id }, createPayrollRequest.regulations);
+					const setRegulationResponse = await updatePayrollRegulations(
+						{ ...params, payrollId: payroll.id },
+						createPayrollRequest.regulations,
+					);
 					if (!setRegulationResponse.ok) {
-						toast("warning", "Organization unit created, but setting regulations failed");
+						toast(
+							"warning",
+							"Organization unit created, but setting regulations failed",
+						);
 						return redirect(payroll.id);
 					}
 					toast("success", "Organization unit created");
 					return redirect(`../payrolls/${payroll.id}/company`);
-				}
+				},
 			},
 			{
 				path: "users",
@@ -688,17 +734,29 @@ const routeData = [
 						userMemberships,
 						userMembershipInvitations,
 						employees,
-						payrolls
+						payrolls,
 					] = await Promise.all([
 						getOrganizationUserMemberships(params),
 						getOrganizationUserMembershipInvitations(params),
 						getEmployees(params).fetchJson(),
-						getPayrolls(params)
+						getPayrolls(params),
 					]);
-					const employeeMap = new Map(employees.map(x => [x.id, x]));
-					const employeesWithMemberships = new Set([...userMemberships.map(x => x.employeeId), ...userMembershipInvitations.map(x => x.employeeId)]);
-					const employeesWithoutMemberships = employees.filter(x => !employeesWithMemberships.has(x.id));
-					return { userMemberships, userMembershipInvitations, employees, employeeMap, payrolls, employeesWithoutMemberships };
+					const employeeMap = new Map(employees.map((x) => [x.id, x]));
+					const employeesWithMemberships = new Set([
+						...userMemberships.map((x) => x.employeeId),
+						...userMembershipInvitations.map((x) => x.employeeId),
+					]);
+					const employeesWithoutMemberships = employees.filter(
+						(x) => !employeesWithMemberships.has(x.id),
+					);
+					return {
+						userMemberships,
+						userMembershipInvitations,
+						employees,
+						employeeMap,
+						payrolls,
+						employeesWithoutMemberships,
+					};
 				},
 				children: [
 					{
@@ -706,7 +764,10 @@ const routeData = [
 						Component: UserMembershipEditDialog,
 						action: async ({ params, request }) => {
 							const membership = await request.json();
-							const response = await saveOrganizationUserMembership(params, membership);
+							const response = await saveOrganizationUserMembership(
+								params,
+								membership,
+							);
 							if (response.ok) {
 								toast("success", "Saved!");
 								return redirect("..");
@@ -714,7 +775,7 @@ const routeData = [
 								toast("error", "Something went wrong");
 							}
 							return null;
-						}
+						},
 					},
 					{
 						path: "memberships/:userMembershipId/remove",
@@ -728,13 +789,14 @@ const routeData = [
 								toast("error", "Something went wrong");
 							}
 							return null;
-						}
+						},
 					},
 					{
 						path: "invitations/:invitationId/withdraw",
 						Component: UserMembershipInvitationWithdrawDialogy,
 						action: async ({ params }) => {
-							const response = await withdrawUserMembershipInvitationToOrganization(params);
+							const response =
+								await withdrawUserMembershipInvitationToOrganization(params);
 							if (response.ok) {
 								toast("success", "Invitation has been withdrawn");
 								return redirect("..");
@@ -742,7 +804,7 @@ const routeData = [
 								toast("error", "Something went wrong");
 							}
 							return null;
-						}
+						},
 					},
 					{
 						path: "invite/:employeeId?",
@@ -753,26 +815,33 @@ const routeData = [
 								employeeEmail = await getEmployeeEmail(params);
 							}
 							return {
-								employeeEmail
+								employeeEmail,
 							};
 						},
-						action: async ({params, request}) => {
+						action: async ({ params, request }) => {
 							const invitationRequest = await request.json();
-							const response = await inviteUserToOrganization(params, invitationRequest);
+							const response = await inviteUserToOrganization(
+								params,
+								invitationRequest,
+							);
 							if (response.ok) {
 								const invitation = await response.json();
 								return invitation;
 							} else {
-								response.status === 409 ?
-									toast("error", "{{email}} already belongs to a member of the organization", {email: invitationRequest.email}) :
-									toast("error", "Could not invite user to organization");
+								response.status === 409
+									? toast(
+											"error",
+											"{{email}} already belongs to a member of the organization",
+											{ email: invitationRequest.email },
+										)
+									: toast("error", "Could not invite user to organization");
 							}
 							return null;
-						}
-					}
-				]
+						},
+					},
+				],
 			},
-		]
+		],
 	},
 	{
 		path: "orgs/:orgId/payrolls/:payrollId?",
@@ -795,9 +864,12 @@ const routeData = [
 			{
 				index: true,
 				Component: Dashboard,
-				loader: async ({params}) => {
+				loader: async ({ params }) => {
 					const { userMembership } = await getOrganizationData();
-					const payrollAdmin = isPayrollAdmin(userMembership.role, params.payrollId);
+					const payrollAdmin = isPayrollAdmin(
+						userMembership.role,
+						params.payrollId,
+					);
 					if (payrollAdmin) {
 						return redirect("hr/employees");
 					}
@@ -809,8 +881,14 @@ const routeData = [
 				},
 			},
 			createRouteEmployeeTable("hr/employees"),
-			createRouteEmployeeNew("hr/employees/new", employeeId => `../hr/employees/${employeeId}/data`),
-			createRouteEmployeeEdit("hr/employees/:employeeId/edit", employeeId => `../hr/employees/${employeeId}`),
+			createRouteEmployeeNew(
+				"hr/employees/new",
+				(employeeId) => `../hr/employees/${employeeId}/data`,
+			),
+			createRouteEmployeeEdit(
+				"hr/employees/:employeeId/edit",
+				(employeeId) => `../hr/employees/${employeeId}`,
+			),
 			{
 				path: "hr/employees/:employeeId",
 				Component: EmployeeTabbedView,
@@ -821,11 +899,12 @@ const routeData = [
 					return {
 						pageTitle: getEmployeeDisplayString(employee),
 						isEmployed: employee.isEmployed,
-						missingData: map.get(employee.id)
+						missingData: map.get(employee.id),
 					};
 				},
 				id: "employee",
-				shouldRevalidate: ({ currentUrl, nextUrl }) => currentUrl.pathname !== nextUrl.pathname,
+				shouldRevalidate: ({ currentUrl, nextUrl }) =>
+					currentUrl.pathname !== nextUrl.pathname,
 				ErrorBoundary: ErrorView,
 				children: [
 					{
@@ -833,9 +912,9 @@ const routeData = [
 						Component: AsyncCaseTable,
 						loader: ({ params }) => {
 							return defer({
-								data: getEmployeeCases(params, "NewEvent")
+								data: getEmployeeCases(params, "NewEvent"),
 							});
-						}
+						},
 					},
 					createRouteCaseForm("new/:caseName"),
 					{
@@ -849,13 +928,13 @@ const routeData = [
 									.withQueryParam("searchTerm", search)
 									.withQueryParam("orderBy", "created desc, id")
 									.withQueryParam("substituteLookupCodes", true);
-							}
-						})
+							},
+						}),
 					},
 					createRouteDataView("data", async ({ params }) => {
 						const map = await store.get(missingEmployeeDataMapAtom);
 						return {
-							missingData: map.get(params.employeeId)
+							missingData: map.get(params.employeeId),
 						};
 					}),
 					createRouteDocument(false),
@@ -868,9 +947,9 @@ const routeData = [
 								data: getEmployeeCases(params, "HRCT"),
 								noDataAvailableText: "Data complete.",
 							});
-						}
-					}
-				]
+						},
+					},
+				],
 			},
 			{
 				path: "hr/tasks",
@@ -963,7 +1042,7 @@ const routeData = [
 						data: store.get(missingEmployeeDataMapAtom),
 						title: "Missing data",
 					});
-				}
+				},
 			},
 			...createRouteCaseForms("hr/missingdata"),
 			{
@@ -976,11 +1055,12 @@ const routeData = [
 						loader: paginatedLoader({
 							pageCount: 15,
 							name: "closedPayrunPeriods",
-							getRequestBuilder: async ({ params }) => getClosedPayrunPeriods(params),
+							getRequestBuilder: async ({ params }) =>
+								getClosedPayrunPeriods(params),
 							getLoaderData: async ({ params }) => {
-								return ({
+								return {
 									openPayrunPeriod: getOpenPayrunPeriod(params),
-								})
+								};
 							},
 						}),
 					},
@@ -988,13 +1068,16 @@ const routeData = [
 						path: ":payrunPeriodId",
 						id: "payrunperiod",
 						handle: {
-							newEventRoot: true
+							newEventRoot: true,
 						},
-						shouldRevalidate: ({ nextUrl }) => nextUrl.pathname.endsWith("payrunperiods/open"),
+						shouldRevalidate: ({ nextUrl }) =>
+							nextUrl.pathname.endsWith("payrunperiods/open"),
 						ErrorBoundary: PayrunErrorBoundary,
 						loader: async ({ params }) => {
 							const isOpen = params.payrunPeriodId === "open";
-							const payrunPeriod = isOpen ? await getOpenPayrunPeriod(params) : await getPayrunPeriod(params);
+							const payrunPeriod = isOpen
+								? await getOpenPayrunPeriod(params)
+								: await getPayrunPeriod(params);
 							if (payrunPeriod === null) {
 								throw new Response("Not found", { status: 404 });
 							}
@@ -1004,16 +1087,38 @@ const routeData = [
 								previousPayrunPeriod,
 								controllingData,
 								salaryTypes,
-								bankAccountDetails
+								bankAccountDetails,
 							] = await Promise.all([
 								getPreviousPayrunPeriod(params, payrunPeriod.periodStart),
-								isOpen ? store.get(payrollControllingDataAtom) : { employeeControllingCases: [], companyControllingCases: [] },
-								Promise.all(payrunPeriod.entries.map(e => getEmployeeSalaryType({ ...params, employeeId: e.employeeId }, evalDate))),
-								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {}
+								isOpen
+									? store.get(payrollControllingDataAtom)
+									: {
+											employeeControllingCases: [],
+											companyControllingCases: [],
+										},
+								Promise.all(
+									payrunPeriod.entries.map((e) =>
+										getEmployeeSalaryType(
+											{ ...params, employeeId: e.employeeId },
+											evalDate,
+										),
+									),
+								),
+								isOpen ? getCompanyBankAccountDetails(params, evalDate) : {},
 							]);
-							const salaryTypesSet = [...new Set(salaryTypes)].filter(Boolean).sort();
+							const salaryTypesSet = [...new Set(salaryTypes)]
+								.filter(Boolean)
+								.sort();
 							const payroll = await store.get(payrollAtom);
-							return { payroll, payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes, salaryTypesSet, bankAccountDetails };
+							return {
+								payroll,
+								payrunPeriod,
+								previousPayrunPeriod,
+								controllingData,
+								salaryTypes,
+								salaryTypesSet,
+								bankAccountDetails,
+							};
 						},
 						children: [
 							{
@@ -1024,33 +1129,34 @@ const routeData = [
 									const formData = await request.formData();
 									const payrunPeriodId = formData.get("payrunPeriodId");
 									const payout = JSON.parse(formData.get("payout"));
-									const response1 = await createPayout({ ...params, payrunPeriodId }, payout);
+									const response1 = await createPayout(
+										{ ...params, payrunPeriodId },
+										payout,
+									);
 									// const [response1, response2] = await Promise.all([createPayout({ ...params, payrunPeriodId }, payout), createPayout({ ...params, payrunPeriodId }, payout)]);
 									if (response1.ok) {
-										toast("success", "Payout created")
+										toast("success", "Payout created");
 										const createdPayout = await response1.json();
 										const bytes = base64ToBytes(createdPayout.painFile.content);
-										const blob = new Blob([bytes], { type: createdPayout.painFile.contentType })
+										const blob = new Blob([bytes], {
+											type: createdPayout.painFile.contentType,
+										});
 										await downloadData(blob, getPayoutFileName(createdPayout));
 										return redirect("payouts");
 									}
 									toast("error", "Error while creating the payout");
 									return null;
-								}
+								},
 							},
 							{
 								Component: PayrunDashboard,
-								children: [
-									createRoutePayrunPeriodDocument()
-								]
+								children: [createRoutePayrunPeriodDocument()],
 							},
 							{
 								id: "payrunperiodreview",
 								path: "review",
 								Component: ReviewOpenPeriod,
-								children: [
-									createRoutePayrunPeriodDocument(),
-								],
+								children: [createRoutePayrunPeriodDocument()],
 								shouldRevalidate: () => false,
 								loader: async ({ params }) => {
 									if (!params.payrunPeriodId === "open") {
@@ -1064,19 +1170,22 @@ const routeData = [
 										return response.json();
 									}
 									return defer({
-										documents: errorHandlingPeriodDocuments()
+										documents: errorHandlingPeriodDocuments(),
 									});
 								},
 								action: async ({ params, request }) => {
 									const formData = await request.formData();
 									const payrunPeriodId = formData.get("payrunPeriodId");
-									const closePeriodResponse = await closePayrunPeriod({ ...params, payrunPeriodId });
+									const closePeriodResponse = await closePayrunPeriod({
+										...params,
+										payrunPeriodId,
+									});
 									if (closePeriodResponse.ok) {
 										toast("success", "Payrun period closed");
 										return redirect("..");
 									}
 									toast("error", "Could not close period");
-								}
+								},
 							},
 							{
 								path: "payouts",
@@ -1092,14 +1201,18 @@ const routeData = [
 									const formData = await request.formData();
 									const payrunPeriodId = formData.get("payrunPeriodId");
 									const payoutId = formData.get("payoutId");
-									const response = await cancelPayout({ ...params, payrunPeriodId, payoutId });
+									const response = await cancelPayout({
+										...params,
+										payrunPeriodId,
+										payoutId,
+									});
 									if (response.ok) {
-										toast("success", "Cancelled payout")
+										toast("success", "Cancelled payout");
 									} else {
 										toast("error", "Error while cancelling the payout");
 									}
 									return null;
-								}
+								},
 							},
 							{
 								id: "payrunperioddocuments",
@@ -1108,12 +1221,10 @@ const routeData = [
 								loader: async ({ params }) => {
 									const response = await getPayrunPeriodDocuments(params);
 									return {
-										documents: await response.json()
-									}
+										documents: await response.json(),
+									};
 								},
-								children: [
-									createRoutePayrunPeriodDocument(),
-								]
+								children: [createRoutePayrunPeriodDocument()],
 							},
 							{
 								path: "entries/:payrunPeriodEntryId/events",
@@ -1128,39 +1239,40 @@ const routeData = [
 												const payrunPeriod = await getOpenPayrunPeriod(params);
 												payrunPeriodId = payrunPeriod.id;
 											}
-											return getPayrunPeriodCaseValues({ ...params, payrunPeriodId });
-										}
-									}
-								]
+											return getPayrunPeriodCaseValues({
+												...params,
+												payrunPeriodId,
+											});
+										},
+									},
+								],
 							},
-						]
+						],
 					},
-				]
+				],
 			},
 			...createRouteCaseForms("payrunperiods/:payrunPeriodId"),
 			{
 				path: "company",
 				Component: withSuspense(CompanyTabbedView),
-				shouldRevalidate: ({ currentUrl, nextUrl, actionResult }) => currentUrl.pathname !== nextUrl.pathname || actionResult?.success,
+				shouldRevalidate: ({ currentUrl, nextUrl, actionResult }) =>
+					currentUrl.pathname !== nextUrl.pathname || actionResult?.success,
 				loader: async () => {
 					store.set(missingDataCompanyAtom); // refresh
 					store.set(onboardingCompanyAtom);
 					refreshPayrollWageTypes();
-					const [
-						missingData,
-						onboardingTask,
-						missingWageTypeAccountInfoCount
-					] = await Promise.all([
-						store.get(missingDataCompanyAtom),
-						store.get(onboardingCompanyAtom),
-						store.get(payrollWageTypesWithMissingAccountInfoCountAtom)
-					]);
+					const [missingData, onboardingTask, missingWageTypeAccountInfoCount] =
+						await Promise.all([
+							store.get(missingDataCompanyAtom),
+							store.get(onboardingCompanyAtom),
+							store.get(payrollWageTypesWithMissingAccountInfoCountAtom),
+						]);
 					return {
 						pageTitle: "Company",
 						missingData,
 						missingWageTypeAccountInfoCount,
 						onboardingTaskCount: onboardingTask.length,
-					}
+					};
 				},
 				children: [
 					{
@@ -1173,32 +1285,31 @@ const routeData = [
 						Component: WageTypeControlling,
 						loader: async ({ params }) => {
 							const regulation = await store.get(clientRegulationAtom);
-							if (!regulation)
-								return null;
+							if (!regulation) return null;
 							const [
 								wageTypes,
 								wageTypeSettings,
 								accountMaster,
 								wageTypeControlTypes,
 								wageTypeAttributeTranslations,
-								collectors
+								collectors,
 							] = await Promise.all([
 								store.get(payrollWageTypesAtom),
 								store.get(payrollWageTypeSettingsAtom),
 								getLookupValues(params, "AccountMaster"),
 								getLookupValues(params, "CH.Swissdec.WageTypesControlTypes"),
 								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
-								getPayrollCollectors(params)
+								getPayrollCollectors(params),
 							]);
-							const attributeTranslationMap = new Map(wageTypeAttributeTranslations.values.map(x => [x.key, x]));
+							const attributeTranslationMap = new Map(
+								wageTypeAttributeTranslations.values.map((x) => [x.key, x]),
+							);
 							const controlTypesMap = new Map();
 							for (const value of wageTypeControlTypes.values) {
 								const keys = JSON.parse(value.key);
-								if (!Array.isArray(keys) || keys.length !== 2)
-									continue;
+								if (!Array.isArray(keys) || keys.length !== 2) continue;
 								if (!controlTypesMap.has(keys[0])) {
 									controlTypesMap.set(keys[0], new Map());
-
 								}
 								controlTypesMap.get(keys[0]).set(keys[1], value.value);
 							}
@@ -1208,12 +1319,15 @@ const routeData = [
 								collectors,
 								controlTypesMap,
 								accountMaster,
-								attributeTranslationMap
-							}
+								attributeTranslationMap,
+							};
 						},
 						action: async ({ params, request }) => {
 							const settings = await request.json();
-							const response = await setPayrollWageTypeSettings({ ...params, }, settings);
+							const response = await setPayrollWageTypeSettings(
+								{ ...params },
+								settings,
+							);
 							if (response.ok) {
 								toast("success", "Updated!");
 								return { success: true };
@@ -1221,26 +1335,44 @@ const routeData = [
 								toast("error", "Action failed");
 								return null;
 							}
-						}
+						},
 					},
-					createRouteLookupForm("accountmaster", "AccountMaster", "Account number", async (data, { params }) => {
-						const wageTypeSettings = await store.get(payrollWageTypeSettingsAtom);
-						const canDelete = (key) => {
-							for (const assignment of Object.values(wageTypeSettings?.accountAssignments ?? [])) {
-								if (assignment.creditAccountNumber === key || assignment.debitAccountNumber === key) {
-									return [false, "This account is associated with a wage type"];
+					createRouteLookupForm(
+						"accountmaster",
+						"AccountMaster",
+						"Account number",
+						async (data, { params }) => {
+							const wageTypeSettings = await store.get(
+								payrollWageTypeSettingsAtom,
+							);
+							const canDelete = (key) => {
+								for (const assignment of Object.values(
+									wageTypeSettings?.accountAssignments ?? [],
+								)) {
+									if (
+										assignment.creditAccountNumber === key ||
+										assignment.debitAccountNumber === key
+									) {
+										return [
+											false,
+											"This account is associated with a wage type",
+										];
+									}
 								}
-							}
-							return [true, null];
-						}
-						return {
-							...data,
-							canDelete
-						}
-					}),
-					createRouteLookupForm("costcentermaster", "CostCenterMaster", "Cost center"),
-					createRouteCaseForm("onboarding/:caseName", {
-					}),
+								return [true, null];
+							};
+							return {
+								...data,
+								canDelete,
+							};
+						},
+					),
+					createRouteLookupForm(
+						"costcentermaster",
+						"CostCenterMaster",
+						"Cost center",
+					),
+					createRouteCaseForm("onboarding/:caseName", {}),
 					{
 						path: "new",
 						Component: AsyncCaseTable,
@@ -1258,17 +1390,21 @@ const routeData = [
 							pageCount: 10,
 							getRequestBuilder: ({ params, request }) => {
 								const search = getQueryParam(request, "q");
-								return getCompanyCaseChanges(params, search, "created desc, id");
+								return getCompanyCaseChanges(
+									params,
+									search,
+									"created desc, id",
+								);
 							},
 						}),
 					},
 					createRouteDataView("data", async () => {
 						return {
-							missingData: await store.get(missingDataCompanyAtom)
+							missingData: await store.get(missingDataCompanyAtom),
 						};
 					}),
 					createRouteCaseForm("missingdata/:caseName", {
-						redirect: "../../data"
+						redirect: "../../data",
 					}),
 					createRouteDocument(false),
 				],
@@ -1284,9 +1420,7 @@ const routeData = [
 								data: getEmployeeCases(params, "ESS"),
 							});
 						},
-						children: [
-							createRouteCaseForm(":caseName", { redirect: ".." }),
-						]
+						children: [createRouteCaseForm(":caseName", { redirect: ".." })],
 					},
 					{
 						path: "missingdata",
@@ -1299,9 +1433,7 @@ const routeData = [
 								data: store.get(ESSMissingDataAtom),
 							});
 						},
-						children: [
-							createRouteCaseForm(":caseName", { redirect: ".." }),
-						]
+						children: [createRouteCaseForm(":caseName", { redirect: ".." })],
 					},
 					createRouteDocument(true),
 				],
@@ -1311,19 +1443,19 @@ const routeData = [
 	{
 		path: "invitation/:invitationId",
 		Component: InvitationView,
-		loader: ({params}) => getInvitation(params),
-		action: async ({params, request}) => {
+		loader: ({ params }) => getInvitation(params),
+		action: async ({ params, request }) => {
 			const invitation = await request.json();
 			const response = await acceptInvitation(params);
 			if (response.ok) {
-				toast("success", "Invitation accepted")
+				toast("success", "Invitation accepted");
 				return redirect(`/orgs/${invitation.tenantId}`);
 			} else {
 				toast("error", "Error accepting invitation");
 			}
 			return null;
-		}
-	}
+		},
+	},
 ];
 
 const updateParamsAtom = (state) => {

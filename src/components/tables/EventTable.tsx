@@ -14,121 +14,135 @@ import {
 	Box,
 	TooltipProps,
 	useMediaQuery,
-	Theme
+	Theme,
 } from "@mui/material";
 import { formatDate } from "../../utils/DateUtils";
 import { AsyncDataRoute } from "../../routes/AsyncDataRoute";
 import { formatCaseValue } from "../../utils/Format";
 import { ScrollToTop } from "../ScrollToTop";
-import { ArrowDropDown, Clear, ExpandLess, ExpandMore, MoreVert } from "@mui/icons-material";
+import {
+	ArrowDropDown,
+	Clear,
+	ExpandLess,
+	ExpandMore,
+	MoreVert,
+} from "@mui/icons-material";
 import { PaginatedContent } from "../PaginatedContent";
 import { useSearchParam } from "../../hooks/useSearchParam";
 import { IdType } from "../../models/IdType";
-import { createColumnHelper, useReactTable, getCoreRowModel, flexRender, Row } from "@tanstack/react-table";
+import {
+	createColumnHelper,
+	useReactTable,
+	getCoreRowModel,
+	flexRender,
+	Row,
+} from "@tanstack/react-table";
 import { TFunction } from "i18next";
-
 
 const columnHelper = createColumnHelper<EventRow>();
 
-
 function createColumns(t: TFunction<"translation", undefined>) {
 	return [
-		columnHelper.accessor("eventName",
-			{
-				cell: name => name.getValue(),
-				header: () => t("Event")
-			}),
-		columnHelper.accessor("eventFieldName",
-			{
-				cell: name => name.getValue(),
-				header: () => t("Field")
-			}),
-		columnHelper.accessor("value",
-			{
-				cell: value => value.getValue(),
-				header: () => t("Value")
-			}),
-		columnHelper.accessor("start",
-			{
-				cell: start => formatDate(start.getValue()),
-				header: t("Start")
-			}),
-		columnHelper.accessor("end",
-			{
-				cell: end => formatDate(end.getValue()),
-				header: t("End")
-			}),
-		columnHelper.accessor("created",
-			{
-				cell: created => <span title={formatDate(created.getValue(), true)}>{formatDate(created.getValue())}</span>,
-				header: () => <span title={t("Newest events first")}>{t("Created")}<ArrowDropDown fontSize="16px" /></span>
-			}),
+		columnHelper.accessor("eventName", {
+			cell: (name) => name.getValue(),
+			header: () => t("Event"),
+		}),
+		columnHelper.accessor("eventFieldName", {
+			cell: (name) => name.getValue(),
+			header: () => t("Field"),
+		}),
+		columnHelper.accessor("value", {
+			cell: (value) => value.getValue(),
+			header: () => t("Value"),
+		}),
+		columnHelper.accessor("start", {
+			cell: (start) => formatDate(start.getValue()),
+			header: t("Start"),
+		}),
+		columnHelper.accessor("end", {
+			cell: (end) => formatDate(end.getValue()),
+			header: t("End"),
+		}),
+		columnHelper.accessor("created", {
+			cell: (created) => (
+				<span title={formatDate(created.getValue(), true)}>
+					{formatDate(created.getValue())}
+				</span>
+			),
+			header: () => (
+				<span title={t("Newest events first")}>
+					{t("Created")}
+					<ArrowDropDown fontSize="16px" />
+				</span>
+			),
+		}),
 		{
 			id: "expandToggle",
 			size: 30,
 			cell: ({ row }) => {
-				return row.getCanExpand() ?
+				return row.getCanExpand() ? (
 					<IconButton onClick={row.getToggleExpandedHandler()} size="small">
 						{row.getIsExpanded() ? <ExpandLess /> : <ExpandMore />}
 					</IconButton>
-					: "";
-			}
+				) : (
+					""
+				);
+			},
 		},
 	];
 }
 
 export function AsyncEventTable() {
-	return <>
-		<TableSearch />
-		<AsyncDataRoute>
-			<PaginatedContent>
-				<AwaitedEventTable />
-			</PaginatedContent>
-		</AsyncDataRoute>
-	</>;
+	return (
+		<>
+			<TableSearch />
+			<AsyncDataRoute>
+				<PaginatedContent>
+					<AwaitedEventTable />
+				</PaginatedContent>
+			</AsyncDataRoute>
+		</>
+	);
 }
 
 function AwaitedEventTable() {
 	const { items } = useAsyncValue() as { items: Array<Event> };
-	const isDesktop = useMediaQuery<Theme>(theme => theme.breakpoints.up(1000));
+	const isDesktop = useMediaQuery<Theme>((theme) => theme.breakpoints.up(1000));
 	const Content = isDesktop ? EventTable : EventCards;
-	return <Content items={items} />
+	return <Content items={items} />;
 }
-
 
 type Event = {
-	id: IdType
-	caseName: string
-	created: Date
-	cancellationId: IdType
-	cancallationDate: Date
-	values: Array<EventValue>
-}
+	id: IdType;
+	caseName: string;
+	created: Date;
+	cancellationId: IdType;
+	cancallationDate: Date;
+	values: Array<EventValue>;
+};
 
 type EventValue = {
-	id: IdType
-	caseFieldName: string
-	valueType: string
-	value: string
-	numericValue: number | null
-	start: Date
-	end: Date
-	attributes: any
-}
+	id: IdType;
+	caseFieldName: string;
+	valueType: string;
+	value: string;
+	numericValue: number | null;
+	start: Date;
+	end: Date;
+	attributes: any;
+};
 
 type EventRow = {
-	id: IdType
-	eventName?: string
-	eventFieldName?: string
-	value?: string
-	start?: Date
-	end?: Date
-	created?: Date
-	type?: string
-	subRows?: Array<EventRow>
-}
-
-
+	id: IdType;
+	eventName?: string;
+	eventFieldName?: string;
+	value?: string;
+	start?: Date;
+	end?: Date;
+	created?: Date;
+	type?: string;
+	subRows?: Array<EventRow>;
+};
 
 let reentry = false;
 // invert the logic so that all rows are expanded by default
@@ -150,24 +164,27 @@ function getIsRowExpanded(row: Row<EventRow>) {
 }
 
 type EventDisplayProps = {
-	items: Array<Event>
-}
+	items: Array<Event>;
+};
 
 export function EventTable({ items: events }: EventDisplayProps) {
 	const { t } = useTranslation();
-	const e: Array<EventRow> = useMemo(() => events.map(event => ({
-		id: event.id,
-		eventName: event.caseName,
-		created: event.created,
-		subRows: event.values.map(v => (
-			{
-				id: v.id,
-				eventFieldName: v.caseFieldName,
-				value: formatCaseValue(v, t),
-				start: v.start,
-				end: v.end
-			}))
-	})), [events]);
+	const e: Array<EventRow> = useMemo(
+		() =>
+			events.map((event) => ({
+				id: event.id,
+				eventName: event.caseName,
+				created: event.created,
+				subRows: event.values.map((v) => ({
+					id: v.id,
+					eventFieldName: v.caseFieldName,
+					value: formatCaseValue(v, t),
+					start: v.start,
+					end: v.end,
+				})),
+			})),
+		[events],
+	);
 	const columns = useMemo(() => createColumns(t), [t]);
 	const table = useReactTable({
 		columns: columns,
@@ -175,29 +192,31 @@ export function EventTable({ items: events }: EventDisplayProps) {
 		//@ts-ignore -- hack around table
 		getIsRowExpanded,
 		getCoreRowModel: getCoreRowModel(),
-		getRowId: originalRow => originalRow.id,
-		getSubRows: (row) => row.subRows
+		getRowId: (originalRow) => originalRow.id,
+		getSubRows: (row) => row.subRows,
 	});
 	return (
 		<>
 			<Stack>
-				{table.getHeaderGroups().map(headerGroup => (
+				{table.getHeaderGroups().map((headerGroup) => (
 					<Row key={headerGroup.id}>
-						{headerGroup.headers.map(header => (
+						{headerGroup.headers.map((header) => (
 							<Typography fontWeight="bold" key={header.id} sx={{ p: 0.5 }}>
 								{flexRender(
 									header.column.columnDef.header,
-									header.getContext())
-								}
+									header.getContext(),
+								)}
 							</Typography>
 						))}
 					</Row>
 				))}
-				<Stack sx={{
-					"& > div:nth-of-type(even)": {
-						backgroundColor: theme => theme.palette.primary.hover
-					}
-				}}>
+				<Stack
+					sx={{
+						"& > div:nth-of-type(even)": {
+							backgroundColor: (theme) => theme.palette.primary.hover,
+						},
+					}}
+				>
 					{table.getRowModel().rows.map((row) => (
 						<Row key={row.id}>
 							{row.getVisibleCells().map((cell) => (
@@ -205,11 +224,17 @@ export function EventTable({ items: events }: EventDisplayProps) {
 									{flexRender(cell.column.columnDef.cell, cell.getContext())}
 								</Box>
 							))}
-							{row.getIsExpanded() && row.subRows.flatMap((subRow) => subRow.getVisibleCells().map((cell) => (
-								<Box key={cell.id} sx={{ p: 0.5 }}>
-									{flexRender(cell.column.columnDef.cell, cell.getContext())}
-								</Box>
-							)))}
+							{row.getIsExpanded() &&
+								row.subRows.flatMap((subRow) =>
+									subRow.getVisibleCells().map((cell) => (
+										<Box key={cell.id} sx={{ p: 0.5 }}>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext(),
+											)}
+										</Box>
+									)),
+								)}
 						</Row>
 					))}
 				</Stack>
@@ -221,18 +246,22 @@ export function EventTable({ items: events }: EventDisplayProps) {
 
 function Row({ children }: PropsWithChildren) {
 	return (
-		<Box display="grid" gridTemplateColumns="1fr 1fr 1fr 75px 75px 75px 40px" gridTemplateRows="auto" alignItems="start">
+		<Box
+			display="grid"
+			gridTemplateColumns="1fr 1fr 1fr 75px 75px 75px 40px"
+			gridTemplateRows="auto"
+			alignItems="start"
+		>
 			{children}
 		</Box>
-	)
+	);
 }
-
 
 function TableSearch() {
 	const { t } = useTranslation();
 	const [searchTerm, setSearchTerm] = useSearchParam("q", {
 		replace: true,
-		exclusive: true
+		exclusive: true,
 	});
 	const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
@@ -244,7 +273,7 @@ function TableSearch() {
 	const onClear = () => {
 		setLocalSearchTerm("");
 		setSearchTerm("");
-	}
+	};
 
 	const onSubmit = (event) => {
 		setSearchTerm(localSearchTerm);
@@ -259,7 +288,7 @@ function TableSearch() {
 					<Clear />
 				</IconButton>
 			</InputAdornment>
-		)
+		);
 	}
 
 	return (
@@ -273,13 +302,12 @@ function TableSearch() {
 				slotProps={{
 					input: {
 						endAdornment: clearButton,
-					}
+					},
 				}}
 			/>
 		</form>
 	);
 }
-
 
 function EventCards({ items: events }: EventDisplayProps) {
 	return (

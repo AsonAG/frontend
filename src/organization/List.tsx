@@ -9,10 +9,22 @@ import { useAppDocumentTitle } from "../hooks/useAppDocumentTitle";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../components/ContentLayout";
 import { useRole } from "../user/utils";
-import { Button, IconButton, Stack, TextField, Tooltip, Typography } from "@mui/material";
-import FileUploadIcon from '@mui/icons-material/FileUpload';
+import {
+	Button,
+	IconButton,
+	Stack,
+	TextField,
+	Tooltip,
+	Typography,
+} from "@mui/material";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { Organization } from "../models/Organization";
-import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, ResponsiveDialogTrigger } from "../components/ResponsiveDialog";
+import {
+	ResponsiveDialog,
+	ResponsiveDialogClose,
+	ResponsiveDialogContent,
+	ResponsiveDialogTrigger,
+} from "../components/ResponsiveDialog";
 import { Add } from "@mui/icons-material";
 
 export function OrganizationList() {
@@ -20,16 +32,15 @@ export function OrganizationList() {
 	const { t } = useTranslation();
 	useAppDocumentTitle(t("Organizations"));
 	return (
-		<ContentLayout title={t("Select an organization")} buttons={<ButtonStack />}>
+		<ContentLayout
+			title={t("Select an organization")}
+			buttons={<ButtonStack />}
+		>
 			<Paper>
 				<List>
 					{organizations.map((org) => (
 						<ListItem disablePadding key={org.id}>
-							<ListItemButton
-								component={Link}
-								to={org.id}
-								state={{ org }}
-							>
+							<ListItemButton component={Link} to={org.id} state={{ org }}>
 								<ListItemText primary={org.identifier} />
 							</ListItemButton>
 						</ListItem>
@@ -48,27 +59,21 @@ function ButtonStack() {
 				<ImportButton />
 			</Stack>
 		</Suspense>
-	)
+	);
 }
 
 function ImportButton() {
 	const { t } = useTranslation();
 	const isInstanceAdmin = useRole("InstanceAdmin");
-	if (!isInstanceAdmin)
-		return null;
+	if (!isInstanceAdmin) return null;
 
 	return (
 		<Tooltip title={t("Import organization")} placement="top" arrow>
-			<IconButton
-				component={Link}
-				to="import"
-				color="primary"
-				size="small"
-			>
+			<IconButton component={Link} to="import" color="primary" size="small">
 				<FileUploadIcon />
 			</IconButton>
 		</Tooltip>
-	)
+	);
 }
 
 function CreateOrganizationButton() {
@@ -77,28 +82,27 @@ function CreateOrganizationButton() {
 		<ResponsiveDialog>
 			<ResponsiveDialogTrigger>
 				<Tooltip title={t("Create organization")} placement="top" arrow>
-					<IconButton
-						color="primary"
-						size="small"
-					>
+					<IconButton color="primary" size="small">
 						<Add />
 					</IconButton>
 				</Tooltip>
 			</ResponsiveDialogTrigger>
 			<ResponsiveDialogContent>
-			<Form method="POST">
-				<Stack spacing={2}>
-				<Typography variant="h6">{t("Create organization")}</Typography>
-				<TextField name="org_name" placeholder={t("Organization name")}/>
-				<Stack direction="row" justifyContent="end" spacing={1}>
-					<ResponsiveDialogClose>
-						<Button>{t("Cancel")}</Button>
-					</ResponsiveDialogClose>
-					<Button type="submit" variant="contained" color="primary">{t("Create")}</Button>
-				</Stack>
-				</Stack>
-			</Form>
+				<Form method="POST">
+					<Stack spacing={2}>
+						<Typography variant="h6">{t("Create organization")}</Typography>
+						<TextField name="org_name" placeholder={t("Organization name")} />
+						<Stack direction="row" justifyContent="end" spacing={1}>
+							<ResponsiveDialogClose>
+								<Button>{t("Cancel")}</Button>
+							</ResponsiveDialogClose>
+							<Button type="submit" variant="contained" color="primary">
+								{t("Create")}
+							</Button>
+						</Stack>
+					</Stack>
+				</Form>
 			</ResponsiveDialogContent>
 		</ResponsiveDialog>
-	)
+	);
 }

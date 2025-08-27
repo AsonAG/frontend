@@ -1,7 +1,6 @@
 import { IdType } from "./IdType";
 
 export type Division = {
-  id: IdType;
-  name: string
+	id: IdType;
+	name: string;
 };
-

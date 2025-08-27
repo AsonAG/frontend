@@ -3,10 +3,9 @@ import { ContentLayout } from "../components/ContentLayout";
 import { PayrollData } from "./PayrollData";
 
 export function NewPayrollView() {
-  return (
-    <ContentLayout title="New organization unit">
-      <PayrollData />
-    </ContentLayout>
-  );
+	return (
+		<ContentLayout title="New organization unit">
+			<PayrollData />
+		</ContentLayout>
+	);
 }
-

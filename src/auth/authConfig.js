@@ -21,5 +21,5 @@ export const authConfig = {
 
 	onSigninCallback: async (user) => {
 		location.href = user?.state?.location || "/";
-	}
+	},
 };

@@ -6,7 +6,8 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { ReactNode } from "react";
 
 const DrawerContent = styled("div", {
-	shouldForwardProp: (name) => !(name === "containerWidth" || name === "disablePadding"),
+	shouldForwardProp: (name) =>
+		!(name === "containerWidth" || name === "disablePadding"),
 })<Props>(({ theme, spacing }) =>
 	theme.unstable_sx({
 		display: "flex",
@@ -30,7 +31,8 @@ const DrawerContent = styled("div", {
 );
 
 const DialogContent = styled("div", {
-	shouldForwardProp: (name) => !(name === "containerWidth" || name === "disablePadding"),
+	shouldForwardProp: (name) =>
+		!(name === "containerWidth" || name === "disablePadding"),
 })<Props>(({ theme, containerWidth, disablePadding, spacing }) =>
 	theme.unstable_sx({
 		display: "flex",
@@ -50,7 +52,7 @@ const DialogContent = styled("div", {
 		":focus-visible": {
 			outline: "none",
 		},
-		boxShadow: theme.shadows[1]
+		boxShadow: theme.shadows[1],
 	}),
 );
 
@@ -58,7 +60,7 @@ interface Props {
 	children?: ReactNode;
 	containerWidth?: boolean;
 	disablePadding?: boolean;
-	spacing?: number
+	spacing?: number;
 }
 
 export const ResponsiveDialogContent = React.forwardRef<HTMLDivElement, Props>(
