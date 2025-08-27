@@ -3,7 +3,11 @@ import { useContext } from "react";
 import { FieldContext } from "../Field";
 import { DatePicker } from "../../../DatePicker";
 
-export function getDatePickerVariant(configuration, defaultValue = "standard", defaultMonth = "month") {
+export function getDatePickerVariant(
+	configuration,
+	defaultValue = "standard",
+	defaultMonth = "month",
+) {
 	if (configuration === "Month") {
 		return defaultMonth;
 	}

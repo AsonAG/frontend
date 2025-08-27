@@ -30,7 +30,8 @@ const translations = {
 		"payrun_period_error": "With errors (the support has been informed)",
 		"dashboard_payout_header": "Payout",
 		"inactive_collector_chip": "{{count}} inactive collectors...",
-		"date_accounting_start_date_validation": "Date has to be greater than or equal to the payroll accounting start date ({{accountingStartDate}})"
+		"date_accounting_start_date_validation": "Date has to be greater than or equal to the payroll accounting start date ({{accountingStartDate}})",
+		"date_start_before_end_validation": "Start date must be before the end date"
 	},
 };
 

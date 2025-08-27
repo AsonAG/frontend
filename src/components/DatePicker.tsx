@@ -9,14 +9,14 @@ import {
 } from "@mui/x-date-pickers";
 import { InputAdornment, InputAdornmentProps, IconButton } from "@mui/material";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
-import React, { MouseEventHandler, useEffect, useRef, useState } from "react";
+import React, { MouseEventHandler, useRef, useState } from "react";
 import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 
 type DatePickerInputAdornmentProps = {
-	handleBack: MouseEventHandler
-	handleForward: MouseEventHandler
-	disabled?: boolean
+	handleBack: MouseEventHandler;
+	handleForward: MouseEventHandler;
+	disabled?: boolean;
 } & InputAdornmentProps;
 
 function DatePickerInputAdornment({
@@ -50,8 +50,12 @@ interface DateTimePickerProps extends MuiDateTimePickerProps<Dayjs> {
 
 type DatePickerVariants = "standard" | "datetime" | "month" | "year";
 
-type Props<T> = (T extends "datetime" ? DateTimePickerProps : DatePickerProps) & {
-	minDateErrorMessage?: string
+type Props<T> = (T extends "datetime"
+	? DateTimePickerProps
+	: DatePickerProps) & {
+	getValidationErrorMessage?: (
+		error: DateValidationError | DateTimeValidationError | null | undefined,
+	) => string | undefined;
 };
 
 export function DatePicker<T extends DatePickerVariants>({
@@ -60,42 +64,78 @@ export function DatePicker<T extends DatePickerVariants>({
 	slotProps,
 	required = false,
 	onChange,
-	minDateErrorMessage,
+	getValidationErrorMessage,
 	...datePickerProps
 }: Props<T>) {
 	const { t } = useTranslation();
-	const inputRef = useRef<HTMLInputElement | null>();
+	const inputRef = useRef<HTMLInputElement | null>(null);
 	const Picker = variant === "datetime" ? MuiDateTimePicker : MuiDatePicker;
 	let pickerProps = {};
 	const { value } = datePickerProps;
-	const [validationError, setValidationError] = useState<string>("");
+	const [localValue, setLocalValue] = useState<Dayjs | null>(value ?? null);
+	const lastValidationError = useRef<
+		DateValidationError | DateTimeValidationError | null
+	>(null);
+
 	const handleDateChange = (
 		newDate: Dayjs | null,
 		context: PickerChangeHandlerContext<
 			DateValidationError | DateTimeValidationError
 		>,
 	) => {
-		setValidationError(getValidationError({ validationError: context.validationError, minDateErrorMessage }));
-		const isValid = newDate === null || newDate.isValid();
+		setLocalValue(newDate);
+		lastValidationError.current = context.validationError;
+	};
+
+	const handleBlur = () => {
+		const isValid = !localValue || localValue.isValid();
+		const err = lastValidationError.current;
+		let message: string | undefined;
+
+		if (getValidationErrorMessage) {
+			message = getValidationErrorMessage(err);
+		}
+		if (!message && err) {
+			message = getValidationError({
+				validationError: err,
+			});
+		}
+
+		if (inputRef.current) {
+			if (message) {
+				inputRef.current.setCustomValidity(t(message));
+			} else if (!required) {
+				inputRef.current.setCustomValidity("");
+			} else if (!localValue) {
+				inputRef.current.setCustomValidity(t("Please enter a date"));
+			} else {
+				inputRef.current.setCustomValidity("");
+			}
+		}
+
 		if (isValid && onChange) {
 			// @ts-ignore
-			onChange(newDate);
+			onChange(localValue);
 		}
 	};
+
 	slotProps = {
 		...slotProps,
-		field: {
-			...slotProps?.field,
-			// @ts-ignore
+		textField: {
+			...slotProps?.textField,
 			required,
+			inputRef,
+			onBlur: handleBlur,
 		},
 		openPickerButton: { tabIndex: -1 },
 	};
+
 	if (variant === "month" || variant === "month-short") {
 		pickerProps = {
 			views: ["year", "month"],
 			openTo: "month",
 		};
+
 		if (variant !== "month-short") {
 			const setNewValue = (v: Dayjs | null | undefined) => {
 				if (!v || !onChange) return;
@@ -111,46 +151,26 @@ export function DatePicker<T extends DatePickerVariants>({
 				...slotProps,
 				inputAdornment: {
 					// @ts-ignore
-					handleBack: () => setNewValue(value?.subtract(1, "month")),
-					handleForward: () => setNewValue(value?.add(1, "month")),
-					disabled: datePickerProps.disabled
+					handleBack: () => setNewValue(localValue?.subtract(1, "month")),
+					handleForward: () => setNewValue(localValue?.add(1, "month")),
+					disabled: datePickerProps.disabled,
 				},
 			};
-		}
-		else {
+		} else {
 			// @ts-ignore
 			pickerProps.format = "MMM YYYY";
 		}
 	}
-	if (variant === "year") {
-		pickerProps = {
-			views: ["year"],
-		};
-	}
 
-	// We need to set the validity ourselves, because the MUI Datepicker
-	// populates the input field with a placeholder.
-	// The default HTML Form validation error message won't display because of that.
-	useEffect(() => {
-		if (validationError) {
-			inputRef.current?.setCustomValidity(t(validationError));
-			return;
-		}
-		if (!required) {
-			inputRef.current?.setCustomValidity("");
-			return;
-		}
-		let error = ""
-		if (!value) {
-			error = t("Please enter a date");
-		}
-		inputRef.current?.setCustomValidity(error);
-	}, [value?.toISOString(), inputRef.current, required, validationError]);
+	if (variant === "year") {
+		pickerProps = { views: ["year"] };
+	}
 
 	return (
 		<Picker
 			{...datePickerProps}
 			{...pickerProps}
+			value={localValue}
 			inputRef={inputRef}
 			timezone="UTC"
 			onChange={handleDateChange}
@@ -163,12 +183,12 @@ export function DatePicker<T extends DatePickerVariants>({
 }
 
 type GetValidationErrorProps = {
-	validationError: DateTimeValidationError
-	minDateErrorMessage?: string
-}
-function getValidationError({ validationError, minDateErrorMessage }: GetValidationErrorProps) {
+	validationError?: DateTimeValidationError | DateValidationError | null;
+};
+
+function getValidationError({ validationError }: GetValidationErrorProps) {
 	if (validationError === "minDate") {
-		return minDateErrorMessage ?? "Date is not in the valid range.";
+		return "Date is not in the valid range.";
 	}
 	if (validationError === "maxDate") {
 		return "Date is not in the valid range.";
