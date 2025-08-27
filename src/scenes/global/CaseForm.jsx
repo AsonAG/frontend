@@ -8,11 +8,10 @@ import {
 import { CaseComponent } from "../../components/case/CaseComponent";
 import { createContext, useRef, useState } from "react";
 import { CaseFormButtons } from "../../components/buttons/CaseFormButtons";
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import { useCaseData } from "../../hooks/useCaseData.js";
 import { Loading } from "../../components/Loading";
 import { CaseErrorComponent } from "../../components/case/CaseErrorComponent";
-import { ErrorView } from "../../components/ErrorView";
 import { PageContent } from "../../components/ContentLayout";
 import { toast } from "../../utils/dataAtoms";
 import { CaseFieldDetails } from "../../components/CaseFieldDetails";
@@ -30,6 +29,7 @@ export function Component() {
 }
 
 function CaseForm() {
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const { payroll } = useRouteLoaderData("root");
 	const loaderData = useLoaderData();
@@ -64,7 +64,7 @@ function CaseForm() {
 	const renderFieldPeriods = caseData?.periodInputMode === "Individual";
 	let content = null;
 	if (fatalError) {
-		content = <ErrorView error={fatalError} />;
+		content = <Typography>{t(fatalError.message)}</Typography>;
 	} else if (loading) {
 		content = <Loading />;
 	} else {

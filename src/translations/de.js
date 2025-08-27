@@ -213,6 +213,8 @@ const translations = {
 		"Employee is required": "Mitarbeiter ist erforderlich",
 		"Could not invite user to organization": "Der Benutzer konnte nicht in die Organisation eingeladen werden",
 		"{{email}} already belongs to a member of the organization": "{{email}} gehört schon einem Mitglied der Organisation",
+		"The event does not exist or you do not have permission.": "Das Ereignis gibt es nicht oder Sie haben keine Berechtigungen.",
+		"Something went wrong": "Etwas ist schief gelaufen",
 
 		// compliance
 		Submit: "Übermitteln",
