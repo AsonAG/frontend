@@ -177,7 +177,7 @@ const translations = {
 		"No features available for this user": "Keine Funktionen verfügbar für diesen User",
 		"Choose a role": "Wählen Sie eine Rolle aus",
 		"Grants access to the whole organization": "Gewährt Zugriff auf die ganze Organisation",
-		"Grant access to specific payrolls": "Gewährt Zugriff auf ausgewählte Organisationseinheiten",
+		"Grants access to specific organization units": "Gewährt Zugriff auf ausgewählte Organisationseinheiten",
 		"Grants restricted access to the employee": "Gewährt eingeschränkten Zugriff auf den Mitarbeiter",
 		"Invitation": "Einladung",
 		"You have been invited to join the organization {{orgName}}.": "Sie sind eingeladen der Organiation {{orgName}} beizutreten.",

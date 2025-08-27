@@ -95,7 +95,7 @@ function ManagerRoleOption(props: RoleSelectionProps) {
   return (
     <RoleOption active={active} onSelect={() => !active && props.dispatch({ type: "set_selected_role", value: "PayrollManager" })}>
       <Typography>{t("Manager")}</Typography>
-      <Typography variant="body2">{t("Grant access to specific payrolls")}</Typography>
+      <Typography variant="body2">{t("Grants access to specific organization units")}</Typography>
       {active && <ManagerPayrollSection {...props} />}
     </RoleOption>
   )
