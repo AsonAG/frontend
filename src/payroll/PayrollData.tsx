@@ -1,5 +1,5 @@
-import { Stack, TextField, FormControl, InputLabel, Select, SelectChangeEvent, MenuItem, Typography, Button, Box, Chip } from "@mui/material";
-import React, { useRef, useState, useReducer, useEffect } from "react";
+import { Stack, TextField, FormControl, InputLabel, Select, MenuItem, Typography, Button, Box, Chip } from "@mui/material";
+import { useRef, useState, useReducer, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, useLoaderData, useNavigation, useSubmit } from "react-router-dom";
 import { PayrollSettingsLoaderData } from "./Settings";
@@ -8,6 +8,9 @@ import { DatePicker } from "../components/DatePicker";
 import dayjs from "dayjs";
 import { AvailableRegulation, AvailableRegulations, CountrySpecificRegulations } from "../models/AvailableRegulations";
 import { PayrollRegulations, RegulationName } from "../models/PayrollRegulations";
+import { Language } from "../models/Language";
+import { LanguagePicker } from "../components/LanguagePicker"
+
 
 export function PayrollData() {
   const { t } = useTranslation();
@@ -15,7 +18,7 @@ export function PayrollData() {
   const { payroll, payrollRegulations, availableRegulations } = useLoaderData() as PayrollSettingsLoaderData;
   const [payrollName, setPayrollName] = useState(payroll?.name ?? "");
   const [accountingStartDate, setAccountingStartDate] = useState((!!payroll && payroll.accountingStartDate) ? dayjs.utc(payroll.accountingStartDate) : dayjs().utc().startOf('year'));
-  const [language, setLanguage] = useState(payroll?.language ?? "German");
+  const [language, setLanguage] = useState<Language>(payroll?.language ?? "German");
   const { state: navigationState } = useNavigation();
 
   const createInitialStateArgs = {
@@ -78,15 +81,7 @@ export function PayrollData() {
           onChange={(e) => setAccountingStartDate(e)}
           required
           disabled={!!payroll} />
-        <FormControl fullWidth variant="outlined" size="small" required>
-          <InputLabel>{t("Language for documents")}</InputLabel>
-          <Select value={language} onChange={(e: SelectChangeEvent) => setLanguage(e.target.value)} label={t("Language for documents")}>
-            <MenuItem value="German">{t("German")}</MenuItem>
-            <MenuItem value="English">{t("English")}</MenuItem>
-            <MenuItem value="French">{t("French")}</MenuItem>
-            <MenuItem value="Italian">{t("Italian")}</MenuItem>
-          </Select>
-        </FormControl>
+        <LanguagePicker label={t("Language for documents")} language={language} onChange={setLanguage} />
         <Typography variant="h6">{t("Regulations")}</Typography>
         <RegulationSelect
           label={t("Country")}

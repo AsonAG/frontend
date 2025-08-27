@@ -4,14 +4,16 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import { Link, useLoaderData } from "react-router-dom";
+import { Form, Link, useLoaderData } from "react-router-dom";
 import { useAppDocumentTitle } from "../hooks/useAppDocumentTitle";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "../components/ContentLayout";
-import { useRole } from "../hooks/useRole";
-import { IconButton, Stack, Tooltip } from "@mui/material";
+import { useRole } from "../user/utils";
+import { Button, IconButton, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { Organization } from "../models/Organization";
+import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, ResponsiveDialogTrigger } from "../components/ResponsiveDialog";
+import { Add } from "@mui/icons-material";
 
 export function OrganizationList() {
 	const organizations = useLoaderData() as Array<Organization>;
@@ -42,6 +44,7 @@ function ButtonStack() {
 	return (
 		<Suspense>
 			<Stack direction="row" spacing={1}>
+				<CreateOrganizationButton />
 				<ImportButton />
 			</Stack>
 		</Suspense>
@@ -50,8 +53,8 @@ function ButtonStack() {
 
 function ImportButton() {
 	const { t } = useTranslation();
-	const isProvider = useRole("provider");
-	if (!isProvider)
+	const isInstanceAdmin = useRole("InstanceAdmin");
+	if (!isInstanceAdmin)
 		return null;
 
 	return (
@@ -65,5 +68,37 @@ function ImportButton() {
 				<FileUploadIcon />
 			</IconButton>
 		</Tooltip>
+	)
+}
+
+function CreateOrganizationButton() {
+	const { t } = useTranslation();
+	return (
+		<ResponsiveDialog>
+			<ResponsiveDialogTrigger>
+				<Tooltip title={t("Create organization")} placement="top" arrow>
+					<IconButton
+						color="primary"
+						size="small"
+					>
+						<Add />
+					</IconButton>
+				</Tooltip>
+			</ResponsiveDialogTrigger>
+			<ResponsiveDialogContent>
+			<Form method="POST">
+				<Stack spacing={2}>
+				<Typography variant="h6">{t("Create organization")}</Typography>
+				<TextField name="org_name" placeholder={t("Organization name")}/>
+				<Stack direction="row" justifyContent="end" spacing={1}>
+					<ResponsiveDialogClose>
+						<Button>{t("Cancel")}</Button>
+					</ResponsiveDialogClose>
+					<Button type="submit" variant="contained" color="primary">{t("Create")}</Button>
+				</Stack>
+				</Stack>
+			</Form>
+			</ResponsiveDialogContent>
+		</ResponsiveDialog>
 	)
 }

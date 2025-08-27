@@ -8,7 +8,7 @@ import {
 import { Organization } from "../../models/Organization";
 import { Payroll } from "../../models/Payroll";
 import { useTranslation } from "react-i18next";
-import { useRole } from "../../hooks/useRole";
+import { useRole } from "../../user/utils";
 
 type LoaderData = {
 	org: Organization,
@@ -25,7 +25,8 @@ export function PayrollSelector() {
 	const handleClose = () => setAnchorEl(null);
 	const adminTitle = t("Admin");
 	const currentSelection = payroll?.name ?? adminTitle;
-	const isAdmin = useRole("admin");
+	const isAdmin = useRole("Admin");
+	const isOwner = useRole("Owner");
 
 	return (
 		<>
@@ -52,7 +53,7 @@ export function PayrollSelector() {
 				</Typography>
 			</Button>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-				{isAdmin && <MenuItem component={Link} to={`/orgs/${org.id}/settings`} onClick={handleClose}>{adminTitle}</MenuItem>}
+				{(isAdmin || isOwner) && <MenuItem component={Link} to={`/orgs/${org.id}/settings`} onClick={handleClose}>{adminTitle}</MenuItem>}
 				{
 					payrolls.map(payroll => (
 						<MenuItem key={payroll.id} component={Link} to={`/orgs/${org.id}/payrolls/${payroll.id}`} onClick={handleClose}>

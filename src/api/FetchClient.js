@@ -9,6 +9,10 @@ const availableRegulationsUrl = "/regulations/available";
 const organizationsUrl = "/tenants";
 const organizationImportUrl = "/tenants/import";
 const organizationUrl = "/tenants/:orgId";
+const organizationUserMembershipsUrl = "/tenants/:orgId/user_memberships";
+const organizationUserMembershipUrl = "/tenants/:orgId/user_memberships/:userMembershipId";
+const organizationUserMembershipInviteUrl = "/tenants/:orgId/user_memberships/invite";
+const organizationUserMembershipWithdrawInvitationUrl = "/tenants/:orgId/user_memberships/invitations/:invitationId";
 const payrollsUrl = "/tenants/:orgId/payrolls";
 const payrollsSimpleUrl = "/tenants/:orgId/payrolls/simple";
 const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
@@ -34,7 +38,10 @@ const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
 const employeeUrl = "/tenants/:orgId/employees/:employeeId";
-const usersUrl = "/tenants/:orgId/users";
+const usersUrl = "/users";
+const userUrl = "/users/:userId";
+const employeeCaseValuesUrl =
+	"/tenants/:orgId/employees/:employeeId/cases";
 const employeeDocumentUrl =
 	"/tenants/:orgId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
 const companyDocumentUrl =
@@ -52,6 +59,7 @@ const payoutsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPer
 const payoutUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
 const payoutDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId/document";
 const exportUrl = "/tenants/:orgId/export";
+const invitationUrl = "/user_membership_invitations/:invitationId"
 
 const store = getDefaultStore();
 
@@ -64,7 +72,6 @@ class FetchRequestBuilder {
 	body = null;
 	url = null;
 	routeParams = {};
-	addUserQueryParam = false;
 	addPayrollDivision = false;
 	ignoreErrors = false;
 	fallbackValue = null;
@@ -153,11 +160,6 @@ class FetchRequestBuilder {
 		return this;
 	}
 
-	withUser() {
-		this.addUserQueryParam = true;
-		return this;
-	}
-
 	withPayrollDivision() {
 		this.addPayrollDivision = true;
 		return this;
@@ -188,10 +190,6 @@ class FetchRequestBuilder {
 		if (this.localizeRequest) {
 			const user = await store.get(userAtom);
 			if (user !== null) this.searchParams.set("language", user.language);
-		}
-		if (this.addUserQueryParam) {
-			const user = await store.get(userAtom);
-			if (user !== null) this.searchParams.set("userId", user.id);
 		}
 		if (this.addPayrollDivision) {
 			const payroll = await store.get(payrollAtom);
@@ -239,6 +237,10 @@ export function getOrganizations() {
 	return new FetchRequestBuilder(organizationsUrl).fetchJson();
 }
 
+export function createOrganization(name) {
+	return new FetchRequestBuilder(organizationsUrl).withMethod("POST").withBody({identifier: name}).fetch();
+}
+
 export function importOrganization(body) {
 	return new FetchRequestBuilder(organizationImportUrl).withMethod("POST").withTimout(600000).withFileBody(body).fetch();
 }
@@ -249,6 +251,59 @@ export function getOrganization(routeParams) {
 
 export function deleteOrganization(routeParams) {
 	return new FetchRequestBuilder(organizationUrl, routeParams).withMethod("DELETE").fetch();
+}
+
+export function getOrganizationUserMemberships(routeParams) {
+	return new FetchRequestBuilder(organizationUserMembershipsUrl, routeParams).fetchJson();
+}
+
+export function getOrganizationUserMembershipInvitations(routeParams) {
+	return new FetchRequestBuilder(organizationUserMembershipsUrl + "/invitations", routeParams).fetchJson();
+}
+
+
+export function getOrganizationUserMembership(routeParams, userId) {
+	return new FetchRequestBuilder(organizationUserMembershipsUrl, routeParams)
+		.withQueryParam("filter", `userId eq '${userId}'`)
+		.fetchSingle();
+}
+
+export function saveOrganizationUserMembership(routeParams, userMembership) {
+	return new FetchRequestBuilder(organizationUserMembershipUrl, routeParams)
+		.withMethod("PUT")
+		.withBody(userMembership)
+		.fetch();
+}
+
+export function inviteUserToOrganization(routeParams, inviteRequest) {
+	return new FetchRequestBuilder(organizationUserMembershipInviteUrl, routeParams)
+		.withMethod("POST")
+		.withBody(inviteRequest)
+		.fetch();
+}
+
+export function withdrawUserMembershipInvitationToOrganization(routeParams) {
+	return new FetchRequestBuilder(organizationUserMembershipWithdrawInvitationUrl, routeParams)
+		.withMethod("DELETE")
+		.fetch();
+}
+
+export function removeUserFromOrganization(routeParams) {
+	return new FetchRequestBuilder(organizationUserMembershipUrl, routeParams)
+		.withMethod("DELETE")
+		.fetch();
+}
+
+export function getInvitation(routeParams) {
+	return new FetchRequestBuilder(invitationUrl, routeParams)
+		.withIgnoreErrors(null)
+		.fetchJson();
+}
+
+export function acceptInvitation(routeParams) {
+	return new FetchRequestBuilder(invitationUrl, routeParams)
+		.withMethod("POST")
+		.fetch();
 }
 
 export function getPayrolls(routeParams) {
@@ -303,6 +358,11 @@ export function getDivision(routeParams, divisionId) {
 }
 
 export function getEmployees(routeParams) {
+	return new FetchRequestBuilder(employeesUrl, routeParams)
+		.withQueryParam("orderBy", `firstName asc`);
+}
+
+export function getPayrollEmployees(routeParams) {
 	return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
 		.withQueryParam("orderBy", `firstName asc`);
 }
@@ -342,7 +402,6 @@ export function getEmployeeCases(routeParams, clusterSetName, signal, evalDate =
 		.withQueryParam("evaluationDate", evalDate)
 		.withSignal(signal)
 		.withLocalization()
-		.withUser()
 		.withIgnoreErrors([])
 		.fetchJson();
 }
@@ -359,7 +418,6 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 export function getPayrunPeriodCaseValues(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodEntryRelevantEventValues, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -374,7 +432,6 @@ export function getCaseChangeCaseValues(routeParams, top) {
 		.withQueryParam("top", top)
 		.withQueryParam("result", !!top ? "ItemsWithCount" : undefined)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 export function getCaseValueCount(routeParams, minCount) {
@@ -383,7 +440,6 @@ export function getCaseValueCount(routeParams, minCount) {
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", caseType)
 		.withQueryParam("minCount", minCount)
-		.withUser()
 		.fetchJson();
 }
 export function getCurrentValues(routeParams) {
@@ -393,7 +449,6 @@ export function getCurrentValues(routeParams) {
 		.withQueryParam("caseType", caseType)
 		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
-		.withUser()
 		.fetchJson()
 }
 
@@ -403,7 +458,6 @@ export function getEmployeeCaseChanges(routeParams) {
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", "Employee")
 		.withLocalization()
-		.withUser();
 }
 
 export function getCompanyCases(routeParams, clusterSetName, signal) {
@@ -413,7 +467,6 @@ export function getCompanyCases(routeParams, clusterSetName, signal) {
 		.withQueryParam("orderBy", `nameLocalizationsde asc`)
 		.withSignal(signal)
 		.withLocalization()
-		.withUser()
 		.withIgnoreErrors([])
 		.fetchJson();
 }
@@ -425,14 +478,12 @@ export function getCompanyCaseChanges(routeParams, search, orderBy) {
 		.withQueryParam("searchTerm", search)
 		.withQueryParam("orderBy", orderBy)
 		.withQueryParam("substituteLookupCodes", true)
-		.withLocalization()
-		.withUser();
+		.withLocalization();
 }
 
 export function getCompanyMissingDataCases(routeParams) {
 	return new FetchRequestBuilder(missingDataCompanyUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -445,7 +496,19 @@ export async function getEmployeeSalaryType(routeParams, evalDate = null) {
 		.withQueryParam("valueDate", evalDate)
 		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
-		.withUser()
+		.fetchSingle();
+
+	return caseValue?.value;
+}
+
+export async function getEmployeeEmail(routeParams) {
+	const emailCaseField = "CH.Swissdec.EmployeeEmail"
+	const caseValue = await new FetchRequestBuilder(employeeCaseValuesUrl, routeParams)
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParams("caseFieldName", emailCaseField)
+		.withQueryParam("orderBy", "created desc")
+		.withQueryParam("top", 1)
+		.withLocalization()
 		.fetchSingle();
 
 	return caseValue?.value;
@@ -459,7 +522,6 @@ export async function getCompanyBankDetails(routeParams, evalDate = null) {
 		.withQueryParams("caseFieldNames", ibanFieldName)
 		.withQueryParams("caseFieldNames", accountFieldName)
 		.withQueryParam("evaluationDate", evalDate)
-		.withUser()
 		.fetchJson();
 
 	const iban = values.find(v => v.caseFieldName === ibanFieldName)?.value;
@@ -474,7 +536,6 @@ export async function getCompanyBankDetails(routeParams, evalDate = null) {
 export function getEmployeeMissingData(routeParams) {
 	return new FetchRequestBuilder(missingDataEmployeeUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -536,14 +597,12 @@ export function getOpenPayrunPeriod(routeParams) {
 export function closePayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodCloseUrl, routeParams)
 		.withMethod("POST")
-		.withUser()
 		.fetch();
 }
 
 export function createOpenPayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl + "/open", routeParams)
 		.withMethod("POST")
-		.withUser()
 		.fetch();
 }
 
@@ -557,7 +616,6 @@ export function getPayrunPeriodDocuments(routeParams) {
 export function getPayrunPeriodControllingTasks(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodControllingUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -576,7 +634,6 @@ export function buildCase(routeParams, caseChangeSetup) {
 		.withBody(caseChangeSetup)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withLocalization()
-		.withUser()
 		.fetch();
 }
 
@@ -586,16 +643,19 @@ export function addCase(routeParams, caseChangeSetup) {
 		.withBody(caseChangeSetup)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withLocalization()
-		.withUser()
 		.fetch();
 }
 
-export async function getUser(routeParams, identifier) {
-	const users = await new FetchRequestBuilder(usersUrl, routeParams)
-		.withQueryParam("filter", `Identifier eq '${identifier}'`)
-		.fetchJson();
-	const user = users?.length ? users[0] : null;
-	return user;
+export async function getUser() {
+	return await new FetchRequestBuilder(usersUrl)
+		.fetchSingle();
+}
+
+export async function updateUser(userId, user) {
+	return await new FetchRequestBuilder(userUrl, {userId})
+		.withMethod("PUT")
+		.withBody(user)
+		.fetch();
 }
 
 export function getLookupValues(routeParams, lookupName) {
@@ -625,7 +685,6 @@ export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
 		.withQueryParam("top", top)
 		.withQueryParam("filter", `CaseFieldName eq '${caseFieldName}' and DocumentCount gt 0`)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 

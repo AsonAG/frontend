@@ -1,3 +1,4 @@
+import { Language } from "./Language";
 import { IdType } from "./IdType";
 
 export type Payroll = {
@@ -6,5 +7,5 @@ export type Payroll = {
   divisionId: IdType
   accountingStartDate: string
   transmissionStartDate: string
-  language: string
+  language: Language | null
 }

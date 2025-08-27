@@ -28,7 +28,7 @@ import {
 	ResponsiveDialogContent,
 	ResponsiveDialogTrigger,
 } from "../ResponsiveDialog";
-import { useRole } from "../../hooks/useRole";
+import { useRole } from "../../user/utils";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { IdType } from "../../models/IdType";
 import { AvailableCase } from "../../models/AvailableCase";
@@ -230,7 +230,7 @@ function MonthGroup({ month, values }: { month: string, values: Array<CaseValue>
 			action: `${caseValueId}/i/${documentId}`
 		});
 	};
-	const isProviderRole = useRole("provider");
+	const isInstanceAdmin = useRole("InstanceAdmin");
 	const isMobile = useIsMobile();
 	return (
 		<Box display="grid" gridTemplateColumns="90px 1fr" gridTemplateRows="auto" alignItems="start">
@@ -243,7 +243,7 @@ function MonthGroup({ month, values }: { month: string, values: Array<CaseValue>
 							to={`${caseValue.id}/i/${document.id}`}
 							sx={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}
 						/>
-						{isProviderRole && !isMobile &&
+						{isInstanceAdmin && !isMobile &&
 							<ResponsiveDialog>
 								<ResponsiveDialogTrigger>
 									<IconButton size="small">
