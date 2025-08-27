@@ -19,8 +19,9 @@ import { App } from "./App";
 
 // TODO AJO error states when network requests fail
 import {
-	getEmployees,
+	getPayrollEmployees,
 	getEmployee,
+	getEmployees,
 	getEmployeeCases,
 	getEmployeeCaseChanges,
 	getCompanyCases,
@@ -67,7 +68,18 @@ import {
 	getPayrollRegulations,
 	updatePayrollRegulations,
 	updatePayroll,
-	createPayroll
+	createPayroll,
+	getOrganizationUserMemberships,
+	getPayrolls,
+	createOrganization,
+	getOrganizationUserMembershipInvitations,
+	getEmployeeEmail,
+	inviteUserToOrganization,
+	getInvitation,
+	acceptInvitation,
+	removeUserFromOrganization,
+	withdrawUserMembershipInvitationToOrganization,
+	saveOrganizationUserMembership
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -96,6 +108,7 @@ import {
 	refreshPayrollWageTypes,
 	payrollWageTypesAtom,
 	payrollWageTypeSettingsAtom,
+	userMembershipAtom
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
 import { PayrunDashboard } from "./payrun/Dashboard";
@@ -122,15 +135,23 @@ import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
 import { WageTypeControlling } from "./company/WageTypeControlling";
 import { PayrollSettings, ConfirmTransmissionDialog } from "./payroll/Settings";
 import { NewPayrollView } from "./payroll/NewPayrollView";
+import { UserMembershipTable } from "./user/UserMembershipTable";
+import { UserMembershipEditDialog } from "./user/UserMembershipEditDialog";
+import { isPayrollAdmin } from "./user/utils";
+import { UserMembershipInviteDialog } from "./user/UserMembershipInviteDialog";
+import { UserMembershipRemoveDialog } from "./user/UserMembershipRemoveDialog";
+import { InvitationView } from "./user/InvitationView";
+import { UserMembershipInvitationWithdrawDialogy } from "./user/UserMembershipInvitationWithdrawDialog";
+
 const store = getDefaultStore();
 
 async function getOrganizationData() {
-	const [org, payrolls, user] = await Promise.all([
+	const [org, payrolls, userMembership] = await Promise.all([
 		store.get(orgAtom),
 		store.get(payrollsAtom),
-		store.get(userAtom),
+		store.get(userMembershipAtom),
 	]);
-	return { org, payrolls, user };
+	return { org, payrolls, userMembership };
 }
 
 function getQueryParam(request, name, defaultValue = null) {
@@ -348,7 +369,7 @@ function createRouteEmployeeTable(path, showButtons = true) {
 		loader: async ({ params }) => {
 			return defer({
 				showButtons,
-				data: getEmployees(params).fetchJson(),
+				data: getPayrollEmployees(params).fetchJson(),
 			});
 		}
 	};
@@ -474,9 +495,6 @@ const routeData = [
 	{
 		path: "/",
 		element: <App />,
-		loader: () => {
-			return { user: null };
-		},
 		ErrorBoundary: ErrorView,
 		children: [
 			{
@@ -493,6 +511,18 @@ const routeData = [
 						return redirect(`../orgs/${orgs[0].id}`);
 					}
 					return orgs;
+				},
+				action: async ({request}) => {
+					const formData = await request.formData();
+					const response = await createOrganization(formData.get("org_name"));
+					if (response.ok) {
+						toast("success", "Organization created");
+						const org = await response.json();
+						return redirect(org.id)
+					} else {
+						toast("error", "Organization creation failed");
+					}
+					return null;
 				}
 			},
 			{
@@ -523,19 +553,19 @@ const routeData = [
 		element: <App renderDrawer />,
 		ErrorBoundary: ErrorView,
 		loader: async () => {
-			const { org, payrolls, user } = await getOrganizationData();
+			const { org, payrolls, userMembership } = await getOrganizationData();
 			const employee = await store.get(selfServiceEmployeeAtom);
-			return { org, user, payrolls, employee };
+			return { org, userMembership, payrolls, employee };
 		},
 		id: "orgRoot",
 		children: [
 			{
 				index: true,
 				loader: async () => {
-					// const { user } = await getOrganizationData();
-					// const isAdmin = user?.attributes.roles?.includes("admin");
-					// if (isAdmin)
-					// 	return redirect("employees");
+					const {payrolls} = await getOrganizationData();
+					if (!payrolls || payrolls.length === 0) {
+						return redirect("settings/newpayroll");
+					}
 					return redirect("payrolls");
 
 				}
@@ -648,20 +678,113 @@ const routeData = [
 					toast("success", "Organization unit created");
 					return redirect(`../payrolls/${payroll.id}/company`);
 				}
-			}
+			},
+			{
+				path: "users",
+				Component: UserMembershipTable,
+				id: "userTable",
+				loader: async ({ params }) => {
+					const [
+						userMemberships,
+						userMembershipInvitations,
+						employees,
+						payrolls
+					] = await Promise.all([
+						getOrganizationUserMemberships(params),
+						getOrganizationUserMembershipInvitations(params),
+						getEmployees(params).fetchJson(),
+						getPayrolls(params)
+					]);
+					const employeeMap = new Map(employees.map(x => [x.id, x]));
+					const employeesWithMemberships = new Set([...userMemberships.map(x => x.employeeId), ...userMembershipInvitations.map(x => x.employeeId)]);
+					const employeesWithoutMemberships = employees.filter(x => !employeesWithMemberships.has(x.id));
+					return { userMemberships, userMembershipInvitations, employees, employeeMap, payrolls, employeesWithoutMemberships };
+				},
+				children: [
+					{
+						path: "memberships/:userMembershipId/edit",
+						Component: UserMembershipEditDialog,
+						action: async ({ params, request }) => {
+							const membership = await request.json();
+							const response = await saveOrganizationUserMembership(params, membership);
+							if (response.ok) {
+								toast("success", "Saved!");
+								return redirect("..");
+							} else {
+								toast("error", "Something went wrong");
+							}
+							return null;
+						}
+					},
+					{
+						path: "memberships/:userMembershipId/remove",
+						Component: UserMembershipRemoveDialog,
+						action: async ({ params }) => {
+							const response = await removeUserFromOrganization(params);
+							if (response.ok) {
+								toast("success", "User has been removed");
+								return redirect("..");
+							} else {
+								toast("error", "Something went wrong");
+							}
+							return null;
+						}
+					},
+					{
+						path: "invitations/:invitationId/withdraw",
+						Component: UserMembershipInvitationWithdrawDialogy,
+						action: async ({ params }) => {
+							const response = await withdrawUserMembershipInvitationToOrganization(params);
+							if (response.ok) {
+								toast("success", "Invitation has been withdrawn");
+								return redirect("..");
+							} else {
+								toast("error", "Something went wrong");
+							}
+							return null;
+						}
+					},
+					{
+						path: "invite/:employeeId?",
+						Component: UserMembershipInviteDialog,
+						loader: async ({ params }) => {
+							let employeeEmail = null;
+							if (params.employeeId) {
+								employeeEmail = await getEmployeeEmail(params);
+							}
+							return {
+								employeeEmail
+							};
+						},
+						action: async ({params, request}) => {
+							const invitationRequest = await request.json();
+							const response = await inviteUserToOrganization(params, invitationRequest);
+							if (response.ok) {
+								const invitation = await response.json();
+								return invitation;
+							} else {
+								response.status === 409 ?
+									toast("error", "{{email}} already belongs to a member of the organization", {email: invitationRequest.email}) :
+									toast("error", "Could not invite user to organization");
+							}
+							return null;
+						}
+					}
+				]
+			},
 		]
 	},
 	{
 		path: "orgs/:orgId/payrolls/:payrollId?",
 		element: <App renderDrawer />,
 		loader: async ({ params }) => {
-			const { org, payrolls, user } = await getOrganizationData();
+			const { org, payrolls, userMembership } = await getOrganizationData();
 			if (!params.payrollId) {
 				return redirect(payrolls[0].id);
 			}
 			const payroll = payrolls.find((p) => p.id === params.payrollId);
 			const employee = await store.get(selfServiceEmployeeAtom);
-			return { org, user, payrolls, payroll, employee };
+			return { org, userMembership, payrolls, payroll, employee };
 		},
 		shouldRevalidate: ({ currentParams, nextParams }) =>
 			currentParams.orgId !== nextParams.orgId ||
@@ -672,10 +795,10 @@ const routeData = [
 			{
 				index: true,
 				Component: Dashboard,
-				loader: async () => {
-					const { user } = await getOrganizationData();
-					const isHrUser = user?.attributes.roles?.includes("hr");
-					if (isHrUser) {
+				loader: async ({params}) => {
+					const { userMembership } = await getOrganizationData();
+					const payrollAdmin = isPayrollAdmin(userMembership.role, params.payrollId);
+					if (payrollAdmin) {
 						return redirect("hr/employees");
 					}
 					const employee = await store.get(selfServiceEmployeeAtom);
@@ -753,7 +876,7 @@ const routeData = [
 				path: "hr/tasks",
 				Component: AsyncTaskTable,
 				loader: async ({ params, request }) => {
-					const { user } = await getOrganizationData();
+					const user = await store.get(userAtom);
 					const searchParams = new URL(request.url).searchParams;
 					let dataPromise = null;
 					if (searchParams.has("completed")) {
@@ -772,7 +895,7 @@ const routeData = [
 			{
 				path: "hr/tasks/new",
 				Component: NewTaskView,
-				loader: ({ params }) => getEmployees(params).fetchJson(),
+				loader: ({ params }) => getPayrollEmployees(params).fetchJson(),
 				action: async ({ params, request }) => {
 					const task = await request.json();
 					const response = await addTask(params, task);
@@ -1185,6 +1308,22 @@ const routeData = [
 			},
 		],
 	},
+	{
+		path: "invitation/:invitationId",
+		Component: InvitationView,
+		loader: ({params}) => getInvitation(params),
+		action: async ({params, request}) => {
+			const invitation = await request.json();
+			const response = await acceptInvitation(params);
+			if (response.ok) {
+				toast("success", "Invitation accepted")
+				return redirect(`/orgs/${invitation.tenantId}`);
+			} else {
+				toast("error", "Error accepting invitation");
+			}
+			return null;
+		}
+	}
 ];
 
 const updateParamsAtom = (state) => {

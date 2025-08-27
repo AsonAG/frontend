@@ -14,6 +14,10 @@ declare module '@mui/material/styles' {
     selection?: PaletteOptions['primary'];
     selectionAttention: Palette['primary'];
   }
+
+  interface PaletteColor {
+    hover?: string;
+  }
 }
 
 declare module '@mui/material/Badge' {

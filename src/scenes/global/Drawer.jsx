@@ -29,10 +29,10 @@ import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom } from "../../utils/dataAtoms";
-import { useRole } from "../../hooks/useRole";
+import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom, unwrappedUserMembershipAtom } from "../../utils/dataAtoms";
 import { unwrap } from "jotai/utils";
-import { Add, Business } from "@mui/icons-material";
+import { Add, Business, ManageAccounts } from "@mui/icons-material";
+import { useRole, isPayrollAdmin } from "../../user/utils";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {
@@ -182,6 +182,11 @@ function MenuItemsOrganization() {
 					icon={<SettingsIcon />}
 					end
 				/>
+				<NavigationItem
+					label={t("Users")}
+					to="users"
+					icon={<ManageAccounts />}
+				/>
 			</NavigationGroup>
 			<NavigationGroup name={t("Organization unit")}>
 				{payrolls.map(x => (
@@ -262,15 +267,20 @@ function MenuItemsUnknown() {
 function MenuItems() {
 	const { employee } = useLoaderData();
 	const payrollViewMatch = useMatch("/orgs/:orgId/payrolls/:payrollId/*");
-	const isAdmin = useRole("admin");
-	const isEmployee = useRole("user");
+	var userMembership = useAtomValue(unwrappedUserMembershipAtom);
+	if (!userMembership) {
+		return;
+	}
+	const payrollAdmin = !!payrollViewMatch && isPayrollAdmin(userMembership.role, payrollViewMatch.params.payrollId);
+	const isAdmin = userMembership.role.$type === "Admin" || userMembership.role.$type === "Owner";
+	const isSelfService = userMembership.role.$type === "SelfService";
 	if (!payrollViewMatch && isAdmin) {
 		return <MenuItemsOrganization />;
 	}
-	else if (payrollViewMatch && isAdmin) {
+	else if (payrollViewMatch && payrollAdmin) {
 		return <MenuItemsPayrollAdmin />;
 	}
-	else if (payrollViewMatch && isEmployee && employee) {
+	else if (payrollViewMatch && isSelfService && employee) {
 		return <MenuItemsPayrollEmployee employee={employee} />;
 	}
 	else {
@@ -352,9 +362,9 @@ function Drawer({ temporary, open, onClose }) {
 function OrganizationSection() {
 	const { t } = useTranslation();
 	const { org } = useLoaderData();
-	const isProvider = useRole("provider");
+	const isInstanceAdmin = useRole("InstanceAdmin");
 	const showOrgSelection = useAtomValue(showOrgSelectionAtom);
-	if (!isProvider && !showOrgSelection)
+	if (!isInstanceAdmin && !showOrgSelection)
 		return null;
 
 	return (

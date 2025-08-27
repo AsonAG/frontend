@@ -3,7 +3,7 @@ import { ContentLayout } from "../components/ContentLayout";
 import { Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useNavigation, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useRole } from "../hooks/useRole";
+import { useRole } from "../user/utils";
 import { ResponsiveDialog, ResponsiveDialogClose, ResponsiveDialogContent, ResponsiveDialogTrigger } from "../components/ResponsiveDialog";
 import { Organization } from "../models/Organization";
 
@@ -24,10 +24,10 @@ export function OrganizationSettings() {
 
 function ProviderOrganizationSection({ org }) {
   const { t } = useTranslation();
-  const isProvider = useRole("provider");
+  const isInstanceAdmin = useRole("InstanceAdmin");
   const [onExport, exportButtonDisabled, exportButtonIcon] = useAction("export");
   const [onDelete, deleteButtonDisabled, deleteButtonIcon] = useAction("delete");
-  if (!isProvider) return null;
+  if (!isInstanceAdmin) return null;
 
   return (
     <Stack spacing={2}>

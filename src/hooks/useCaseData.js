@@ -17,7 +17,7 @@ function mapCase(_case, attachments) {
 	};
 }
 
-export function useCaseData(params, user, payroll) {
+export function useCaseData(params, payroll) {
 	const attachments = useRef({});
 	const [caseData, setCaseData] = useState(null);
 	const [caseErrors, setCaseErrors] = useState([]);
@@ -44,7 +44,6 @@ export function useCaseData(params, user, payroll) {
 			return null;
 		}
 		const caseChangeSetup = {
-			userId: user.id,
 			divisionId: payroll.divisionId,
 			case: mapCase(caseData, attachments),
 			start: startDate?.toISOString(),
@@ -57,6 +56,10 @@ export function useCaseData(params, user, payroll) {
 	}
 
 	async function handleError(caseResponse) {
+		if (caseResponse.status === 404) {
+			setFatalError(new Error("The event does not exist or you do not have permission."));
+			return;
+		}
 		const response = await caseResponse.json();
 		if (caseResponse.status >= 400 && caseResponse.status < 500) {
 			if (typeof response === "string") {
@@ -68,7 +71,7 @@ export function useCaseData(params, user, payroll) {
 				setCaseErrors(errors);
 			}
 		} else {
-			setFatalError(new Error(response));
+			setFatalError(new Error("Something went wrong"));
 		}
 	}
 
