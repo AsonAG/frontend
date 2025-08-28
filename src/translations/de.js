@@ -202,9 +202,9 @@ const translations = {
 			"Sie sind eingeladen der Organiation {{orgName}} beizutreten.",
 		"The invitation is invalid": "Die Einladung ist ungültig",
 		Join: "Beitreten",
-		"User has been invited!": "Der Benutzer wurde eingeladen!",
-		"The user has been sent an invitation link to {{email}}":
-			"Dem Benutzer wurde ein Einladungslink auf die Adresse {{email}} gesendet.",
+		"Invitation has been created!": "Die Einladung wurde erstellt!",
+		"Send this link to the user with the email {{email}}.":
+			"Senden sie diesen Link an den Benutzer mit der Email {{email}}.",
 		"Invitation link": "Einladungslink",
 		"Copied to clipboard": "In die Zwischenablage kopiert",
 		Invite: "Einladen",

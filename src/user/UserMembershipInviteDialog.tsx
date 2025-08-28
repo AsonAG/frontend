@@ -85,10 +85,10 @@ export function UserMembershipInviteDialog() {
 			<ResponsiveDialog open>
 				<ResponsiveDialogContent>
 					<ResponsiveDialogTitle asChild>
-						<Typography variant="h6">{t("User has been invited!")}</Typography>
+						<Typography variant="h6">{t("Invitation has been created!")}</Typography>
 					</ResponsiveDialogTitle>
 					<Typography>
-						{t("The user has been sent an invitation link to {{email}}", {
+						{t("Send this link to the user with the email {{email}}.", {
 							email: invitation.email,
 						})}
 					</Typography>
@@ -123,7 +123,7 @@ export function UserMembershipInviteDialog() {
 				{!!selectedEmployee && (
 					<EmployeeSelection
 						employee={selectedEmployee}
-						onChange={() => {}}
+						onChange={() => { }}
 						employees={[]}
 						disabled
 					/>
