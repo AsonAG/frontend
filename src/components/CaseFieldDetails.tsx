@@ -1,5 +1,16 @@
 import React, { Fragment } from "react";
-import { Box, Button, Dialog, Divider, IconButton, Stack, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+	Box,
+	Button,
+	Dialog,
+	Divider,
+	IconButton,
+	Stack,
+	Theme,
+	Typography,
+	useMediaQuery,
+	useTheme,
+} from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { formatDate } from "../utils/DateUtils";
 import { useTranslation } from "react-i18next";
@@ -10,130 +21,164 @@ import { Loading } from "./Loading";
 import { useIncrementallyLoadedData } from "../hooks/useIncrementallyLoadedData";
 import { CaseChangeCaseValue } from "../models/CaseChangeCaseValue";
 
-export function CaseFieldDetails({ caseField, onClose }) {
-  const { t } = useTranslation();
-  const title = `${t("Details")} ${caseField.displayName}`;
-  const closeButton = <ButtonClose onClose={onClose} />;
-  const showHistory = caseField.timeType !== "Timeless";
+type CaseFieldDetailsProps = {
+	caseField: any;
+	onClose: () => void;
+	focus?: "description" | "history";
+};
 
-  return (
-    <DetailsContainer title={title} closeButton={closeButton}>
-      <CaseFieldDescription description={caseField.description} />
-      {showHistory && <CaseFieldHistory caseFieldName={caseField.name} /> }
-    </DetailsContainer>
-  )
+export function CaseFieldDetails({
+	caseField,
+	onClose,
+	focus,
+}: CaseFieldDetailsProps) {
+	const { t } = useTranslation();
+	const title = `${t("Details")} ${caseField.displayName}`;
+	const closeButton = <ButtonClose onClose={onClose} />;
+	const showHistory = caseField.timeType !== "Timeless";
+
+	return (
+		<DetailsContainer title={title} closeButton={closeButton}>
+			{}
+			{focus === "description" && (
+				<CaseFieldDescription description={caseField.description} />
+			)}
+
+			{}
+			{focus === "history" && showHistory && (
+				<CaseFieldHistory caseFieldName={caseField.name} />
+			)}
+		</DetailsContainer>
+	);
 }
 
 function DetailsContainer({ title, closeButton, children }) {
-  const useSidebar = useMediaQuery<Theme>(theme => theme.breakpoints.up(1000));
-  const useFullScreen = useMediaQuery<Theme>(theme => theme.breakpoints.down("sm"));
-  if (useSidebar) {
-    return (
-      <Sidebar title={title} closeButton={closeButton}>
-        {children}
-      </Sidebar>
-    )
-  }
-  return (
-    <Dialog fullScreen={useFullScreen} open fullWidth>
-      <DialogHeader title={title} closeButton={closeButton} />
-      <Divider />
-      <Stack spacing={2} p={2}>
-        {children}
-      </Stack>
-    </Dialog>
-  )
+	const useSidebar = useMediaQuery<Theme>((theme) =>
+		theme.breakpoints.up(1000),
+	);
+	const useFullScreen = useMediaQuery<Theme>((theme) =>
+		theme.breakpoints.down("sm"),
+	);
+	if (useSidebar) {
+		return (
+			<Sidebar title={title} closeButton={closeButton}>
+				{children}
+			</Sidebar>
+		);
+	}
+	return (
+		<Dialog fullScreen={useFullScreen} open fullWidth>
+			<DialogHeader title={title} closeButton={closeButton} />
+			<Divider />
+			<Stack spacing={2} p={2}>
+				{children}
+			</Stack>
+		</Dialog>
+	);
 }
 
 function DialogHeader({ title, closeButton }) {
-  const theme = useTheme();
-  return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      spacing={2}
-      px={2}
-      sx={theme.mixins.toolbar}
-    >
-      <Typography variant="h6" sx={{ flex: 1 }}>
-        {title}
-      </Typography>
-      {closeButton}
-    </Stack>
-  );
+	const theme = useTheme();
+	return (
+		<Stack
+			direction="row"
+			alignItems="center"
+			spacing={2}
+			px={2}
+			sx={theme.mixins.toolbar}
+		>
+			<Typography variant="h6" sx={{ flex: 1 }}>
+				{title}
+			</Typography>
+			{closeButton}
+		</Stack>
+	);
 }
 
 function ButtonClose({ onClose }) {
-  return (
-    <IconButton onClick={onClose} size="small">
-      <Close />
-    </IconButton>
-  )
+	return (
+		<IconButton onClick={onClose} size="small">
+			<Close />
+		</IconButton>
+	);
 }
 
 function CaseFieldDescription({ description }) {
-  const { t } = useTranslation();
-  if (!description)
-    return null;
+	const { t } = useTranslation();
+	if (!description) return null;
 
-  return (
-    <Stack spacing={1}>
-      <Typography variant="h6">
-        {t("Description")}
-      </Typography>
-      <HtmlContent content={description} />
-    </Stack>
-  )
+	return (
+		<Stack spacing={1}>
+			<Typography variant="h6">{t("Description")}</Typography>
+			<HtmlContent content={description} />
+		</Stack>
+	);
 }
 
 function CaseFieldHistory({ caseFieldName }) {
-  const { t } = useTranslation();
-  return (
-    <Stack spacing={1}>
-      <Typography variant="h6">{t("History")}</Typography>
-      <CaseFieldHistoryTable key={caseFieldName} caseFieldName={caseFieldName} />
-    </Stack>
-  )
+	const { t } = useTranslation();
+	return (
+		<Stack spacing={1}>
+			<Typography variant="h6">{t("History")}</Typography>
+			<CaseFieldHistoryTable
+				key={caseFieldName}
+				caseFieldName={caseFieldName}
+			/>
+		</Stack>
+	);
 }
 
 function CaseFieldHistoryTable({ caseFieldName }) {
-  const { t } = useTranslation();
-  const { items, loading, hasMore, loadMore } = useIncrementallyLoadedData<CaseChangeCaseValue>(`history/${encodeURIComponent(caseFieldName)}`, 20);
-  if (items.length === 0 && loading) {
-    return <Loading />;
-  }
+	const { t } = useTranslation();
+	const { items, loading, hasMore, loadMore } =
+		useIncrementallyLoadedData<CaseChangeCaseValue>(
+			`history/${encodeURIComponent(caseFieldName)}`,
+			20,
+		);
+	if (items.length === 0 && loading) {
+		return <Loading />;
+	}
 
-  if (items.length === 0 && !loading)
-    return <Typography>{t("No data")}</Typography>;
+	if (items.length === 0 && !loading)
+		return <Typography>{t("No data")}</Typography>;
 
-  const buttonEnabled = hasMore && !loading;
-  const buttonLabel = loading ? t("Loading...") :
-    hasMore ? t("Load more") :
-      t("Showing all values")
+	const buttonEnabled = hasMore && !loading;
+	const buttonLabel = loading
+		? t("Loading...")
+		: hasMore
+			? t("Load more")
+			: t("Showing all values");
 
-
-  return (
-    <Stack spacing={1}>
-      <Box display="grid" gridTemplateColumns="1fr 75px 75px 75px" columnGap="8px">
-        <Typography fontWeight="bold">{t("Value")}</Typography>
-        <Typography fontWeight="bold">{t("Start")}</Typography>
-        <Typography fontWeight="bold">{t("End")}</Typography>
-        <Typography fontWeight="bold">{t("Created")}</Typography>
-        {
-          items.map(cv => {
-            const caseValueFormatted = formatCaseValue(cv, t);
-            return (
-              <Fragment key={cv.id}>
-                <Typography noWrap title={caseValueFormatted}>{caseValueFormatted}</Typography>
-                <Typography>{formatDate(cv.start)}</Typography>
-                <Typography>{formatDate(cv.end)}</Typography>
-                <Typography title={formatDate(cv.created, true)}>{formatDate(cv.created)}</Typography>
-              </Fragment>
-            )
-          })
-        }
-      </Box>
-      <Button onClick={loadMore} disabled={!buttonEnabled}>{buttonLabel}</Button>
-    </Stack>
-  );
+	return (
+		<Stack spacing={1}>
+			<Box
+				display="grid"
+				gridTemplateColumns="1fr 75px 75px 75px"
+				columnGap="8px"
+			>
+				<Typography fontWeight="bold">{t("Value")}</Typography>
+				<Typography fontWeight="bold">{t("Start")}</Typography>
+				<Typography fontWeight="bold">{t("End")}</Typography>
+				<Typography fontWeight="bold">{t("Created")}</Typography>
+				{items.map((cv) => {
+					const caseValueFormatted = formatCaseValue(cv, t);
+					return (
+						<Fragment key={cv.id}>
+							<Typography noWrap title={caseValueFormatted}>
+								{caseValueFormatted}
+							</Typography>
+							<Typography>{formatDate(cv.start)}</Typography>
+							<Typography>{formatDate(cv.end)}</Typography>
+							<Typography title={formatDate(cv.created, true)}>
+								{formatDate(cv.created)}
+							</Typography>
+						</Fragment>
+					);
+				})}
+			</Box>
+			<Button onClick={loadMore} disabled={!buttonEnabled}>
+				{buttonLabel}
+			</Button>
+		</Stack>
+	);
 }

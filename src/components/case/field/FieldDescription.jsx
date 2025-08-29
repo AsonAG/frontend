@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { Tooltip, styled } from "@mui/material";
-import { Info } from "@mui/icons-material";
+import { Tooltip, styled, Stack } from "@mui/material";
+import { Info, History } from "@mui/icons-material";
 import { FieldContext } from "./Field";
 import { useTranslation } from "react-i18next";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
@@ -25,6 +25,7 @@ export function FieldDetails() {
 	const { setCaseFieldDetails } = useContext(CaseFormContext);
 	const { field } = useContext(FieldContext);
 	const { t } = useTranslation();
+	const showHistory = field.timeType !== "Timeless";
 
 	if (field.attributes["input.hidden"]) {
 		return null;
@@ -34,14 +35,30 @@ export function FieldDetails() {
 	}
 
 	return (
-		<Tooltip
-			arrow
-			title={t("Details")}
-			placement="right"
-		>
-			<ButtonBox type="button" tabIndex={-1} onClick={() => setCaseFieldDetails(field)}>
-				<Info />
-			</ButtonBox>
-		</Tooltip>
+		<Stack direction="row" spacing={1}>
+			{/* Alter Button: nur Beschreibung */}
+			<Tooltip arrow title={t("Description")} placement="right">
+				<ButtonBox
+					type="button"
+					tabIndex={-1}
+					onClick={() => setCaseFieldDetails({ field, focus: "description" })}
+				>
+					<Info />
+				</ButtonBox>
+			</Tooltip>
+
+			{/* Neuer Button: nur Verlauf (falls historisierbar) */}
+			{showHistory && (
+				<Tooltip arrow title={t("History")} placement="right">
+					<ButtonBox
+						type="button"
+						tabIndex={-1}
+						onClick={() => setCaseFieldDetails({ field, focus: "history" })}
+					>
+						<History />
+					</ButtonBox>
+				</Tooltip>
+			)}
+		</Stack>
 	);
 }

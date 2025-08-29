@@ -78,7 +78,13 @@ function CaseForm() {
 							<PeriodPicker variant={caseData.attributes?.["input.datePicker"] === "month" ? "month-short" : "standard"} inputMode={caseData.periodInputMode} startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
 							<CaseFormButtons onSubmit={handleSubmit} backPath={redirectPath} submitting={submitting} isReadonlyCase={isReadonlyCase} />
 						</Stack >
-						{caseFieldDetails && <CaseFieldDetails caseField={caseFieldDetails} onClose={() => setCaseFieldDetails(null)} />}
+						{caseFieldDetails && (
+							<CaseFieldDetails
+								caseField={caseFieldDetails.field ?? caseFieldDetails}
+								focus={caseFieldDetails.focus}
+								onClose={() => setCaseFieldDetails(null)}
+							/>
+						)}
 					</Stack>
 				</Form>
 			</CaseFormContext.Provider>
