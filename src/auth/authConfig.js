@@ -1,6 +1,6 @@
 import { WebStorageStateStore } from "oidc-client-ts";
 
-export const useOidc = !!import.meta.env.VITE_ENABLE_OIDC;
+export const useOidc = !import.meta.env.VITE_DISABLE_OIDC;
 
 export const authConfig = {
 	client_id: import.meta.env.VITE_CLIENT_ID,
