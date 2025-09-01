@@ -18,6 +18,7 @@ import { CaseFieldDetails } from "../../components/CaseFieldDetails";
 import { DatePicker } from "../../components/DatePicker";
 import { useTranslation } from "react-i18next";
 import { useAccountingPeriodDateLimit } from "../../components/case/useAccountingPeriodDateLimit";
+import { CaseReason } from "../../components/case/CaseReason";
 
 export const CaseFormContext = createContext();
 
@@ -49,6 +50,8 @@ function CaseForm() {
 		endDate,
 		setEndDate,
 		addCase,
+		reason,
+		setReason,
 	} = useCaseData(params, payroll);
 	const formRef = useRef();
 
@@ -87,6 +90,7 @@ function CaseForm() {
 							direction="row"
 							flexWrap="wrap"
 						>
+							<CaseReason reason={reason} setReason={setReason} />
 							<PeriodPicker
 								variant={
 									caseData.attributes?.["input.datePicker"] === "month"
