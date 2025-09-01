@@ -25,6 +25,7 @@ export function useCaseData(params, payroll) {
 	const [fatalError, setFatalError] = useState(null);
 	const [submitting, setSubmitting] = useState(false);
 	const [reason, setReason] = useState("");
+	const [includeReasonInPayslip, setIncludeReasonInPayslip] = useState(true);
 	let [startDate, setStartDate] = useState(null);
 	let [endDate, setEndDate] = useState(null);
 
@@ -49,15 +50,23 @@ export function useCaseData(params, payroll) {
 		if (!caseData) {
 			return null;
 		}
+		const reasonOnWageTypeNumber =
+			caseData.attributes?.["reasonOnWageTypeNumber"] ?? null;
+		const attributes =
+			!!reasonOnWageTypeNumber && includeReasonInPayslip
+				? {
+						reasonOnWageTypeNumber,
+						includeReasonInPayslip: "true",
+					}
+				: null;
+
 		const caseChangeSetup = {
 			reason: reason !== "" ? reason : null,
 			divisionId: payroll.divisionId,
 			case: mapCase(caseData, attachments),
 			start: startDate?.toISOString(),
 			end: endDate?.toISOString(),
-			attributes: {
-				addReasonToPayslip: true,
-			},
+			attributes,
 		};
 		if (params.employeeId) {
 			caseChangeSetup.employeeId = params.employeeId;
@@ -123,6 +132,8 @@ export function useCaseData(params, payroll) {
 		endDate,
 		reason,
 		setReason,
+		includeReasonInPayslip,
+		setIncludeReasonInPayslip,
 		setStartDate: (updatedStartDate) => {
 			// setStartDate does not immediately update startDate..
 			// so we need to update the value and trigger the rerender

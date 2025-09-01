@@ -52,6 +52,8 @@ function CaseForm() {
 		addCase,
 		reason,
 		setReason,
+		includeReasonInPayslip,
+		setIncludeReasonInPayslip,
 	} = useCaseData(params, payroll);
 	const formRef = useRef();
 
@@ -70,6 +72,8 @@ function CaseForm() {
 	} else if (loading) {
 		content = <Loading />;
 	} else {
+		const reasonCanBeIncludedInPayslip =
+			!!caseData?.attributes?.["reasonOnWageTypeNumber"];
 		content = (
 			<CaseFormContext.Provider
 				value={{
@@ -86,11 +90,17 @@ function CaseForm() {
 						<Stack
 							spacing={2}
 							justifyContent="end"
-							alignItems="end"
+							alignItems="center"
 							direction="row"
 							flexWrap="wrap"
 						>
-							<CaseReason reason={reason} setReason={setReason} />
+							<CaseReason
+								reason={reason}
+								setReason={setReason}
+								reasonCanBeIncludedInPayslip={reasonCanBeIncludedInPayslip}
+								includeReasonInPayslip={includeReasonInPayslip}
+								setIncludeReasonInPayslip={setIncludeReasonInPayslip}
+							/>
 							<PeriodPicker
 								variant={
 									caseData.attributes?.["input.datePicker"] === "month"
