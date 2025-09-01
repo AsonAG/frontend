@@ -242,6 +242,7 @@ const translations = {
 		"The event does not exist or you do not have permission.":
 			"Das Ereignis gibt es nicht oder Sie haben keine Berechtigungen.",
 		"Something went wrong": "Etwas ist schief gelaufen",
+		"Show reason in payslip": "Grund in Lohnabrechnung anzeigen",
 
 		// compliance
 		Submit: "Übermitteln",

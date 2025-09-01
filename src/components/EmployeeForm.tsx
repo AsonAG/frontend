@@ -1,12 +1,9 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
 	Button,
 	Stack,
 	TextField,
 	FormControl,
-	InputLabel,
-	Select,
-	MenuItem,
 	FormControlLabel,
 	Checkbox,
 	Typography,
