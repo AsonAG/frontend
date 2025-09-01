@@ -43,7 +43,6 @@ function AuthenticatedUserSettings() {
 	const auth = useAuth();
 	const handleLogout = async () => {
 		if (auth.isAuthenticated) {
-			await auth.removeUser();
 			await auth.signoutRedirect();
 		}
 	};
