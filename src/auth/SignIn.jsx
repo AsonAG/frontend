@@ -30,7 +30,7 @@ function SignIn({ children }) {
 		});
 	}, [auth.events]);
 
-	if (auth.isLoading) {
+	if (auth.isLoading || auth.activeNavigator) {
 		return <Loading />;
 	}
 
