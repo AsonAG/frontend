@@ -40,10 +40,12 @@ export type PayrunDocument = {
 	id: IdType;
 	name: string;
 	contentType: string;
-	attributes:
-		| Record<string, string>
-		| Record<"reports", DocumentReportDefinition>;
+	attributes: PayrunDocumentAttributes;
 };
+type PayrunDocumentAttributes = {
+	type: string,
+	reports?: DocumentReportDefinition[]
+}
 type DocumentReportDefinition = {
 	Name: string;
 	Variants: Array<string>;
