@@ -44,22 +44,7 @@ const columnHelper = createColumnHelper<EventRow>();
 function createColumns(t: TFunction<"translation", undefined>) {
 	return [
 		columnHelper.accessor("eventName", {
-			cell: (props) => {
-				return (
-					<Stack>
-						<Typography>{props.getValue()}</Typography>
-						{!!props.row.original.eventReason && (
-							<Typography
-								variant="body2"
-								color="textSecondary"
-								sx={{ fontStyle: "italic" }}
-							>
-								{t("Reason")}: {t(props.row.original.eventReason)}
-							</Typography>
-						)}
-					</Stack>
-				);
-			},
+			cell: (name) => name.getValue(),
 			header: () => t("Event"),
 		}),
 		columnHelper.accessor("eventFieldName", {
@@ -133,7 +118,6 @@ type Event = {
 	created: Date;
 	cancellationId: IdType;
 	cancallationDate: Date;
-	reason: string | null;
 	values: Array<EventValue>;
 };
 
@@ -151,7 +135,6 @@ type EventValue = {
 type EventRow = {
 	id: IdType;
 	eventName?: string;
-	eventReason?: string | null;
 	eventFieldName?: string;
 	value?: string;
 	start?: Date;
@@ -191,7 +174,6 @@ export function EventTable({ items: events }: EventDisplayProps) {
 			events.map((event) => ({
 				id: event.id,
 				eventName: event.caseName,
-				eventReason: event.reason,
 				created: event.created,
 				subRows: event.values.map((v) => ({
 					id: v.id,
@@ -367,17 +349,17 @@ function CaseChange({ caseChange, variant }) {
 		<Stack>
 			<Card>
 				<CardHeader
+					action={
+						<IconButton>
+							<MoreVert />
+						</IconButton>
+					}
 					title={caseChange.caseName}
 					titleTypographyProps={{ variant: "h6" }}
 					subheader={
-						<Stack>
-							<Tooltip title={t("Created")} {...tooltipProps}>
-								<Typography>{formatDate(caseChange.created, true)}</Typography>
-							</Tooltip>
-							<Typography sx={{ fontStyle: "italic" }}>
-								{t("Reason")}: {caseChange.reason}
-							</Typography>
-						</Stack>
+						<Tooltip title={t("Created")} {...tooltipProps}>
+							<Typography>{formatDate(caseChange.created, true)}</Typography>
+						</Tooltip>
 					}
 				/>
 				<CardContent>
