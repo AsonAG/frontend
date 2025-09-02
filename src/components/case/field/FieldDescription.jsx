@@ -4,6 +4,7 @@ import { Info, History } from "@mui/icons-material";
 import { FieldContext } from "./Field";
 import { useTranslation } from "react-i18next";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
+import { useIncrementallyLoadedData } from "../../../hooks/useIncrementallyLoadedData";
 
 const ButtonBox = styled("button")(({ theme }) =>
 	theme.unstable_sx({
@@ -17,7 +18,7 @@ const ButtonBox = styled("button")(({ theme }) =>
 		alignItems: "center",
 		color: theme.palette.text.secondary,
 		backgroundColor: theme.palette.background.default,
-		cursor: "pointer"
+		cursor: "pointer",
 	}),
 );
 
@@ -25,29 +26,45 @@ export function FieldDetails() {
 	const { setCaseFieldDetails } = useContext(CaseFormContext);
 	const { field } = useContext(FieldContext);
 	const { t } = useTranslation();
-	const showHistory = field.timeType !== "Timeless";
+
+	const isHistorisable = field.timeType !== "Timeless";
+
+	const { items } = useIncrementallyLoadedData(
+		`history/${encodeURIComponent(field.name)}`,
+		1
+	);
+
+	const hasAnyHistory = Array.isArray(items) && items.length > 0;
+
+	const showDescription = !!field.description;
+	const showHistory = isHistorisable && hasAnyHistory;
 
 	if (field.attributes["input.hidden"]) {
 		return null;
 	}
-	if (field.timeType === "Timeless" && !field.description) {
+
+	if (!showDescription && !showHistory) {
 		return null;
 	}
 
 	return (
 		<Stack direction="row" spacing={1}>
-			{/* Alter Button: nur Beschreibung */}
-			<Tooltip arrow title={t("Description")} placement="right">
-				<ButtonBox
-					type="button"
-					tabIndex={-1}
-					onClick={() => setCaseFieldDetails({ field, focus: "description" })}
-				>
-					<Info />
-				</ButtonBox>
-			</Tooltip>
+			{ }
+			{showDescription && (
+				<Tooltip arrow title={t("Description")} placement="right">
+					<ButtonBox
+						type="button"
+						tabIndex={-1}
+						onClick={() =>
+							setCaseFieldDetails({ field, focus: "description" })
+						}
+					>
+						<Info />
+					</ButtonBox>
+				</Tooltip>
+			)}
 
-			{/* Neuer Button: nur Verlauf (falls historisierbar) */}
+			{ }
 			{showHistory && (
 				<Tooltip arrow title={t("History")} placement="right">
 					<ButtonBox
