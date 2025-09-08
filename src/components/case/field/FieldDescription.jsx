@@ -1,9 +1,10 @@
 import { useContext } from "react";
-import { Tooltip, styled } from "@mui/material";
-import { Info } from "@mui/icons-material";
+import { Tooltip, styled, Stack } from "@mui/material";
+import { Info, History } from "@mui/icons-material";
 import { FieldContext } from "./Field";
 import { useTranslation } from "react-i18next";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
+import { useIncrementallyLoadedData } from "../../../hooks/useIncrementallyLoadedData";
 
 const ButtonBox = styled("button")(({ theme }) =>
 	theme.unstable_sx({
@@ -26,22 +27,55 @@ export function FieldDetails() {
 	const { field } = useContext(FieldContext);
 	const { t } = useTranslation();
 
+	const isHistorisable = field.timeType !== "Timeless";
+
+	const { items } = useIncrementallyLoadedData(
+		`history/${encodeURIComponent(field.name)}`,
+		1
+	);
+
+	const hasAnyHistory = Array.isArray(items) && items.length > 0;
+
+	const showDescription = !!field.description;
+	const showHistory = isHistorisable && hasAnyHistory;
+
 	if (field.attributes["input.hidden"]) {
 		return null;
 	}
-	if (field.timeType === "Timeless" && !field.description) {
+
+	if (!showDescription && !showHistory) {
 		return null;
 	}
 
 	return (
-		<Tooltip arrow title={t("Details")} placement="right">
-			<ButtonBox
-				type="button"
-				tabIndex={-1}
-				onClick={() => setCaseFieldDetails(field)}
-			>
-				<Info />
-			</ButtonBox>
-		</Tooltip>
+		<Stack direction="row" spacing={1}>
+			{ }
+			{showDescription && (
+				<Tooltip arrow title={t("Description")} placement="right">
+					<ButtonBox
+						type="button"
+						tabIndex={-1}
+						onClick={() =>
+							setCaseFieldDetails({ field, focus: "description" })
+						}
+					>
+						<Info />
+					</ButtonBox>
+				</Tooltip>
+			)}
+
+			{ }
+			{showHistory && (
+				<Tooltip arrow title={t("History")} placement="right">
+					<ButtonBox
+						type="button"
+						tabIndex={-1}
+						onClick={() => setCaseFieldDetails({ field, focus: "history" })}
+					>
+						<History />
+					</ButtonBox>
+				</Tooltip>
+			)}
+		</Stack>
 	);
 }
