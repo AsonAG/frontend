@@ -31,13 +31,13 @@ export function FieldDetails() {
 
 	const { items } = useIncrementallyLoadedData(
 		`history/${encodeURIComponent(field.name)}`,
-		1
+		2
 	);
 
-	const hasAnyHistory = Array.isArray(items) && items.length > 0;
+	const hasEnoughHistory = Array.isArray(items) && items.length > 1;
 
 	const showDescription = !!field.description;
-	const showHistory = isHistorisable && hasAnyHistory;
+	const showHistory = isHistorisable && hasEnoughHistory;
 
 	if (field.attributes["input.hidden"]) {
 		return null;
