@@ -21,7 +21,17 @@ import { Loading } from "./Loading";
 import { useIncrementallyLoadedData } from "../hooks/useIncrementallyLoadedData";
 import { CaseChangeCaseValue } from "../models/CaseChangeCaseValue";
 
-export function CaseFieldDetails({ caseField, onClose }) {
+type CaseFieldDetailsProps = {
+	caseField: any;
+	onClose: () => void;
+	focus?: "description" | "history";
+};
+
+export function CaseFieldDetails({
+	caseField,
+	onClose,
+	focus,
+}: CaseFieldDetailsProps) {
 	const { t } = useTranslation();
 	const title = `${t("Details")} ${caseField.displayName}`;
 	const closeButton = <ButtonClose onClose={onClose} />;
@@ -29,8 +39,15 @@ export function CaseFieldDetails({ caseField, onClose }) {
 
 	return (
 		<DetailsContainer title={title} closeButton={closeButton}>
-			<CaseFieldDescription description={caseField.description} />
-			{showHistory && <CaseFieldHistory caseFieldName={caseField.name} />}
+			{}
+			{focus === "description" && (
+				<CaseFieldDescription description={caseField.description} />
+			)}
+
+			{}
+			{focus === "history" && showHistory && (
+				<CaseFieldHistory caseFieldName={caseField.name} />
+			)}
 		</DetailsContainer>
 	);
 }
