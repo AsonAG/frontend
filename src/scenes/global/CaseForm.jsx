@@ -108,7 +108,8 @@ function CaseForm() {
 						</Stack>
 						{caseFieldDetails && (
 							<CaseFieldDetails
-								caseField={caseFieldDetails}
+								caseField={caseFieldDetails.field ?? caseFieldDetails}
+								focus={caseFieldDetails.focus}
 								onClose={() => setCaseFieldDetails(null)}
 							/>
 						)}
@@ -146,7 +147,9 @@ function PeriodPicker({
 			variant={variant}
 			required
 			onChange={(s) =>
-				setStartDate(variant === "month-short" ? s.startOf("month") : s)
+				setStartDate(
+					variant === "month-short" ? s.startOf("month") : s
+				)
 			}
 			name="case_change_valid_from"
 			{...startPickerProps}
@@ -161,7 +164,9 @@ function PeriodPicker({
 				variant={variant}
 				required
 				onChange={(e) =>
-					setEndDate(variant === "month-short" ? e.endOf("month") : e)
+					setEndDate(
+						variant === "month-short" ? e.endOf("month") : e
+					)
 				}
 				name="case_change_valid_until"
 				{...endPickerProps}
