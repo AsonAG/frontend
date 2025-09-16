@@ -4,7 +4,7 @@ import { Info, History } from "@mui/icons-material";
 import { FieldContext } from "./Field";
 import { useTranslation } from "react-i18next";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
-import { useIncrementallyLoadedData } from "../../../hooks/useIncrementallyLoadedData";
+import { useHistoryCount } from "../../../hooks/useHistoryCount";
 
 const ButtonBox = styled("button")(({ theme }) =>
 	theme.unstable_sx({
@@ -29,27 +29,20 @@ export function FieldDetails() {
 
 	const isHistorisable = field.timeType !== "Timeless";
 
-	const { items } = useIncrementallyLoadedData(
-		`history/${encodeURIComponent(field.name)}`,
-		2
-	);
+	// Nur die Anzahl laden 
+	const { count } = useHistoryCount(field?.name);
 
-	const hasEnoughHistory = Array.isArray(items) && items.length > 1;
-
+	// Details-Button nur mit Beschreibung
 	const showDescription = !!field.description;
-	const showHistory = isHistorisable && hasEnoughHistory;
 
-	if (field.attributes["input.hidden"]) {
-		return null;
-	}
+	// History-Button nur, min 2 Werte
+	const showHistory = isHistorisable && typeof count === "number" && count >= 2;
 
-	if (!showDescription && !showHistory) {
-		return null;
-	}
+	if (field.attributes["input.hidden"]) return null;
+	if (!showDescription && !showHistory) return null;
 
 	return (
 		<Stack direction="row" spacing={1}>
-			{ }
 			{showDescription && (
 				<Tooltip arrow title={t("Description")} placement="right">
 					<ButtonBox
@@ -64,7 +57,6 @@ export function FieldDetails() {
 				</Tooltip>
 			)}
 
-			{ }
 			{showHistory && (
 				<Tooltip arrow title={t("History")} placement="right">
 					<ButtonBox
