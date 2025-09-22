@@ -108,8 +108,8 @@ function CaseForm() {
 						</Stack>
 						{caseFieldDetails && (
 							<CaseFieldDetails
-								caseField={caseFieldDetails.field ?? caseFieldDetails}
-								view={caseFieldDetails.view ?? caseFieldDetails.focus}
+								caseField={caseFieldDetails.field}
+								view={caseFieldDetails.view}
 								onClose={() => setCaseFieldDetails(null)}
 							/>
 						)}
