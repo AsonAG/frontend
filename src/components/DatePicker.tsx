@@ -96,9 +96,7 @@ export function DatePicker<T extends DatePickerVariants>({
 			message = getValidationErrorMessage(err);
 		}
 		if (!message && err) {
-			message = getValidationError({
-				validationError: err,
-			});
+			message = getDefaultValidationErrorMessage(err);
 		}
 
 		if (inputRef.current) {
@@ -182,11 +180,9 @@ export function DatePicker<T extends DatePickerVariants>({
 	);
 }
 
-type GetValidationErrorProps = {
-	validationError?: DateTimeValidationError | DateValidationError | null;
-};
-
-function getValidationError({ validationError }: GetValidationErrorProps) {
+function getDefaultValidationErrorMessage(
+	validationError: DateTimeValidationError | DateValidationError | null,
+): string {
 	if (validationError === "minDate") {
 		return "Date is not in the valid range.";
 	}
