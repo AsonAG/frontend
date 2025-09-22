@@ -26,17 +26,13 @@ export function FieldDetails() {
 	const { setCaseFieldDetails } = useContext(CaseFormContext);
 	const { field } = useContext(FieldContext);
 	const { t } = useTranslation();
-
 	const isHistorisable = field.timeType !== "Timeless";
-
-	// Nur die Anzahl laden 
 	const { count } = useHistoryCount(field?.name);
 
-	// Details-Button nur mit Beschreibung
-	const showDescription = !!field.description;
-
-	// History-Button nur, min 2 Werte
-	const showHistory = isHistorisable && typeof count === "number" && count >= 2;
+	//min 2 Werte vorhanden sind
+	const showHistory = isHistorisable && count !== null && count >= 2;
+	//wenn wirklich eine Beschreibung existiert
+	const showDescription = Boolean(field.description);
 
 	if (field.attributes["input.hidden"]) return null;
 	if (!showDescription && !showHistory) return null;
@@ -49,7 +45,7 @@ export function FieldDetails() {
 						type="button"
 						tabIndex={-1}
 						onClick={() =>
-							setCaseFieldDetails({ field, focus: "description" })
+							setCaseFieldDetails({ field, view: "description" })
 						}
 					>
 						<Info />
@@ -62,7 +58,9 @@ export function FieldDetails() {
 					<ButtonBox
 						type="button"
 						tabIndex={-1}
-						onClick={() => setCaseFieldDetails({ field, focus: "history" })}
+						onClick={() =>
+							setCaseFieldDetails({ field, view: "history" })
+						}
 					>
 						<History />
 					</ButtonBox>

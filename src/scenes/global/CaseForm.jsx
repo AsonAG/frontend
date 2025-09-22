@@ -109,7 +109,7 @@ function CaseForm() {
 						{caseFieldDetails && (
 							<CaseFieldDetails
 								caseField={caseFieldDetails.field ?? caseFieldDetails}
-								focus={caseFieldDetails.focus}
+								view={caseFieldDetails.view ?? caseFieldDetails.focus}
 								onClose={() => setCaseFieldDetails(null)}
 							/>
 						)}

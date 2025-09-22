@@ -27,7 +27,7 @@ type CaseField = {
 	timeType: string;
 	description?: string | null;
 };
-type CaseFieldDetailsProps = {
+export type CaseFieldDetailsProps = {
 	caseField: CaseField;
 	onClose: () => void;
 	view?: "description" | "history";
@@ -41,14 +41,13 @@ export function CaseFieldDetails({
 	const { t } = useTranslation();
 	const title = `${t("Details")} ${caseField.displayName}`;
 	const closeButton = <ButtonClose onClose={onClose} />;
-	const showHistory = caseField.timeType !== "Timeless";
 
 	return (
 		<DetailsContainer title={title} closeButton={closeButton}>
 			{view === "description" && (
 				<CaseFieldDescription description={caseField.description ?? null} />
 			)}
-			{view === "history" && showHistory && (
+			{view === "history" && (
 				<CaseFieldHistory caseFieldName={caseField.name} />
 			)}
 		</DetailsContainer>
