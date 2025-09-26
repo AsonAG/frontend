@@ -20,19 +20,27 @@ import { PayrollSelector } from "../../components/selectors/PayrollSelector";
 import { Stack } from "@mui/system";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import SettingsIcon from '@mui/icons-material/Settings';
-import BusinessIcon from '@mui/icons-material/Business';
-import NotificationImportantIcon from '@mui/icons-material/NotificationImportant';
-import PaymentsIcon from '@mui/icons-material/Payments';
+import SettingsIcon from "@mui/icons-material/Settings";
+import BusinessIcon from "@mui/icons-material/Business";
+import NotificationImportantIcon from "@mui/icons-material/NotificationImportant";
+import PaymentsIcon from "@mui/icons-material/Payments";
 
 import Logo from "../../components/Logo";
 import styled from "@emotion/styled";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
-import { companyMissingDataCountAtom, openTasksAtom, showOrgSelectionAtom, ESSMissingDataAtom, missingDataEmployeesAtom, payrollControllingDataTotalCountAtom } from "../../utils/dataAtoms";
-import { useRole } from "../../hooks/useRole";
+import {
+	companyMissingDataCountAtom,
+	openTasksAtom,
+	showOrgSelectionAtom,
+	ESSMissingDataAtom,
+	missingDataEmployeesAtom,
+	payrollControllingDataTotalCountAtom,
+	unwrappedUserMembershipAtom,
+} from "../../utils/dataAtoms";
 import { unwrap } from "jotai/utils";
-import { Add, Business } from "@mui/icons-material";
+import { Add, Business, ManageAccounts } from "@mui/icons-material";
+import { useRole, isPayrollAdmin } from "../../user/utils";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {
@@ -64,7 +72,7 @@ function NavigationItem(props) {
 	const matches = useMatches();
 	let active = false;
 	if (activeOn) {
-		active = matches.some(match => match.id === activeOn);
+		active = matches.some((match) => match.id === activeOn);
 	}
 
 	return (
@@ -81,12 +89,17 @@ function OpenTasksBadgeIcon() {
 	const icon = <FormatListBulletedIcon />;
 	return (
 		<Suspense fallback={icon}>
-			<AtomBadge atom={openTasksAtom} color="warning">{icon}</AtomBadge>
+			<AtomBadge atom={openTasksAtom} color="warning">
+				{icon}
+			</AtomBadge>
 		</Suspense>
 	);
 }
 
-const unwrappedCompanyMissingDataCountAtom = unwrap(companyMissingDataCountAtom, (prev => prev ?? 0))
+const unwrappedCompanyMissingDataCountAtom = unwrap(
+	companyMissingDataCountAtom,
+	(prev) => prev ?? 0,
+);
 function CompanyBadgeIcon({ icon }) {
 	const count = useAtomValue(unwrappedCompanyMissingDataCountAtom);
 	return (
@@ -96,11 +109,16 @@ function CompanyBadgeIcon({ icon }) {
 	);
 }
 
-const unwrappedMissingDataEmployeesAtom = unwrap(missingDataEmployeesAtom, (prev => prev ?? []));
+const unwrappedMissingDataEmployeesAtom = unwrap(
+	missingDataEmployeesAtom,
+	(prev) => prev ?? [],
+);
 
 function EmployeeBadgeIcon({ icon }) {
 	const cases = useAtomValue(unwrappedMissingDataEmployeesAtom);
-	const count = cases.map((x) => x.cases?.length ?? 0).reduce((a, b) => a + b, 0)
+	const count = cases
+		.map((x) => x.cases?.length ?? 0)
+		.reduce((a, b) => a + b, 0);
 	return (
 		<Badge badgeContent={count} color="warning" overlap="circular">
 			{icon}
@@ -119,10 +137,12 @@ function EmployeeMissingDataBadge({ icon }) {
 			</AtomBadge>
 		</Suspense>
 	);
-
 }
 
-const unwrappedPayrollControllingDataTotalCountAtom = unwrap(payrollControllingDataTotalCountAtom, (prev => prev ?? 0));
+const unwrappedPayrollControllingDataTotalCountAtom = unwrap(
+	payrollControllingDataTotalCountAtom,
+	(prev) => prev ?? 0,
+);
 function PayrollBadgeIcon({ icon }) {
 	const count = useAtomValue(unwrappedPayrollControllingDataTotalCountAtom);
 	return (
@@ -132,17 +152,21 @@ function PayrollBadgeIcon({ icon }) {
 	);
 }
 
-
 function defaultCount(data) {
 	return data.count;
 }
-function AtomBadge({ atom, color = "primary", countFunc = defaultCount, children }) {
+function AtomBadge({
+	atom,
+	color = "primary",
+	countFunc = defaultCount,
+	children,
+}) {
 	const data = useAtomValue(atom);
 	const count = countFunc(data);
 	return (
 		<Badge badgeContent={count} color={color} overlap="circular">
 			{children}
-		</Badge >
+		</Badge>
 	);
 }
 
@@ -172,7 +196,7 @@ function NavigationGroup({ name, children, hidden = false }) {
 
 function MenuItemsOrganization() {
 	const { t } = useTranslation();
-	const { payrolls } = useLoaderData()
+	const { payrolls } = useLoaderData();
 	return (
 		<>
 			<NavigationGroup>
@@ -182,9 +206,14 @@ function MenuItemsOrganization() {
 					icon={<SettingsIcon />}
 					end
 				/>
+				<NavigationItem
+					label={t("Users")}
+					to="users"
+					icon={<ManageAccounts />}
+				/>
 			</NavigationGroup>
 			<NavigationGroup name={t("Organization unit")}>
-				{payrolls.map(x => (
+				{payrolls.map((x) => (
 					<NavigationItem
 						key={x.id}
 						label={x.name}
@@ -228,7 +257,7 @@ function MenuItemsPayrollAdmin() {
 				icon={<OpenTasksBadgeIcon />}
 			/>
 		</NavigationGroup>
-	)
+	);
 }
 
 function MenuItemsPayrollEmployee({ employee }) {
@@ -243,7 +272,12 @@ function MenuItemsPayrollEmployee({ employee }) {
 			<NavigationItem
 				label={t("Missing data")}
 				to={`employees/${employee.id}/missingdata`}
-				icon={<EmployeeMissingDataBadge employeeId={employee.id} icon={<NotificationImportantIcon />} />}
+				icon={
+					<EmployeeMissingDataBadge
+						employeeId={employee.id}
+						icon={<NotificationImportantIcon />}
+					/>
+				}
 			/>
 			<NavigationItem
 				label={t("Documents")}
@@ -256,27 +290,32 @@ function MenuItemsPayrollEmployee({ employee }) {
 
 function MenuItemsUnknown() {
 	const { t } = useTranslation();
-	return <Typography>{t("No features available for this user")}</Typography>
+	return <Typography>{t("No features available for this user")}</Typography>;
 }
 
 function MenuItems() {
 	const { employee } = useLoaderData();
 	const payrollViewMatch = useMatch("/orgs/:orgId/payrolls/:payrollId/*");
-	const isAdmin = useRole("admin");
-	const isEmployee = useRole("user");
+	var userMembership = useAtomValue(unwrappedUserMembershipAtom);
+	if (!userMembership) {
+		return;
+	}
+	const payrollAdmin =
+		!!payrollViewMatch &&
+		isPayrollAdmin(userMembership.role, payrollViewMatch.params.payrollId);
+	const isAdmin =
+		userMembership.role.$type === "Admin" ||
+		userMembership.role.$type === "Owner";
+	const isSelfService = userMembership.role.$type === "SelfService";
 	if (!payrollViewMatch && isAdmin) {
 		return <MenuItemsOrganization />;
-	}
-	else if (payrollViewMatch && isAdmin) {
+	} else if (payrollViewMatch && payrollAdmin) {
 		return <MenuItemsPayrollAdmin />;
-	}
-	else if (payrollViewMatch && isEmployee && employee) {
+	} else if (payrollViewMatch && isSelfService && employee) {
 		return <MenuItemsPayrollEmployee employee={employee} />;
-	}
-	else {
+	} else {
 		return <MenuItemsUnknown />;
 	}
-
 }
 
 const drawerWidth = 265;
@@ -352,10 +391,9 @@ function Drawer({ temporary, open, onClose }) {
 function OrganizationSection() {
 	const { t } = useTranslation();
 	const { org } = useLoaderData();
-	const isProvider = useRole("provider");
+	const isInstanceAdmin = useRole("InstanceAdmin");
 	const showOrgSelection = useAtomValue(showOrgSelectionAtom);
-	if (!isProvider && !showOrgSelection)
-		return null;
+	if (!isInstanceAdmin && !showOrgSelection) return null;
 
 	return (
 		<>
@@ -363,11 +401,7 @@ function OrganizationSection() {
 			<Stack sx={{ p: 2 }} spacing={1}>
 				<Typography>{t("Organization")}</Typography>
 				<Stack spacing={1} direction="row">
-					<Typography
-						variant="body2"
-						textOverflow="ellipsis"
-						overflow="hidden"
-					>
+					<Typography variant="body2" textOverflow="ellipsis" overflow="hidden">
 						{org.identifier}
 					</Typography>
 					<Typography
@@ -388,7 +422,6 @@ function OrganizationSection() {
 			</Stack>
 		</>
 	);
-
 }
 
 export default Drawer;

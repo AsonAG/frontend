@@ -8,9 +8,13 @@ const storageKey = `oidc.user:${authConfig.authority}:${authConfig.client_id}`;
 
 type NullableUser = User | null;
 
-function createAuthUserAtom(): WritableAtom<NullableUser, [NullableUser], void> {
+function createAuthUserAtom(): WritableAtom<
+	NullableUser,
+	[NullableUser],
+	void
+> {
 	if (useOidc) {
-		return atomWithRefresh<User | null>(_ => {
+		return atomWithRefresh<User | null>((_) => {
 			const oidcStorage = localStorage.getItem(storageKey);
 			if (!oidcStorage) return null;
 			return User.fromStorageString(oidcStorage);
@@ -30,18 +34,23 @@ function createAuthUserAtom(): WritableAtom<NullableUser, [NullableUser], void> 
 			iss: "",
 			aud: "",
 			exp: 0,
-			iat: 0
+			iat: 0,
 		},
 		state: undefined,
 		expires_in: undefined,
 		expired: undefined,
 		scopes: [],
-		toStorageString: function(): string {
+		toStorageString: function (): string {
 			throw new Error("Function not implemented.");
-		}
+		},
 	};
 
-	const localUserAtom = atomWithStorage<User | null>("local.ason.user", defaultLocalUser, undefined, { getOnInit: true });
+	const localUserAtom = atomWithStorage<User | null>(
+		"local.ason.user",
+		defaultLocalUser,
+		undefined,
+		{ getOnInit: true },
+	);
 	return localUserAtom;
 }
 
@@ -59,7 +68,7 @@ export const localUserEmailAtom = atom(
 			user.profile.email = update;
 			set(authUserAtom, user);
 		}
-	}
+	},
 );
 
 export const authUserRolesAtom = atom((get) => {
@@ -71,9 +80,9 @@ export const authUserRolesAtom = atom((get) => {
 	return [];
 });
 
-window.addEventListener("storage", event => {
+window.addEventListener("storage", (event) => {
 	if (event.key === storageKey) {
 		// @ts-ignore
 		getDefaultStore().set(authUserAtom);
 	}
-})
+});

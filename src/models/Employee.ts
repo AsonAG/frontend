@@ -11,10 +11,14 @@ export type Employee = {
 };
 
 export type EmployeeSet = Employee & {
-	leavingDate: string | null
-	isEmployed: boolean
-}
+	leavingDate: string | null;
+	isEmployed: boolean;
+};
 
-export function getEmployeeDisplayString(employee: { firstName: string, lastName: string, identifier: string }) {
+export function getEmployeeDisplayString(employee: {
+	firstName: string;
+	lastName: string;
+	identifier: string;
+}) {
 	return `${employee.firstName} ${employee.lastName} (${employee.identifier})`;
 }

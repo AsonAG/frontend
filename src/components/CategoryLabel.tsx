@@ -2,9 +2,9 @@ import { Chip, SxProps, Theme, Typography, useTheme } from "@mui/material";
 import React from "react";
 
 type CategoryLabelProps = {
-	label: string,
-	sx?: SxProps<Theme> | undefined
-}
+	label: string;
+	sx?: SxProps<Theme> | undefined;
+};
 
 export function CategoryLabel({ label, sx }: CategoryLabelProps) {
 	if (!label) return;

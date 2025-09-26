@@ -5,9 +5,6 @@ import {
 	Button,
 	TextField,
 	IconButton,
-	FormGroup,
-	FormControlLabel,
-	Switch
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
@@ -15,15 +12,21 @@ import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";
 import { localUserEmailAtom } from "../../auth/getUser";
-import { userInformationAtom } from "../../utils/dataAtoms";
+import {
+	toast,
+	unwrappedUserAtom,
+	userInformationAtom,
+} from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
-import * as Popover from '@radix-ui/react-popover';
+import * as Popover from "@radix-ui/react-popover";
 import { AccountCircle } from "@mui/icons-material";
 import { useDarkMode } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import ContrastIcon from '@mui/icons-material/Contrast';
-import ErrorIcon from '@mui/icons-material/Error';
+import ContrastIcon from "@mui/icons-material/Contrast";
+import ErrorIcon from "@mui/icons-material/Error";
+import { LanguagePicker } from "../../components/LanguagePicker";
+import { getUser, updateUser } from "../../api/FetchClient";
 
 const buttonSx = {
 	flexGrow: 1,
@@ -34,26 +37,19 @@ const settingsLink = import.meta.env.VITE_AUTHORITY_SETTINGS_URL;
 
 function AuthenticatedUserSettings() {
 	// this does not change at runtime
-	if (!useOidc)
-		return null;
+	if (!useOidc) return null;
 
 	const { t } = useTranslation();
 	const auth = useAuth();
 	const handleLogout = async () => {
 		if (auth.isAuthenticated) {
-			await auth.removeUser();
 			await auth.signoutRedirect();
 		}
 	};
 
 	return (
 		<ButtonGroup variant="outlined" fullWidth>
-			<Button
-				sx={buttonSx}
-				color="primary"
-				component={Link}
-				to={settingsLink}
-			>
+			<Button sx={buttonSx} color="primary" component={Link} to={settingsLink}>
 				{t("Settings")}
 			</Button>
 			<Button
@@ -90,8 +86,8 @@ function UserEdit() {
 			onKeyDown={onKeyDown}
 			slotProps={{
 				htmlInput: {
-					style: { textAlign: "center" }
-				}
+					style: { textAlign: "center" },
+				},
 			}}
 		/>
 	);
@@ -101,26 +97,51 @@ function UserInformation() {
 	const { t } = useTranslation();
 	const userInformation = useAtomValue(userInformationAtom) ?? {
 		name: t("User does not exist!"),
-		email: "<MISSING EMAIL>"
+		email: "<MISSING EMAIL>",
+	};
+	const user = useAtomValue(unwrappedUserAtom);
+
+	const onUpdateLanguage = async (lang) => {
+		const user = await getUser();
+		if (!user) {
+			toast("error", "Could not update user language");
+			return;
+		}
+		user.language = lang;
+		const response = await updateUser(user.id, user);
+		if (response.ok) {
+			toast("success", "User language updated");
+			window.location.reload();
+			return;
+		} else {
+			toast("error", "Could not update user language");
+		}
 	};
 
-
 	return (
-		<Stack alignItems="center" width="100%">
-			<Typography variant="h6" gutterBottom>{userInformation.name}</Typography>
-			{
-				useOidc ?
-					<Typography variant="body2">{userInformation.email}</Typography> :
+		<Stack alignItems="center" width="100%" spacing={1}>
+			<Stack alignItems="center" width="100%">
+				<Typography variant="h6" gutterBottom>
+					{userInformation.name}
+				</Typography>
+				{useOidc ? (
+					<Typography variant="body2">{userInformation.email}</Typography>
+				) : (
 					<UserEdit />
-			}
+				)}
+			</Stack>
+			<LanguagePicker
+				label={t("Language")}
+				language={user.language}
+				onChange={onUpdateLanguage}
+				variant="standard"
+			/>
 		</Stack>
 	);
 }
 
 function FeatureFlags() {
-	if (import.meta.env.PROD)
-		return;
-
+	if (import.meta.env.PROD) return;
 
 	// return (
 	// 	<Stack alignSelf="stretch">
@@ -135,25 +156,34 @@ function FeatureFlags() {
 const popoverSx = {
 	border: 1,
 	borderColor: "divider",
-	bgcolor: theme => theme.palette.background.default,
+	bgcolor: (theme) => theme.palette.background.default,
 	overflow: "hidden",
-	zIndex: theme => theme.zIndex.appBar
+	zIndex: (theme) => theme.zIndex.appBar,
 };
 
 export function UserAccountComponent() {
 	const userInformation = useAtomValue(userInformationAtom);
-	const icon = userInformation ? <AccountCircle /> : <ErrorIcon color="error" />
+	const icon = userInformation ? (
+		<AccountCircle />
+	) : (
+		<ErrorIcon color="error" />
+	);
 
 	return (
 		<Popover.Root>
 			<Popover.Trigger asChild>
-				<IconButton size="large">
-					{icon}
-				</IconButton>
+				<IconButton size="large">{icon}</IconButton>
 			</Popover.Trigger>
 			<Popover.Portal>
 				<Popover.Content asChild>
-					<Stack spacing={2} borderRadius={2} mx={2} p={2} sx={popoverSx} alignItems="center">
+					<Stack
+						spacing={2}
+						borderRadius={2}
+						mx={2}
+						p={2}
+						sx={popoverSx}
+						alignItems="center"
+					>
 						<UserInformation />
 						<AuthenticatedUserSettings />
 						<ThemeModePicker />
@@ -195,5 +225,5 @@ function ThemeModePicker() {
 				{t("Dark")}
 			</Button>
 		</ButtonGroup>
-	)
+	);
 }

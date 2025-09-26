@@ -129,9 +129,7 @@ function TaskRow({ task, variant, taskFilter }) {
 						label={t("Employee")}
 						spacing={rowInfoSpacing}
 					>
-						<Typography>
-							{getEmployeeDisplayString(task.employee)}
-						</Typography>
+						<Typography>{getEmployeeDisplayString(task.employee)}</Typography>
 					</RowInfo>
 				)}
 				{variant !== "mobile" && task.assignedUser && (

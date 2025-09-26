@@ -45,12 +45,12 @@ function FieldValueDropdownComponent({ useDataHook }) {
 									) : null}
 									{params.InputProps.endAdornment}
 								</>
-							)
+							),
 						},
 						htmlInput: {
 							...params.inputProps,
 							required: required && (data.value?.length ?? 0) === 0,
-						}
+						},
 					}}
 					sx={{ flex: 1 }}
 				/>

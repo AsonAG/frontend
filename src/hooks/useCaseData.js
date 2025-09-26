@@ -13,23 +13,30 @@ function mapCase(_case, attachments) {
 			documents: attachments[f.id],
 			tags: f.valueTags,
 			attributes: f.valueAttributes,
-		}))
+		})),
 	};
 }
 
-export function useCaseData(params, user, payroll) {
+export function useCaseData(params, payroll) {
 	const attachments = useRef({});
 	const [caseData, setCaseData] = useState(null);
 	const [caseErrors, setCaseErrors] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [fatalError, setFatalError] = useState(null);
 	const [submitting, setSubmitting] = useState(false);
+	const [reason, setReason] = useState("");
+	const [includeReasonInPayslip, setIncludeReasonInPayslip] = useState(true);
 	let [startDate, setStartDate] = useState(null);
 	let [endDate, setEndDate] = useState(null);
 
 	const isReadonlyCase = useMemo(
-		() => caseData?.fields.every(field => field.valueType === "None" || field.valueType === "WebResource") ?? true, [caseData]);
-
+		() =>
+			caseData?.fields.every(
+				(field) =>
+					field.valueType === "None" || field.valueType === "WebResource",
+			) ?? true,
+		[caseData],
+	);
 
 	useEffect(() => {
 		const loadData = async () => {
@@ -43,12 +50,23 @@ export function useCaseData(params, user, payroll) {
 		if (!caseData) {
 			return null;
 		}
+		const reasonOnWageTypeNumber =
+			caseData.attributes?.["reasonOnWageTypeNumber"] ?? null;
+		const attributes =
+			!!reasonOnWageTypeNumber && includeReasonInPayslip
+				? {
+						reasonOnWageTypeNumber,
+						includeReasonInPayslip: "true",
+					}
+				: null;
+
 		const caseChangeSetup = {
-			userId: user.id,
+			reason: reason !== "" ? reason : null,
 			divisionId: payroll.divisionId,
 			case: mapCase(caseData, attachments),
 			start: startDate?.toISOString(),
-			end: endDate?.toISOString()
+			end: endDate?.toISOString(),
+			attributes,
 		};
 		if (params.employeeId) {
 			caseChangeSetup.employeeId = params.employeeId;
@@ -57,6 +75,12 @@ export function useCaseData(params, user, payroll) {
 	}
 
 	async function handleError(caseResponse) {
+		if (caseResponse.status === 404) {
+			setFatalError(
+				new Error("The event does not exist or you do not have permission."),
+			);
+			return;
+		}
 		const response = await caseResponse.json();
 		if (caseResponse.status >= 400 && caseResponse.status < 500) {
 			if (typeof response === "string") {
@@ -68,7 +92,7 @@ export function useCaseData(params, user, payroll) {
 				setCaseErrors(errors);
 			}
 		} else {
-			setFatalError(new Error(response));
+			setFatalError(new Error("Something went wrong"));
 		}
 	}
 
@@ -106,6 +130,10 @@ export function useCaseData(params, user, payroll) {
 		isReadonlyCase,
 		startDate,
 		endDate,
+		reason,
+		setReason,
+		includeReasonInPayslip,
+		setIncludeReasonInPayslip,
 		setStartDate: (updatedStartDate) => {
 			// setStartDate does not immediately update startDate..
 			// so we need to update the value and trigger the rerender

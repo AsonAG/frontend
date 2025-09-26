@@ -10,9 +10,9 @@ const codeTypographySx: SxProps<Theme> = {
 };
 
 type XmlViewProps = {
-	title?: string
-	base64content: string
-}
+	title?: string;
+	base64content: string;
+};
 
 export function XmlView({ title, base64content }: XmlViewProps) {
 	const xml = useMemo(() => base64Decode(base64content), [base64content]);

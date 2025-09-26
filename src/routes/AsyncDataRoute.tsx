@@ -7,10 +7,10 @@ import { useTranslation } from "react-i18next";
 import React from "react";
 
 type AsyncDataRouteProps = {
-	loadingElement?: ReactNode,
-	skipDataCheck?: boolean,
-	noDataAvailableText?: string
-	children?: ReactNode | undefined
+	loadingElement?: ReactNode;
+	skipDataCheck?: boolean;
+	noDataAvailableText?: string;
+	children?: ReactNode | undefined;
 } & PropsWithChildren;
 
 export function AsyncDataRoute({
@@ -37,7 +37,7 @@ export function AsyncDataRoute({
 	);
 }
 
-function hasData(value: { length: number; count: number; }) {
+function hasData(value: { length: number; count: number }) {
 	if (Array.isArray(value)) {
 		return value.length > 0;
 	}

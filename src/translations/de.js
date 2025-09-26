@@ -5,6 +5,9 @@ const translations = {
 		"Organization unit": "Organisationseinheit",
 		"Organization unit assignment": "Organisationseinheitszugehörigkeit",
 		"Organization unit name": "Organisationseinheitsname",
+		"Create organization": "Organisation erstellen",
+		"Organization creation failed": "Erstellen der Organisation fehlgeschlagen",
+		"Organization created": "Organisation erstellt",
 		"New organization unit": "Neue Organisationseinheit",
 		Employees: "Mitarbeiter",
 		Company: "Firma",
@@ -137,7 +140,7 @@ const translations = {
 		Period: "Periode",
 		"Open period": "Offene Periode",
 		Forecast: "Szenario",
-		Reason: "Grund",
+		Reason: "Notiz",
 		"Select employees": "Mitarbeiter auswählen",
 		Create: "Erstellen",
 		Close: "Schliessen",
@@ -175,7 +178,7 @@ const translations = {
 		"Deletes the organization completely": "Löscht die Organisation komplett",
 		"Delete organization": "Organisation löschen",
 		delete_organization_description:
-			"Sie sie sicher, dass Sie die Organisation '{{organizationName}}' permanent löschen wollen?",
+			"Sie sie sicher, dass Sie die Organisation '{{orgName}}' permanent löschen wollen?",
 		confirm_organization_deletion:
 			"Bitte bestätigen Sie die Löschung durch die Eingabe des Organisationsnamens.",
 		"Organization name": "Organisationsname",
@@ -187,6 +190,59 @@ const translations = {
 			"Die Organisation konnte nicht gelöscht werden",
 		"No features available for this user":
 			"Keine Funktionen verfügbar für diesen User",
+		"Choose a role": "Wählen Sie eine Rolle aus",
+		"Grants access to the whole organization":
+			"Gewährt Zugriff auf die ganze Organisation",
+		"Grants access to specific organization units":
+			"Gewährt Zugriff auf ausgewählte Organisationseinheiten",
+		"Grants restricted access to the employee":
+			"Gewährt eingeschränkten Zugriff auf den Mitarbeiter",
+		Invitation: "Einladung",
+		"You have been invited to join the organization {{orgName}}.":
+			"Sie sind eingeladen der Organiation {{orgName}} beizutreten.",
+		"The invitation is invalid": "Die Einladung ist ungültig",
+		Join: "Beitreten",
+		"Invitation has been created!": "Die Einladung wurde erstellt!",
+		"Send this link to the user with the email {{email}}.":
+			"Senden sie diesen Link an den Benutzer mit der Email {{email}}.",
+		"Invitation link": "Einladungslink",
+		"Copied to clipboard": "In die Zwischenablage kopiert",
+		Invite: "Einladen",
+		"Employees without access": "Mitarbeiter ohne Zugriff",
+		Users: "Benutzer",
+		"Invite to organization": "In die Organisation einladen",
+		"Update membership of {{name}}": "Mitgliedschaft von {{name}} anpassen",
+		rolename_Owner: "Besitzer",
+		rolename_Admin: "Administrator",
+		rolename_PayrollManager: "Manager",
+		rolename_SelfService: "Self Service",
+		pending: "ausstehend",
+		expired: "abgelaufen",
+		external: "Extern",
+		"This user is not assigned to an employee of the organization":
+			"Dieser Benutzer ist keinem Miterarbeiter der Organisation zugeordnet",
+		"Remove user": "Benutzer entfernen",
+		"Do you want to remove {{name}} from the organization?":
+			"Möchten Sie den Benutzer {{name}} aus der Organisation entfernen?",
+		Remove: "Entfernen",
+		"User has been removed": "Benutzer wurde entfernt",
+		Withdraw: "Zurückziehen",
+		"Withdraw invitation": "Einladung zurückziehen",
+		"Do you want to withdraw the invitation for {{name}} to join the organization?":
+			"Möchten Sie die Einladung für {{name}} zum Beitritt zur Organisation zurückziehen?",
+		"Invitation has been withdrawn": "Einladung wurde zurückgezogen",
+		"Select at least one payroll":
+			"Wählen Sie mindestens eine Organisationseinheit aus",
+		"Email is required": "Email ist erforderlich",
+		"Employee is required": "Mitarbeiter ist erforderlich",
+		"Could not invite user to organization":
+			"Der Benutzer konnte nicht in die Organisation eingeladen werden",
+		"{{email}} already belongs to a member of the organization":
+			"{{email}} gehört schon einem Mitglied der Organisation",
+		"The event does not exist or you do not have permission.":
+			"Das Ereignis gibt es nicht oder Sie haben keine Berechtigungen.",
+		"Something went wrong": "Etwas ist schief gelaufen",
+		"Show reason in payslip": "Notiz in Lohnabrechnung anzeigen",
 
 		// compliance
 		Submit: "Übermitteln",

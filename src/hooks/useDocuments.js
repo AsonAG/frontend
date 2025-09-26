@@ -30,13 +30,7 @@ export function useDocuments(caseFieldName) {
 			}
 		};
 		load();
-	}, [
-		caseFieldName,
-		params.orgId,
-		params.payrollId,
-		params.employeeId,
-		top,
-	]);
+	}, [caseFieldName, params.orgId, params.payrollId, params.employeeId, top]);
 
 	const hasMore = documents.count > documents.items.length;
 

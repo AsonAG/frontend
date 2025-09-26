@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: "Environment to deploy to"
         type: environment
         required: true
 jobs:
@@ -29,8 +29,10 @@ jobs:
           # deployment_environment: ${{!inputs.production && 'staging' || null }}
         env:
           VITE_AUTHORITY_URL: "https://login.asonpayroll.com"
-          VITE_AUTHORITY_SETTINGS_URL: "https://login.asonpayroll.com/ui/console/"          
+          VITE_AUTHORITY_SETTINGS_URL: "https://login.asonpayroll.com/ui/console/"
           VITE_API_URL: ${{ vars.API_URL }}
           VITE_REDIRECT_URL: ${{ vars.REDIRECT_URL }}
           VITE_PROJECT_ID: ${{ vars.PROJECT_ID }}
           VITE_CLIENT_ID: ${{ vars.CLIENT_ID }}
+          VITE_APP_NAME: "Ason Payroll"
+          VITE_META_DESCRIPTION: "Ason Global Payroll Service Portal."

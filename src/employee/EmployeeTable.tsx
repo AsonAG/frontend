@@ -1,5 +1,18 @@
-import React, { createContext, useContext, useState, forwardRef, Dispatch, useReducer, useCallback } from "react";
-import { useAsyncValue, useLoaderData, Link as RouterLink, LinkProps } from "react-router-dom";
+import React, {
+	createContext,
+	useContext,
+	useState,
+	forwardRef,
+	Dispatch,
+	useReducer,
+	useCallback,
+} from "react";
+import {
+	useAsyncValue,
+	useLoaderData,
+	Link as RouterLink,
+	LinkProps,
+} from "react-router-dom";
 import {
 	Stack,
 	Typography,
@@ -11,7 +24,7 @@ import {
 	Theme,
 	SxProps,
 	IconButtonProps,
-	styled
+	styled,
 } from "@mui/material";
 import { TableButton } from "../components/buttons/TableButton";
 import { useTranslation } from "react-i18next";
@@ -36,49 +49,53 @@ import { SearchField } from "../components/SearchField";
 import { EmployeeTableFilter } from "./TableFilter";
 import { EmployeeSet, getEmployeeDisplayString } from "../models/Employee";
 import { IdType } from "../models/IdType";
-
+import { UIFeatureGate, UIFeature } from "../utils/UIFeature";
 
 type EmployeeTableContextProps = {
-	state: TableState
-	dispatch: Dispatch<TableAction>
-	variant: "standard" | "dense"
-	showButtons: boolean
-}
+	state: TableState;
+	dispatch: Dispatch<TableAction>;
+	variant: "standard" | "dense";
+	showButtons: boolean;
+};
 
-export const EmployeeTableContext = createContext<EmployeeTableContextProps>(null!);
+export const EmployeeTableContext = createContext<EmployeeTableContextProps>(
+	null!,
+);
 
 export type TableState = {
-	onlyActive: boolean
-	onlyWithMissingData: boolean
-	filter: string
-}
+	onlyActive: boolean;
+	onlyWithMissingData: boolean;
+	filter: string;
+};
 
-
-export type TableAction = {
-	type: "toggle_show_inactive"
-} | {
-	type: "toggle_only_with_missing_data"
-} | {
-	type: "set_filter"
-	filter: string
-}
+export type TableAction =
+	| {
+			type: "toggle_show_inactive";
+	  }
+	| {
+			type: "toggle_only_with_missing_data";
+	  }
+	| {
+			type: "set_filter";
+			filter: string;
+	  };
 function reducer(state: TableState, action: TableAction): TableState {
 	switch (action.type) {
 		case "toggle_show_inactive": {
 			return {
 				...state,
-				onlyActive: !state.onlyActive
+				onlyActive: !state.onlyActive,
 			};
 		}
 		case "toggle_only_with_missing_data":
 			return {
 				...state,
-				onlyWithMissingData: !state.onlyWithMissingData
+				onlyWithMissingData: !state.onlyWithMissingData,
 			};
 		case "set_filter":
 			return {
 				...state,
-				filter: action.filter
+				filter: action.filter,
 			};
 	}
 }
@@ -86,14 +103,16 @@ function reducer(state: TableState, action: TableAction): TableState {
 export function AsyncEmployeeTable() {
 	const { showButtons = true } = useLoaderData() as { showButtons: boolean };
 	const theme = useTheme();
-	const variant: "standard" | "dense" = useMediaQuery(theme.breakpoints.down("sm"))
+	const variant: "standard" | "dense" = useMediaQuery(
+		theme.breakpoints.down("sm"),
+	)
 		? "dense"
 		: "standard";
 
 	const [state, dispatch] = useReducer(reducer, {
 		onlyActive: true,
 		onlyWithMissingData: false,
-		filter: ""
+		filter: "",
 	});
 
 	const tableContext = { state, dispatch, variant, showButtons };
@@ -135,17 +154,19 @@ const Link = styled(
 });
 
 type SearchButtonProps = {
-	isFiltering: boolean
+	isFiltering: boolean;
 } & IconButtonProps;
 
 const SearchButton = styled(
-	forwardRef<HTMLButtonElement, SearchButtonProps>(function SearchButton(itemProps, ref) {
-		return (
-			<IconButton ref={ref} {...itemProps} role={undefined}>
-				<Search />
-			</IconButton>
-		);
-	}),
+	forwardRef<HTMLButtonElement, SearchButtonProps>(
+		function SearchButton(itemProps, ref) {
+			return (
+				<IconButton ref={ref} {...itemProps} role={undefined}>
+					<Search />
+				</IconButton>
+			);
+		},
+	),
 	{ shouldForwardProp: (name) => name !== "isFiltering" },
 )(({ theme, ...props }) => {
 	if (props.isFiltering) {
@@ -166,27 +187,27 @@ function EmployeeTableButtons() {
 		<Stack direction="row" spacing={2}>
 			<EmployeeTableSearch />
 			<EmployeeTableFilter />
-			<TableButton
-				title={t("New employee")}
-				to="new"
-				icon={<AddOutlinedIcon />}
-				variant={variant}
-			/>
+			<UIFeatureGate feature={UIFeature.HrEmployeesNew}>
+				<TableButton
+					title={t("New employee")}
+					to="new"
+					icon={<AddOutlinedIcon />}
+					variant={variant}
+				/>
+			</UIFeatureGate>
 		</Stack>
 	);
 }
 
-
 function EmployeeTableSearchField() {
 	const { t } = useTranslation();
 	const { state, dispatch } = useContext(EmployeeTableContext);
-	const setValue = useCallback((filter: string) => dispatch({ type: "set_filter", filter }), [state, dispatch]);
+	const setValue = useCallback(
+		(filter: string) => dispatch({ type: "set_filter", filter }),
+		[state, dispatch],
+	);
 	return (
-		<SearchField
-			label={t("Search")}
-			value={state.filter}
-			setValue={setValue}
-		/>
+		<SearchField label={t("Search")} value={state.filter} setValue={setValue} />
 	);
 }
 
@@ -241,10 +262,7 @@ function EmployeeTable() {
 	return (
 		<Stack>
 			{employees.map((employee) => (
-				<EmployeeRow
-					key={employee.id}
-					employee={employee}
-				/>
+				<EmployeeRow key={employee.id} employee={employee} />
 			))}
 		</Stack>
 	);
@@ -263,11 +281,14 @@ const sx: SxProps<Theme> = {
 function EmployeeRow({ employee }: { employee: EmployeeSet }) {
 	const { state, variant, showButtons } = useContext(EmployeeTableContext);
 	const missingDataCount = useEmployeeMissingDataCount(employee.id);
-	if (state.onlyActive && !employee.isEmployed)
-		return;
-	if (state.onlyWithMissingData && (missingDataCount === 0))
-		return;
-	if (!!state.filter && !getEmployeeDisplayString(employee).toLowerCase().includes(state.filter.toLowerCase()))
+	if (state.onlyActive && !employee.isEmployed) return;
+	if (state.onlyWithMissingData && missingDataCount === 0) return;
+	if (
+		!!state.filter &&
+		!getEmployeeDisplayString(employee)
+			.toLowerCase()
+			.includes(state.filter.toLowerCase())
+	)
 		return;
 
 	return (
@@ -286,12 +307,23 @@ function EmployeeRow({ employee }: { employee: EmployeeSet }) {
 					{!state.onlyActive && <StatusDot isEmployed={employee.isEmployed} />}
 				</Stack>
 			</Link>
-			{variant === "standard" && showButtons && <EmployeeButtons employeeId={employee.id} missingDataCount={missingDataCount} />}
+			{variant === "standard" && showButtons && (
+				<EmployeeButtons
+					employeeId={employee.id}
+					missingDataCount={missingDataCount}
+				/>
+			)}
 		</Stack>
 	);
 }
 
-function EmployeeButtons({ employeeId, missingDataCount }: { employeeId: IdType, missingDataCount: number }) {
+function EmployeeButtons({
+	employeeId,
+	missingDataCount,
+}: {
+	employeeId: IdType;
+	missingDataCount: number;
+}) {
 	const { t } = useTranslation();
 	const variant = "dense";
 

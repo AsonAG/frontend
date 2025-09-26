@@ -1,5 +1,11 @@
 import { React, useState } from "react";
-import { useAsyncValue, useLocation, Link, useSubmit, useRouteLoaderData } from "react-router-dom";
+import {
+	useAsyncValue,
+	useLocation,
+	Link,
+	useSubmit,
+	useRouteLoaderData,
+} from "react-router-dom";
 import { Stack, Typography, Button, TextField } from "@mui/material";
 import { HtmlContent } from "./HtmlContent";
 import { ContentLayout } from "./ContentLayout";
@@ -39,7 +45,7 @@ function TaskView() {
 	const task = useAsyncValue();
 	const { t } = useTranslation();
 	const submit = useSubmit();
-	const { user } = useRouteLoaderData("root");
+	const { userMembership } = useRouteLoaderData("root");
 	const taskCompleted = task.completed !== null;
 	const taskComment = task.comment || "";
 	const [comment, setComment] = useState(taskComment);
@@ -48,24 +54,23 @@ function TaskView() {
 	const submitPost = (payload) =>
 		submit(payload, {
 			method: "post",
-			encType: "application/json"
+			encType: "application/json",
 		});
 
-
-	const saveComment = () => submitPost({ task, comment, action: "saveComment" });
+	const saveComment = () =>
+		submitPost({ task, comment, action: "saveComment" });
 	let primaryAction;
 	let buttonText;
 	if (taskCompleted) {
 		primaryAction = saveComment;
 		buttonText = saveCommentText;
-	}
-	else if (task.assignedUserId !== user.id) {
+	} else if (task.assignedUserId !== userMembership.userId) {
 		primaryAction = () => submitPost({ task, action: "accept" });
 		buttonText = t("Accept task");
-	}
-	else {
+	} else {
 		primaryAction = () => submitPost({ task, comment, action: "complete" });
-		buttonText = comment !== taskComment ? t("Save comment & complete") : t("Complete");
+		buttonText =
+			comment !== taskComment ? t("Save comment & complete") : t("Complete");
 	}
 
 	return (
@@ -87,7 +92,11 @@ function TaskView() {
 					<Typography variant="h6" gutterBottom>
 						{t("Assigned to")}
 					</Typography>
-					<Typography>{task.assignedUser ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}` : t("not assigned")}</Typography>
+					<Typography>
+						{task.assignedUser
+							? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
+							: t("not assigned")}
+					</Typography>
 				</Stack>
 				{task.employee && (
 					<Stack>
@@ -95,9 +104,7 @@ function TaskView() {
 							{t("Employee")}
 						</Typography>
 						<Link to={`../hr/employees/${task.employee.id}/events`}>
-							<Typography>
-								{getEmployeeDisplayString(task.employee)}
-							</Typography>
+							<Typography>{getEmployeeDisplayString(task.employee)}</Typography>
 						</Link>
 					</Stack>
 				)}

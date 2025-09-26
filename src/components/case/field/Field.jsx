@@ -9,7 +9,8 @@ import { FieldPeriodSelector } from "./FieldPeriodSelector";
 export const FieldContext = createContext();
 
 export function Field({ field }) {
-	const { buildCase, attachments, renderFieldPeriods } = useContext(CaseFormContext);
+	const { buildCase, attachments, renderFieldPeriods } =
+		useContext(CaseFormContext);
 	const isReadonly = field.attributes?.["input.readOnly"] ?? false;
 	const required = !field.optional;
 	const theme = useTheme();
@@ -30,7 +31,10 @@ export function Field({ field }) {
 			{mobile ? (
 				<MobileLayout field={field} renderPeriodSelector={renderFieldPeriods} />
 			) : (
-				<DefaultLayout field={field} renderPeriodSelector={renderFieldPeriods} />
+				<DefaultLayout
+					field={field}
+					renderPeriodSelector={renderFieldPeriods}
+				/>
 			)}
 		</FieldContext.Provider>
 	);

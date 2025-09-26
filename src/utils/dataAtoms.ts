@@ -3,8 +3,6 @@ import {
 	getTasks,
 	getOrganization,
 	getUser,
-	getEmployeeByIdentifier,
-	getPayrun,
 	getEmployeeMissingData,
 	getOrganizations,
 	getCompanyMissingDataCases,
@@ -14,6 +12,8 @@ import {
 	getClientRegulation,
 	getPayrollWageTypes,
 	getPayrollWageTypeSettings,
+	getOrganizationUserMembership,
+	getEmployee,
 } from "../api/FetchClient";
 import { payrollIdAtom, orgIdAtom } from "./routeParamAtoms";
 import { authUserAtom } from "../auth/getUser";
@@ -21,17 +21,27 @@ import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useOidc } from "../auth/authConfig";
 import { IdType } from "../models/IdType";
 import { MissingData } from "../models/MissingData";
-import { atomWithRefresh, atomWithStorage, createJSONStorage, unwrap } from "jotai/utils";
+import {
+	atomWithRefresh,
+	atomWithStorage,
+	createJSONStorage,
+	unwrap,
+} from "jotai/utils";
 import { ExpandedState } from "@tanstack/react-table";
 import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 import { AvailableCase } from "../models/AvailableCase";
 import { ControllingData } from "../payrun/types";
-import { WageType, WageTypeDetailed, WageTypeSettings } from "../models/WageType";
+import {
+	WageType,
+	WageTypeDetailed,
+	WageTypeSettings,
+} from "../models/WageType";
+import { UserMembership } from "../models/User";
 
-export const orgsAtom = atomWithRefresh((get => {
+export const orgsAtom = atomWithRefresh((get) => {
 	const _ = get(authUserAtom);
 	return getOrganizations();
-}));
+});
 
 export const orgAtom = atom((get) => {
 	const orgId = get(orgIdAtom);
@@ -55,25 +65,38 @@ export const payrollAtom = atom(async (get) => {
 });
 
 export const userAtom = atom((get) => {
-	const orgId = get(orgIdAtom);
-	if (orgId == null) return null;
-	const authUserEmail = get(authUserAtom)?.profile.email;
-	return getUser({ orgId }, authUserEmail);
+	const _ = get(authUserAtom); // subscribe to the value
+	return getUser();
 });
+export const unwrappedUserAtom = unwrap(userAtom, (prev) => prev ?? null);
 
-export const selfServiceEmployeeAtom = atom((get) => {
+export const userMembershipAtom = atom(async (get) => {
+	const orgId = get(orgIdAtom);
+	const user = await get(userAtom);
+	if (orgId === null || user === null) return null;
+	const userMembership = await getOrganizationUserMembership(
+		{ orgId },
+		user.id,
+	);
+	return userMembership as UserMembership;
+});
+export const unwrappedUserMembershipAtom = unwrap(
+	userMembershipAtom,
+	(prev) => prev ?? null,
+);
+
+export const selfServiceEmployeeAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return null;
-	const authUserEmail = get(authUserAtom)?.profile.email;
-	return getEmployeeByIdentifier({ orgId, payrollId }, authUserEmail);
-});
+	const userMembership = await get(userMembershipAtom);
+	if (userMembership?.role.$type !== "SelfService") return null;
 
-export const payrunAtom = atom(async (get) => {
-	const orgId = get(orgIdAtom);
-	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return null;
-	return await getPayrun({ orgId, payrollId });
+	return await getEmployee({
+		orgId,
+		payrollId,
+		employeeId: userMembership.employeeId,
+	});
 });
 
 export const openTasksAtom = atomWithRefresh(async (get) => {
@@ -90,7 +113,9 @@ export const openTasksAtom = atomWithRefresh(async (get) => {
 	return getTasks({ orgId, payrollId }, filter, orderBy);
 });
 
-export const missingDataEmployeesAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
+export const missingDataEmployeesAtom = atomWithRefresh<
+	Promise<Array<MissingData>>
+>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return [];
@@ -100,26 +125,32 @@ export const missingDataEmployeesAtom = atomWithRefresh<Promise<Array<MissingDat
 		return employeeMissingData;
 	}
 	return [];
-})
+});
 
-export const missingDataCompanyAtom = atomWithRefresh<Promise<MissingData>>(async (get) => {
-	const orgId = get(orgIdAtom);
-	const payrollId = get(payrollIdAtom);
-	let missingData: MissingData = {
-		id: payrollId,
-		cases: []
-	};
-	if (orgId === null || payrollId === null)
+export const missingDataCompanyAtom = atomWithRefresh<Promise<MissingData>>(
+	async (get) => {
+		const orgId = get(orgIdAtom);
+		const payrollId = get(payrollIdAtom);
+		let missingData: MissingData = {
+			id: payrollId,
+			cases: [],
+		};
+		if (orgId === null || payrollId === null) return missingData;
+
+		var companyMissingDataCases = await getCompanyMissingDataCases({
+			orgId,
+			payrollId,
+		});
+		if (Array.isArray(companyMissingDataCases)) {
+			missingData.cases = companyMissingDataCases;
+		}
 		return missingData;
+	},
+);
 
-	var companyMissingDataCases = await getCompanyMissingDataCases({ orgId, payrollId });
-	if (Array.isArray(companyMissingDataCases)) {
-		missingData.cases = companyMissingDataCases;
-	}
-	return missingData;
-})
-
-export const onboardingCompanyAtom = atomWithRefresh<Promise<Array<AvailableCase>>>(async (get) => {
+export const onboardingCompanyAtom = atomWithRefresh<
+	Promise<Array<AvailableCase>>
+>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return [];
@@ -129,7 +160,7 @@ export const onboardingCompanyAtom = atomWithRefresh<Promise<Array<AvailableCase
 		return companyOnboardingCases;
 	}
 	return [];
-})
+});
 
 export const clientRegulationAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);
@@ -142,14 +173,16 @@ export const companyMissingDataCountAtom = atom(async (get) => {
 	const missingCompanyData = await get(missingDataCompanyAtom);
 	const onboardingData = await get(onboardingCompanyAtom);
 	return missingCompanyData.cases.length + onboardingData.length;
-})
+});
 
 export const showOrgSelectionAtom = atom(async (get) => {
 	const orgs = await get(orgsAtom);
 	return orgs.length > 1;
 });
 
-export const missingEmployeeDataMapAtom = atom<Promise<Map<IdType, MissingData>>>(async (get) => {
+export const missingEmployeeDataMapAtom = atom<
+	Promise<Map<IdType, MissingData>>
+>(async (get) => {
 	const missingData = await get(missingDataEmployeesAtom);
 	const map = new Map();
 	for (var data of missingData || []) {
@@ -158,27 +191,41 @@ export const missingEmployeeDataMapAtom = atom<Promise<Map<IdType, MissingData>>
 	return map;
 });
 
-export const ESSMissingDataAtom = atomWithRefresh<Promise<Array<MissingData>>>(async (get) => {
-	const orgId = get(orgIdAtom);
-	const payrollId = get(payrollIdAtom);
-	const selfServiceEmployee = await get(selfServiceEmployeeAtom);
-	if (orgId === null || payrollId === null || selfServiceEmployee === null) return [];
+export const ESSMissingDataAtom = atomWithRefresh<Promise<Array<MissingData>>>(
+	async (get) => {
+		const orgId = get(orgIdAtom);
+		const payrollId = get(payrollIdAtom);
+		const selfServiceEmployee = await get(selfServiceEmployeeAtom);
+		if (orgId === null || payrollId === null || selfServiceEmployee === null)
+			return [];
 
-	return getEmployeeCases({ orgId, payrollId, employeeId: selfServiceEmployee.id }, "ECT")
-});
+		return getEmployeeCases(
+			{ orgId, payrollId, employeeId: selfServiceEmployee.id },
+			"ECT",
+		);
+	},
+);
 
-type ToastSeverity = 'error' | 'info' | 'success' | 'warning';
+type ToastSeverity = "error" | "info" | "success" | "warning";
 
 export type Toast = {
-	severity: ToastSeverity,
-	message: string,
-	messageArgs?: Record<string, string>
+	severity: ToastSeverity;
+	message: string;
+	messageArgs?: Record<string, string>;
 };
 
 export const toastNotificationAtom = atom<Toast | null>(null);
 
-export function toast(severity: ToastSeverity, message: string, messageArgs?: Record<string, string>) {
-	getDefaultStore().set(toastNotificationAtom, { severity, message, messageArgs });
+export function toast(
+	severity: ToastSeverity,
+	message: string,
+	messageArgs?: Record<string, string>,
+) {
+	getDefaultStore().set(toastNotificationAtom, {
+		severity,
+		message,
+		messageArgs,
+	});
 }
 
 export function useEmployeeMissingDataCount(objectId: IdType) {
@@ -188,44 +235,69 @@ export function useEmployeeMissingDataCount(objectId: IdType) {
 	return missingData.cases.length;
 }
 
-export const userInformationAtom = atom((async get => {
-	if (useOidc) {
-		const authUser = get(authUserAtom);
-		if (!authUser) return null;
-		return {
-			email: authUser.profile.email,
-			name: authUser.profile.name
-		};
-	}
-	const user = await get(userAtom);
-	if (user) {
-		return {
-			email: user.identifier,
-			name: `${user.firstName} ${user.lastName}`
-		};
-	}
-	return null;
-}));
+export const userInformationAtom = unwrap(
+	atom(async (get) => {
+		if (useOidc) {
+			const authUser = get(authUserAtom);
+			if (!authUser) return null;
+			return {
+				email: authUser.profile.email,
+				name: authUser.profile.name,
+			};
+		}
+		const user = await get(userAtom);
+		if (user) {
+			return {
+				email: user.identifier,
+				name: `${user.firstName} ${user.lastName}`,
+			};
+		}
+		return null;
+	}),
+	(prev) => prev ?? null,
+);
 
-const jsonSessionStorage = createJSONStorage(() => sessionStorage) as SyncStorage<ExpandedState>;
-export const documentRecentSettingAtom = atomWithStorage<boolean>("setting.document.recent", true, undefined, { getOnInit: true });
-export const expandedControllingTasks = atomWithStorage<ExpandedState>("config.payrolldashboard.expanded", {}, jsonSessionStorage, { getOnInit: true });
+const jsonSessionStorage = createJSONStorage(
+	() => sessionStorage,
+) as SyncStorage<ExpandedState>;
+export const documentRecentSettingAtom = atomWithStorage<boolean>(
+	"setting.document.recent",
+	true,
+	undefined,
+	{ getOnInit: true },
+);
+export const expandedControllingTasks = atomWithStorage<ExpandedState>(
+	"config.payrolldashboard.expanded",
+	{},
+	jsonSessionStorage,
+	{ getOnInit: true },
+);
 
-
-export const payrollControllingDataAtom = atomWithRefresh<Promise<ControllingData>>(async (get) => {
+export const payrollControllingDataAtom = atomWithRefresh<
+	Promise<ControllingData>
+>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return { employeeControllingCases: [], companyControllingCases: [] };
-	var controllingData = await getPayrunPeriodControllingTasks({ orgId, payrollId });
+	if (orgId === null || payrollId === null)
+		return { employeeControllingCases: [], companyControllingCases: [] };
+	var controllingData = await getPayrunPeriodControllingTasks({
+		orgId,
+		payrollId,
+	});
 	return controllingData;
-})
+});
 
 export const payrollControllingDataTotalCountAtom = atom(async (get) => {
 	const controllingData = await get(payrollControllingDataAtom);
-	return controllingData.employeeControllingCases.length + (controllingData.companyControllingCases.length > 0 ? 1 : 0);
-})
+	return (
+		controllingData.employeeControllingCases.length +
+		(controllingData.companyControllingCases.length > 0 ? 1 : 0)
+	);
+});
 
-export const payrollWageTypeSettingsAtom = atomWithRefresh<Promise<WageTypeSettings>>(async (get) => {
+export const payrollWageTypeSettingsAtom = atomWithRefresh<
+	Promise<WageTypeSettings>
+>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return [];
@@ -233,19 +305,19 @@ export const payrollWageTypeSettingsAtom = atomWithRefresh<Promise<WageTypeSetti
 	return wageTypeSettings;
 });
 
-export const payrollWageTypesAtom = atomWithRefresh<Promise<WageTypeDetailed[]>>(async (get) => {
+export const payrollWageTypesAtom = atomWithRefresh<
+	Promise<WageTypeDetailed[]>
+>(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return [];
-	const [
-		wageTypes,
-		settings
-	]: [WageType[], WageTypeSettings] = await Promise.all([
-		getPayrollWageTypes({ orgId, payrollId }),
-		get(payrollWageTypeSettingsAtom)
-	]);
+	const [wageTypes, settings]: [WageType[], WageTypeSettings] =
+		await Promise.all([
+			getPayrollWageTypes({ orgId, payrollId }),
+			get(payrollWageTypeSettingsAtom),
+		]);
 
-	return wageTypes.map(wt => {
+	return wageTypes.map((wt) => {
 		const wageTypeNumber = wt.wageTypeNumber.toString();
 		const assignment = settings.accountAssignments[wageTypeNumber];
 		const accountAssignmentRequired =
@@ -253,19 +325,20 @@ export const payrollWageTypesAtom = atomWithRefresh<Promise<WageTypeDetailed[]>>
 			(!assignment?.creditAccountNumber || !assignment?.debitAccountNumber);
 		return {
 			...wt,
-			accountAssignmentRequired
-		}
+			accountAssignmentRequired,
+		};
 	});
 });
 
 export function refreshPayrollWageTypes() {
 	const store = getDefaultStore();
-	store.set(payrollWageTypeSettingsAtom)
+	store.set(payrollWageTypeSettingsAtom);
 	store.set(payrollWageTypesAtom);
-
 }
 
-export const payrollWageTypesWithMissingAccountInfoCountAtom = atom<Promise<number>>(async (get) => {
+export const payrollWageTypesWithMissingAccountInfoCountAtom = atom<
+	Promise<number>
+>(async (get) => {
 	const wageTypes = await get(payrollWageTypesAtom);
-	return wageTypes.filter(wt => wt.accountAssignmentRequired).length;
+	return wageTypes.filter((wt) => wt.accountAssignmentRequired).length;
 });

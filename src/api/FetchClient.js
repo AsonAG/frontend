@@ -9,6 +9,13 @@ const availableRegulationsUrl = "/regulations/available";
 const organizationsUrl = "/tenants";
 const organizationImportUrl = "/tenants/import";
 const organizationUrl = "/tenants/:orgId";
+const organizationUserMembershipsUrl = "/tenants/:orgId/user_memberships";
+const organizationUserMembershipUrl =
+	"/tenants/:orgId/user_memberships/:userMembershipId";
+const organizationUserMembershipInviteUrl =
+	"/tenants/:orgId/user_memberships/invite";
+const organizationUserMembershipWithdrawInvitationUrl =
+	"/tenants/:orgId/user_memberships/invitations/:invitationId";
 const payrollsUrl = "/tenants/:orgId/payrolls";
 const payrollsSimpleUrl = "/tenants/:orgId/payrolls/simple";
 const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
@@ -16,47 +23,63 @@ const payrollRegulationsUrl = "/tenants/:orgId/payrolls/:payrollId/regulations";
 const divisionsUrl = "/tenants/:orgId/divisions";
 const regulationsUrl = "/tenants/:orgId/regulations";
 const lookupSetUrl = "/tenants/:orgId/regulations/:regulationId/lookups/sets";
-const lookupValuesUrl = "/tenants/:orgId/regulations/:regulationId/lookups/:lookupId/values";
-const lookupValueUrl = "/tenants/:orgId/regulations/:regulationId/lookups/:lookupId/values/:lookupValueId";
+const lookupValuesUrl =
+	"/tenants/:orgId/regulations/:regulationId/lookups/:lookupId/values";
+const lookupValueUrl =
+	"/tenants/:orgId/regulations/:regulationId/lookups/:lookupId/values/:lookupValueId";
 const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
-const caseChangeCaseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/changes/values";
-const caseValueCountUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values/count";
+const caseChangeCaseValuesUrl =
+	"/tenants/:orgId/payrolls/:payrollId/changes/values";
+const caseValueCountUrl =
+	"/tenants/:orgId/payrolls/:payrollId/cases/values/count";
 const caseValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values";
 const timeValuesUrl = "/tenants/:orgId/payrolls/:payrollId/cases/values/time";
 const missingDataCompanyUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata";
-const missingDataEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
-const payrollLookupValuesUrl = "/tenants/:orgId/payrolls/:payrollId/lookups/values";
+const missingDataEmployeeUrl =
+	"/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
+const payrollLookupValuesUrl =
+	"/tenants/:orgId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
-const payrollEmployeeUrl = "/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
-const payrollWageTypeMasterUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
-const payrollWageTypeSettingsUrl = "/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
+const payrollEmployeeUrl =
+	"/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
+const payrollWageTypeMasterUrl =
+	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
+const payrollWageTypeSettingsUrl =
+	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
 const employeeUrl = "/tenants/:orgId/employees/:employeeId";
-const usersUrl = "/tenants/:orgId/users";
+const usersUrl = "/users";
+const userUrl = "/users/:userId";
+const employeeCaseValuesUrl = "/tenants/:orgId/employees/:employeeId/cases";
 const employeeDocumentUrl =
 	"/tenants/:orgId/employees/:employeeId/cases/:caseValueId/documents/:documentId";
 const companyDocumentUrl =
 	"/tenants/:orgId/companycases/:caseValueId/documents/:documentId";
 const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
-const payrunsUrl = "/tenants/:orgId/payruns";
 const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods";
-const payrunPeriodUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId";
-const payrunPeriodCloseUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/close";
-const payrunPeriodEntryRelevantEventValues = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/entries/:payrunPeriodEntryId/relevantEventValues";
-const payrunPeriodDocumentsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents";
-const payrunPeriodDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
-const payrunPeriodControllingUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/open/controlling";
-const payoutsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts";
-const payoutUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
-const payoutDocumentUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId/document";
-const payrollResultsUrl =
-	"/tenants/:orgId/payrollresults";
-const wageTypesUrl =
-	"/tenants/:orgId/payrollresults/:payrollResultId/wagetypes";
+const payrunPeriodUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId";
+const payrunPeriodCloseUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/close";
+const payrunPeriodEntryRelevantEventValues =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/entries/:payrunPeriodEntryId/relevantEventValues";
+const payrunPeriodDocumentsUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents";
+const payrunPeriodDocumentUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
+const payrunPeriodControllingUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/open/controlling";
+const payoutsUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts";
+const payoutUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
+const payoutDocumentUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId/document";
 const exportUrl = "/tenants/:orgId/export";
+const invitationUrl = "/user_membership_invitations/:invitationId";
 
 const store = getDefaultStore();
 
@@ -69,7 +92,6 @@ class FetchRequestBuilder {
 	body = null;
 	url = null;
 	routeParams = {};
-	addUserQueryParam = false;
 	addPayrollDivision = false;
 	ignoreErrors = false;
 	fallbackValue = null;
@@ -158,11 +180,6 @@ class FetchRequestBuilder {
 		return this;
 	}
 
-	withUser() {
-		this.addUserQueryParam = true;
-		return this;
-	}
-
 	withPayrollDivision() {
 		this.addPayrollDivision = true;
 		return this;
@@ -178,7 +195,7 @@ class FetchRequestBuilder {
 	withIgnoreErrors(fallbackValue) {
 		this.ignoreErrors = true;
 		if (fallbackValue !== undefined) {
-			this.fallbackValue = fallbackValue
+			this.fallbackValue = fallbackValue;
 		}
 		return this;
 	}
@@ -194,10 +211,6 @@ class FetchRequestBuilder {
 			const user = await store.get(userAtom);
 			if (user !== null) this.searchParams.set("language", user.language);
 		}
-		if (this.addUserQueryParam) {
-			const user = await store.get(userAtom);
-			if (user !== null) this.searchParams.set("userId", user.id);
-		}
 		if (this.addPayrollDivision) {
 			const payroll = await store.get(payrollAtom);
 			if (payroll !== null) {
@@ -210,11 +223,16 @@ class FetchRequestBuilder {
 		}
 
 		if (this.retries > 0) {
-			return fetchWithTimeoutAndRetry(url, {
-				method: this.method,
-				headers: this.headers,
-				body: this.body,
-			}, this.timeout, this.retries);
+			return fetchWithTimeoutAndRetry(
+				url,
+				{
+					method: this.method,
+					headers: this.headers,
+					body: this.body,
+				},
+				this.timeout,
+				this.retries,
+			);
 		}
 		return fetch(url, {
 			method: this.method,
@@ -229,7 +247,21 @@ class FetchRequestBuilder {
 		if (this.ignoreErrors && !response.ok) {
 			return this.fallbackValue;
 		}
-		return response.json();
+		const result = await response.json();
+		if (!result) return result;
+		if (result.items !== undefined && result.count !== undefined) {
+			// query result
+			const queryResultType = this.searchParams.get("result");
+			switch (queryResultType) {
+				case "ItemsWithCount":
+					return result;
+				case "Count":
+					return result.count;
+				default:
+					return result.items;
+			}
+		}
+		return result;
 	}
 
 	async fetchSingle() {
@@ -244,8 +276,19 @@ export function getOrganizations() {
 	return new FetchRequestBuilder(organizationsUrl).fetchJson();
 }
 
+export function createOrganization(name) {
+	return new FetchRequestBuilder(organizationsUrl)
+		.withMethod("POST")
+		.withBody({ identifier: name })
+		.fetch();
+}
+
 export function importOrganization(body) {
-	return new FetchRequestBuilder(organizationImportUrl).withMethod("POST").withTimout(600000).withFileBody(body).fetch();
+	return new FetchRequestBuilder(organizationImportUrl)
+		.withMethod("POST")
+		.withTimout(600000)
+		.withFileBody(body)
+		.fetch();
 }
 
 export function getOrganization(routeParams) {
@@ -253,7 +296,73 @@ export function getOrganization(routeParams) {
 }
 
 export function deleteOrganization(routeParams) {
-	return new FetchRequestBuilder(organizationUrl, routeParams).withMethod("DELETE").fetch();
+	return new FetchRequestBuilder(organizationUrl, routeParams)
+		.withMethod("DELETE")
+		.fetch();
+}
+
+export function getOrganizationUserMemberships(routeParams) {
+	return new FetchRequestBuilder(
+		organizationUserMembershipsUrl,
+		routeParams,
+	).fetchJson();
+}
+
+export function getOrganizationUserMembershipInvitations(routeParams) {
+	return new FetchRequestBuilder(
+		organizationUserMembershipsUrl + "/invitations",
+		routeParams,
+	).fetchJson();
+}
+
+export function getOrganizationUserMembership(routeParams, userId) {
+	return new FetchRequestBuilder(organizationUserMembershipsUrl, routeParams)
+		.withQueryParam("filter", `userId eq '${userId}'`)
+		.fetchSingle();
+}
+
+export function saveOrganizationUserMembership(routeParams, userMembership) {
+	return new FetchRequestBuilder(organizationUserMembershipUrl, routeParams)
+		.withMethod("PUT")
+		.withBody(userMembership)
+		.fetch();
+}
+
+export function inviteUserToOrganization(routeParams, inviteRequest) {
+	return new FetchRequestBuilder(
+		organizationUserMembershipInviteUrl,
+		routeParams,
+	)
+		.withMethod("POST")
+		.withBody(inviteRequest)
+		.fetch();
+}
+
+export function withdrawUserMembershipInvitationToOrganization(routeParams) {
+	return new FetchRequestBuilder(
+		organizationUserMembershipWithdrawInvitationUrl,
+		routeParams,
+	)
+		.withMethod("DELETE")
+		.fetch();
+}
+
+export function removeUserFromOrganization(routeParams) {
+	return new FetchRequestBuilder(organizationUserMembershipUrl, routeParams)
+		.withMethod("DELETE")
+		.fetch();
+}
+
+export function getInvitation(routeParams) {
+	return new FetchRequestBuilder(invitationUrl, routeParams)
+		.withIgnoreErrors(null)
+		.fetchJson();
+}
+
+export function acceptInvitation(routeParams) {
+	return new FetchRequestBuilder(invitationUrl, routeParams)
+		.withMethod("POST")
+		.fetch();
 }
 
 export function getPayrolls(routeParams) {
@@ -279,7 +388,10 @@ export function updatePayroll(routeParams, payroll) {
 }
 
 export function getPayrollRegulations(routeParams) {
-	return new FetchRequestBuilder(payrollRegulationsUrl, routeParams).fetchJson();
+	return new FetchRequestBuilder(
+		payrollRegulationsUrl,
+		routeParams,
+	).fetchJson();
 }
 
 export function updatePayrollRegulations(routeParams, regulations) {
@@ -308,8 +420,17 @@ export function getDivision(routeParams, divisionId) {
 }
 
 export function getEmployees(routeParams) {
-	return new FetchRequestBuilder(payrollEmployeesUrl, routeParams)
-		.withQueryParam("orderBy", `firstName asc`);
+	return new FetchRequestBuilder(employeesUrl, routeParams).withQueryParam(
+		"orderBy",
+		`firstName asc`,
+	);
+}
+
+export function getPayrollEmployees(routeParams) {
+	return new FetchRequestBuilder(
+		payrollEmployeesUrl,
+		routeParams,
+	).withQueryParam("orderBy", `firstName asc`);
 }
 
 export async function getEmployee(routeParams) {
@@ -338,7 +459,12 @@ export function getEmployeeByIdentifier(routeParams, identifier) {
 		.fetchSingle();
 }
 
-export function getEmployeeCases(routeParams, clusterSetName, signal, evalDate = null) {
+export function getEmployeeCases(
+	routeParams,
+	clusterSetName,
+	signal,
+	evalDate = null,
+) {
 	return new FetchRequestBuilder(caseSetsUrl, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("clusterSetName", clusterSetName)
@@ -347,7 +473,6 @@ export function getEmployeeCases(routeParams, clusterSetName, signal, evalDate =
 		.withQueryParam("evaluationDate", evalDate)
 		.withSignal(signal)
 		.withLocalization()
-		.withUser()
 		.withIgnoreErrors([])
 		.fetchJson();
 }
@@ -356,15 +481,23 @@ export function getCaseValues(routeParams, caseFieldName, start, end) {
 	return new FetchRequestBuilder(caseValuesUrl, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseFieldNames", caseFieldName)
-		.withQueryParam("startDate", (start?.toISOString() ?? "1970-01-01T00:00:00.00000Z"))
-		.withQueryParam("endDate", (end?.toISOString() ?? "2345-01-01T00:00:00.00000Z"))
+		.withQueryParam(
+			"startDate",
+			start?.toISOString() ?? "1970-01-01T00:00:00.00000Z",
+		)
+		.withQueryParam(
+			"endDate",
+			end?.toISOString() ?? "2345-01-01T00:00:00.00000Z",
+		)
 		.fetchJson();
 }
 
 export function getPayrunPeriodCaseValues(routeParams) {
-	return new FetchRequestBuilder(payrunPeriodEntryRelevantEventValues, routeParams)
+	return new FetchRequestBuilder(
+		payrunPeriodEntryRelevantEventValues,
+		routeParams,
+	)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -379,7 +512,6 @@ export function getCaseChangeCaseValues(routeParams, top) {
 		.withQueryParam("top", top)
 		.withQueryParam("result", !!top ? "ItemsWithCount" : undefined)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 export function getCaseValueCount(routeParams, minCount) {
@@ -388,7 +520,6 @@ export function getCaseValueCount(routeParams, minCount) {
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", caseType)
 		.withQueryParam("minCount", minCount)
-		.withUser()
 		.fetchJson();
 }
 export function getCurrentValues(routeParams) {
@@ -398,8 +529,7 @@ export function getCurrentValues(routeParams) {
 		.withQueryParam("caseType", caseType)
 		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
-		.withUser()
-		.fetchJson()
+		.fetchJson();
 }
 
 export function getEmployeeCaseChanges(routeParams) {
@@ -407,8 +537,7 @@ export function getEmployeeCaseChanges(routeParams) {
 	return new FetchRequestBuilder(url, routeParams)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withQueryParam("caseType", "Employee")
-		.withLocalization()
-		.withUser();
+		.withLocalization();
 }
 
 export function getCompanyCases(routeParams, clusterSetName, signal) {
@@ -418,7 +547,6 @@ export function getCompanyCases(routeParams, clusterSetName, signal) {
 		.withQueryParam("orderBy", `nameLocalizationsde asc`)
 		.withSignal(signal)
 		.withLocalization()
-		.withUser()
 		.withIgnoreErrors([])
 		.fetchJson();
 }
@@ -430,19 +558,17 @@ export function getCompanyCaseChanges(routeParams, search, orderBy) {
 		.withQueryParam("searchTerm", search)
 		.withQueryParam("orderBy", orderBy)
 		.withQueryParam("substituteLookupCodes", true)
-		.withLocalization()
-		.withUser();
+		.withLocalization();
 }
 
 export function getCompanyMissingDataCases(routeParams) {
 	return new FetchRequestBuilder(missingDataCompanyUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
 export async function getEmployeeSalaryType(routeParams, evalDate = null) {
-	const salaryType = "CH.Swissdec.EmployeeSalaryType"
+	const salaryType = "CH.Swissdec.EmployeeSalaryType";
 	const caseValue = await new FetchRequestBuilder(timeValuesUrl, routeParams)
 		.withQueryParam("caseType", "Employee")
 		.withQueryParam("employeeId", routeParams.employeeId)
@@ -450,7 +576,22 @@ export async function getEmployeeSalaryType(routeParams, evalDate = null) {
 		.withQueryParam("valueDate", evalDate)
 		.withQueryParam("substituteLookupCodes", true)
 		.withLocalization()
-		.withUser()
+		.fetchSingle();
+
+	return caseValue?.value;
+}
+
+export async function getEmployeeEmail(routeParams) {
+	const emailCaseField = "CH.Swissdec.EmployeeEmail";
+	const caseValue = await new FetchRequestBuilder(
+		employeeCaseValuesUrl,
+		routeParams,
+	)
+		.withQueryParam("employeeId", routeParams.employeeId)
+		.withQueryParams("caseFieldName", emailCaseField)
+		.withQueryParam("orderBy", "created desc")
+		.withQueryParam("top", 1)
+		.withLocalization()
 		.fetchSingle();
 
 	return caseValue?.value;
@@ -464,22 +605,22 @@ export async function getCompanyBankDetails(routeParams, evalDate = null) {
 		.withQueryParams("caseFieldNames", ibanFieldName)
 		.withQueryParams("caseFieldNames", accountFieldName)
 		.withQueryParam("evaluationDate", evalDate)
-		.withUser()
 		.fetchJson();
 
-	const iban = values.find(v => v.caseFieldName === ibanFieldName)?.value;
-	const accountName = values.find(v => v.caseFieldName === accountFieldName)?.value;
+	const iban = values.find((v) => v.caseFieldName === ibanFieldName)?.value;
+	const accountName = values.find(
+		(v) => v.caseFieldName === accountFieldName,
+	)?.value;
 
 	return {
 		iban,
-		accountName
+		accountName,
 	};
 }
 
 export function getEmployeeMissingData(routeParams) {
 	return new FetchRequestBuilder(missingDataEmployeeUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -512,12 +653,6 @@ export function updateTask(routeParams, task) {
 		.fetch();
 }
 
-export function getPayrun(routeParams) {
-	return new FetchRequestBuilder(payrunsUrl, routeParams)
-		.withQueryParam("filter", `payrollId eq '${routeParams.payrollId}'`)
-		.fetchSingle();
-}
-
 export function getClosedPayrunPeriods(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
 		.withQueryParam("orderBy", "periodStart desc")
@@ -534,8 +669,7 @@ export function getPreviousPayrunPeriod(routeParams, payrunPeriodStart) {
 }
 
 export function getPayrunPeriod(routeParams) {
-	return new FetchRequestBuilder(payrunPeriodUrl, routeParams)
-		.fetchJson();
+	return new FetchRequestBuilder(payrunPeriodUrl, routeParams).fetchJson();
 }
 export function getOpenPayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
@@ -547,14 +681,12 @@ export function getOpenPayrunPeriod(routeParams) {
 export function closePayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodCloseUrl, routeParams)
 		.withMethod("POST")
-		.withUser()
 		.fetch();
 }
 
 export function createOpenPayrunPeriod(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodsUrl + "/open", routeParams)
 		.withMethod("POST")
-		.withUser()
 		.fetch();
 }
 
@@ -568,7 +700,6 @@ export function getPayrunPeriodDocuments(routeParams) {
 export function getPayrunPeriodControllingTasks(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodControllingUrl, routeParams)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -587,7 +718,6 @@ export function buildCase(routeParams, caseChangeSetup) {
 		.withBody(caseChangeSetup)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withLocalization()
-		.withUser()
 		.fetch();
 }
 
@@ -597,16 +727,18 @@ export function addCase(routeParams, caseChangeSetup) {
 		.withBody(caseChangeSetup)
 		.withQueryParam("employeeId", routeParams.employeeId)
 		.withLocalization()
-		.withUser()
 		.fetch();
 }
 
-export async function getUser(routeParams, identifier) {
-	const users = await new FetchRequestBuilder(usersUrl, routeParams)
-		.withQueryParam("filter", `Identifier eq '${identifier}'`)
-		.fetchJson();
-	const user = users?.length ? users[0] : null;
-	return user;
+export async function getUser() {
+	return await new FetchRequestBuilder(usersUrl).fetchSingle();
+}
+
+export async function updateUser(userId, user) {
+	return await new FetchRequestBuilder(userUrl, { userId })
+		.withMethod("PUT")
+		.withBody(user)
+		.fetch();
 }
 
 export function getLookupValues(routeParams, lookupName) {
@@ -634,9 +766,11 @@ export function getDocumentsOfCaseField(routeParams, caseFieldName, top) {
 		.withQueryParam("orderBy", "start desc")
 		.withQueryParam("result", top ? "ItemsWithCount" : undefined)
 		.withQueryParam("top", top)
-		.withQueryParam("filter", `CaseFieldName eq '${caseFieldName}' and DocumentCount gt 0`)
+		.withQueryParam(
+			"filter",
+			`CaseFieldName eq '${caseFieldName}' and DocumentCount gt 0`,
+		)
 		.withLocalization()
-		.withUser()
 		.fetchJson();
 }
 
@@ -649,22 +783,7 @@ export function getDocument(routeParams) {
 export function deleteDocument(routeParams) {
 	const url = routeParams.employeeId ? employeeDocumentUrl : companyDocumentUrl;
 
-	return new FetchRequestBuilder(url, routeParams)
-		.withMethod("DELETE")
-		.fetch();
-}
-
-export function getPayrollResult(routeParams, period, employeeId) {
-	return new FetchRequestBuilder(payrollResultsUrl, routeParams)
-		.withQueryParam("filter", `PayrollId eq '${routeParams.payrollId}' and EmployeeId eq '${employeeId}' and PeriodName eq '${period}'`)
-		.withQueryParam("orderBy", "created desc")
-		.withQueryParam("top", 1)
-		.fetchSingle();
-}
-
-export function getWageTypes(routeParams, payrollResultId) {
-	return new FetchRequestBuilder(wageTypesUrl, { ...routeParams, payrollResultId })
-		.fetchJson();
+	return new FetchRequestBuilder(url, routeParams).withMethod("DELETE").fetch();
 }
 
 export function getPayouts(routeParams) {
@@ -688,7 +807,10 @@ export function cancelPayout(routeParams) {
 
 export function getClientRegulation(routeParams) {
 	return new FetchRequestBuilder(regulationsUrl, routeParams)
-		.withQueryParam("filter", `name eq 'ClientRegulation:${routeParams.payrollId}'`)
+		.withQueryParam(
+			"filter",
+			`name eq 'ClientRegulation:${routeParams.payrollId}'`,
+		)
 		.fetchSingle();
 }
 
@@ -722,8 +844,10 @@ export function getPayrollWageTypes(routeParams) {
 		.fetchJson();
 }
 export function getPayrollWageTypeSettings(routeParams) {
-	return new FetchRequestBuilder(payrollWageTypeSettingsUrl, routeParams)
-		.fetchJson();
+	return new FetchRequestBuilder(
+		payrollWageTypeSettingsUrl,
+		routeParams,
+	).fetchJson();
 }
 export function setPayrollWageTypeSettings(routeParams, settings) {
 	return new FetchRequestBuilder(payrollWageTypeSettingsUrl, routeParams)
@@ -738,10 +862,7 @@ export function getPayrollCollectors(routeParams) {
 }
 
 export async function requestExportDataDownload(routeParams, name) {
-	const builder = new FetchRequestBuilder(
-		exportUrl,
-		routeParams,
-	);
+	const builder = new FetchRequestBuilder(exportUrl, routeParams);
 	const response = await builder.withTimout(600000).fetch();
 	const blob = await response.blob();
 	await downloadData(blob, name);
@@ -752,28 +873,30 @@ export async function downloadData(blob, name) {
 	let anchor = document.createElement("a");
 	try {
 		anchor.href = objectUrl;
-		if (name)
-			anchor.download = name;
+		if (name) anchor.download = name;
 		anchor.click();
 	} finally {
 		window.URL.revokeObjectURL(objectUrl);
 		anchor.remove();
 	}
-
 }
 
 export async function requestPainFileDownload(routeParams, name) {
 	const builder = new FetchRequestBuilder(
 		payoutDocumentUrl,
 		routeParams,
-	)
-		.withDefaultAcceptHeader();
+	).withDefaultAcceptHeader();
 	const response = await builder.fetch();
 	const blob = await response.blob();
 	await downloadData(blob, name);
 }
 
-async function fetchWithTimeoutAndRetry(url, options = {}, timeout = 5000, maxRetries = 3) {
+async function fetchWithTimeoutAndRetry(
+	url,
+	options = {},
+	timeout = 5000,
+	maxRetries = 3,
+) {
 	let attempt = 0;
 
 	const fetchWithTimeout = (url, options, timeout) => {
@@ -781,15 +904,15 @@ async function fetchWithTimeoutAndRetry(url, options = {}, timeout = 5000, maxRe
 			const controller = new AbortController();
 			const timer = setTimeout(() => {
 				controller.abort();
-				reject(new Error('Timeout'));
+				reject(new Error("Timeout"));
 			}, timeout);
 
 			fetch(url, { ...options, signal: controller.signal })
-				.then(response => {
+				.then((response) => {
 					clearTimeout(timer);
 					resolve(response);
 				})
-				.catch(err => {
+				.catch((err) => {
 					clearTimeout(timer);
 					reject(err);
 				});
@@ -801,7 +924,7 @@ async function fetchWithTimeoutAndRetry(url, options = {}, timeout = 5000, maxRe
 			const response = await fetchWithTimeout(url, options, timeout);
 			return response; // success
 		} catch (err) {
-			if (err.name === 'AbortError' || err.message === 'Timeout') {
+			if (err.name === "AbortError" || err.message === "Timeout") {
 				attempt++;
 				if (attempt >= maxRetries) {
 					throw new Error(`Failed after ${maxRetries} retries due to timeout.`);

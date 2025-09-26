@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { useLoaderData, useOutlet } from "react-router-dom";
 
 type ContentLayoutProps = {
-	title: ReactNode | string,
-	disableInset?: boolean,
-	buttons?: ReactNode
-	maxHeightContent?: boolean,
+	title: ReactNode | string;
+	disableInset?: boolean;
+	buttons?: ReactNode;
+	maxHeightContent?: boolean;
 } & PropsWithChildren;
 
 export function ContentLayout({
@@ -29,13 +29,18 @@ export function ContentLayout({
 			}}
 		>
 			<PageHeader title={defaultTitle} buttons={buttons} />
-			<PageContent disableInset={disableInset} maxHeightContent={maxHeightContent}>{children}</PageContent>
+			<PageContent
+				disableInset={disableInset}
+				maxHeightContent={maxHeightContent}
+			>
+				{children}
+			</PageContent>
 		</Stack>
 	);
 }
 
 type LoaderData = {
-	title: string
+	title: string;
 };
 
 export function PageHeader({ title, buttons }) {
@@ -62,11 +67,14 @@ export function PageHeader({ title, buttons }) {
 }
 
 type PageHeaderTitleProps = {
-	title: string,
-	flex?: number | string
+	title: string;
+	flex?: number | string;
 };
 
-export function PageHeaderTitle({ title, flex = undefined }: PageHeaderTitleProps) {
+export function PageHeaderTitle({
+	title,
+	flex = undefined,
+}: PageHeaderTitleProps) {
 	return (
 		<Typography variant="h2" fontWeight={500} flex={flex} noWrap>
 			{title}
@@ -74,7 +82,12 @@ export function PageHeaderTitle({ title, flex = undefined }: PageHeaderTitleProp
 	);
 }
 
-export function PageContent({ children, disableInset = false, maxHeightContent = false, ...sxProps }) {
+export function PageContent({
+	children,
+	disableInset = false,
+	maxHeightContent = false,
+	...sxProps
+}) {
 	const px = disableInset ? undefined : "var(--content-inset)";
 	const outlet = useOutlet();
 	return (
@@ -94,16 +107,18 @@ export function PageContent({ children, disableInset = false, maxHeightContent =
 	);
 }
 
-export function withPage<T>(header: ReactNode | string, Component: FC<T>, renderOutlet: boolean) {
+export function withPage<T>(
+	header: ReactNode | string,
+	Component: FC<T>,
+	renderOutlet: boolean,
+) {
 	return function withPageHOC(props: T) {
 		const outlet = useOutlet();
-		{/* @ts-ignore */ }
+		{
+			/* @ts-ignore */
+		}
 		const content = renderOutlet && outlet ? outlet : <Component {...props} />;
-		return (
-			<ContentLayout title={header}>
-				{content}
-			</ContentLayout>
-		);
+		return <ContentLayout title={header}>{content}</ContentLayout>;
 	};
 }
 

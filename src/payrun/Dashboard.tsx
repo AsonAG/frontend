@@ -1,5 +1,19 @@
-import React, { createContext, Dispatch, forwardRef, Ref, useCallback, useContext, useMemo, useReducer } from "react";
-import { Link as RouterLink, Outlet, useRouteLoaderData, LinkProps } from "react-router-dom";
+import React, {
+	createContext,
+	Dispatch,
+	forwardRef,
+	Ref,
+	useCallback,
+	useContext,
+	useMemo,
+	useReducer,
+} from "react";
+import {
+	Link as RouterLink,
+	Outlet,
+	useRouteLoaderData,
+	LinkProps,
+} from "react-router-dom";
 import { Stack, Typography, Button, Chip, Box, styled } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
@@ -13,353 +27,464 @@ import { CalculatingIndicator } from "./CalculatingIndicator";
 import { SearchField } from "../components/SearchField";
 import { MissingDataCase } from "../models/MissingData";
 
-
 type PayrollTableContextProps = {
-  state: DashboardState
-  dispatch: Dispatch<DashboardAction>
-}
+	state: DashboardState;
+	dispatch: Dispatch<DashboardAction>;
+};
 
-export const PayrollTableContext = createContext<PayrollTableContextProps>(null!);
+export const PayrollTableContext = createContext<PayrollTableContextProps>(
+	null!,
+);
 
 export function PayrunDashboard() {
-  const { payrunPeriod } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
-  return (
-    <>
-      <PayrunPeriodView key={payrunPeriod.id} />
-      <Outlet />
-    </>
-  );
+	const { payrunPeriod } = useRouteLoaderData(
+		"payrunperiod",
+	) as PayrunPeriodLoaderData;
+	return (
+		<>
+			<PayrunPeriodView key={payrunPeriod.id} />
+			<Outlet />
+		</>
+	);
 }
 
 function PayrunPeriodView() {
-  const { payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
-  const isOpen = payrunPeriod.periodStatus === "Open";
-  const rows: Array<EntryRow> = useMemo(() => {
-    const controllingDataMap = new Map(controllingData.employeeControllingCases.map(x => [x.id, x.cases]));
-    let entries = payrunPeriod.entries.map((entry, index) => ({
-      ...entry,
-      amount: entry.openPayout ?? 0,
-      previousEntry: previousPayrunPeriod?.entries?.find(previousEntry => previousEntry.employeeId == entry.employeeId),
-      controllingTasks: isOpen ? controllingDataMap.get(entry.employeeId) : [],
-      salaryType: salaryTypes[index]
-    }));
-    // filter here, otherwise the index wont match
-    if (!isOpen) {
-      entries = entries.filter(e => e.isEmployed || e.hasWage);
-    }
-    return entries;
-  }, [payrunPeriod.entries, previousPayrunPeriod?.entries, isOpen, controllingData]);
-  const [state, dispatch] = useReducer(
-    reducer,
-    rows,
-    createInitialState
-  );
+	const { payrunPeriod, previousPayrunPeriod, controllingData, salaryTypes } =
+		useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
+	const isOpen = payrunPeriod.periodStatus === "Open";
+	const rows: Array<EntryRow> = useMemo(() => {
+		const controllingDataMap = new Map(
+			controllingData.employeeControllingCases.map((x) => [x.id, x.cases]),
+		);
+		let entries = payrunPeriod.entries.map((entry, index) => ({
+			...entry,
+			amount: entry.openPayout ?? 0,
+			previousEntry: previousPayrunPeriod?.entries?.find(
+				(previousEntry) => previousEntry.employeeId == entry.employeeId,
+			),
+			controllingTasks: isOpen ? controllingDataMap.get(entry.employeeId) : [],
+			salaryType: salaryTypes[index],
+		}));
+		// filter here, otherwise the index wont match
+		if (!isOpen) {
+			entries = entries.filter((e) => e.isEmployed || e.hasWage);
+		}
+		return entries;
+	}, [
+		payrunPeriod.entries,
+		previousPayrunPeriod?.entries,
+		isOpen,
+		controllingData,
+	]);
+	const [state, dispatch] = useReducer(reducer, rows, createInitialState);
 
-  const header = (
-    <DashboardHeader index>
-      <Stack direction="row" spacing={2}>
-        {
-          isOpen && <>
-            <PayrunTabs />
-            <CalculatingIndicator />
-          </>
-        }
-        <Box flex={1} />
-        <EmployeeTableSearchField />
-      </Stack>
-    </DashboardHeader>
-  );
+	const header = (
+		<DashboardHeader index>
+			<Stack direction="row" spacing={2}>
+				{isOpen && (
+					<>
+						<PayrunTabs />
+						<CalculatingIndicator />
+					</>
+				)}
+				<Box flex={1} />
+				<EmployeeTableSearchField />
+			</Stack>
+		</DashboardHeader>
+	);
 
-
-  return (
-    <PayrollTableContext.Provider value={{ state, dispatch }}>
-      <ContentLayout title={header}>
-        {
-          isOpen ? (
-            <>
-              <PayrunTabContent tab="Controlling" emptyText="Controlling completed.">
-                <ControllingList />
-              </PayrunTabContent>
-              <PayrunTabContent tab="Payable" emptyText="All employees have been paid out.">
-                <PayrunTable entries={state.entriesByState["Payable"]} completed={false} />
-              </PayrunTabContent>
-              <PayrunTabContent tab="PaidOut" emptyText="No payment has been made yet.">
-                <PayrunTable entries={state.entriesByState["PaidOut"]} completed={true} />
-              </PayrunTabContent>
-            </>
-          ) :
-            <PayrunTable entries={state.filteredEntries} completed={true} />
-        }
-      </ContentLayout>
-    </PayrollTableContext.Provider>
-  );
+	return (
+		<PayrollTableContext.Provider value={{ state, dispatch }}>
+			<ContentLayout title={header}>
+				{isOpen ? (
+					<>
+						<PayrunTabContent
+							tab="Controlling"
+							emptyText="Controlling completed."
+						>
+							<ControllingList />
+						</PayrunTabContent>
+						<PayrunTabContent
+							tab="Payable"
+							emptyText="All employees have been paid out."
+						>
+							<PayrunTable
+								entries={state.entriesByState["Payable"]}
+								completed={false}
+							/>
+						</PayrunTabContent>
+						<PayrunTabContent
+							tab="PaidOut"
+							emptyText="No payment has been made yet."
+						>
+							<PayrunTable
+								entries={state.entriesByState["PaidOut"]}
+								completed={true}
+							/>
+						</PayrunTabContent>
+					</>
+				) : (
+					<PayrunTable entries={state.filteredEntries} completed={true} />
+				)}
+			</ContentLayout>
+		</PayrollTableContext.Provider>
+	);
 }
 
-
-
-type EntryState = "Controlling" | "Payable" | "PaidOut" | "Calculating" | "NoWage" | "FormerEmployee" | "Error";
+type EntryState =
+	| "Controlling"
+	| "Payable"
+	| "PaidOut"
+	| "Calculating"
+	| "NoWage"
+	| "FormerEmployee"
+	| "Error";
 
 function EmployeeTableSearchField() {
-  const { t } = useTranslation();
-  const { state, dispatch } = useContext(PayrollTableContext);
-  const setFilter = useCallback((filter: string) => dispatch({ type: "set_employee_filter", filter }), [dispatch]);
+	const { t } = useTranslation();
+	const { state, dispatch } = useContext(PayrollTableContext);
+	const setFilter = useCallback(
+		(filter: string) => dispatch({ type: "set_employee_filter", filter }),
+		[dispatch],
+	);
 
-
-  return (
-    <SearchField
-      label={t("Employee search")}
-      value={state.employeeFilter}
-      setValue={setFilter} />
-  );
+	return (
+		<SearchField
+			label={t("Employee search")}
+			value={state.employeeFilter}
+			setValue={setFilter}
+		/>
+	);
 }
 export type DashboardState = {
-  entries: Array<EntryRow>
-  filteredEntries: Array<EntryRow>
-  entriesByState: Record<EntryState, EntryRow[]>
-  entryCountByTab: Record<Tab, number>
-  selectedTab: Tab,
-  salaryType: string | null
-  employeeFilter: string
-}
+	entries: Array<EntryRow>;
+	filteredEntries: Array<EntryRow>;
+	entriesByState: Record<EntryState, EntryRow[]>;
+	entryCountByTab: Record<Tab, number>;
+	selectedTab: Tab;
+	salaryType: string | null;
+	employeeFilter: string;
+};
 
+export type DashboardAction =
+	| {
+			type: "set_salary_type";
+			salaryType: string | null;
+	  }
+	| {
+			type: "set_employee_filter";
+			filter: string;
+	  }
+	| {
+			type: "set_tab";
+			tab: Tab;
+	  };
 
-export type DashboardAction = {
-  type: "set_salary_type"
-  salaryType: string | null
-} | {
-  type: "set_employee_filter"
-  filter: string
-} | {
-  type: "set_tab"
-  tab: Tab
-}
-
-function reducer(state: DashboardState, action: DashboardAction): DashboardState {
-  let newState: DashboardState;
-  switch (action.type) {
-    case "set_tab": {
-      if (action.tab === state.selectedTab) {
-        return state;
-      }
-      return {
-        ...state,
-        selectedTab: action.tab,
-      };
-    }
-    case "set_salary_type":
-      if (state.salaryType === action.salaryType) {
-        return state;
-      }
-      newState = {
-        ...state,
-        salaryType: action.salaryType
-      };
-      break;
-    case "set_employee_filter":
-      newState = {
-        ...state,
-        employeeFilter: action.filter
-      };
-      break;
-  }
-  newState.filteredEntries = newState.entries.filter(e => filterBySalaryType(e, newState.salaryType) && filterBySearch(e, newState.employeeFilter));
-  newState.entriesByState = groupRows(newState.filteredEntries);
-  newState.entryCountByTab = getEntryCountByTab(newState.entriesByState);
-  if (action.type === "set_employee_filter") {
-    newState.selectedTab = getSelectedTabAfterSearch(newState);
-  }
-  return newState;
+function reducer(
+	state: DashboardState,
+	action: DashboardAction,
+): DashboardState {
+	let newState: DashboardState;
+	switch (action.type) {
+		case "set_tab": {
+			if (action.tab === state.selectedTab) {
+				return state;
+			}
+			return {
+				...state,
+				selectedTab: action.tab,
+			};
+		}
+		case "set_salary_type":
+			if (state.salaryType === action.salaryType) {
+				return state;
+			}
+			newState = {
+				...state,
+				salaryType: action.salaryType,
+			};
+			break;
+		case "set_employee_filter":
+			newState = {
+				...state,
+				employeeFilter: action.filter,
+			};
+			break;
+	}
+	newState.filteredEntries = newState.entries.filter(
+		(e) =>
+			filterBySalaryType(e, newState.salaryType) &&
+			filterBySearch(e, newState.employeeFilter),
+	);
+	newState.entriesByState = groupRows(newState.filteredEntries);
+	newState.entryCountByTab = getEntryCountByTab(newState.entriesByState);
+	if (action.type === "set_employee_filter") {
+		newState.selectedTab = getSelectedTabAfterSearch(newState);
+	}
+	return newState;
 }
 
 function filterBySalaryType(entry: EntryRow, salaryType: string | null) {
-  if (salaryType === null)
-    return true;
-  return entry.salaryType === salaryType;
+	if (salaryType === null) return true;
+	return entry.salaryType === salaryType;
 }
 
 function filterBySearch(entry: EntryRow, search: string) {
-  if (search === "")
-    return true;
-  return getEmployeeDisplayString(entry).toLowerCase().includes(search.toLowerCase());
+	if (search === "") return true;
+	return getEmployeeDisplayString(entry)
+		.toLowerCase()
+		.includes(search.toLowerCase());
 }
 
 function getSelectedTabAfterSearch(state: DashboardState): Tab {
-  function hasEntries(tab: EntryState) { return (state.entriesByState[tab] ?? []).length > 0; }
-  if (hasEntries(state.selectedTab)) {
-    return state.selectedTab;
-  }
-  if (hasEntries("Controlling") || hasEntries("NoWage") || hasEntries("Error")) {
-    return "Controlling"
-  }
-  if (hasEntries("Payable")) {
-    return "Payable";
-  }
-  if (hasEntries("PaidOut")) {
-    return "PaidOut";
-  }
-  return state.selectedTab;
+	function hasEntries(tab: EntryState) {
+		return (state.entriesByState[tab] ?? []).length > 0;
+	}
+	if (hasEntries(state.selectedTab)) {
+		return state.selectedTab;
+	}
+	if (
+		hasEntries("Controlling") ||
+		hasEntries("NoWage") ||
+		hasEntries("Error")
+	) {
+		return "Controlling";
+	}
+	if (hasEntries("Payable")) {
+		return "Payable";
+	}
+	if (hasEntries("PaidOut")) {
+		return "PaidOut";
+	}
+	return state.selectedTab;
 }
 
-
 function createInitialState(employeeRows: Array<EntryRow>): DashboardState {
-  const grouped = groupRows(employeeRows);
+	const grouped = groupRows(employeeRows);
 
-  return {
-    entries: employeeRows,
-    filteredEntries: employeeRows,
-    entriesByState: grouped,
-    entryCountByTab: getEntryCountByTab(grouped),
-    selectedTab: "Controlling",
-    salaryType: null,
-    employeeFilter: ""
-  };
+	return {
+		entries: employeeRows,
+		filteredEntries: employeeRows,
+		entriesByState: grouped,
+		entryCountByTab: getEntryCountByTab(grouped),
+		selectedTab: "Controlling",
+		salaryType: null,
+		employeeFilter: "",
+	};
 }
 
 function groupRows(rows: Array<EntryRow>): Record<EntryState, Array<EntryRow>> {
-  return Object.groupBy(rows, groupingFn);
-  function groupingFn(row: EntryRow): EntryState {
-    if (row.state === "OutOfDate") {
-      return "Calculating";
-    }
-    if (row.state === "Error") {
-      return "Error";
-    }
-    if ((row.controllingTasks?.length ?? 0) > 0) {
-      return "Controlling";
-    }
-    if (row.openPayout === 0 && ((row.paidOut ?? 0) > 0) || (row.paidOutGarnishment ?? 0) > 0) {
-      return "PaidOut";
-    }
-    if (!row.isEmployed && !row.hasWage) {
-      return "FormerEmployee";
-    }
-    if (!row.hasWage) {
-      return "NoWage";
-    }
-    return "Payable";
-  }
+	return Object.groupBy(rows, groupingFn);
+	function groupingFn(row: EntryRow): EntryState {
+		if (row.state === "OutOfDate") {
+			return "Calculating";
+		}
+		if (row.state === "Error") {
+			return "Error";
+		}
+		if ((row.controllingTasks?.length ?? 0) > 0) {
+			return "Controlling";
+		}
+		if (
+			(row.openPayout === 0 && (row.paidOut ?? 0) > 0) ||
+			(row.paidOutGarnishment ?? 0) > 0
+		) {
+			return "PaidOut";
+		}
+		if (!row.isEmployed && !row.hasWage) {
+			return "FormerEmployee";
+		}
+		if (!row.hasWage) {
+			return "NoWage";
+		}
+		return "Payable";
+	}
 }
 
-function getEntryCountByTab(grouped: Record<EntryState, EntryRow[]>): Record<Tab, number> {
-  return {
-    "Controlling": (grouped["Controlling"]?.length ?? 0) + (grouped["NoWage"]?.length ?? 0) + (grouped["Error"]?.length ?? 0),
-    "Payable": (grouped["Payable"]?.length ?? 0),
-    "PaidOut": (grouped["PaidOut"]?.length ?? 0)
-  };
+function getEntryCountByTab(
+	grouped: Record<EntryState, EntryRow[]>,
+): Record<Tab, number> {
+	return {
+		Controlling:
+			(grouped["Controlling"]?.length ?? 0) +
+			(grouped["NoWage"]?.length ?? 0) +
+			(grouped["Error"]?.length ?? 0),
+		Payable: grouped["Payable"]?.length ?? 0,
+		PaidOut: grouped["PaidOut"]?.length ?? 0,
+	};
 }
-
 
 function ControllingList() {
-  const { t } = useTranslation();
-  const { state } = useContext(PayrollTableContext);
-  const { controllingData } = useRouteLoaderData("payrunperiod") as PayrunPeriodLoaderData;
-  const wageControlling = state.entriesByState["Controlling"];
-  const noWage = state.entriesByState["NoWage"];
-  const errors = state.entriesByState["Error"];
-  if (!wageControlling && !noWage && !errors && controllingData.companyControllingCases.length === 0) {
-    if (state.employeeFilter)
-      return;
-    return <Typography>{t("All entries are ok.")}</Typography>
-  }
+	const { t } = useTranslation();
+	const { state } = useContext(PayrollTableContext);
+	const { controllingData } = useRouteLoaderData(
+		"payrunperiod",
+	) as PayrunPeriodLoaderData;
+	const wageControlling = state.entriesByState["Controlling"];
+	const noWage = state.entriesByState["NoWage"];
+	const errors = state.entriesByState["Error"];
+	if (
+		!wageControlling &&
+		!noWage &&
+		!errors &&
+		controllingData.companyControllingCases.length === 0
+	) {
+		if (state.employeeFilter) return;
+		return <Typography>{t("All entries are ok.")}</Typography>;
+	}
 
-  return (
-    <Stack spacing={2}>
-      <WageControllingList wageControlling={wageControlling} companyControllingCases={controllingData.companyControllingCases} />
-      <NoWageList entries={noWage} />
-      <ErrorList entries={errors} />
-    </Stack>
-  )
+	return (
+		<Stack spacing={2}>
+			<WageControllingList
+				wageControlling={wageControlling}
+				companyControllingCases={controllingData.companyControllingCases}
+			/>
+			<NoWageList entries={noWage} />
+			<ErrorList entries={errors} />
+		</Stack>
+	);
 }
 
-function WageControllingList({ wageControlling, companyControllingCases }: { wageControlling: Array<EntryRow>, companyControllingCases: MissingDataCase[] }) {
-  const { t } = useTranslation();
-  if (!wageControlling && companyControllingCases.length === 0)
-    return;
+function WageControllingList({
+	wageControlling,
+	companyControllingCases,
+}: {
+	wageControlling: Array<EntryRow>;
+	companyControllingCases: MissingDataCase[];
+}) {
+	const { t } = useTranslation();
+	if (!wageControlling && companyControllingCases.length === 0) return;
 
-  return (
-    <Stack spacing={1}>
-      <Typography variant="h6">{t("payrun_period_wage_controlling")}</Typography>
-      <CompanyControllingRow companyControllingCases={companyControllingCases} />
-      {wageControlling?.map(entry => <ControllingRow key={entry.id} entry={entry} />)}
-    </Stack>
-  )
+	return (
+		<Stack spacing={1}>
+			<Typography variant="h6">
+				{t("payrun_period_wage_controlling")}
+			</Typography>
+			<CompanyControllingRow
+				companyControllingCases={companyControllingCases}
+			/>
+			{wageControlling?.map((entry) => (
+				<ControllingRow key={entry.id} entry={entry} />
+			))}
+		</Stack>
+	);
 }
 
-function CompanyControllingRow({ companyControllingCases }: { companyControllingCases: MissingDataCase[] }) {
-  const { t } = useTranslation();
-  if (companyControllingCases.length === 0)
-    return;
-  return (
-    <Stack spacing={0.5} alignItems="start">
-      <Typography>{t("Company")}</Typography>
-      <Stack direction="row" spacing={0.5} flexWrap="wrap">
-        {
-          companyControllingCases.map(task => <Button key={task.id} component={RouterLink} to={`company/new/${encodeURIComponent(task.name)}`} variant="outlined" color="warning" size="small">{task.displayName}</Button>)
-        }
-      </Stack>
-    </Stack>
-  )
+function CompanyControllingRow({
+	companyControllingCases,
+}: {
+	companyControllingCases: MissingDataCase[];
+}) {
+	const { t } = useTranslation();
+	if (companyControllingCases.length === 0) return;
+	return (
+		<Stack spacing={0.5} alignItems="start">
+			<Typography>{t("Company")}</Typography>
+			<Stack direction="row" spacing={0.5} flexWrap="wrap">
+				{companyControllingCases.map((task) => (
+					<Button
+						key={task.id}
+						component={RouterLink}
+						to={`company/new/${encodeURIComponent(task.name)}`}
+						variant="outlined"
+						color="warning"
+						size="small"
+					>
+						{task.displayName}
+					</Button>
+				))}
+			</Stack>
+		</Stack>
+	);
 }
 function ControllingRow({ entry }: { entry: EntryRow }) {
-  return (
-    <Stack spacing={0.5} alignItems="start">
-      <Link to={`../../hr/employees/${entry.employeeId}`} >{getEmployeeDisplayString(entry)}</Link>
-      <Stack direction="row" spacing={0.5} flexWrap="wrap">
-        {
-          entry?.controllingTasks?.map(task => <Button key={task.name} component={RouterLink} to={`employees/${entry.employeeId}/new/${encodeURIComponent(task.name)}`} variant="outlined" color="warning" size="small">{task.displayName}</Button>)
-        }
-      </Stack>
-    </Stack>
-  )
+	return (
+		<Stack spacing={0.5} alignItems="start">
+			<Link to={`../../hr/employees/${entry.employeeId}`}>
+				{getEmployeeDisplayString(entry)}
+			</Link>
+			<Stack direction="row" spacing={0.5} flexWrap="wrap">
+				{entry?.controllingTasks?.map((task) => (
+					<Button
+						key={task.name}
+						component={RouterLink}
+						to={`employees/${entry.employeeId}/new/${encodeURIComponent(task.name)}`}
+						variant="outlined"
+						color="warning"
+						size="small"
+					>
+						{task.displayName}
+					</Button>
+				))}
+			</Stack>
+		</Stack>
+	);
 }
 
 const Link = styled(
-  forwardRef(function Link(itemProps: LinkProps, ref: Ref<HTMLAnchorElement>) {
-    return <RouterLink ref={ref} {...itemProps} role={undefined} />;
-  }),
+	forwardRef(function Link(itemProps: LinkProps, ref: Ref<HTMLAnchorElement>) {
+		return <RouterLink ref={ref} {...itemProps} role={undefined} />;
+	}),
 )(({ theme }) => {
-  return {
-    display: "block",
-    textDecoration: "none",
-    paddingTop: theme.spacing(0.25),
-    paddingBottom: theme.spacing(0.25),
-    borderRadius: theme.shape.borderRadius,
-    color: theme.palette.primary.main,
-    "&:hover": {
-      backgroundColor: theme.palette.primary.hover
-    }
-  };
+	return {
+		display: "block",
+		textDecoration: "none",
+		paddingTop: theme.spacing(0.25),
+		paddingBottom: theme.spacing(0.25),
+		borderRadius: theme.shape.borderRadius,
+		color: theme.palette.primary.main,
+		"&:hover": {
+			backgroundColor: theme.palette.primary.hover,
+		},
+	};
 });
 
 function NoWageList({ entries }: { entries: Array<EntryRow> }) {
-  const { t } = useTranslation();
-  if (!entries)
-    return;
+	const { t } = useTranslation();
+	if (!entries) return;
 
-  return (
-    <Stack spacing={1}>
-      <Typography variant="h6">{t("payrun_period_no_wage")}</Typography>
-      <Stack direction="row" spacing={0.5} flexWrap="wrap">
-        {entries.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="primary" />)}
-      </Stack>
-    </Stack>
-  )
+	return (
+		<Stack spacing={1}>
+			<Typography variant="h6">{t("payrun_period_no_wage")}</Typography>
+			<Stack direction="row" spacing={0.5} flexWrap="wrap">
+				{entries.map((entry) => (
+					<Chip
+						component={RouterLink}
+						to={`../../hr/employees/${entry.employeeId}`}
+						key={entry.id}
+						label={getEmployeeDisplayString(entry)}
+						variant="outlined"
+						onClick={noop}
+						color="primary"
+					/>
+				))}
+			</Stack>
+		</Stack>
+	);
 }
 
 function ErrorList({ entries }: { entries: Array<EntryRow> }) {
-  const { t } = useTranslation();
-  if (!entries)
-    return;
+	const { t } = useTranslation();
+	if (!entries) return;
 
-  return (
-    <Stack spacing={1}>
-      <Typography variant="h6">{t("payrun_period_error")}</Typography>
-      <Stack direction="row" spacing={0.5} flexWrap="wrap">
-        {entries.map(entry => <Chip component={RouterLink} to={`../../hr/employees/${entry.employeeId}`} key={entry.id} label={getEmployeeDisplayString(entry)} variant="outlined" onClick={noop} color="error" />)}
-      </Stack>
-    </Stack>
-  )
+	return (
+		<Stack spacing={1}>
+			<Typography variant="h6">{t("payrun_period_error")}</Typography>
+			<Stack direction="row" spacing={0.5} flexWrap="wrap">
+				{entries.map((entry) => (
+					<Chip
+						component={RouterLink}
+						to={`../../hr/employees/${entry.employeeId}`}
+						key={entry.id}
+						label={getEmployeeDisplayString(entry)}
+						variant="outlined"
+						onClick={noop}
+						color="error"
+					/>
+				))}
+			</Stack>
+		</Stack>
+	);
 }
 
-
-const noop = () => { };
+const noop = () => {};

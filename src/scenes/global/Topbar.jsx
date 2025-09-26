@@ -1,8 +1,4 @@
-import {
-	AppBar,
-	Toolbar,
-	Stack,
-} from "@mui/material";
+import { AppBar, Toolbar, Stack } from "@mui/material";
 import { UserAccountComponent } from "./UserAccountComponent";
 import { Suspense } from "react";
 import { NewEventCommand } from "../../components/NewEventCommand";
@@ -23,8 +19,12 @@ function Topbar({ children }) {
 				spacing={1}
 			>
 				{children}
-				<Stack sx={{ flexGrow: 1 }} alignItems="center" justifyContent="center" direction="row">
-				</Stack>
+				<Stack
+					sx={{ flexGrow: 1 }}
+					alignItems="center"
+					justifyContent="center"
+					direction="row"
+				></Stack>
 				<Stack direction="row" spacing={2.5} alignItems="center">
 					<Suspense>
 						<NewEventCommand />

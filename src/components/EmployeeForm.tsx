@@ -1,12 +1,9 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
 	Button,
 	Stack,
 	TextField,
 	FormControl,
-	InputLabel,
-	Select,
-	MenuItem,
 	FormControlLabel,
 	Checkbox,
 	Typography,
@@ -18,13 +15,13 @@ import { Employee } from "../models/Employee";
 import { Division } from "../models/Division";
 
 type LoaderData = {
-	employee: Employee,
-	divisions: Array<Division>,
-	selectedDivisions: Array<string>
-}
+	employee: Employee;
+	divisions: Array<Division>;
+	selectedDivisions: Array<string>;
+};
 
 export function EmployeeForm() {
-	const { employee, } = useLoaderData() as LoaderData;
+	const { employee } = useLoaderData() as LoaderData;
 	const isNew = !employee;
 	const title = isNew ? "New employee" : "Edit employee";
 	const { t } = useTranslation();
@@ -44,7 +41,9 @@ export function EmployeeForm() {
 					name="lastName"
 					defaultValue={employee?.lastName}
 				/>
-				{!isNew && <input type="hidden" name="status" value={employee.status} />}
+				{!isNew && (
+					<input type="hidden" name="status" value={employee.status} />
+				)}
 				<TextField
 					label={t("Identifier")}
 					required
@@ -71,20 +70,24 @@ function PayrollAssignmentView() {
 	return (
 		<Stack display="none">
 			<Typography variant="h6">{t("Organization unit assignment")}</Typography>
-			{
-				divisions.map(division => {
-					return (
-						<FormControl key={division.id}>
-							<FormControlLabel
-								name="division"
-								label={division.name}
-								labelPlacement="end"
-								control={<Checkbox defaultChecked={selectedDivisions.includes(division.name)} value={division.name} name="divisions" />}
-							/>
-						</FormControl>
-					);
-				})
-			}
+			{divisions.map((division) => {
+				return (
+					<FormControl key={division.id}>
+						<FormControlLabel
+							name="division"
+							label={division.name}
+							labelPlacement="end"
+							control={
+								<Checkbox
+									defaultChecked={selectedDivisions.includes(division.name)}
+									value={division.name}
+									name="divisions"
+								/>
+							}
+						/>
+					</FormControl>
+				);
+			})}
 		</Stack>
-	)
+	);
 }
