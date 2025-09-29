@@ -1,35 +1,47 @@
-import { useEffect } from "react";
-import { useFetcher } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getCaseValueCount } from "../api/FetchClient";
 
-export function useHistoryCount(caseFieldName?: string) {
-	if (!caseFieldName) {
-		return { count: 0, loading: false, error: null as unknown, hasMore: false };
-	}
+type HookState = {
+	count: number;
+	loading: boolean;
+	error: unknown;
+	hasMore: boolean;
+};
 
-	const fetcher = useFetcher();
-	const encodedName = encodeURIComponent(caseFieldName);
-	const loadUrl = `history/${encodedName}?top=1`;
+export function useHistoryCount(caseFieldName?: string): HookState {
+	const params = useParams();
+	const [state, setState] = useState<HookState>({
+		count: 0,
+		loading: false,
+		error: null,
+		hasMore: false,
+	});
 
 	useEffect(() => {
-		fetcher.load(loadUrl);
-	}, [loadUrl]);
-
-	const loading = fetcher.state === "loading";
-
-	let safeCount = 0;
-	if (fetcher.data) {
-		const { count, items } = fetcher.data as {
-			count?: number;
-			items?: Array<unknown>;
-		};
-		if (typeof count === "number" && !isNaN(count)) {
-			safeCount = count;
-		} else if (Array.isArray(items)) {
-			safeCount = items.length;
+		if (!caseFieldName) {
+			setState({ count: 0, loading: false, error: null, hasMore: false });
+			return;
 		}
-	}
 
-	const hasMore = safeCount > 1;
+		let cancelled = false;
+		setState((s) => ({ ...s, loading: true, error: null }));
 
-	return { count: safeCount, loading, error: null as unknown, hasMore };
+		getCaseValueCount(params as any, undefined)
+			.then((valueCounts: Record<string, number> | undefined) => {
+				if (cancelled) return;
+				const count = valueCounts?.[caseFieldName] ?? 0;
+				setState({ count, loading: false, error: null, hasMore: count > 1 });
+			})
+			.catch((err) => {
+				if (cancelled) return;
+				setState({ count: 0, loading: false, error: err, hasMore: false });
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [caseFieldName, params.orgId, params.payrollId, params.employeeId]);
+
+	return state;
 }
