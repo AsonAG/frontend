@@ -39,24 +39,41 @@ function DatePickerInputAdornment({
 	);
 }
 
-interface DatePickerProps extends MuiDatePickerProps<Dayjs> {
+interface BaseExtras {
+	variant: "standard" | "month" | "month-short" | "year" | "datetime";
+	required?: boolean;
+	getValidationErrorMessage?: (
+		error: DateValidationError | DateTimeValidationError | null | undefined,
+	) => string | undefined;
+}
+
+interface DatePickerProps
+	extends Omit<MuiDatePickerProps<Dayjs>, "onChange" | "value"> {
+	value?: Dayjs | null;
+	onChange?: (value: Dayjs | null) => void;
 	variant: "standard" | "month" | "month-short" | "year";
 	required?: boolean;
 }
-interface DateTimePickerProps extends MuiDateTimePickerProps<Dayjs> {
+
+interface DateTimePickerProps
+	extends Omit<MuiDateTimePickerProps<Dayjs>, "onChange" | "value"> {
+	value?: Dayjs | null;
+	onChange?: (value: Dayjs | null) => void;
 	variant: "datetime";
 	required?: boolean;
 }
 
-type DatePickerVariants = "standard" | "datetime" | "month" | "year";
+type DatePickerVariants =
+	| "standard"
+	| "datetime"
+	| "month"
+	| "year"
+	| "month-short";
 
-type Props<T> = (T extends "datetime"
-	? DateTimePickerProps
-	: DatePickerProps) & {
-	getValidationErrorMessage?: (
-		error: DateValidationError | DateTimeValidationError | null | undefined,
-	) => string | undefined;
-};
+type Props<T> = (T extends "datetime" ? DateTimePickerProps : DatePickerProps) &
+	Omit<BaseExtras, "variant"> & {
+		variant: T;
+	};
 
 export function DatePicker<T extends DatePickerVariants>({
 	variant,
@@ -70,12 +87,24 @@ export function DatePicker<T extends DatePickerVariants>({
 	const { t } = useTranslation();
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const Picker = variant === "datetime" ? MuiDateTimePicker : MuiDatePicker;
-	let pickerProps = {};
-	const { value } = datePickerProps;
+	let pickerProps: Record<string, unknown> = {};
+	const { value } = datePickerProps as { value?: Dayjs | null };
 	const [localValue, setLocalValue] = useState<Dayjs | null>(value ?? null);
 	const lastValidationError = useRef<
 		DateValidationError | DateTimeValidationError | null
 	>(null);
+
+	const commitIfValid = (v: Dayjs | null | undefined) => {
+		if (!onChange) return;
+		if (!v) {
+			onChange(null);
+			return;
+		}
+		// gültig, kein bekannter Validierungsfehler
+		if (v.isValid() && !lastValidationError.current) {
+			onChange(v);
+		}
+	};
 
 	const handleDateChange = (
 		newDate: Dayjs | null,
@@ -136,8 +165,9 @@ export function DatePicker<T extends DatePickerVariants>({
 
 		if (variant !== "month-short") {
 			const setNewValue = (v: Dayjs | null | undefined) => {
-				if (!v || !onChange) return;
+				if (!v) return;
 				handleDateChange(v, { validationError: null });
+				commitIfValid(v);
 			};
 			slots = {
 				...slots,
@@ -166,12 +196,18 @@ export function DatePicker<T extends DatePickerVariants>({
 
 	return (
 		<Picker
-			{...datePickerProps}
+			{...(datePickerProps as any)}
 			{...pickerProps}
 			value={localValue}
 			inputRef={inputRef}
 			timezone="UTC"
 			onChange={handleDateChange}
+			onAccept={(v: Dayjs | null) => {
+				commitIfValid(v);
+			}}
+			onClose={() => {
+				commitIfValid(localValue);
+			}}
 			// @ts-ignore
 			slots={slots}
 			// @ts-ignore
