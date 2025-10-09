@@ -3,12 +3,34 @@ import {
 	FieldValueDateComponent,
 	getDatePickerVariant,
 } from "./value/FieldValueDateComponent";
-import { useAccountingPeriodDateLimit } from "../useAccountingPeriodDateLimit";
+import { usePeriodDateLimit } from "../usePeriodDateLimit";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { useMemo } from "react";
+
+dayjs.extend(utc);
 
 export function FieldPeriodSelector({ field }) {
 	const { t } = useTranslation();
-	const startPickerProps = useAccountingPeriodDateLimit();
-	const endPickerProps = useAccountingPeriodDateLimit();
+
+	const startValue = useMemo(
+		() => dayjs.utc(field?.start ?? null),
+		[field?.start],
+	);
+
+	const endValue = useMemo(() => dayjs.utc(field?.end ?? null), [field?.end]);
+
+	const startPickerProps = usePeriodDateLimit({
+		picker: "start",
+		start: startValue,
+		end: endValue,
+	});
+	const endPickerProps = usePeriodDateLimit({
+		picker: "end",
+		start: startValue,
+		end: endValue,
+	});
+
 	if (
 		field.timeType === "Timeless" ||
 		field.attributes?.["input.hideStartEnd"]
@@ -16,7 +38,7 @@ export function FieldPeriodSelector({ field }) {
 		return null;
 	}
 
-	const periodPickers = (
+	return (
 		<>
 			<FieldValueDateComponent
 				propertyName="start"
@@ -44,6 +66,4 @@ export function FieldPeriodSelector({ field }) {
 			)}
 		</>
 	);
-
-	return periodPickers;
 }
