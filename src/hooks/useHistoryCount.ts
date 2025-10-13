@@ -25,14 +25,14 @@ export function useHistoryCount(caseFieldName?: string): HookState {
 		let cancelled = false;
 		setState((s) => ({ ...s, loading: true, error: null }));
 
-		getCaseValueCount(params as any, undefined)
-			.then((valueCounts: Record<string, number> | undefined) => {
-				if (cancelled) return;
+		const routeParams: any = { ...params, caseFieldName };
+
+		getCaseValueCount(routeParams, undefined)
+			.then((valueCounts) => {
 				const count = valueCounts?.[caseFieldName] ?? 0;
 				setState({ count, loading: false, error: null });
 			})
 			.catch((err) => {
-				if (cancelled) return;
 				setState({ count: 0, loading: false, error: err });
 			});
 
