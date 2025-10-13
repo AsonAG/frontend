@@ -6,6 +6,7 @@ type HookState = {
 	count: number;
 	loading: boolean;
 	error: unknown;
+	hasMore: boolean;
 };
 
 export function useHistoryCount(caseFieldName?: string): HookState {
@@ -14,11 +15,12 @@ export function useHistoryCount(caseFieldName?: string): HookState {
 		count: 0,
 		loading: false,
 		error: null,
+		hasMore: false,
 	});
 
 	useEffect(() => {
 		if (!caseFieldName) {
-			setState({ count: 0, loading: false, error: null });
+			setState({ count: 0, loading: false, error: null, hasMore: false });
 			return;
 		}
 
@@ -29,11 +31,11 @@ export function useHistoryCount(caseFieldName?: string): HookState {
 			.then((valueCounts: Record<string, number> | undefined) => {
 				if (cancelled) return;
 				const count = valueCounts?.[caseFieldName] ?? 0;
-				setState({ count, loading: false, error: null });
+				setState({ count, loading: false, error: null, hasMore: count > 1 });
 			})
 			.catch((err) => {
 				if (cancelled) return;
-				setState({ count: 0, loading: false, error: err });
+				setState({ count: 0, loading: false, error: err, hasMore: false });
 			});
 
 		return () => {
