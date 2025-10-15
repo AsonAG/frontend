@@ -96,11 +96,12 @@ export function DatePicker<T extends DatePickerVariants>({
 
 	const commitIfValid = (v: Dayjs | null | undefined) => {
 		if (!onChange) return;
+
 		if (!v) {
 			onChange(null);
 			return;
 		}
-		// gültig, kein bekannter Validierungsfehler
+
 		if (v.isValid() && !lastValidationError.current) {
 			onChange(v);
 		}
