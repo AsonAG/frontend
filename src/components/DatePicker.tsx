@@ -206,9 +206,6 @@ export function DatePicker<T extends DatePickerVariants>({
 			onAccept={(v: Dayjs | null) => {
 				commitIfValid(v);
 			}}
-			onClose={() => {
-				commitIfValid(localValue);
-			}}
 			// @ts-ignore
 			slots={slots}
 			// @ts-ignore
