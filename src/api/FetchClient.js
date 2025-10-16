@@ -247,7 +247,21 @@ class FetchRequestBuilder {
 		if (this.ignoreErrors && !response.ok) {
 			return this.fallbackValue;
 		}
-		return response.json();
+		const result = await response.json();
+		if (!result) return result;
+		if (result.items !== undefined && result.count !== undefined) {
+			// query result
+			const queryResultType = this.searchParams.get("result");
+			switch (queryResultType) {
+				case "ItemsWithCount":
+					return result;
+				case "Count":
+					return result.count;
+				default:
+					return result.items;
+			}
+		}
+		return result;
 	}
 
 	async fetchSingle() {
