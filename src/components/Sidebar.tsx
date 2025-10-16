@@ -4,9 +4,9 @@ import { ContentLayout } from "./ContentLayout";
 import { Close } from "@mui/icons-material";
 
 type SidebarProps = PropsWithChildren & {
-	title: string;
-	closeButton?: ReactNode | undefined;
-	onClose?: () => void | undefined;
+	title: ReactNode | string;
+	closeButton?: ReactNode;
+	onClose?: () => void;
 };
 
 export function Sidebar({

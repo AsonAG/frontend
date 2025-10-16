@@ -26,6 +26,9 @@ type CaseField = {
 	name: string;
 	timeType: string;
 	description?: string | null;
+	attributes?: Record<string, any>;
+	optional?: boolean;
+	endMandatory?: boolean;
 };
 export type CaseFieldDetailsProps = {
 	caseField: CaseField;
@@ -71,7 +74,23 @@ function DetailsContainer({
 	);
 	if (useSidebar) {
 		return (
-			<Sidebar title={title} closeButton={closeButton}>
+			<Sidebar
+				title={
+					<Typography
+						variant="h3"
+						fontWeight={500}
+						sx={{
+							flex: 1,
+							whiteSpace: "normal",
+							wordBreak: "break-word",
+							overflowWrap: "anywhere",
+						}}
+					>
+						{title}
+					</Typography>
+				}
+				closeButton={closeButton}
+			>
 				{children}
 			</Sidebar>
 		);
@@ -103,7 +122,16 @@ function DialogHeader({
 			px={2}
 			sx={theme.mixins.toolbar}
 		>
-			<Typography variant="h6" sx={{ flex: 1 }}>
+			{}
+			<Typography
+				variant="h6"
+				sx={{
+					flex: 1,
+					whiteSpace: "normal",
+					wordBreak: "break-word",
+					overflowWrap: "anywhere",
+				}}
+			>
 				{title}
 			</Typography>
 			{closeButton}
