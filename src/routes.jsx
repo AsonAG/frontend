@@ -529,10 +529,12 @@ const routeData = [
 			{
 				path: "orgs",
 				Component: OrganizationList,
-				loader: async () => {
+				loader: async ({ request }) => {
 					store.set(orgsAtom); // refresh
+					const url = new URL(request.url);
+					const preventRedirect = url.searchParams.get("from") === "app";
 					const orgs = await store.get(orgsAtom);
-					if (orgs.length === 1) {
+					if (orgs.length === 1 && !preventRedirect) {
 						return redirect(`../orgs/${orgs[0].id}`);
 					}
 					return orgs;

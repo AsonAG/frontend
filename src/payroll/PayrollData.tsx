@@ -142,7 +142,7 @@ export function PayrollData() {
 					required
 				/>
 				<RegulationSelect
-					label={t("Industry")}
+					label={`${t("Industry")} (${t("Please check with support first!")})`}
 					items={state.countryRegulations.industries}
 					multiple
 					onChange={(values) =>
@@ -151,7 +151,7 @@ export function PayrollData() {
 					value={state.selectedRegulations.industries}
 				/>
 				<RegulationSelect
-					label={t("ERP")}
+					label={`${t("ERP")} (${t("Please check with support first!")})`}
 					items={state.countryRegulations.erp}
 					multiple
 					onChange={(values) => dispatch({ type: "set_erp", erp: values })}

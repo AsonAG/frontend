@@ -18,6 +18,7 @@ import { CaseFieldDetails } from "../../components/CaseFieldDetails";
 import { DatePicker } from "../../components/DatePicker";
 import { useTranslation } from "react-i18next";
 import { useAccountingPeriodDateLimit } from "../../components/case/useAccountingPeriodDateLimit";
+import { CaseReason } from "../../components/case/CaseReason";
 
 export const CaseFormContext = createContext();
 
@@ -49,6 +50,10 @@ function CaseForm() {
 		endDate,
 		setEndDate,
 		addCase,
+		reason,
+		setReason,
+		includeReasonInPayslip,
+		setIncludeReasonInPayslip,
 	} = useCaseData(params, payroll);
 	const formRef = useRef();
 
@@ -67,6 +72,8 @@ function CaseForm() {
 	} else if (loading) {
 		content = <Loading />;
 	} else {
+		const reasonCanBeIncludedInPayslip =
+			!!caseData?.attributes?.["reasonOnWageTypeNumber"];
 		content = (
 			<CaseFormContext.Provider
 				value={{
@@ -83,10 +90,17 @@ function CaseForm() {
 						<Stack
 							spacing={2}
 							justifyContent="end"
-							alignItems="end"
+							alignItems="center"
 							direction="row"
 							flexWrap="wrap"
 						>
+							<CaseReason
+								reason={reason}
+								setReason={setReason}
+								reasonCanBeIncludedInPayslip={reasonCanBeIncludedInPayslip}
+								includeReasonInPayslip={includeReasonInPayslip}
+								setIncludeReasonInPayslip={setIncludeReasonInPayslip}
+							/>
 							<PeriodPicker
 								variant={
 									caseData.attributes?.["input.datePicker"] === "month"
