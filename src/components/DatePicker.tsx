@@ -9,9 +9,10 @@ import {
 } from "@mui/x-date-pickers";
 import { InputAdornment, InputAdornmentProps, IconButton } from "@mui/material";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
-import React, { MouseEventHandler, useRef, useState } from "react";
+import { MouseEventHandler, useRef, useState } from "react";
 import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
+import type {} from "@mui/x-date-pickers/AdapterDayjs";
 
 type DatePickerInputAdornmentProps = {
 	handleBack: MouseEventHandler;
@@ -39,30 +40,6 @@ function DatePickerInputAdornment({
 	);
 }
 
-interface BaseExtras {
-	variant: "standard" | "month" | "month-short" | "year" | "datetime";
-	required?: boolean;
-	getValidationErrorMessage?: (
-		error: DateValidationError | DateTimeValidationError | null | undefined,
-	) => string | undefined;
-}
-
-interface DatePickerProps
-	extends Omit<MuiDatePickerProps<Dayjs>, "onChange" | "value"> {
-	value?: Dayjs | null;
-	onChange?: (value: Dayjs | null) => void;
-	variant: "standard" | "month" | "month-short" | "year";
-	required?: boolean;
-}
-
-interface DateTimePickerProps
-	extends Omit<MuiDateTimePickerProps<Dayjs>, "onChange" | "value"> {
-	value?: Dayjs | null;
-	onChange?: (value: Dayjs | null) => void;
-	variant: "datetime";
-	required?: boolean;
-}
-
 type DatePickerVariants =
 	| "standard"
 	| "datetime"
@@ -70,10 +47,15 @@ type DatePickerVariants =
 	| "year"
 	| "month-short";
 
-type Props<T> = (T extends "datetime" ? DateTimePickerProps : DatePickerProps) &
-	Omit<BaseExtras, "variant"> & {
-		variant: T;
-	};
+type Props<T> = (T extends "datetime"
+	? MuiDateTimePickerProps<Dayjs>
+	: MuiDatePickerProps<Dayjs>) & {
+	variant: DatePickerVariants;
+	required?: boolean;
+	getValidationErrorMessage?: (
+		error: DateValidationError | DateTimeValidationError | null | undefined,
+	) => string | undefined;
+};
 
 export function DatePicker<T extends DatePickerVariants>({
 	variant,
@@ -87,8 +69,8 @@ export function DatePicker<T extends DatePickerVariants>({
 	const { t } = useTranslation();
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const Picker = variant === "datetime" ? MuiDateTimePicker : MuiDatePicker;
-	let pickerProps: Record<string, unknown> = {};
-	const { value } = datePickerProps as { value?: Dayjs | null };
+	let pickerProps = {};
+	const { value } = datePickerProps;
 	const [localValue, setLocalValue] = useState<Dayjs | null>(value ?? null);
 	const lastValidationError = useRef<
 		DateValidationError | DateTimeValidationError | null
@@ -98,12 +80,12 @@ export function DatePicker<T extends DatePickerVariants>({
 		if (!onChange) return;
 
 		if (!v) {
-			onChange(null);
+			onChange(null, { validationError: null });
 			return;
 		}
 
 		if (v.isValid() && !lastValidationError.current) {
-			onChange(v);
+			onChange(v, { validationError: null });
 		}
 	};
 
