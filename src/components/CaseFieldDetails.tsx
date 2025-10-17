@@ -75,16 +75,7 @@ function DetailsContainer({
 		return (
 			<Sidebar
 				title={
-					<Typography
-						variant="h3"
-						fontWeight={500}
-						sx={{
-							flex: 1,
-							whiteSpace: "normal",
-							wordBreak: "break-word",
-							overflowWrap: "anywhere",
-						}}
-					>
+					<Typography variant="h3" fontWeight={500} flex={1}>
 						{title}
 					</Typography>
 				}
