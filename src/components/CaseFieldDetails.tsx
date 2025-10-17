@@ -21,21 +21,50 @@ import { Loading } from "./Loading";
 import { useIncrementallyLoadedData } from "../hooks/useIncrementallyLoadedData";
 import { CaseChangeCaseValue } from "../models/CaseChangeCaseValue";
 
-export function CaseFieldDetails({ caseField, onClose }) {
-	const { t } = useTranslation();
-	const title = `${t("Details")} ${caseField.displayName}`;
+type CaseField = {
+	displayName: string;
+	name: string;
+	timeType: string;
+	description?: string | null;
+	attributes?: Record<string, any>;
+	optional?: boolean;
+	endMandatory?: boolean;
+};
+export type CaseFieldDetailsProps = {
+	caseField: CaseField;
+	onClose: () => void;
+	view?: "description" | "history";
+};
+
+export function CaseFieldDetails({
+	caseField,
+	onClose,
+	view,
+}: CaseFieldDetailsProps) {
+	const title = caseField.displayName;
 	const closeButton = <ButtonClose onClose={onClose} />;
-	const showHistory = caseField.timeType !== "Timeless";
 
 	return (
 		<DetailsContainer title={title} closeButton={closeButton}>
-			<CaseFieldDescription description={caseField.description} />
-			{showHistory && <CaseFieldHistory caseFieldName={caseField.name} />}
+			{view === "description" && (
+				<CaseFieldDescription description={caseField.description ?? null} />
+			)}
+			{view === "history" && (
+				<CaseFieldHistory caseFieldName={caseField.name} />
+			)}
 		</DetailsContainer>
 	);
 }
 
-function DetailsContainer({ title, closeButton, children }) {
+function DetailsContainer({
+	title,
+	closeButton,
+	children,
+}: {
+	title: string;
+	closeButton: React.ReactNode;
+	children: React.ReactNode;
+}) {
 	const useSidebar = useMediaQuery<Theme>((theme) =>
 		theme.breakpoints.up(1000),
 	);
@@ -44,7 +73,14 @@ function DetailsContainer({ title, closeButton, children }) {
 	);
 	if (useSidebar) {
 		return (
-			<Sidebar title={title} closeButton={closeButton}>
+			<Sidebar
+				title={
+					<Typography variant="h3" fontWeight={500} flex={1}>
+						{title}
+					</Typography>
+				}
+				closeButton={closeButton}
+			>
 				{children}
 			</Sidebar>
 		);
@@ -60,7 +96,13 @@ function DetailsContainer({ title, closeButton, children }) {
 	);
 }
 
-function DialogHeader({ title, closeButton }) {
+function DialogHeader({
+	title,
+	closeButton,
+}: {
+	title: string;
+	closeButton: React.ReactNode;
+}) {
 	const theme = useTheme();
 	return (
 		<Stack
@@ -70,7 +112,16 @@ function DialogHeader({ title, closeButton }) {
 			px={2}
 			sx={theme.mixins.toolbar}
 		>
-			<Typography variant="h6" sx={{ flex: 1 }}>
+			{}
+			<Typography
+				variant="h6"
+				sx={{
+					flex: 1,
+					whiteSpace: "normal",
+					wordBreak: "break-word",
+					overflowWrap: "anywhere",
+				}}
+			>
 				{title}
 			</Typography>
 			{closeButton}
@@ -78,7 +129,7 @@ function DialogHeader({ title, closeButton }) {
 	);
 }
 
-function ButtonClose({ onClose }) {
+function ButtonClose({ onClose }: { onClose: () => void }) {
 	return (
 		<IconButton onClick={onClose} size="small">
 			<Close />
@@ -86,7 +137,11 @@ function ButtonClose({ onClose }) {
 	);
 }
 
-function CaseFieldDescription({ description }) {
+function CaseFieldDescription({
+	description,
+}: {
+	description?: string | null;
+}) {
 	const { t } = useTranslation();
 	if (!description) return null;
 
@@ -98,7 +153,7 @@ function CaseFieldDescription({ description }) {
 	);
 }
 
-function CaseFieldHistory({ caseFieldName }) {
+function CaseFieldHistory({ caseFieldName }: { caseFieldName: string }) {
 	const { t } = useTranslation();
 	return (
 		<Stack spacing={1}>
@@ -111,7 +166,7 @@ function CaseFieldHistory({ caseFieldName }) {
 	);
 }
 
-function CaseFieldHistoryTable({ caseFieldName }) {
+function CaseFieldHistoryTable({ caseFieldName }: { caseFieldName: string }) {
 	const { t } = useTranslation();
 	const { items, loading, hasMore, loadMore } =
 		useIncrementallyLoadedData<CaseChangeCaseValue>(
@@ -122,8 +177,9 @@ function CaseFieldHistoryTable({ caseFieldName }) {
 		return <Loading />;
 	}
 
-	if (items.length === 0 && !loading)
+	if (items.length === 0 && !loading) {
 		return <Typography>{t("No data")}</Typography>;
+	}
 
 	const buttonEnabled = hasMore && !loading;
 	const buttonLabel = loading
