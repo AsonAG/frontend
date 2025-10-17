@@ -419,6 +419,7 @@ const translations = {
 			"Dieses Konto ist einer Lohnart zugewiesen",
 		date_accounting_start_date_validation:
 			"Datum muss grösser oder gleich dem Startdatum der Lohnbuchhaltung ({{accountingStartDate}}) sein",
+		date_start_before_end_validation: "Startdatum muss vor dem Enddatum liegen",
 		"Without category": "Ohne Kategorie",
 
 		// Command
