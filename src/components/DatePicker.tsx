@@ -47,11 +47,15 @@ type DatePickerVariants =
 	| "year"
 	| "month-short";
 
+type DatePickerProps = Omit<MuiDatePickerProps<Dayjs>, "onChange">;
+type DateTimePickerProps = Omit<MuiDateTimePickerProps<Dayjs>, "onChange">;
+
 type Props<T> = (T extends "datetime"
-	? MuiDateTimePickerProps<Dayjs>
-	: MuiDatePickerProps<Dayjs>) & {
+	? DateTimePickerProps
+	: DatePickerProps) & {
 	variant: DatePickerVariants;
 	required?: boolean;
+	onChange: (value: Dayjs | null) => void;
 	getValidationErrorMessage?: (
 		error: DateValidationError | DateTimeValidationError | null | undefined,
 	) => string | undefined;
@@ -80,12 +84,12 @@ export function DatePicker<T extends DatePickerVariants>({
 		if (!onChange) return;
 
 		if (!v) {
-			onChange(null, { validationError: null });
+			onChange(null);
 			return;
 		}
 
 		if (v.isValid() && !lastValidationError.current) {
-			onChange(v, { validationError: null });
+			onChange(v);
 		}
 	};
 
@@ -179,7 +183,7 @@ export function DatePicker<T extends DatePickerVariants>({
 
 	return (
 		<Picker
-			{...(datePickerProps as any)}
+			{...datePickerProps}
 			{...pickerProps}
 			value={localValue}
 			inputRef={inputRef}
