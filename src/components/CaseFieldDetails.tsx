@@ -41,8 +41,7 @@ export function CaseFieldDetails({
 	onClose,
 	view,
 }: CaseFieldDetailsProps) {
-	const { t } = useTranslation();
-	const title = `${t("Details")} ${caseField.displayName}`;
+	const title = caseField.displayName;
 	const closeButton = <ButtonClose onClose={onClose} />;
 
 	return (
