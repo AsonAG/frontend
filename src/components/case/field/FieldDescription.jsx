@@ -29,9 +29,19 @@ export function FieldDetails() {
 	const isHistorisable = field.timeType !== "Timeless";
 	const { count } = useHistoryCount(field?.name);
 
-	//min 2 Werte vorhanden sind
-	const showHistory = isHistorisable && count !== null && count >= 2;
-	//wenn wirklich eine Beschreibung existiert
+	let showHistory;
+	if (isHistorisable && count !== null) {
+		// wenn der Feldtyp "Moment" ist, die Historie bereits beim ersten vorhandenen Wert anzeigen
+		if (field.timeType === "Moment") {
+			showHistory = count >= 1;
+		} else {
+			// ansonsten erst ab zwei Einträgen
+			showHistory = count >= 2;
+		}
+	} else {
+		showHistory = false;
+	}
+	// wenn wirklich eine Beschreibung existiert
 	const showDescription = Boolean(field.description);
 
 	if (field.attributes["input.hidden"]) return null;
