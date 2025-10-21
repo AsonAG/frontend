@@ -58,7 +58,7 @@ export function FieldValueNumberComponent() {
 	const [isValid, setIsValid] = useState(true);
 
 	const handleBlur = () => {
-		if (!value) {
+		if (value === null) {
 			field.value = null;
 			buildCase();
 			return;

@@ -32,7 +32,6 @@ import { useAtomValue } from "jotai";
 import {
 	companyMissingDataCountAtom,
 	openTasksAtom,
-	showOrgSelectionAtom,
 	ESSMissingDataAtom,
 	missingDataEmployeesAtom,
 	payrollControllingDataTotalCountAtom,
@@ -391,9 +390,6 @@ function Drawer({ temporary, open, onClose }) {
 function OrganizationSection() {
 	const { t } = useTranslation();
 	const { org } = useLoaderData();
-	const isInstanceAdmin = useRole("InstanceAdmin");
-	const showOrgSelection = useAtomValue(showOrgSelectionAtom);
-	if (!isInstanceAdmin && !showOrgSelection) return null;
 
 	return (
 		<>
@@ -408,7 +404,7 @@ function OrganizationSection() {
 						component={RouterLink}
 						variant="body2"
 						color="primary.main"
-						to="/orgs"
+						to="/orgs?from=app"
 						sx={{
 							textDecoration: "none",
 							"&: hover": {

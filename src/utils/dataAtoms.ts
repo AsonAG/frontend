@@ -175,11 +175,6 @@ export const companyMissingDataCountAtom = atom(async (get) => {
 	return missingCompanyData.cases.length + onboardingData.length;
 });
 
-export const showOrgSelectionAtom = atom(async (get) => {
-	const orgs = await get(orgsAtom);
-	return orgs.length > 1;
-});
-
 export const missingEmployeeDataMapAtom = atom<
 	Promise<Map<IdType, MissingData>>
 >(async (get) => {

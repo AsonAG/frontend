@@ -102,6 +102,8 @@ const translations = {
 			"Geladene Branchen Regelwerke können nicht entfernt werden!",
 		"Loaded ERP regulations cannot be removed!":
 			"Geladene ERP Regelwerke können nicht entfernt werden!",
+		"Please check with support first!":
+			"Bitte vorgänging mit Support abklären!",
 		"Save regulations": "Regelwerke speichern",
 		"Regulations saved!": "Regelwerke gespeichert!",
 		"Data saved!": "Daten gespeichert!",
