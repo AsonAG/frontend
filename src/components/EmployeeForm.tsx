@@ -79,8 +79,8 @@ function PayrollAssignmentView() {
 							labelPlacement="end"
 							control={
 								<Checkbox
-									defaultChecked={selectedDivisions.includes(division.name)}
-									value={division.name}
+									defaultChecked={selectedDivisions.includes(division.id)}
+									value={division.id}
 									name="divisions"
 								/>
 							}

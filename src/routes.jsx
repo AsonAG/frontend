@@ -440,9 +440,7 @@ function createRouteEmployeeNew(path, createUrlRedirect) {
 		loader: async ({ params }) => {
 			const divisions = await getDivisions(params);
 			const payroll = await store.get(payrollAtom);
-			const selectedDivisions = !!payroll
-				? [divisions.find((d) => d.id === payroll.divisionId).name]
-				: [];
+			const selectedDivisions = !!payroll ? [payroll.divisionId] : [];
 			return { divisions, selectedDivisions };
 		},
 		action: async ({ params, request }) => {
