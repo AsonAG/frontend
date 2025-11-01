@@ -161,8 +161,3 @@ export function ReviewOpenPeriod() {
 		</>
 	);
 }
-
-type LoaderData = {
-	employees: Array<Employee>;
-	payrunPeriod: PayrunPeriod;
-};

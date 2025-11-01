@@ -1,15 +1,19 @@
 import { IconButton, Tooltip } from "@mui/material";
 import { PayrunPeriodEntry } from "../models/PayrunPeriod";
 import React, { MouseEventHandler } from "react";
-import { Link } from "react-router-dom";
+import { Link, useRouteLoaderData } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import FilePresentRoundedIcon from "@mui/icons-material/FilePresentRounded";
+import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 
 type PayslipButtonProps = {
 	payrunPeriodEntry: PayrunPeriodEntry;
 };
 export function PayslipButton({ payrunPeriodEntry }: PayslipButtonProps) {
 	const { t } = useTranslation();
+	const { payrunPeriod } = useRouteLoaderData(
+		"payrunperiod",
+	) as PayrunPeriodLoaderData;
 	const generatingTooltip = t("Generating...");
 	if (payrunPeriodEntry.state !== "Current") {
 		return (
@@ -32,7 +36,7 @@ export function PayslipButton({ payrunPeriodEntry }: PayslipButtonProps) {
 				<IconButton
 					size="small"
 					component={Link}
-					to={`${payrunPeriodEntry.id}/doc/${doc.id}`}
+					to={`${payrunPeriod.id}/entries/${payrunPeriodEntry.id}/doc/${doc.id}`}
 					onClick={stopPropagation}
 				>
 					<FilePresentRoundedIcon />

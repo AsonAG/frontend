@@ -88,7 +88,11 @@ function LoadingView() {
 	);
 }
 
-const errorStates = {
+type ErrorInformation = {
+	severity: "warning" | "error";
+	text: string;
+};
+const errorStates: Record<number, ErrorInformation> = {
 	400: {
 		severity: "warning",
 		text: "The payrun period is not processed yet. The documents cannot be generated. Please try again after.",
@@ -114,6 +118,11 @@ function ErrorView() {
 	);
 }
 
+type WageStatementEntry = [string, IdType, PayrunDocument];
+function notNull<T>(x: T): x is NonNullable<T> {
+	return x != null;
+}
+
 function WageStatementSection() {
 	const { t } = useTranslation();
 	const { payrunPeriod } = useRouteLoaderData(
@@ -125,11 +134,15 @@ function WageStatementSection() {
 			const wageStatementDoc = entry?.documents?.find(
 				(doc) => doc.attributes?.type === "wagestatement",
 			);
-			return wageStatementDoc
-				? [getEmployeeDisplayString(entry), entry?.id, wageStatementDoc]
-				: null;
+			if (!wageStatementDoc) return null;
+			const result: WageStatementEntry = [
+				getEmployeeDisplayString(entry),
+				entry?.id,
+				wageStatementDoc,
+			];
+			return result;
 		})
-		.filter(Boolean);
+		.filter(notNull);
 	if (wageStatements.length === 0) return;
 
 	return (
@@ -142,11 +155,22 @@ function WageStatementSection() {
 					{open ? <ArrowDropUp /> : <ArrowDropDown />}
 				</IconButton>
 			</Stack>
-			{open && <WageStatements wageStatements={wageStatements} />}
+			{open && (
+				<WageStatements
+					payrunPeriodId={payrunPeriod.id}
+					wageStatements={wageStatements}
+				/>
+			)}
 		</Stack>
 	);
 }
-function WageStatements({ wageStatements }) {
+function WageStatements({
+	payrunPeriodId,
+	wageStatements,
+}: {
+	payrunPeriodId: IdType;
+	wageStatements: WageStatementEntry[];
+}) {
 	return (
 		<Stack spacing={1}>
 			{wageStatements.map(([label, entryId, doc]) => (
@@ -154,7 +178,7 @@ function WageStatements({ wageStatements }) {
 					<Typography>{label}</Typography>
 					<XmlChip to={`${entryId}/doc/${doc.id}`} />
 					<PdfChip
-						to={`${entryId}/doc/${doc.id}?report=${encodeURIComponent(doc.attributes?.reports[0].Name)}`}
+						to={`${payrunPeriodId}/entries/${entryId}/doc/${doc.id}?report=${encodeURIComponent(doc.attributes?.reports?.[0].Name ?? "")}`}
 					/>
 				</Stack>
 			))}
@@ -288,7 +312,7 @@ function renderDocumentWithError(document: PayrunDocument) {
 	);
 }
 
-const errorMap = {};
+const errorMap: Record<number, React.FC> = {};
 errorMap[-10000] = WageTypeAccountMappingError;
 
 function WageTypeAccountMappingError() {

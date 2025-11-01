@@ -43,9 +43,10 @@ export type PayrunDocument = {
 	attributes: PayrunDocumentAttributes;
 };
 type PayrunDocumentAttributes = {
-	type: string,
-	reports?: DocumentReportDefinition[]
-}
+	type: string;
+	reports?: DocumentReportDefinition[];
+	errorCode?: number;
+};
 type DocumentReportDefinition = {
 	Name: string;
 	Variants: Array<string>;

@@ -62,6 +62,7 @@ import {
 	getLookupValues,
 	getPayrollCollectors,
 	getPayrunPeriodDocuments,
+	getPayrunPeriodEntryDocument,
 	setPayrollWageTypeSettings,
 	getPayroll,
 	getAvailableRegulations,
@@ -469,17 +470,30 @@ function createRouteEmployeeNew(path, createUrlRedirect) {
 }
 
 function createRoutePayrunPeriodDocument() {
-	return {
-		path: ":payrunPeriodId/doc/:documentId",
-		Component: CaseValueDocumentDialog,
-		loader: async ({ params, request }) => {
-			const report = getQueryParam(request, "report");
-			const variant = getQueryParam(request, "variant");
-			return defer({
-				document: getPayrunPeriodDocument(params, report, variant),
-			});
+	return [
+		{
+			path: ":payrunPeriodId/doc/:documentId",
+			Component: CaseValueDocumentDialog,
+			loader: async ({ params, request }) => {
+				const report = getQueryParam(request, "report");
+				const variant = getQueryParam(request, "variant");
+				return defer({
+					document: getPayrunPeriodDocument(params, report, variant),
+				});
+			},
 		},
-	};
+		{
+			path: ":payrunPeriodId/entries/:payrunPeriodEntryId/doc/:documentId",
+			Component: CaseValueDocumentDialog,
+			loader: async ({ params, request }) => {
+				const report = getQueryParam(request, "report");
+				const variant = getQueryParam(request, "variant");
+				return defer({
+					document: getPayrunPeriodEntryDocument(params, report, variant),
+				});
+			},
+		},
+	];
 }
 
 function createRouteCaseForms(path) {
@@ -1150,13 +1164,13 @@ const routeData = [
 							},
 							{
 								Component: PayrunDashboard,
-								children: [createRoutePayrunPeriodDocument()],
+								children: [...createRoutePayrunPeriodDocument()],
 							},
 							{
 								id: "payrunperiodreview",
 								path: "review",
 								Component: ReviewOpenPeriod,
-								children: [createRoutePayrunPeriodDocument()],
+								children: [...createRoutePayrunPeriodDocument()],
 								shouldRevalidate: () => false,
 								loader: async ({ params }) => {
 									if (!params.payrunPeriodId === "open") {
@@ -1224,7 +1238,7 @@ const routeData = [
 										documents: await response.json(),
 									};
 								},
-								children: [createRoutePayrunPeriodDocument()],
+								children: [...createRoutePayrunPeriodDocument()],
 							},
 							{
 								path: "entries/:payrunPeriodEntryId/events",

@@ -70,6 +70,8 @@ const payrunPeriodDocumentsUrl =
 	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents";
 const payrunPeriodDocumentUrl =
 	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/documents/:documentId";
+const payrunPeriodEntryDocumentUrl =
+	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/entries/:payrunPeriodEntryId/documents/:documentId";
 const payrunPeriodControllingUrl =
 	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/open/controlling";
 const payoutsUrl =
@@ -702,9 +704,15 @@ export function getPayrunPeriodControllingTasks(routeParams) {
 		.withLocalization()
 		.fetchJson();
 }
-
 export function getPayrunPeriodDocument(routeParams, report, variant) {
 	return new FetchRequestBuilder(payrunPeriodDocumentUrl, routeParams)
+		.withQueryParam("report", report)
+		.withQueryParam("variant", variant)
+		.fetchJson();
+}
+
+export function getPayrunPeriodEntryDocument(routeParams, report, variant) {
+	return new FetchRequestBuilder(payrunPeriodEntryDocumentUrl, routeParams)
 		.withQueryParam("report", report)
 		.withQueryParam("variant", variant)
 		.fetchJson();
