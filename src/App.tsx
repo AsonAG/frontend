@@ -11,21 +11,12 @@ import {
 import Topbar from "./scenes/global/Topbar";
 import Drawer from "./scenes/global/Drawer";
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import localizedFormat from "dayjs/plugin/localizedFormat";
 import { Outlet } from "react-router-dom";
 import { Container } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "./components/Logo";
 import { useTranslation } from "react-i18next";
 
-dayjs.extend(utc);
-dayjs.extend(localizedFormat);
-
-// dynamically load these when we support more locales
-import "dayjs/locale/de";
-import "dayjs/locale/en";
 import { useAtom } from "jotai";
 import { toastNotificationAtom } from "./utils/dataAtoms";
 import { useRole } from "./user/utils";

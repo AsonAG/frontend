@@ -40,6 +40,21 @@ const translations = {
 		date_accounting_start_date_validation:
 			"Date has to be greater than or equal to the payroll accounting start date ({{accountingStartDate}})",
 		date_start_before_end_validation: "Start date must be before the end date",
+
+		// culture
+		"de-CH_culturelabel": "German (Switzerland)",
+		"de-DE_culturelabel": "German (Germany)",
+		"de-AT_culturelabel": "German (Austria)",
+		"en-US_culturelabel": "English (United States)",
+		"en-UK_culturelabel": "English (United Kingdom)",
+		"fr-CH_culturelabel": "French (Switzerland)",
+		"fr-FR_culturelabel": "French (France)",
+		"it-CH_culturelabel": "Italian (Switzerland)",
+		"it-IT_culturelabel": "Italian (Italy)",
+		de_culturelabel: "German",
+		en_culturelabel: "English",
+		fr_culturelabel: "French",
+		it_culturelabel: "Italian",
 	},
 };
 

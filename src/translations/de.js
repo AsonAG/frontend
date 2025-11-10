@@ -430,6 +430,26 @@ const translations = {
 		"Company event": "Firmenereignis",
 		"No employee found": "Mitarbeiter nicht gefunden",
 		"No event found": "Ereignis nicht gefunden",
+
+		// Culture
+		"Region settings": "Regionseinstellungen",
+		Automatic: "Automatisch",
+		"Could not update region settings":
+			"Regionseinstellungen konnten nicht gespeichert werden",
+		"Region settings updated": "Regionseinstellungen wurden gespeichert",
+		"de-CH_culturelabel": "Deutsch (Schweiz)",
+		"de-DE_culturelabel": "Deutsch (Deutschland)",
+		"de-AT_culturelabel": "Deutsch (Österreich)",
+		"en-US_culturelabel": "Englisch (Vereinigte Staaten)",
+		"en-UK_culturelabel": "Englisch (Vereinigtes Königreich)",
+		"fr-CH_culturelabel": "Französisch (Schweiz)",
+		"fr-FR_culturelabel": "Französisch (Frankreich)",
+		"it-CH_culturelabel": "Italienisch (Schweiz)",
+		"it-IT_culturelabel": "Italienisch (Italien)",
+		de_culturelabel: "Deutsch",
+		en_culturelabel: "Englisch",
+		fr_culturelabel: "Französisch",
+		it_culturelabel: "Italienisch",
 	},
 };
 

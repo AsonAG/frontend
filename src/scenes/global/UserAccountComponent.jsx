@@ -26,6 +26,7 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import ContrastIcon from "@mui/icons-material/Contrast";
 import ErrorIcon from "@mui/icons-material/Error";
 import { LanguagePicker } from "../../components/LanguagePicker";
+import { CulturePicker } from "../../components/CulturePicker";
 import { getUser, updateUser } from "../../api/FetchClient";
 
 const buttonSx = {
@@ -117,6 +118,22 @@ function UserInformation() {
 			toast("error", "Could not update user language");
 		}
 	};
+	const onUpdateCulture = async (culture) => {
+		const user = await getUser();
+		if (!user) {
+			toast("error", "Could not update region settings");
+			return;
+		}
+		user.culture = culture;
+		const response = await updateUser(user.id, user);
+		if (response.ok) {
+			toast("success", "Region settings updated");
+			window.location.reload();
+			return;
+		} else {
+			toast("error", "Could not update region settings");
+		}
+	};
 
 	return (
 		<Stack alignItems="center" width="100%" spacing={1}>
@@ -134,6 +151,12 @@ function UserInformation() {
 				label={t("Language")}
 				language={user.language}
 				onChange={onUpdateLanguage}
+				variant="standard"
+			/>
+			<CulturePicker
+				label={t("Region settings")}
+				culture={user.culture}
+				onChange={onUpdateCulture}
 				variant="standard"
 			/>
 		</Stack>

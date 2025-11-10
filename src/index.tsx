@@ -7,16 +7,27 @@ import { AuthProvider } from "react-oidc-context";
 import { authConfig, useOidc } from "./auth/authConfig";
 import SignIn from "./auth/SignIn";
 import "./translations";
-import { getDateLocale } from "./services/converters/DateLocaleExtractor";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
 import { useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
 import { getLanguageCode } from "./services/converters/LanguageConverter";
 import { useCreateTheme } from "./theme";
 import { userAtom } from "./utils/dataAtoms";
+import { defaultBrowserCulture } from "./models/Culture";
+
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+dayjs.extend(utc);
+dayjs.extend(localizedFormat);
+
+// dynamically load these when we support more locales
+import "dayjs/locale/de";
+import "dayjs/locale/en";
+import "dayjs/locale/fr";
+import "dayjs/locale/it";
 
 function Authentication({ children }) {
 	if (!useOidc) {
@@ -47,19 +58,20 @@ function AppScaffold({ children }: PropsWithChildren) {
 	const theme = useCreateTheme();
 	const user = useAtomValue(userAtom);
 	const { i18n } = useTranslation();
+	var userLocale = user?.culture ?? defaultBrowserCulture;
 
 	useEffect(() => {
-		dayjs.locale(getDateLocale(user));
+		dayjs.locale(userLocale);
 		const languageCode = getLanguageCode(user?.language);
 		i18n.changeLanguage(languageCode);
-	}, [user?.culture, user?.language]);
+	}, [userLocale, user?.language]);
 
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<LocalizationProvider
 				dateAdapter={AdapterDayjs}
-				adapterLocale={getDateLocale(user)}
+				adapterLocale={userLocale}
 			>
 				{children}
 			</LocalizationProvider>
