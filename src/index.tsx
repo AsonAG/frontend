@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { getLanguageCode } from "./services/converters/LanguageConverter";
 import { useCreateTheme } from "./theme";
 import { userAtom } from "./utils/dataAtoms";
-import { defaultBrowserCulture } from "./models/Culture";
+import { getSupportedCulture, defaultBrowserCulture } from "./models/Culture";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -25,9 +25,14 @@ dayjs.extend(localizedFormat);
 
 // dynamically load these when we support more locales
 import "dayjs/locale/de";
+import "dayjs/locale/de-ch";
+import "dayjs/locale/de-at";
 import "dayjs/locale/en";
+import "dayjs/locale/en-gb";
 import "dayjs/locale/fr";
+import "dayjs/locale/fr-ch";
 import "dayjs/locale/it";
+import "dayjs/locale/it-ch";
 
 function Authentication({ children }) {
 	if (!useOidc) {
@@ -38,6 +43,19 @@ function Authentication({ children }) {
 			<SignIn>{children}</SignIn>
 		</AuthProvider>
 	);
+}
+
+function getDayjsLocale(culture: string) {
+	if (
+		culture === "de-CH" ||
+		culture === "de-AT" ||
+		culture === "en-GB" ||
+		culture === "fr-CH" ||
+		culture === "it-CH"
+	) {
+		return culture.toLowerCase();
+	}
+	return culture.split("-")[0];
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -58,20 +76,22 @@ function AppScaffold({ children }: PropsWithChildren) {
 	const theme = useCreateTheme();
 	const user = useAtomValue(userAtom);
 	const { i18n } = useTranslation();
-	var userLocale = user?.culture ?? defaultBrowserCulture;
+	const userLocale =
+		getSupportedCulture(user?.culture) ?? defaultBrowserCulture;
+	const dayjsLocale = getDayjsLocale(userLocale);
 
 	useEffect(() => {
-		dayjs.locale(userLocale);
+		dayjs.locale(dayjsLocale);
 		const languageCode = getLanguageCode(user?.language);
 		i18n.changeLanguage(languageCode);
-	}, [userLocale, user?.language]);
+	}, [dayjsLocale, user?.language]);
 
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<LocalizationProvider
 				dateAdapter={AdapterDayjs}
-				adapterLocale={userLocale}
+				adapterLocale={dayjsLocale}
 			>
 				{children}
 			</LocalizationProvider>

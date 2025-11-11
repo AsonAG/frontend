@@ -3,7 +3,7 @@ export const supportedCultures = [
 	"de-DE",
 	"de-AT",
 	"en-US",
-	"en-UK",
+	"en-GB",
 	"fr-CH",
 	"fr-FR",
 	"it-CH",
@@ -18,3 +18,12 @@ export const defaultBrowserCulture =
 	navigator.languages.find((lang) => supportedCulturesSet.has(lang)) ??
 	navigator.languages.find((lang) => countryCultures.has(lang)) ??
 	"de-CH";
+
+export function getSupportedCulture(culture?: string): string | null {
+	if (!culture) return null;
+	if (supportedCulturesSet.has(culture)) return culture;
+	if (countryCultures.has(culture)) {
+		return culture;
+	}
+	return null;
+}

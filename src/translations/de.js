@@ -441,7 +441,7 @@ const translations = {
 		"de-DE_culturelabel": "Deutsch (Deutschland)",
 		"de-AT_culturelabel": "Deutsch (Österreich)",
 		"en-US_culturelabel": "Englisch (Vereinigte Staaten)",
-		"en-UK_culturelabel": "Englisch (Vereinigtes Königreich)",
+		"en-GB_culturelabel": "Englisch (Vereinigtes Königreich)",
 		"fr-CH_culturelabel": "Französisch (Schweiz)",
 		"fr-FR_culturelabel": "Französisch (Frankreich)",
 		"it-CH_culturelabel": "Italienisch (Schweiz)",

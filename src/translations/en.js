@@ -46,7 +46,7 @@ const translations = {
 		"de-DE_culturelabel": "German (Germany)",
 		"de-AT_culturelabel": "German (Austria)",
 		"en-US_culturelabel": "English (United States)",
-		"en-UK_culturelabel": "English (United Kingdom)",
+		"en-GB_culturelabel": "English (United Kingdom)",
 		"fr-CH_culturelabel": "French (Switzerland)",
 		"fr-FR_culturelabel": "French (France)",
 		"it-CH_culturelabel": "Italian (Switzerland)",
