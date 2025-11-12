@@ -37,6 +37,7 @@ import {
 	WageTypeSettings,
 } from "../models/WageType";
 import { UserMembership } from "../models/User";
+import { getSupportedCulture } from "../models/Culture";
 
 export const orgsAtom = atomWithRefresh((get) => {
 	const _ = get(authUserAtom);
@@ -69,6 +70,13 @@ export const userAtom = atom((get) => {
 	return getUser();
 });
 export const unwrappedUserAtom = unwrap(userAtom, (prev) => prev ?? null);
+export const userCultureAtom = unwrap(
+	atom(async (get) => {
+		const user = await get(userAtom);
+		return getSupportedCulture(user?.culture);
+	}),
+	(prev) => prev ?? null,
+);
 
 export const userMembershipAtom = atom(async (get) => {
 	const orgId = get(orgIdAtom);

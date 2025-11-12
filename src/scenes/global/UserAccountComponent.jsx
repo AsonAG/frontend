@@ -15,6 +15,7 @@ import { localUserEmailAtom } from "../../auth/getUser";
 import {
 	toast,
 	unwrappedUserAtom,
+	userCultureAtom,
 	userInformationAtom,
 } from "../../utils/dataAtoms";
 import { useOidc } from "../../auth/authConfig";
@@ -101,6 +102,7 @@ function UserInformation() {
 		email: "<MISSING EMAIL>",
 	};
 	const user = useAtomValue(unwrappedUserAtom);
+	const userCulture = useAtomValue(userCultureAtom);
 
 	const onUpdateLanguage = async (lang) => {
 		const user = await getUser();
@@ -155,7 +157,7 @@ function UserInformation() {
 			/>
 			<CulturePicker
 				label={t("Region settings")}
-				culture={user.culture}
+				culture={userCulture}
 				onChange={onUpdateCulture}
 				variant="standard"
 			/>

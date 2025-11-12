@@ -14,8 +14,7 @@ import { useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
 import { getLanguageCode } from "./services/converters/LanguageConverter";
 import { useCreateTheme } from "./theme";
-import { userAtom } from "./utils/dataAtoms";
-import { getSupportedCulture, defaultBrowserCulture } from "./models/Culture";
+import { userAtom, userCultureAtom } from "./utils/dataAtoms";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -33,6 +32,7 @@ import "dayjs/locale/fr";
 import "dayjs/locale/fr-ch";
 import "dayjs/locale/it";
 import "dayjs/locale/it-ch";
+import { defaultBrowserCulture } from "./models/Culture";
 
 function Authentication({ children }) {
 	if (!useOidc) {
@@ -75,9 +75,8 @@ root.render(
 function AppScaffold({ children }: PropsWithChildren) {
 	const theme = useCreateTheme();
 	const user = useAtomValue(userAtom);
+	const userLocale = useAtomValue(userCultureAtom) ?? defaultBrowserCulture;
 	const { i18n } = useTranslation();
-	const userLocale =
-		getSupportedCulture(user?.culture) ?? defaultBrowserCulture;
 	const dayjsLocale = getDayjsLocale(userLocale);
 
 	useEffect(() => {
