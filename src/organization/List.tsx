@@ -26,6 +26,7 @@ import {
 	ResponsiveDialogTrigger,
 } from "../components/ResponsiveDialog";
 import { Add } from "@mui/icons-material";
+import { UIFeatureGate, UIFeature } from "../utils/UIFeature";
 
 export function OrganizationList() {
 	const organizations = useLoaderData() as Array<Organization>;
@@ -55,8 +56,12 @@ function ButtonStack() {
 	return (
 		<Suspense>
 			<Stack direction="row" spacing={1}>
-				<CreateOrganizationButton />
-				<ImportButton />
+				<UIFeatureGate feature={UIFeature.OrganizationsCreate}>
+					<CreateOrganizationButton />
+				</UIFeatureGate>
+				<UIFeatureGate feature={UIFeature.OrganizationsImport}>
+					<ImportButton />
+				</UIFeatureGate>
 			</Stack>
 		</Suspense>
 	);
