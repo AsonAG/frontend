@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Edit } from "@mui/icons-material";
 import { StatusDot } from "./StatusDot";
 import { EventTabbedView } from "../components/EventTabbedView";
+import { UIFeatureGate, UIFeature } from "../utils/UIFeature";
 
 type LoaderData = {
 	pageTitle: string;
@@ -27,16 +28,18 @@ export function EmployeeTabbedView() {
 			width="100%"
 		>
 			<PageHeaderTitle title={pageTitle} />
-			<Tooltip title={t("Edit employee")} placement="top" arrow>
-				<IconButton
-					component={RouterLink}
-					to="edit"
-					color="primary"
-					size="small"
-				>
-					<Edit />
-				</IconButton>
-			</Tooltip>
+			<UIFeatureGate feature={UIFeature.HrEmployeesEdit}>
+				<Tooltip title={t("Edit employee")} placement="top" arrow>
+					<IconButton
+						component={RouterLink}
+						to="edit"
+						color="primary"
+						size="small"
+					>
+						<Edit />
+					</IconButton>
+				</Tooltip>
+			</UIFeatureGate>
 			<StatusDot isEmployed={isEmployed} />
 		</Stack>
 	);

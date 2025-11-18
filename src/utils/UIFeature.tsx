@@ -1,12 +1,13 @@
 import { PropsWithChildren } from "react";
 
 export enum UIFeature {
+  HrEmployeesEdit,
   HrEmployeesNew,
   OrganizationsCreate,
   OrganizationsImport,
   OrganizationUnitCreate,
-  UsersInvite,
   UsersEditRole,
+  UsersInvite,
   UsersRemove,
 }
 
