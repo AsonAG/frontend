@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { IdType } from "../models/IdType";
 import dayjs from "dayjs";
 import { getDisplayName } from "./utils";
+import { UIFeatureGate, UIFeature } from "../utils/UIFeature";
 
 type LoaderData = {
 	userMemberships: Array<UserMembership>;
@@ -53,15 +54,17 @@ export function UserMembershipTable() {
 function InviteButton() {
 	const { t } = useTranslation();
 	return (
-		<Button
-			variant="outlined"
-			component={Link}
-			to="invite"
-			startIcon={<Add />}
-			size="small"
-		>
-			<Typography>{t("Invite")}</Typography>
-		</Button>
+		<UIFeatureGate feature={UIFeature.UsersInvite}>
+			<Button
+				variant="outlined"
+				component={Link}
+				to="invite"
+				startIcon={<Add />}
+				size="small"
+			>
+				<Typography>{t("Invite")}</Typography>
+			</Button>
+		</UIFeatureGate>
 	);
 }
 
@@ -85,16 +88,20 @@ function UserMembershipRow({ membership }: { membership: UserMembership }) {
 					</Tooltip>
 				)}
 			</Stack>
-			<EditUserRolesButton membership={membership} />
-			<Button
-				component={Link}
-				variant="outlined"
-				to={`memberships/${membership.id}/remove`}
-				size="small"
-				color="destructive"
-			>
-				{t("Remove")}
-			</Button>
+			<UIFeatureGate feature={UIFeature.UsersEditRole}>
+				<EditUserRolesButton membership={membership} />
+			</UIFeatureGate>
+			<UIFeatureGate feature={UIFeature.UsersRemove}>
+				<Button
+					component={Link}
+					variant="outlined"
+					to={`memberships/${membership.id}/remove`}
+					size="small"
+					color="destructive"
+				>
+					{t("Remove")}
+				</Button>
+			</UIFeatureGate>
 		</Stack>
 	);
 }
@@ -153,14 +160,16 @@ function EmployeeInvitationRow({ employee }: { employee: Employee }) {
 			<Typography variant="body1" flex={1}>
 				{employee.firstName} {employee.lastName}
 			</Typography>
-			<Button
-				component={Link}
-				variant="outlined"
-				to={`invite/${employee.id}`}
-				size="small"
-			>
-				{t("Invite")}
-			</Button>
+			<UIFeatureGate feature={UIFeature.UsersInvite}>
+				<Button
+					component={Link}
+					variant="outlined"
+					to={`invite/${employee.id}`}
+					size="small"
+				>
+					{t("Invite")}
+				</Button>
+			</UIFeatureGate>
 		</Stack>
 	);
 }

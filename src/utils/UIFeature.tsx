@@ -2,6 +2,12 @@ import { PropsWithChildren } from "react";
 
 export enum UIFeature {
   HrEmployeesNew,
+  OrganizationsCreate,
+  OrganizationsImport,
+  OrganizationUnitCreate,
+  UsersInvite,
+  UsersEditRole,
+  UsersRemove,
 }
 
 const disabledFeatures: Set<string> = new Set(

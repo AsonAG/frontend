@@ -40,6 +40,7 @@ import {
 import { unwrap } from "jotai/utils";
 import { Add, Business, ManageAccounts } from "@mui/icons-material";
 import { useRole, isPayrollAdmin } from "../../user/utils";
+import { UIFeatureGate, UIFeature } from "../../utils/UIFeature";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {
@@ -220,11 +221,13 @@ function MenuItemsOrganization() {
 						icon={<Business />}
 					/>
 				))}
-				<NavigationItem
-					label={t("Create")}
-					to="settings/newpayroll"
-					icon={<Add />}
-				/>
+				<UIFeatureGate feature={UIFeature.OrganizationUnitCreate}>
+					<NavigationItem
+						label={t("Create")}
+						to="settings/newpayroll"
+						icon={<Add />}
+					/>
+				</UIFeatureGate>
 			</NavigationGroup>
 		</>
 	);
