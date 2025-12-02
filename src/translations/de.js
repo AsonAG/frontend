@@ -153,7 +153,7 @@ const translations = {
 			"Datum liegt nicht im zulässigen Bereich.",
 		"Saved!": "Gespeichert!",
 		"New employee": "Neuer Eintritt",
-		"Edit employee": "Mitarbeiter bearbeiten",
+		"Edit employee": "Mitarbeitende bearbeiten",
 		"User does not exist!": "User existiert nicht!",
 		Status: "Status",
 		Active: "Aktiv",
@@ -210,7 +210,7 @@ const translations = {
 		"Invitation link": "Einladungslink",
 		"Copied to clipboard": "In die Zwischenablage kopiert",
 		Invite: "Einladen",
-		"Employees without access": "Mitarbeiter ohne Zugriff",
+		"Employees without access": "Mitarbeitende ohne Zugriff",
 		Users: "Benutzer",
 		"Invite to organization": "In die Organisation einladen",
 		"Update membership of {{name}}": "Mitgliedschaft von {{name}} anpassen",
@@ -386,7 +386,7 @@ const translations = {
 		"The documents are being generated, this can take up to a few minutes...":
 			"Die Dokumente werden erstellt. Das kann einige Minuten dauern...",
 		"There are employees with open payouts!":
-			"Es gibt noch Mitarbeiter mit offenen Auszahlungen!",
+			"Es gibt noch Mitarbeitende mit offenen Auszahlungen!",
 		"Do you want to move all open payouts to the next period?":
 			"Möchten Sie die offenen Beträge in die nächste Periode übernehmen?",
 		"The wage controlling has not been completed yet. The period cannot be closed.":
