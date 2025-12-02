@@ -9,7 +9,7 @@ const translations = {
 		"Organization creation failed": "Erstellen der Organisation fehlgeschlagen",
 		"Organization created": "Organisation erstellt",
 		"New organization unit": "Neue Organisationseinheit",
-		Employees: "Mitarbeiter",
+		Employees: "Mitarbeitende",
 		Company: "Firma",
 		"New event": "Neues Ereignis",
 		Data: "Daten",
@@ -17,7 +17,7 @@ const translations = {
 		Event: "Ereignis",
 		Documents: "Dokumente",
 		Document: "Dokument",
-		Employee: "Mitarbeiter",
+		Employee: "Mitarbeitenden",
 		"Missing data": "Fehlende Daten",
 		Tasks: "Aufgaben",
 		"Select...": "Auswählen...",
@@ -143,7 +143,7 @@ const translations = {
 		"Open period": "Offene Periode",
 		Forecast: "Szenario",
 		Reason: "Notiz",
-		"Select employees": "Mitarbeiter auswählen",
+		"Select employees": "Mitarbeitende auswählen",
 		Create: "Erstellen",
 		Close: "Schliessen",
 		Content: "Inhalt",
@@ -158,9 +158,9 @@ const translations = {
 		Status: "Status",
 		Active: "Aktiv",
 		Inactive: "Inaktiv",
-		"Hide former employees": "Frühere Mitarbeiter ausblenden",
+		"Hide former employees": "Frühere Mitarbeitende ausblenden",
 		"Only show employees with missing data":
-			"Nur Mitarbeiter mit fehlenden Daten anzeigen",
+			"Nur Mitarbeitende mit fehlenden Daten anzeigen",
 		"New employee created": "Neueintritt erfasst",
 		"Saving failed!": "Speichern fehlgeschlagen!",
 		Identifier: "Identifikator",
@@ -198,7 +198,7 @@ const translations = {
 		"Grants access to specific organization units":
 			"Gewährt Zugriff auf ausgewählte Organisationseinheiten",
 		"Grants restricted access to the employee":
-			"Gewährt eingeschränkten Zugriff auf den Mitarbeiter",
+			"Gewährt eingeschränkten Zugriff auf den Mitarbeitende",
 		Invitation: "Einladung",
 		"You have been invited to join the organization {{orgName}}.":
 			"Sie sind eingeladen der Organiation {{orgName}} beizutreten.",
@@ -236,7 +236,7 @@ const translations = {
 		"Select at least one payroll":
 			"Wählen Sie mindestens eine Organisationseinheit aus",
 		"Email is required": "Email ist erforderlich",
-		"Employee is required": "Mitarbeiter ist erforderlich",
+		"Employee is required": "Mitarbeitende ist erforderlich",
 		"Could not invite user to organization":
 			"Der Benutzer konnte nicht in die Organisation eingeladen werden",
 		"{{email}} already belongs to a member of the organization":
@@ -293,7 +293,7 @@ const translations = {
 		Payout: "Auszahlen",
 		Payouts: "Auszahlungen",
 		Payslip: "Lohnabrechnung",
-		"This employee has blockers": "Dieser Mitarbeiter hat Blocker",
+		"This employee has blockers": "Dieser Mitarbeitende hat Blocker",
 		"Review period": "Periode kontrollieren",
 		"Close period": "Periode schliessen",
 		"Upon closing the period, these documents will be sent to swissdec.":
@@ -317,7 +317,7 @@ const translations = {
 		payrun_period_wage_controlling: "Lohnkontrolle",
 		payrun_period_ready: "Auszahlungsbereit",
 		payrun_period_paid_out: "Ausbezahlt",
-		payrun_period_former_employees: "Frühere Mitarbeiter",
+		payrun_period_former_employees: "Frühere Mitarbeitende",
 		payrun_period_no_wage: "Angestellt aber ohne Lohn",
 		payrun_period_error: "Mit Fehlern (der Support wurde informiert)",
 		"The open period is being created. Please refresh the page in a moment.":
@@ -402,7 +402,8 @@ const translations = {
 		"Salary type": "Lohntyp",
 		"Employee search": "Mitarbeitersuche",
 		"Controlling completed.": "Kontrolle abgeschlossen.",
-		"All employees have been paid out.": "Alle Mitarbeiter wurden ausbezahlt.",
+		"All employees have been paid out.":
+			"Alle Mitarbeitende wurden ausbezahlt.",
 		"No payment has been made yet.": "Es wurde noch keine Auszahlung getätigt.",
 		"No matches.": "Keine Treffer.",
 		"Go to employee data": "Gehe zu Mitarbeiterdaten",
