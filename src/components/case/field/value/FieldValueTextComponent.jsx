@@ -14,7 +14,13 @@ export function FieldValueTextComponent() {
 	const isMaskedInput = !!field.attributes?.["input.mask"];
 
 	const handleChange = (e) => {
-		setValue(e.target.value);
+		const newValue = e.target.value;
+		setValue(newValue);
+		const isIbanField = field.name?.toLowerCase().includes("iban");
+		if (isIbanField) {
+			field.value = newValue;
+			buildCase();
+		}
 	};
 
 	const handleBlur = () => {
