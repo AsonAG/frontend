@@ -17,7 +17,7 @@ const translations = {
 		Event: "Ereignis",
 		Documents: "Dokumente",
 		Document: "Dokument",
-		Employee: "Mitarbeitenden",
+		Employee: "Mitarbeitende",
 		"Missing data": "Fehlende Daten",
 		Tasks: "Aufgaben",
 		"Select...": "Auswählen...",
@@ -198,7 +198,7 @@ const translations = {
 		"Grants access to specific organization units":
 			"Gewährt Zugriff auf ausgewählte Organisationseinheiten",
 		"Grants restricted access to the employee":
-			"Gewährt eingeschränkten Zugriff auf den Mitarbeitende",
+			"Gewährt eingeschränkten Zugriff auf den Mitarbeitenden",
 		Invitation: "Einladung",
 		"You have been invited to join the organization {{orgName}}.":
 			"Sie sind eingeladen der Organiation {{orgName}} beizutreten.",
@@ -236,7 +236,7 @@ const translations = {
 		"Select at least one payroll":
 			"Wählen Sie mindestens eine Organisationseinheit aus",
 		"Email is required": "Email ist erforderlich",
-		"Employee is required": "Mitarbeitende ist erforderlich",
+		"Employee is required": "Mitarbeitender ist erforderlich",
 		"Could not invite user to organization":
 			"Der Benutzer konnte nicht in die Organisation eingeladen werden",
 		"{{email}} already belongs to a member of the organization":
@@ -403,7 +403,7 @@ const translations = {
 		"Employee search": "Mitarbeitersuche",
 		"Controlling completed.": "Kontrolle abgeschlossen.",
 		"All employees have been paid out.":
-			"Alle Mitarbeitende wurden ausbezahlt.",
+			"Alle Mitarbeitenden wurden ausbezahlt.",
 		"No payment has been made yet.": "Es wurde noch keine Auszahlung getätigt.",
 		"No matches.": "Keine Treffer.",
 		"Go to employee data": "Gehe zu Mitarbeiterdaten",
