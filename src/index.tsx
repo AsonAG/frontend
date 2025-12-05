@@ -14,7 +14,7 @@ import { useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
 import { getLanguageCode } from "./services/converters/LanguageConverter";
 import { useCreateTheme } from "./theme";
-import { userAtom, userCultureAtom } from "./utils/dataAtoms";
+import { userAtom } from "./utils/dataAtoms";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -58,7 +58,7 @@ function getDayjsLocale(culture: string) {
 	return culture.split("-")[0];
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
 	<React.StrictMode>
 		<Authentication>
@@ -75,15 +75,15 @@ root.render(
 function AppScaffold({ children }: PropsWithChildren) {
 	const theme = useCreateTheme();
 	const user = useAtomValue(userAtom);
-	const userLocale = useAtomValue(userCultureAtom) ?? defaultBrowserCulture;
 	const { i18n } = useTranslation();
-	const dayjsLocale = getDayjsLocale(userLocale);
+	const languageCode = getLanguageCode(user?.language);
+	const localeSource = languageCode ?? defaultBrowserCulture;
+	const dayjsLocale = getDayjsLocale(localeSource);
 
 	useEffect(() => {
 		dayjs.locale(dayjsLocale);
-		const languageCode = getLanguageCode(user?.language);
-		i18n.changeLanguage(languageCode);
-	}, [dayjsLocale, user?.language]);
+		i18n.changeLanguage(languageCode ?? "en");
+	}, [dayjsLocale, languageCode]);
 
 	return (
 		<ThemeProvider theme={theme}>
