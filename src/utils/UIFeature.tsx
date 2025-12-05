@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 
 export enum UIFeature {
   HrEmployeesEdit,
@@ -35,4 +35,17 @@ export const UIFeatureGate = ({
   }
 
   return children;
+};
+
+export const UIFeatureQuery = ({
+  feature,
+  render,
+}: {
+  feature: UIFeature;
+  render: (enabled: boolean) => React.ReactNode;
+}) => {
+  const featureName = UIFeature[feature];
+  const enabled = !disabledFeatures.has(featureName);
+
+  return render(enabled);
 };
