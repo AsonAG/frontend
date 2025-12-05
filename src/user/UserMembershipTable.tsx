@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { IdType } from "../models/IdType";
 import dayjs from "dayjs";
 import { getDisplayName } from "./utils";
-import { UIFeatureGate, UIFeature } from "../utils/UIFeature";
+import { UIFeatureGate, UIFeatureQuery, UIFeature } from "../utils/UIFeature";
 
 type LoaderData = {
 	userMemberships: Array<UserMembership>;
@@ -88,9 +88,15 @@ function UserMembershipRow({ membership }: { membership: UserMembership }) {
 					</Tooltip>
 				)}
 			</Stack>
-			<UIFeatureGate feature={UIFeature.UsersEditRole}>
-				<EditUserRolesButton membership={membership} />
-			</UIFeatureGate>
+			<UIFeatureQuery
+				feature={UIFeature.UsersEditRole}
+				render={(enabled) => (
+					<EditUserRolesButton
+						membership={membership}
+						featureDisabled={!enabled}
+					/>
+				)}
+			/>
 			<UIFeatureGate feature={UIFeature.UsersRemove}>
 				<Button
 					component={Link}
@@ -174,9 +180,15 @@ function EmployeeInvitationRow({ employee }: { employee: Employee }) {
 	);
 }
 
-function EditUserRolesButton({ membership }: { membership: UserMembership }) {
+function EditUserRolesButton({
+	membership,
+	featureDisabled,
+}: {
+	membership: UserMembership;
+	featureDisabled: boolean;
+}) {
 	const { t } = useTranslation();
-	const disabled = membership.role.$type === "Owner";
+	const disabled = featureDisabled || membership.role.$type === "Owner";
 	return (
 		<Button
 			component={Link}
