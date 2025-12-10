@@ -105,11 +105,11 @@ export function DatePicker<T extends DatePickerVariants>({
 
 	const handleAccept = (v: Dayjs | null) => {
 		setLocalValue(v);
-		if (v && v.isValid()) {
-			onChange(v);
-		} else if (!v) {
-			onChange(null);
+		lastValidationError.current = null;
+		if (inputRef.current) {
+			inputRef.current.setCustomValidity("");
 		}
+		commitIfValid(v ?? null);
 	};
 
 	const handleBlur = () => {
