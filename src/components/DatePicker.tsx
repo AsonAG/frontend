@@ -80,7 +80,7 @@ export function DatePicker<T extends DatePickerVariants>({
 		DateValidationError | DateTimeValidationError | null
 	>(null);
 
-	const handleCommit = (v: Dayjs | null | undefined) => {
+	const commitIfValid = (v: Dayjs | null | undefined) => {
 		if (!onChange) return;
 
 		if (!v) {
@@ -101,12 +101,19 @@ export function DatePicker<T extends DatePickerVariants>({
 	) => {
 		setLocalValue(newDate);
 		lastValidationError.current = context.validationError;
-		if (!context.validationError && newDate && newDate.isValid()) {
-			handleCommit(newDate);
+	};
+
+	const handleAccept = (v: Dayjs | null) => {
+		setLocalValue(v);
+		if (v && v.isValid()) {
+			onChange(v);
+		} else if (!v) {
+			onChange(null);
 		}
 	};
 
 	const handleBlur = () => {
+		const isValid = !localValue || localValue.isValid();
 		const err = lastValidationError.current;
 		let message: string | undefined;
 
@@ -120,11 +127,18 @@ export function DatePicker<T extends DatePickerVariants>({
 		if (inputRef.current) {
 			if (message) {
 				inputRef.current.setCustomValidity(t(message));
-			} else if (!required && !localValue) {
+			} else if (!required) {
 				inputRef.current.setCustomValidity("");
+			} else if (!localValue) {
+				inputRef.current.setCustomValidity(t("Please enter a date"));
 			} else {
 				inputRef.current.setCustomValidity("");
 			}
+		}
+
+		if (isValid && onChange) {
+			// @ts-ignore
+			onChange(localValue);
 		}
 	};
 
@@ -149,7 +163,7 @@ export function DatePicker<T extends DatePickerVariants>({
 			const setNewValue = (v: Dayjs | null | undefined) => {
 				if (!v) return;
 				handleDateChange(v, { validationError: null });
-				handleCommit(v);
+				commitIfValid(v);
 			};
 			slots = {
 				...slots,
@@ -184,9 +198,7 @@ export function DatePicker<T extends DatePickerVariants>({
 			inputRef={inputRef}
 			timezone="UTC"
 			onChange={handleDateChange}
-			onAccept={(v: Dayjs | null) => {
-				handleCommit(v);
-			}}
+			onAccept={handleAccept}
 			// @ts-ignore
 			slots={slots}
 			// @ts-ignore
