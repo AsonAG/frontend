@@ -1,8 +1,7 @@
 import { NumericFormat } from "react-number-format";
 import { InputAdornment, TextField } from "@mui/material";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { FieldContext } from "../Field";
-import { useUpdateEffect } from "usehooks-ts";
 import { getDecimalPlaces } from "../../../../utils/Format";
 
 function getDecimalParams({ valueType, attributes }) {
@@ -78,13 +77,16 @@ export function FieldValueNumberComponent() {
 	};
 
 	// handle server reset
-	useUpdateEffect(() => {
-		setValue(getValue(field));
+	useEffect(() => {
+		const fieldValue = getValue(field);
+		if (fieldValue !== value) {
+			setValue(fieldValue);
+		}
 	}, [field.value]);
 
 	return (
 		<NumericFormat
-			value={value}
+			value={value || ""}
 			onValueChange={handleChange}
 			valueIsNumericString
 			error={!isValid}
