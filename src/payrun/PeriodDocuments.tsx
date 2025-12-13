@@ -242,6 +242,8 @@ function DocumentChip({
 			return <PdfChip {...chipProps} />;
 		case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
 			return <ExcelChip {...chipProps} />;
+		case "text/csv":
+			return <CsvChip {...chipProps} />;
 	}
 }
 
@@ -279,6 +281,22 @@ function PdfChip({ to, label }: ChipProps) {
 
 function ExcelChip({ to, label }: ChipProps) {
 	label ??= "Excel";
+	return (
+		<Chip
+			variant="outlined"
+			component={RouterLink}
+			to={to}
+			label={label}
+			size="small"
+			icon={<Functions fontSize="small" />}
+			onClick={noop}
+			color="green"
+		/>
+	);
+}
+
+function CsvChip({ to, label }: ChipProps) {
+	label ??= "Csv";
 	return (
 		<Chip
 			variant="outlined"
