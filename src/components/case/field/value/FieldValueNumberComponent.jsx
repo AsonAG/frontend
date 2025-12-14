@@ -86,7 +86,7 @@ export function FieldValueNumberComponent() {
 
 	return (
 		<NumericFormat
-			value={value || ""}
+			value={value ?? ""}
 			onValueChange={handleChange}
 			valueIsNumericString
 			error={!isValid}
