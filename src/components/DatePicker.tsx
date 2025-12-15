@@ -93,22 +93,40 @@ export function DatePicker<T extends DatePickerVariants>({
 		}
 	};
 
+	const updateLocalState = (
+		v: Dayjs | null,
+		validationError?: DateValidationError | DateTimeValidationError | null,
+	) => {
+		setLocalValue(v);
+		lastValidationError.current = validationError ?? null;
+
+		if (!inputRef.current) return;
+
+		if (validationError) {
+			let message: string | undefined;
+			if (getValidationErrorMessage) {
+				message = getValidationErrorMessage(validationError);
+			}
+			if (!message) {
+				message = getDefaultValidationErrorMessage(validationError);
+			}
+			inputRef.current.setCustomValidity(t(message));
+		} else {
+			inputRef.current.setCustomValidity("");
+		}
+	};
+
 	const handleDateChange = (
 		newDate: Dayjs | null,
 		context: PickerChangeHandlerContext<
 			DateValidationError | DateTimeValidationError
 		>,
 	) => {
-		setLocalValue(newDate);
-		lastValidationError.current = context.validationError;
+		updateLocalState(newDate, context.validationError);
 	};
 
 	const handleAccept = (v: Dayjs | null) => {
-		setLocalValue(v);
-		lastValidationError.current = null;
-		if (inputRef.current) {
-			inputRef.current.setCustomValidity("");
-		}
+		updateLocalState(v, null);
 		commitIfValid(v ?? null);
 	};
 
@@ -136,9 +154,8 @@ export function DatePicker<T extends DatePickerVariants>({
 			}
 		}
 
-		if (isValid && onChange) {
-			// @ts-ignore
-			onChange(localValue);
+		if (isValid) {
+			commitIfValid(localValue);
 		}
 	};
 
@@ -162,7 +179,7 @@ export function DatePicker<T extends DatePickerVariants>({
 		if (variant !== "month-short") {
 			const setNewValue = (v: Dayjs | null | undefined) => {
 				if (!v) return;
-				handleDateChange(v, { validationError: null });
+				updateLocalState(v, null);
 				commitIfValid(v);
 			};
 			slots = {
