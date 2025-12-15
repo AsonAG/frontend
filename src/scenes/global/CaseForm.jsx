@@ -59,11 +59,6 @@ function CaseForm() {
 
 	const handleSubmit = async () => {
 		if (formRef?.current?.reportValidity()) {
-
-			if (document.activeElement instanceof HTMLElement) {
-				document.activeElement.blur();
-			}
-			await new Promise((resolve) => setTimeout(resolve, 0));
 			addCase(() => {
 				toast("success", "Saved!");
 				navigate(redirectPath, { relative: "path", state: "case_added" });

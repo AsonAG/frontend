@@ -19,6 +19,7 @@ function mapCase(_case, attachments) {
 
 export function useCaseData(params, payroll) {
 	const attachments = useRef({});
+	const lastBuildPromise = useRef(null);
 	const [caseData, setCaseData] = useState(null);
 	const [caseErrors, setCaseErrors] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -97,16 +98,31 @@ export function useCaseData(params, payroll) {
 	}
 
 	async function _buildCase() {
-		const caseResponse = await buildCase(params, getCaseChangeSetup());
-		if (caseResponse.ok) {
-			setCaseData(await caseResponse.json());
-			setCaseErrors([]);
-		} else {
-			handleError(caseResponse);
+		const promise = (async () => {
+			const caseResponse = await buildCase(params, getCaseChangeSetup());
+			if (caseResponse.ok) {
+				setCaseData(await caseResponse.json());
+				setCaseErrors([]);
+			} else {
+				await handleError(caseResponse);
+			}
+		})();
+		lastBuildPromise.current = promise;
+		try {
+			await promise;
+		} finally {
+			if (lastBuildPromise.current === promise) lastBuildPromise.current = null;
 		}
+		return promise;
 	}
 
 	async function _addCase(onCaseAdded) {
+		if (lastBuildPromise.current) {
+			try {
+				await lastBuildPromise.current;
+			} catch (e) {}
+		}
+
 		setSubmitting(true);
 		try {
 			const caseResponse = await addCase(params, getCaseChangeSetup());
