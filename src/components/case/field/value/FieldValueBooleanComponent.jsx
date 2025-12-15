@@ -1,7 +1,10 @@
 import {
 	FormControl,
 	FormControlLabel,
+	FormLabel,
 	Checkbox,
+	RadioGroup,
+	Radio as MuiRadio,
 	Switch as MuiSwitch,
 	styled,
 	Box,
@@ -17,12 +20,27 @@ export function FieldValueBooleanComponent() {
 	// make sure null values are sent as false
 	field.value = checked + "";
 
-	function handleChange(e) {
-		field.value = e.target.checked + "";
+	function handleChange(value) {
+		field.value = value + "";
 		buildCase();
 	}
 
+	const boolRadioButton = field.attributes?.["input.boolRadioButton"];
+	if (!!boolRadioButton) {
+		return (
+			<Radio
+				fieldName={field.Name}
+				displayName={displayName}
+				checked={field.value}
+				handleChange={(_, value) => handleChange(value)}
+				isReadonly={isReadonly}
+				config={boolRadioButton}
+			/>
+		);
+	}
+
 	const Control = field.attributes?.["input.switch"] ? Switch : Checkbox;
+
 	return (
 		<FormControl sx={{ flex: 1 }}>
 			<FormControlLabel
@@ -32,11 +50,38 @@ export function FieldValueBooleanComponent() {
 				control={
 					<Control
 						checked={checked}
-						onChange={handleChange}
+						onChange={(_, checked) => handleChange(checked)}
 						disabled={isReadonly}
 					/>
 				}
 			/>
+		</FormControl>
+	);
+}
+
+function Radio({
+	fieldName,
+	displayName,
+	checked,
+	handleChange,
+	isReadonly,
+	config,
+}) {
+	return (
+		<FormControl disabled={isReadonly}>
+			<FormLabel>{displayName}</FormLabel>
+			<RadioGroup name={fieldName} value={checked} onChange={handleChange}>
+				<FormControlLabel
+					value="true"
+					control={<MuiRadio />}
+					label={config.trueLocalization}
+				/>
+				<FormControlLabel
+					value="false"
+					control={<MuiRadio />}
+					label={config.falseLocalization}
+				/>
+			</RadioGroup>
 		</FormControl>
 	);
 }
