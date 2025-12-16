@@ -80,6 +80,28 @@ export function DatePicker<T extends DatePickerVariants>({
 		DateValidationError | DateTimeValidationError | null
 	>(null);
 
+	const resolveValidationMessage = (
+		validationError?: DateValidationError | DateTimeValidationError | null,
+		options?: { required?: boolean; hasValue?: boolean },
+	): string | undefined => {
+		if (validationError) {
+			let message: string | undefined;
+			if (getValidationErrorMessage) {
+				message = getValidationErrorMessage(validationError);
+			}
+			if (!message) {
+				message = getDefaultValidationErrorMessage(validationError);
+			}
+			return message;
+		}
+
+		if (options?.required && !options.hasValue) {
+			return "Please enter a date";
+		}
+
+		return undefined;
+	};
+
 	const commitIfValid = (v: Dayjs | null | undefined) => {
 		if (!onChange) return;
 
@@ -102,18 +124,8 @@ export function DatePicker<T extends DatePickerVariants>({
 
 		if (!inputRef.current) return;
 
-		if (validationError) {
-			let message: string | undefined;
-			if (getValidationErrorMessage) {
-				message = getValidationErrorMessage(validationError);
-			}
-			if (!message) {
-				message = getDefaultValidationErrorMessage(validationError);
-			}
-			inputRef.current.setCustomValidity(t(message));
-		} else {
-			inputRef.current.setCustomValidity("");
-		}
+		const message = resolveValidationMessage(validationError);
+		inputRef.current.setCustomValidity(message ? t(message) : "");
 	};
 
 	const handleDateChange = (
@@ -133,25 +145,13 @@ export function DatePicker<T extends DatePickerVariants>({
 	const handleBlur = () => {
 		const isValid = !localValue || localValue.isValid();
 		const err = lastValidationError.current;
-		let message: string | undefined;
-
-		if (getValidationErrorMessage) {
-			message = getValidationErrorMessage(err);
-		}
-		if (!message && err) {
-			message = getDefaultValidationErrorMessage(err);
-		}
+		const message = resolveValidationMessage(err, {
+			required,
+			hasValue: !!localValue,
+		});
 
 		if (inputRef.current) {
-			if (message) {
-				inputRef.current.setCustomValidity(t(message));
-			} else if (!required) {
-				inputRef.current.setCustomValidity("");
-			} else if (!localValue) {
-				inputRef.current.setCustomValidity(t("Please enter a date"));
-			} else {
-				inputRef.current.setCustomValidity("");
-			}
+			inputRef.current.setCustomValidity(message ? t(message) : "");
 		}
 
 		if (isValid) {
