@@ -80,6 +80,28 @@ export function DatePicker<T extends DatePickerVariants>({
 		DateValidationError | DateTimeValidationError | null
 	>(null);
 
+	const resolveValidationMessage = (
+		validationError?: DateValidationError | DateTimeValidationError | null,
+		options?: { required?: boolean; hasValue?: boolean },
+	): string | undefined => {
+		if (validationError) {
+			let message: string | undefined;
+			if (getValidationErrorMessage) {
+				message = getValidationErrorMessage(validationError);
+			}
+			if (!message) {
+				message = getDefaultValidationErrorMessage(validationError);
+			}
+			return message;
+		}
+
+		if (options?.required && !options.hasValue) {
+			return "Please enter a date";
+		}
+
+		return undefined;
+	};
+
 	const commitIfValid = (v: Dayjs | null | undefined) => {
 		if (!onChange) return;
 
@@ -93,43 +115,47 @@ export function DatePicker<T extends DatePickerVariants>({
 		}
 	};
 
+	const updateLocalState = (
+		v: Dayjs | null,
+		validationError?: DateValidationError | DateTimeValidationError | null,
+	) => {
+		setLocalValue(v);
+		lastValidationError.current = validationError ?? null;
+
+		if (!inputRef.current) return;
+
+		const message = resolveValidationMessage(validationError);
+		inputRef.current.setCustomValidity(message ? t(message) : "");
+	};
+
 	const handleDateChange = (
 		newDate: Dayjs | null,
 		context: PickerChangeHandlerContext<
 			DateValidationError | DateTimeValidationError
 		>,
 	) => {
-		setLocalValue(newDate);
-		lastValidationError.current = context.validationError;
+		updateLocalState(newDate, context.validationError);
+	};
+
+	const handleAccept = (v: Dayjs | null) => {
+		updateLocalState(v, null);
+		commitIfValid(v ?? null);
 	};
 
 	const handleBlur = () => {
 		const isValid = !localValue || localValue.isValid();
 		const err = lastValidationError.current;
-		let message: string | undefined;
-
-		if (getValidationErrorMessage) {
-			message = getValidationErrorMessage(err);
-		}
-		if (!message && err) {
-			message = getDefaultValidationErrorMessage(err);
-		}
+		const message = resolveValidationMessage(err, {
+			required,
+			hasValue: !!localValue,
+		});
 
 		if (inputRef.current) {
-			if (message) {
-				inputRef.current.setCustomValidity(t(message));
-			} else if (!required) {
-				inputRef.current.setCustomValidity("");
-			} else if (!localValue) {
-				inputRef.current.setCustomValidity(t("Please enter a date"));
-			} else {
-				inputRef.current.setCustomValidity("");
-			}
+			inputRef.current.setCustomValidity(message ? t(message) : "");
 		}
 
-		if (isValid && onChange) {
-			// @ts-ignore
-			onChange(localValue);
+		if (isValid) {
+			commitIfValid(localValue);
 		}
 	};
 
@@ -153,7 +179,7 @@ export function DatePicker<T extends DatePickerVariants>({
 		if (variant !== "month-short") {
 			const setNewValue = (v: Dayjs | null | undefined) => {
 				if (!v) return;
-				handleDateChange(v, { validationError: null });
+				updateLocalState(v, null);
 				commitIfValid(v);
 			};
 			slots = {
@@ -189,9 +215,7 @@ export function DatePicker<T extends DatePickerVariants>({
 			inputRef={inputRef}
 			timezone="UTC"
 			onChange={handleDateChange}
-			onAccept={(v: Dayjs | null) => {
-				commitIfValid(v);
-			}}
+			onAccept={handleAccept}
 			// @ts-ignore
 			slots={slots}
 			// @ts-ignore
