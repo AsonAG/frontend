@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { Form, Link as RouterLink, useLoaderData } from "react-router-dom";
 import { Employee } from "../models/Employee";
 import { Division } from "../models/Division";
+import { UIFeatureQuery, UIFeature } from "../utils/UIFeature";
 
 type LoaderData = {
 	employee: Employee;
@@ -29,18 +30,31 @@ export function EmployeeForm() {
 	return (
 		<Form method="post">
 			<ContentLayout title={title}>
-				<TextField
-					label={t("First name")}
-					required
-					name="firstName"
-					defaultValue={employee?.firstName}
-				/>
-				<TextField
-					label={t("Last name")}
-					required
-					name="lastName"
-					defaultValue={employee?.lastName}
-				/>
+				<UIFeatureQuery
+					feature={UIFeature.HrEmployeesEditFirstName}
+					render={(enabled) => (
+						<TextField
+							label={t("First name")}
+							required
+							name="firstName"
+							defaultValue={employee?.firstName}
+							disabled={!isNew && !enabled}
+						/>
+					)}
+				></UIFeatureQuery>
+				<UIFeatureQuery
+					feature={UIFeature.HrEmployeesEditLastName}
+					render={(enabled) => (
+						<TextField
+							label={t("Last name")}
+							required
+							name="lastName"
+							defaultValue={employee?.lastName}
+							disabled={!isNew && !enabled}
+						/>
+					)}
+				></UIFeatureQuery>
+
 				{!isNew && (
 					<input type="hidden" name="status" value={employee.status} />
 				)}
