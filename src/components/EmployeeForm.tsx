@@ -33,56 +33,50 @@ export function EmployeeForm() {
 				<UIFeatureQuery
 					feature={UIFeature.HrEmployeesEditFirstName}
 					render={(enabled) => {
-						if (!isNew && !enabled) {
-							return (
-								<Stack spacing={0.5}>
-									<Typography variant="body2" color="text.secondary">
-										{t("First name")}
-									</Typography>
-									<Typography variant="body1">{employee?.firstName}</Typography>
+						const disabled = !isNew && !enabled;
+
+						return (
+							<>
+								<TextField
+									label={t("First name")}
+									required
+									name="firstName"
+									defaultValue={employee?.firstName}
+									disabled={disabled}
+								/>
+								{disabled && (
 									<input
 										type="hidden"
 										name="firstName"
-										value={employee?.firstName}
+										value={employee.firstName}
 									/>
-								</Stack>
-							);
-						}
-						return (
-							<TextField
-								label={t("First name")}
-								required
-								name="firstName"
-								defaultValue={employee?.firstName}
-							/>
+								)}
+							</>
 						);
 					}}
 				></UIFeatureQuery>
 				<UIFeatureQuery
 					feature={UIFeature.HrEmployeesEditLastName}
 					render={(enabled) => {
-						if (!isNew && !enabled) {
-							return (
-								<Stack spacing={0.5}>
-									<Typography variant="body2" color="text.secondary">
-										{t("Last name")}
-									</Typography>
-									<Typography variant="body1">{employee?.lastName}</Typography>
+						const disabled = !isNew && !enabled;
+
+						return (
+							<>
+								<TextField
+									label={t("Last name")}
+									required
+									name="lastName"
+									defaultValue={employee?.lastName}
+									disabled={disabled}
+								/>
+								{disabled && (
 									<input
 										type="hidden"
 										name="lastName"
-										value={employee?.lastName}
+										value={employee.lastName}
 									/>
-								</Stack>
-							);
-						}
-						return (
-							<TextField
-								label={t("Last name")}
-								required
-								name="lastName"
-								defaultValue={employee?.lastName}
-							/>
+								)}
+							</>
 						);
 					}}
 				></UIFeatureQuery>
