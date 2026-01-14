@@ -32,27 +32,53 @@ export function EmployeeForm() {
 			<ContentLayout title={title}>
 				<UIFeatureQuery
 					feature={UIFeature.HrEmployeesEditFirstName}
-					render={(enabled) => (
-						<TextField
-							label={t("First name")}
-							required
-							name="firstName"
-							defaultValue={employee?.firstName}
-							disabled={!isNew && !enabled}
-						/>
-					)}
+					render={(enabled) => {
+						const disabled = !isNew && !enabled;
+
+						return (
+							<>
+								<TextField
+									label={t("First name")}
+									required
+									name="firstName"
+									defaultValue={employee?.firstName}
+									disabled={disabled}
+								/>
+								{disabled && (
+									<input
+										type="hidden"
+										name="firstName"
+										value={employee.firstName}
+									/>
+								)}
+							</>
+						);
+					}}
 				></UIFeatureQuery>
 				<UIFeatureQuery
 					feature={UIFeature.HrEmployeesEditLastName}
-					render={(enabled) => (
-						<TextField
-							label={t("Last name")}
-							required
-							name="lastName"
-							defaultValue={employee?.lastName}
-							disabled={!isNew && !enabled}
-						/>
-					)}
+					render={(enabled) => {
+						const disabled = !isNew && !enabled;
+
+						return (
+							<>
+								<TextField
+									label={t("Last name")}
+									required
+									name="lastName"
+									defaultValue={employee?.lastName}
+									disabled={disabled}
+								/>
+								{disabled && (
+									<input
+										type="hidden"
+										name="lastName"
+										value={employee.lastName}
+									/>
+								)}
+							</>
+						);
+					}}
 				></UIFeatureQuery>
 
 				{!isNew && (
