@@ -9,7 +9,7 @@ import {
 } from "@mui/x-date-pickers";
 import { InputAdornment, InputAdornmentProps, IconButton } from "@mui/material";
 import { NavigateBefore, NavigateNext } from "@mui/icons-material";
-import { MouseEventHandler, useRef, useState } from "react";
+import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 import type {} from "@mui/x-date-pickers/AdapterDayjs";
@@ -75,34 +75,14 @@ export function DatePicker<T extends DatePickerVariants>({
 	const Picker = variant === "datetime" ? MuiDateTimePicker : MuiDatePicker;
 	let pickerProps = {};
 	const { value } = datePickerProps;
-	const [localValue, setLocalValue] = useState<Dayjs | null>(value ?? null);
-	const lastValidationError = useRef<
-		DateValidationError | DateTimeValidationError | null
-	>(null);
+	const [localValue, setLocalValue] = useState<Dayjs | null>(null);
 
-	const resolveValidationMessage = (
-		validationError?: DateValidationError | DateTimeValidationError | null,
-		options?: { required?: boolean; hasValue?: boolean },
-	): string | undefined => {
-		if (validationError) {
-			let message: string | undefined;
-			if (getValidationErrorMessage) {
-				message = getValidationErrorMessage(validationError);
-			}
-			if (!message) {
-				message = getDefaultValidationErrorMessage(validationError);
-			}
-			return message;
-		}
+	useEffect(
+		() => updateLocalState(value ?? null, { validationError: null }),
+		[value],
+	);
 
-		if (options?.required && !options.hasValue) {
-			return "Please enter a date";
-		}
-
-		return undefined;
-	};
-
-	const commitIfValid = (v: Dayjs | null | undefined) => {
+	const handleChange = (v: Dayjs | null | undefined) => {
 		if (!onChange) return;
 
 		if (!v) {
@@ -110,53 +90,43 @@ export function DatePicker<T extends DatePickerVariants>({
 			return;
 		}
 
-		if (v.isValid() && !lastValidationError.current) {
+		var hasError = inputRef.current?.validity.customError == true;
+		if (v.isValid() && !hasError) {
 			onChange(v);
 		}
 	};
 
 	const updateLocalState = (
-		v: Dayjs | null,
-		validationError?: DateValidationError | DateTimeValidationError | null,
-	) => {
-		setLocalValue(v);
-		lastValidationError.current = validationError ?? null;
-
-		if (!inputRef.current) return;
-
-		const message = resolveValidationMessage(validationError);
-		inputRef.current.setCustomValidity(message ? t(message) : "");
-	};
-
-	const handleDateChange = (
 		newDate: Dayjs | null,
 		context: PickerChangeHandlerContext<
 			DateValidationError | DateTimeValidationError
 		>,
 	) => {
-		updateLocalState(newDate, context.validationError);
-	};
+		setLocalValue(newDate);
+		var err = context.validationError;
+		let message: string | undefined;
+		if (getValidationErrorMessage) {
+			message = getValidationErrorMessage(err);
+		}
+		if (!message && err) {
+			message = getDefaultValidationErrorMessage(err);
+		}
 
-	const handleAccept = (v: Dayjs | null) => {
-		updateLocalState(v, null);
-		commitIfValid(v ?? null);
+		if (inputRef.current) {
+			if (message) {
+				inputRef.current.setCustomValidity(t(message));
+			} else if (!required) {
+				inputRef.current.setCustomValidity("");
+			} else if (!newDate) {
+				inputRef.current.setCustomValidity(t("Please enter a date"));
+			} else {
+				inputRef.current.setCustomValidity("");
+			}
+		}
 	};
 
 	const handleBlur = () => {
-		const isValid = !localValue || localValue.isValid();
-		const err = lastValidationError.current;
-		const message = resolveValidationMessage(err, {
-			required,
-			hasValue: !!localValue,
-		});
-
-		if (inputRef.current) {
-			inputRef.current.setCustomValidity(message ? t(message) : "");
-		}
-
-		if (isValid) {
-			commitIfValid(localValue);
-		}
+		handleChange(localValue);
 	};
 
 	slotProps = {
@@ -179,8 +149,8 @@ export function DatePicker<T extends DatePickerVariants>({
 		if (variant !== "month-short") {
 			const setNewValue = (v: Dayjs | null | undefined) => {
 				if (!v) return;
-				updateLocalState(v, null);
-				commitIfValid(v);
+				updateLocalState(v, { validationError: null });
+				handleChange(v);
 			};
 			slots = {
 				...slots,
@@ -214,8 +184,11 @@ export function DatePicker<T extends DatePickerVariants>({
 			value={localValue}
 			inputRef={inputRef}
 			timezone="UTC"
-			onChange={handleDateChange}
-			onAccept={handleAccept}
+			onChange={updateLocalState}
+			onAccept={(v: Dayjs | null, context) => {
+				updateLocalState(v, context);
+				handleChange(v);
+			}}
 			// @ts-ignore
 			slots={slots}
 			// @ts-ignore
