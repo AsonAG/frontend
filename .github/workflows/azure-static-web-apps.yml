@@ -36,3 +36,4 @@ jobs:
           VITE_CLIENT_ID: ${{ vars.CLIENT_ID }}
           VITE_APP_NAME: "Ason Payroll"
           VITE_META_DESCRIPTION: "Ason Global Payroll Service Portal."
+          VITE_DISABLED_UI_FEATURES: ${{ vars.DISABLED_UI_FEATURES }}
