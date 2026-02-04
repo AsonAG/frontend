@@ -81,6 +81,8 @@ import {
 	removeUserFromOrganization,
 	withdrawUserMembershipInvitationToOrganization,
 	saveOrganizationUserMembership,
+	runTaskAction,
+	getTaskAttachment,
 } from "./api/FetchClient";
 import { EmployeeTabbedView } from "./employee/EmployeeTabbedView";
 import { ErrorView } from "./components/ErrorView";
@@ -1012,6 +1014,14 @@ const routeData = [
 					const user = await store.get(userAtom);
 					let task = data.task;
 					switch (data.action) {
+						case "runAction":
+							const runActionResponse = await runTaskAction(params);
+							if (runActionResponse.ok) {
+								toast("success", "Files generated");
+							} else {
+								toast("error", "Something went wrong");
+							}
+							return runActionResponse;
 						case "accept":
 							task = { ...task, assignedUserId: user.id };
 							break;
@@ -1044,6 +1054,19 @@ const routeData = [
 					}
 					return response;
 				},
+				children: [
+					{
+						path: "attachments/:attachmentId",
+						Component: CaseValueDocumentDialog,
+						loader: async ({ params, request }) => {
+							const report = getQueryParam(request, "report");
+							const variant = getQueryParam(request, "variant");
+							return defer({
+								document: getTaskAttachment(params, report, variant),
+							});
+						},
+					},
+				],
 			},
 			{
 				path: "hr/missingdata",

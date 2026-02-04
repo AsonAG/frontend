@@ -59,7 +59,7 @@ function PayrunPeriodDocuments() {
 					docs.map((doc) => (
 						<DocumentSection
 							key={doc.id}
-							payrunPeriodId={payrunPeriod.id}
+							docBasePath={payrunPeriod.id}
 							document={doc}
 						/>
 					))
@@ -188,10 +188,13 @@ function WageStatements({
 
 const noop = () => {};
 type DocumentSectionProps = {
-	payrunPeriodId: IdType;
+	docBasePath: string;
 	document: PayrunDocument;
 };
-function DocumentSection({ payrunPeriodId, document }: DocumentSectionProps) {
+export function DocumentSection({
+	docBasePath,
+	document,
+}: DocumentSectionProps) {
 	const errorDoc = renderDocumentWithError(document);
 	if (errorDoc) {
 		return errorDoc;
@@ -200,17 +203,14 @@ function DocumentSection({ payrunPeriodId, document }: DocumentSectionProps) {
 		<Stack spacing={1}>
 			<Typography variant="h6">{document.name}</Typography>
 			<Stack direction="row" spacing={1} flexWrap="wrap">
-				<DocumentChip
-					doc={document}
-					to={`${payrunPeriodId}/doc/${document.id}`}
-				/>
+				<DocumentChip doc={document} to={`${docBasePath}/${document.id}`} />
 				{document.attributes?.reports?.flatMap((report) => {
 					if (report.Variants) {
 						return report.Variants.map((variant) => (
 							<PdfChip
 								key={variant}
 								label={report.Name.split(".").pop() + " " + variant}
-								to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}&variant=${encodeURIComponent(variant)}`}
+								to={`${docBasePath}/${document.id}?report=${encodeURIComponent(report.Name)}&variant=${encodeURIComponent(variant)}`}
 							/>
 						));
 					}
@@ -218,7 +218,7 @@ function DocumentSection({ payrunPeriodId, document }: DocumentSectionProps) {
 						<PdfChip
 							key={report.Name}
 							label={report.Name.split(".").pop()}
-							to={`${payrunPeriodId}/doc/${document.id}?report=${encodeURIComponent(report.Name)}`}
+							to={`${docBasePath}/${document.id}?report=${encodeURIComponent(report.Name)}`}
 						/>
 					);
 				})}

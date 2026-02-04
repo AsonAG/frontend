@@ -59,6 +59,8 @@ const companyDocumentUrl =
 	"/tenants/:orgId/companycases/:caseValueId/documents/:documentId";
 const tasksUrl = "/tenants/:orgId/payrolls/:payrollId/tasks";
 const taskUrl = "/tenants/:orgId/payrolls/:payrollId/tasks/:taskId";
+const taskAttachmentUrl =
+	"/tenants/:orgId/payrolls/:payrollId/tasks/:taskId/attachments/:attachmentId";
 const payrunPeriodsUrl = "/tenants/:orgId/payrolls/:payrollId/payrunperiods";
 const payrunPeriodUrl =
 	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId";
@@ -93,6 +95,7 @@ class FetchRequestBuilder {
 	localizeRequest = false;
 	body = null;
 	url = null;
+	customMethod = null;
 	routeParams = {};
 	addPayrollDivision = false;
 	ignoreErrors = false;
@@ -208,6 +211,11 @@ class FetchRequestBuilder {
 			.withQueryParam("result", "ItemsWithCount");
 	}
 
+	withCustomMethod(methodName) {
+		this.customMethod = methodName;
+		return this;
+	}
+
 	async fetch() {
 		if (this.localizeRequest) {
 			const user = await store.get(userAtom);
@@ -220,6 +228,9 @@ class FetchRequestBuilder {
 			}
 		}
 		let url = this.url;
+		if (this.customMethod) {
+			url = `${url}:${this.customMethod}`;
+		}
 		if ([...this.searchParams].length > 0) {
 			url = `${url}?${this.searchParams}`;
 		}
@@ -653,6 +664,20 @@ export function updateTask(routeParams, task) {
 		.withMethod("PUT")
 		.withBody(task)
 		.fetch();
+}
+
+export function runTaskAction(routeParams) {
+	return new FetchRequestBuilder(taskUrl, routeParams)
+		.withMethod("POST")
+		.withCustomMethod("runAction")
+		.fetch();
+}
+
+export function getTaskAttachment(routeParams, report, variant) {
+	return new FetchRequestBuilder(taskAttachmentUrl, routeParams)
+		.withQueryParam("report", report)
+		.withQueryParam("variant", variant)
+		.fetchJson();
 }
 
 export function getClosedPayrunPeriods(routeParams) {
