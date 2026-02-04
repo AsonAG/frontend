@@ -4,7 +4,9 @@ import {
 	useLocation,
 	Link,
 	useSubmit,
+	Outlet,
 	useRouteLoaderData,
+	useNavigation,
 } from "react-router-dom";
 import { Stack, Typography, Button, TextField } from "@mui/material";
 import { HtmlContent } from "./HtmlContent";
@@ -15,6 +17,7 @@ import { AsyncDataRoute } from "../routes/AsyncDataRoute";
 import { formatDate } from "../utils/DateUtils";
 import { CategoryLabel } from "./CategoryLabel";
 import { getEmployeeDisplayString } from "../models/Employee";
+import { DocumentSection } from "../payrun/PeriodDocuments";
 
 export function AsyncTaskView() {
 	const { t } = useTranslation();
@@ -26,9 +29,12 @@ export function AsyncTaskView() {
 		</ContentLayout>
 	);
 	return (
-		<AsyncDataRoute loadingElement={loadingElement} skipDataCheck>
-			<TaskView />
-		</AsyncDataRoute>
+		<>
+			<AsyncDataRoute loadingElement={loadingElement} skipDataCheck>
+				<TaskView />
+			</AsyncDataRoute>
+			<Outlet />
+		</>
 	);
 }
 
@@ -45,6 +51,8 @@ function TaskView() {
 	const task = useAsyncValue();
 	const { t } = useTranslation();
 	const submit = useSubmit();
+	const navigation = useNavigation();
+	const isExecuting = navigation.state !== "idle";
 	const { userMembership } = useRouteLoaderData("root");
 	const taskCompleted = task.completed !== null;
 	const taskComment = task.comment || "";
@@ -122,6 +130,37 @@ function TaskView() {
 				</Stack>
 				<Stack>
 					<Typography variant="h6" gutterBottom>
+						{t("Files")}
+					</Typography>
+					{(task.attachments?.length ?? 0 > 0) ? (
+						task.attachments.map((attach) => {
+							return (
+								<DocumentSection
+									key={attach.id}
+									docBasePath="attachments"
+									document={attach}
+								></DocumentSection>
+							);
+						})
+					) : (
+						<Typography>{t("No files attached.")}</Typography>
+					)}
+				</Stack>
+				{task.hasAction && (
+					<Stack alignItems="start">
+						<Button
+							variant="outlined"
+							loading={isExecuting}
+							loadingPosition="start"
+							disabled={taskCompleted && taskComment === comment}
+							onClick={() => submitPost({ action: "runAction" })}
+						>
+							<Typography>{t("Generate files...")}</Typography>
+						</Button>
+					</Stack>
+				)}
+				<Stack>
+					<Typography variant="h6" gutterBottom>
 						{t("Comment")}
 					</Typography>
 					<TextField
@@ -133,6 +172,8 @@ function TaskView() {
 					{!taskCompleted && (
 						<Button
 							variant="outlined"
+							loading={isExecuting}
+							loadingPosition="start"
 							disabled={taskComment === comment}
 							sx={{ alignSelf: "end", my: 1 }}
 							onClick={saveComment}
@@ -147,6 +188,8 @@ function TaskView() {
 					</Button>
 					<Button
 						variant="contained"
+						loading={isExecuting}
+						loadingPosition="start"
 						disabled={taskCompleted && taskComment === comment}
 						onClick={primaryAction}
 					>
