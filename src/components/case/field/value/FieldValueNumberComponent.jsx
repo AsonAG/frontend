@@ -74,6 +74,16 @@ export function FieldValueNumberComponent() {
 
 	const handleChange = (values) => {
 		setValue(values.value);
+
+		const rawValue = values.value;
+		if (rawValue === '' || rawValue == null) {
+			// no value entered yet; treat as null
+			field.value = null;
+		} else {
+			const floatValue = parseFloat(rawValue);
+			const transformed = transformValue(field, floatValue);
+			field.value = transformed != null ? transformed.toString() : null;
+		}
 	};
 
 	// handle server reset
