@@ -59,7 +59,7 @@ function PayrunPeriodDocuments() {
 					docs.map((doc) => (
 						<DocumentSection
 							key={doc.id}
-							docBasePath={payrunPeriod.id}
+							docBasePath={`${payrunPeriod.id}/doc`}
 							document={doc}
 						/>
 					))
