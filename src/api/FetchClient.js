@@ -174,7 +174,7 @@ class FetchRequestBuilder {
 		return this;
 	}
 
-	withTimout(timeout) {
+	withTimeout(timeout) {
 		this.timeout = timeout;
 		this.signal = AbortSignal.timeout(timeout);
 		return this;
@@ -299,7 +299,7 @@ export function createOrganization(name) {
 export function importOrganization(body) {
 	return new FetchRequestBuilder(organizationImportUrl)
 		.withMethod("POST")
-		.withTimout(600000)
+		.withTimeout(600000)
 		.withFileBody(body)
 		.fetch();
 }
@@ -670,6 +670,7 @@ export function runTaskAction(routeParams) {
 	return new FetchRequestBuilder(taskUrl, routeParams)
 		.withMethod("POST")
 		.withCustomMethod("runAction")
+		.withTimeout(3 * 60 * 1000)
 		.fetch();
 }
 
@@ -719,7 +720,7 @@ export function createOpenPayrunPeriod(routeParams) {
 
 export function getPayrunPeriodDocuments(routeParams) {
 	return new FetchRequestBuilder(payrunPeriodDocumentsUrl, routeParams)
-		.withTimout(2 * 60 * 1000)
+		.withTimeout(2 * 60 * 1000)
 		.withRetries(10)
 		.fetch();
 }
@@ -896,7 +897,7 @@ export function getPayrollCollectors(routeParams) {
 
 export async function requestExportDataDownload(routeParams, name) {
 	const builder = new FetchRequestBuilder(exportUrl, routeParams);
-	const response = await builder.withTimout(600000).fetch();
+	const response = await builder.withTimeout(600000).fetch();
 	const blob = await response.blob();
 	await downloadData(blob, name);
 }

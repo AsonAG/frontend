@@ -85,6 +85,12 @@ const translations = {
 		"Task accepted": "Aufgabe akzeptiert",
 		"Comment saved": "Kommentar gespeichert",
 		"New task": "Neue Aufgabe",
+		Attachments: "Anhänge",
+		"No files attached.": "Keine Dateien angehängt.",
+		"Generate files": "Datei erstellen",
+		"Files generated": "Dateien erstellt",
+		"Without an attachment the task cannot be completed.":
+			"Ohne einen Anhang kann die Aufgabe nicht abgeschlossen werden.",
 		All: "Alle",
 		"Only recent": "Nur Neueste",
 		selected: "ausgewählt",

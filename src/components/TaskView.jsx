@@ -52,7 +52,7 @@ function TaskView() {
 	const { t } = useTranslation();
 	const submit = useSubmit();
 	const navigation = useNavigation();
-	const isExecuting = navigation.state !== "idle";
+	const isExecuting = navigation.state !== "idle" && !!navigation.formAction;
 	const { userMembership } = useRouteLoaderData("root");
 	const taskCompleted = task.completed !== null;
 	const taskComment = task.comment || "";
@@ -80,7 +80,8 @@ function TaskView() {
 		buttonText =
 			comment !== taskComment ? t("Save comment & complete") : t("Complete");
 	}
-
+	const showAttachmentsSection =
+		task.attachments?.length > 0 || !!task.hasAction;
 	return (
 		<ContentLayout title={task.displayName}>
 			<Stack spacing={2}>
@@ -128,34 +129,35 @@ function TaskView() {
 					</Typography>
 					<HtmlContent content={task.displayInstruction} />
 				</Stack>
-				<Stack>
-					<Typography variant="h6" gutterBottom>
-						{t("Files")}
-					</Typography>
-					{(task.attachments?.length ?? 0 > 0) ? (
-						task.attachments.map((attach) => {
-							return (
-								<DocumentSection
-									key={attach.id}
-									docBasePath="attachments"
-									document={attach}
-								></DocumentSection>
-							);
-						})
-					) : (
-						<Typography>{t("No files attached.")}</Typography>
-					)}
-				</Stack>
-				{task.hasAction && (
+				{showAttachmentsSection && (
+					<Stack>
+						<Typography variant="h6" gutterBottom>
+							{t("Attachments")}
+						</Typography>
+						{(task.attachments?.length ?? 0 > 0) ? (
+							task.attachments.map((attach) => {
+								return (
+									<DocumentSection
+										key={attach.id}
+										docBasePath="attachments"
+										document={attach}
+									></DocumentSection>
+								);
+							})
+						) : (
+							<Typography>{t("No files attached.")}</Typography>
+						)}
+					</Stack>
+				)}
+				{task.hasAction && !taskCompleted && (
 					<Stack alignItems="start">
 						<Button
 							variant="outlined"
 							loading={isExecuting}
 							loadingPosition="start"
-							disabled={taskCompleted && taskComment === comment}
 							onClick={() => submitPost({ action: "runAction" })}
 						>
-							<Typography>{t("Generate files...")}</Typography>
+							<Typography>{t("Generate files")}</Typography>
 						</Button>
 					</Stack>
 				)}

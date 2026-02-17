@@ -1051,6 +1051,13 @@ const routeData = [
 						if (data.action === "saveComment") {
 							toast("success", "Comment saved");
 						}
+					} else if (response.status === 400) {
+						let errorMessage = await response.json();
+						if (!errorMessage || typeof errorMessage !== "string") {
+							errorMessage = "Saving failed!";
+						}
+						toast("error", errorMessage);
+						return null;
 					}
 					return response;
 				},
