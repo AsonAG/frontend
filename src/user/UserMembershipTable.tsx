@@ -144,17 +144,15 @@ function UserMembershipInvitationRow({
 			<Button variant="outlined" disabled size="small">
 				<Typography>{t("rolename_" + invitation.role.$type)}</Typography>
 			</Button>
-			{!isExpired && (
-				<Button
-					component={Link}
-					variant="outlined"
-					to={`invitations/${invitation.id}/withdraw`}
-					size="small"
-					color="destructive"
-				>
-					{t("Withdraw")}
-				</Button>
-			)}
+			<Button
+				component={Link}
+				variant="outlined"
+				to={`invitations/${invitation.id}/withdraw`}
+				size="small"
+				color="destructive"
+			>
+				{t("Withdraw")}
+			</Button>
 		</Stack>
 	);
 }
