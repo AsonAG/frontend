@@ -28,8 +28,8 @@ jobs:
           output_location: "build"
           # deployment_environment: ${{!inputs.production && 'staging' || null }}
         env:
-          VITE_AUTHORITY_URL: "https://login.asonpayroll.com"
-          VITE_AUTHORITY_SETTINGS_URL: "https://login.asonpayroll.com/ui/console/"
+          VITE_AUTHORITY_URL: ${{ vars.AUTHORITY_URL || 'https://login.asonpayroll.com' }} 
+          VITE_AUTHORITY_SETTINGS_URL: ${{ vars.AUTHORITY_SETTINGS_URL || 'https://login.asonpayroll.com/ui/console/' }} 
           VITE_API_URL: ${{ vars.API_URL }}
           VITE_REDIRECT_URL: ${{ vars.REDIRECT_URL }}
           VITE_PROJECT_ID: ${{ vars.PROJECT_ID }}
