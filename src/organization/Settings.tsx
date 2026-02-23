@@ -17,6 +17,7 @@ import {
 	ResponsiveDialogTrigger,
 } from "../components/ResponsiveDialog";
 import { Organization } from "../models/Organization";
+import { UIFeature, UIFeatureGate } from "../utils/UIFeature";
 
 type LoaderData = {
 	org: Organization;
@@ -28,19 +29,24 @@ export function OrganizationSettings() {
 	return (
 		<ContentLayout title="Settings">
 			<TextField value={org.identifier} disabled label={t("Company name")} />
-			<ProviderOrganizationSection org={org} />
+			{/* <ExportOrganization org={org} /> */}
+			<UIFeatureGate feature={UIFeature.OrganizationDelete}>
+				<DeleteOrganization org={org} />
+			</UIFeatureGate>
 		</ContentLayout>
 	);
 }
 
-function ProviderOrganizationSection({ org }) {
+function ExportOrganization({ org }) {
 	const { t } = useTranslation();
 	const isInstanceAdmin = useRole("InstanceAdmin");
+	const isOwner = useRole("Owner");
 	const [onExport, exportButtonDisabled, exportButtonIcon] =
 		useAction("export");
-	const [onDelete, deleteButtonDisabled, deleteButtonIcon] =
-		useAction("delete");
-	if (!isInstanceAdmin) return null;
+
+	if (!isInstanceAdmin && !isOwner) {
+		return;
+	}
 
 	return (
 		<Stack spacing={2}>
@@ -58,6 +64,23 @@ function ProviderOrganizationSection({ org }) {
 					{t("Export")}
 				</Button>
 			</Stack>
+		</Stack>
+	);
+}
+
+function DeleteOrganization({ org }) {
+	const { t } = useTranslation();
+	const isInstanceAdmin = useRole("InstanceAdmin");
+	const isOwner = useRole("Owner");
+	const [onDelete, deleteButtonDisabled, deleteButtonIcon] =
+		useAction("delete");
+
+	if (!isInstanceAdmin && !isOwner) {
+		return;
+	}
+
+	return (
+		<Stack spacing={2}>
 			<Stack direction="row" alignItems="center">
 				<Typography flex={1}>
 					{t("Deletes the organization completely")}
