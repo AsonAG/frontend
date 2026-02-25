@@ -408,8 +408,7 @@ function createRouteEmployeeEdit(path, createUrlRedirect) {
 		Component: EmployeeForm,
 		loader: async ({ params }) => {
 			const employee = await getEmployee(params);
-			const divisions = await getDivisions(params);
-			return { employee, divisions, selectedDivisions: employee.divisions };
+			return { employee };
 		},
 		action: async ({ params, request }) => {
 			const formData = await request.formData();
@@ -418,7 +417,6 @@ function createRouteEmployeeEdit(path, createUrlRedirect) {
 				status: formData.get("status"),
 				firstName: formData.get("firstName"),
 				lastName: formData.get("lastName"),
-				divisions: formData.getAll("divisions"),
 			});
 
 			if (response.ok) {
@@ -440,19 +438,19 @@ function createRouteEmployeeNew(path, createUrlRedirect) {
 	return {
 		path,
 		Component: EmployeeForm,
-		loader: async ({ params }) => {
-			const divisions = await getDivisions(params);
-			const payroll = await store.get(payrollAtom);
-			const selectedDivisions = !!payroll ? [payroll.divisionId] : [];
-			return { divisions, selectedDivisions };
+		loader: () => {
+			return { employee: null };
 		},
 		action: async ({ params, request }) => {
+			const payroll = await store.get(payrollAtom);
+			const employeeDivisions = !!payroll ? [payroll.divisionId] : [];
 			const formData = await request.formData();
+
 			const response = await createEmployee(params, {
 				identifier: formData.get("identifier"),
 				firstName: formData.get("firstName"),
 				lastName: formData.get("lastName"),
-				divisions: formData.getAll("divisions"),
+				divisions: employeeDivisions,
 			});
 
 			if (response.status === 201) {

@@ -1,24 +1,12 @@
-import { useMemo } from "react";
-import {
-	Button,
-	Stack,
-	TextField,
-	FormControl,
-	FormControlLabel,
-	Checkbox,
-	Typography,
-} from "@mui/material";
+import { Button, Stack, TextField } from "@mui/material";
 import { ContentLayout } from "./ContentLayout";
 import { useTranslation } from "react-i18next";
 import { Form, Link as RouterLink, useLoaderData } from "react-router-dom";
 import { Employee } from "../models/Employee";
-import { Division } from "../models/Division";
 import { UIFeatureQuery, UIFeature } from "../utils/UIFeature";
 
 type LoaderData = {
-	employee: Employee;
-	divisions: Array<Division>;
-	selectedDivisions: Array<string>;
+	employee: Employee | null;
 };
 
 export function EmployeeForm() {
@@ -26,7 +14,6 @@ export function EmployeeForm() {
 	const isNew = !employee;
 	const title = isNew ? "New employee" : "Edit employee";
 	const { t } = useTranslation();
-	const divisionAssignmentView = useMemo(() => <PayrollAssignmentView />, []);
 	return (
 		<Form method="post">
 			<ContentLayout title={title}>
@@ -90,7 +77,6 @@ export function EmployeeForm() {
 					name="identifier"
 					defaultValue={employee?.identifier}
 				/>
-				{divisionAssignmentView}
 				<Stack direction="row" justifyContent="right" spacing={1}>
 					<Button component={RouterLink} to=".." relative="path">
 						{t("Back")}
@@ -101,33 +87,5 @@ export function EmployeeForm() {
 				</Stack>
 			</ContentLayout>
 		</Form>
-	);
-}
-
-function PayrollAssignmentView() {
-	const { divisions, selectedDivisions } = useLoaderData() as LoaderData;
-	const { t } = useTranslation();
-	return (
-		<Stack display="none">
-			<Typography variant="h6">{t("Organization unit assignment")}</Typography>
-			{divisions.map((division) => {
-				return (
-					<FormControl key={division.id}>
-						<FormControlLabel
-							name="division"
-							label={division.name}
-							labelPlacement="end"
-							control={
-								<Checkbox
-									defaultChecked={selectedDivisions.includes(division.id)}
-									value={division.id}
-									name="divisions"
-								/>
-							}
-						/>
-					</FormControl>
-				);
-			})}
-		</Stack>
 	);
 }
