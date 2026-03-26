@@ -151,19 +151,13 @@ export function PayrollData() {
 					value={state.selectedRegulations.industries}
 				/>
 				<RegulationSelect
-					label={`${t("ERP")} (${t("Please check with support first!")})`}
-					items={state.countryRegulations.erp}
-					multiple
-					onChange={(values) => dispatch({ type: "set_erp", erp: values })}
-					value={state.selectedRegulations.erp}
-				/>
-				<RegulationSelect
 					label={t("accounting_data_regulation")}
 					items={state.countryRegulations.accountingData}
 					value={state.selectedRegulations.accountingData}
 					onChange={(value) =>
 						dispatch({ type: "set_accounting_data", accountingData: value })
 					}
+					required
 				/>
 				<RegulationSelect
 					label={t("Accounting document")}
@@ -175,6 +169,7 @@ export function PayrollData() {
 							accountingDocument: value,
 						})
 					}
+					required
 				/>
 				<Stack alignItems="end">
 					<Button
