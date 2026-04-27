@@ -118,7 +118,7 @@ export function DatePicker<T extends DatePickerVariants>({
 			} else if (!required) {
 				inputRef.current.setCustomValidity("");
 			} else if (!newDate) {
-				inputRef.current.setCustomValidity(t("Please enter a date"));
+				inputRef.current.setCustomValidity(t("Please enter a date."));
 			} else {
 				inputRef.current.setCustomValidity("");
 			}

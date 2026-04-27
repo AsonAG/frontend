@@ -123,17 +123,17 @@ function UserInformation() {
 	const onUpdateCulture = async (culture) => {
 		const user = await getUser();
 		if (!user) {
-			toast("error", "Could not update region settings");
+			toast("error", "Could not update region settings.");
 			return;
 		}
 		user.culture = culture;
 		const response = await updateUser(user.id, user);
 		if (response.ok) {
-			toast("success", "Region settings updated");
+			toast("success", "Region settings updated.");
 			window.location.reload();
 			return;
 		} else {
-			toast("error", "Could not update region settings");
+			toast("error", "Could not update region settings.");
 		}
 	};
 

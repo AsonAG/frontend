@@ -87,7 +87,7 @@ export function OrganizationImport() {
 					) : (
 						<Typography alignSelf="center">
 							{t(
-								"Drag and drop an organization export here, or click to select file",
+								"Drag and drop an organization export here, or click to select file.",
 							)}
 						</Typography>
 					)}

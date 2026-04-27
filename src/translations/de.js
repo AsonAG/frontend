@@ -9,7 +9,7 @@ const translations = {
 		"Organization creation failed": "Erstellen der Organisation fehlgeschlagen",
 		"Organization created": "Organisation erstellt",
 		"New organization unit": "Neue Organisationseinheit",
-		Employees: "Mitarbeiter",
+		Employees: "Mitarbeitende",
 		Company: "Firma",
 		"New event": "Neues Ereignis",
 		Data: "Daten",
@@ -17,7 +17,7 @@ const translations = {
 		Event: "Ereignis",
 		Documents: "Dokumente",
 		Document: "Dokument",
-		Employee: "Mitarbeiter",
+		Employee: "Mitarbeitender",
 		"Missing data": "Fehlende Daten",
 		Tasks: "Aufgaben",
 		"Select...": "Auswählen...",
@@ -49,7 +49,7 @@ const translations = {
 		"Newest events first": "Neueste Ereignisse zuerst",
 		"Clear search": "Suche zurücksetzen",
 		"No data": "Keine Daten",
-		"Preview not available.": "Vorschau nicht verfügbar.",
+		"Preview not available": "Vorschau nicht verfügbar",
 		"Valid from": "Gültig ab",
 		until: "bis",
 		Yes: "Ja",
@@ -62,9 +62,9 @@ const translations = {
 		"Showing all values": "Es werden alle Werte angezeigt",
 		"Without date": "Ohne Datum",
 		"Invalid date": "Ungültiges Datum",
-		"Please enter a date": "Bitte geben Sie ein Datum ein",
-		"Please enter a value": "Bitte geben Sie einen Wert ein",
-		"Please enter a valid value": "Bitte geben Sie einen gültigen Wert ein",
+		"Please enter a date.": "Bitte geben Sie ein Datum ein.",
+		"Please enter a value.": "Bitte geben Sie einen Wert ein.",
+		"Please enter a valid value.": "Bitte geben Sie einen gültigen Wert ein.",
 		"No tasks found": "Keine Aufgaben gefunden",
 		"Due on": "Fällig am",
 		Assignee: "Zuständig",
@@ -86,36 +86,36 @@ const translations = {
 		"Comment saved": "Kommentar gespeichert",
 		"New task": "Neue Aufgabe",
 		Attachments: "Anhänge",
-		"No files attached.": "Keine Dateien angehängt.",
-		"Generate files": "Datei erstellen",
+		"No files attached": "Keine Dateien angehängt",
+		"Generate files": "Dateien erstellen",
 		"Files generated": "Dateien erstellt",
 		"Without an attachment the task cannot be completed.":
 			"Ohne einen Anhang kann die Aufgabe nicht abgeschlossen werden.",
 		All: "Alle",
 		"Only recent": "Nur Neueste",
 		selected: "ausgewählt",
-		no_employees_selected: "Keine Mitarbeiter $t(selected)",
-		all_employees_selected: "Alle Mitarbeiter $t(selected)",
+		no_employees_selected: "Keine Mitarbeitenden $t(selected)",
+		all_employees_selected: "Alle Mitarbeitenden $t(selected)",
 		employee_name_selected:
 			"{{employee.firstName}} {{employee.lastName}} ({{employee.identifier}}) $t(selected)",
-		n_employees_selected: "{{count}} Mitarbeiter $t(selected)",
+		n_employees_selected: "{{count}} Mitarbeitende $t(selected)",
 		Regulations: "Regelwerke",
 		Country: "Land",
 		Industry: "Branche",
 		"Accounting document": "Buchungsbeleg",
 		"Payroll accounting start date": "Startdatum der Lohnbuchhaltung",
 		"Loaded industry regulations cannot be removed!":
-			"Geladene Branchen Regelwerke können nicht entfernt werden!",
+			"Geladene Branchen-Regelwerke können nicht entfernt werden!",
 		"Loaded ERP regulations cannot be removed!":
-			"Geladene ERP Regelwerke können nicht entfernt werden!",
+			"Geladene ERP-Regelwerke können nicht entfernt werden!",
 		"Please check with support first!":
-			"Bitte vorgänging mit Support abklären!",
+			"Bitte vorgängig mit dem Support abklären!",
 		"Save regulations": "Regelwerke speichern",
 		"Regulations saved!": "Regelwerke gespeichert!",
 		"Data saved!": "Daten gespeichert!",
 		"Organization unit created": "Organisationseinheit erstellt",
 		"Organization unit created, but setting regulations failed":
-			"Organisationseinheit erstellt, aber das Setzen der Regelwerke ist fehlgeschlagen",
+			"Organisationseinheit erstellt, aber das Setzen der Regelwerke ist fehlgeschlagen.",
 		"Create of organization unit failed":
 			"Erstellen der Organisationseinheit fehlgeschlagen",
 		"Organization unit updated, but setting regulations failed":
@@ -123,20 +123,20 @@ const translations = {
 		Transmission: "Übermittlung",
 		"Start transmission": "Übermittlung starten",
 		"{{name}} is live. Closing a period will transmit the documents to swissdec.":
-			"{{name}} ist live. Beim Schliessen der Periode werden die relevanten Dokumente swissdec übermittelt.",
+			"{{name}} ist live. Beim Schliessen der Periode werden die relevanten Dokumente an swissdec übermittelt.",
 		"{{name}} is not live. Documents will not be sent to swissdec.":
-			"{{name}} ist nicht live. Die Dokumente werden swissdec nicht übermittelt.",
+			"{{name}} ist nicht live. Die Dokumente werden nicht an swissdec übermittelt.",
 		"{{name}} is now live!": "{{name}} ist jetzt live!",
 		"Starting with the currently open period {{periodDate}} the relevant documents will be sent to swissdec.":
-			"Beginnend mit der aktuell offenen Periode {{periodDate}} werden die relevanten Dokumente swissdec übermittelt.",
+			"Beginnend mit der aktuell offenen Periode {{periodDate}} werden die relevanten Dokumente an swissdec übermittelt.",
 		"The organisation unit is not live. Documents will not be sent to swissdec.":
-			"Die Organisationseinheit ist nicht live. Die Dokumente werden swissdec nicht übermittelt.",
+			"Die Organisationseinheit ist nicht live. Die Dokumente werden nicht an swissdec übermittelt.",
 		accounting_data_regulation: "Kontenplan",
 
 		Payruns: "Zahlungsläufe",
 		Abort: "Abbrechen",
 		Release: "Freigeben",
-		"New payrun": "Neuer Zahlungslauf",
+		"New payrun": "Neuer Lohnlauf",
 		Payrun: "Zahlungslauf",
 		"PayrunJobStatus.Draft": "Entwurf",
 		"PayrunJobStatus.Release": "Freigegeben",
@@ -149,7 +149,7 @@ const translations = {
 		"Open period": "Offene Periode",
 		Forecast: "Szenario",
 		Reason: "Notiz",
-		"Select employees": "Mitarbeiter auswählen",
+		"Select employees": "Mitarbeitende auswählen",
 		Create: "Erstellen",
 		Close: "Schliessen",
 		Content: "Inhalt",
@@ -159,109 +159,109 @@ const translations = {
 			"Datum liegt nicht im zulässigen Bereich.",
 		"Saved!": "Gespeichert!",
 		"New employee": "Neuer Eintritt",
-		"Edit employee": "Mitarbeiter bearbeiten",
-		"User does not exist!": "User existiert nicht!",
+		"Edit employee": "Mitarbeitenden bearbeiten oder Daten des Mitarbeitenden bearbeiten",
+		"User does not exist!": "Benutzer existiert nicht!",
 		Status: "Status",
 		Active: "Aktiv",
 		Inactive: "Inaktiv",
-		"Hide former employees": "Frühere Mitarbeiter ausblenden",
+		"Hide former employees": "Frühere Mitarbeitende ausblenden",
 		"Only show employees with missing data":
-			"Nur Mitarbeiter mit fehlenden Daten anzeigen",
+			"Nur Mitarbeitende mit fehlenden Daten anzeigen",
 		"New employee created": "Neueintritt erfasst",
 		"Saving failed!": "Speichern fehlgeschlagen!",
 		Identifier: "Identifikator",
 		"Delete document": "Dokument löschen",
 		delete_document_text:
 			"Möchten Sie das Dokument '{{documentName}}' wirklich löschen?",
-		"Drag and drop an organization export here, or click to select file":
-			"Ziehen Sie einen Organisationsexport hier hin, oder klicken um Datei auszuwählen",
+		"Drag and drop an organization export here, or click to select file.":
+			"Ziehen Sie einen Organisationsexport hierhin oder klicken Sie, um eine Datei auszuwählen.",
 		"Import organization": "Organisation importieren",
 		Import: "Importieren",
 		Importing: "Wird importiert",
 		"Organization imported": "Organisation importiert",
-		"Import was not successful": "Der Import war nicht erfolgreich",
+		"Import was not successful.": "Der Import war nicht erfolgreich.",
 		import_organization_button: "{{fileName}} importieren",
 		"Company name": "Firmenname",
 		"Export the data of the organization": "Daten der Organisation exportieren",
 		"Deletes the organization completely": "Löscht die Organisation komplett",
 		"Delete organization": "Organisation löschen",
 		delete_organization_description:
-			"Sie sie sicher, dass Sie die Organisation '{{orgName}}' permanent löschen wollen?",
+			"Sind Sie sicher, dass Sie die Organisation '{{orgName}}' dauerhaft löschen möchten?",
 		confirm_organization_deletion:
 			"Bitte bestätigen Sie die Löschung durch die Eingabe des Organisationsnamens.",
 		"Organization name": "Organisationsname",
 		"Exported organization": "Organisation exportiert",
-		"Organization could not be exported":
-			"Die Organisation konnte nicht exportiert werden",
+		"Organization could not be exported.":
+			"Die Organisation konnte nicht exportiert werden.",
 		"Organization deleted": "Organisation gelöscht",
-		"Organization could not be deleted":
-			"Die Organisation konnte nicht gelöscht werden",
+		"Organization could not be deleted.":
+			"Die Organisation konnte nicht gelöscht werden.",
 		"No features available for this user":
-			"Keine Funktionen verfügbar für diesen User",
-		"Choose a role": "Wählen Sie eine Rolle aus",
+			"Keine Funktionen für diesen Benutzer verfügbar",
+		"Choose a role.": "Wählen Sie eine Rolle aus.",
 		"Grants access to the whole organization":
 			"Gewährt Zugriff auf die ganze Organisation",
 		"Grants access to specific organization units":
 			"Gewährt Zugriff auf ausgewählte Organisationseinheiten",
 		"Grants restricted access to the employee":
-			"Gewährt eingeschränkten Zugriff auf den Mitarbeiter",
+			"Gewährt eingeschränkten Zugriff auf den Mitarbeitenden",
 		Invitation: "Einladung",
 		"You have been invited to join the organization {{orgName}}.":
-			"Sie sind eingeladen der Organiation {{orgName}} beizutreten.",
-		"The invitation is invalid": "Die Einladung ist ungültig",
+			"Sie sind eingeladen, der Organisation {{orgName}} beizutreten.",
+		"The invitation is invalid.": "Die Einladung ist ungültig.",
 		Join: "Beitreten",
 		"Invitation has been created!": "Die Einladung wurde erstellt!",
 		"Send this link to the user with the email {{email}}.":
-			"Senden sie diesen Link an den Benutzer mit der Email {{email}}.",
+			"Senden Sie diesen Link an den Benutzer mit der E-Mail-Adresse {{email}}.",
 		"Invitation link": "Einladungslink",
 		"Copied to clipboard": "In die Zwischenablage kopiert",
 		Invite: "Einladen",
-		"Employees without access": "Mitarbeiter ohne Zugriff",
+		"Employees without access": "Mitarbeitende ohne Zugriff",
 		Users: "Benutzer",
 		"Invite to organization": "In die Organisation einladen",
 		"Update membership of {{name}}": "Mitgliedschaft von {{name}} anpassen",
 		rolename_Owner: "Besitzer",
 		rolename_Admin: "Administrator",
 		rolename_PayrollManager: "Manager",
-		rolename_SelfService: "Self Service",
+		rolename_SelfService: "Self-Service",
 		pending: "ausstehend",
 		expired: "abgelaufen",
 		external: "Extern",
-		"This user is not assigned to an employee of the organization":
-			"Dieser Benutzer ist keinem Miterarbeiter der Organisation zugeordnet",
+		"This user is not assigned to an employee of the organization.":
+			"Dieser Benutzer ist keinem Mitarbeitenden der Organisation zugeordnet.",
 		"Remove user": "Benutzer entfernen",
 		"Do you want to remove {{name}} from the organization?":
 			"Möchten Sie den Benutzer {{name}} aus der Organisation entfernen?",
 		Remove: "Entfernen",
-		"User has been removed": "Benutzer wurde entfernt",
+		"User has been removed.": "Benutzer wurde entfernt.",
 		Withdraw: "Zurückziehen",
 		"Withdraw invitation": "Einladung zurückziehen",
 		"Do you want to withdraw the invitation for {{name}} to join the organization?":
 			"Möchten Sie die Einladung für {{name}} zum Beitritt zur Organisation zurückziehen?",
-		"Invitation has been withdrawn": "Einladung wurde zurückgezogen",
-		"Select at least one payroll":
-			"Wählen Sie mindestens eine Organisationseinheit aus",
-		"Email is required": "Email ist erforderlich",
-		"Employee is required": "Mitarbeiter ist erforderlich",
-		"Could not invite user to organization":
-			"Der Benutzer konnte nicht in die Organisation eingeladen werden",
-		"{{email}} already belongs to a member of the organization":
-			"{{email}} gehört schon einem Mitglied der Organisation",
+		"Invitation has been withdrawn.": "Einladung wurde zurückgezogen.",
+		"Select at least one payroll.":
+			"Wählen Sie mindestens eine Organisationseinheit aus.",
+		"Email is required.": "Email ist erforderlich.",
+		"Employee is required": "Mitarbeitender ist erforderlich",
+		"Could not invite user to organization.":
+			"Der Benutzer konnte nicht in die Organisation eingeladen werden.",
+		"{{email}} already belongs to a member of the organization.":
+			"{{email}} gehört schon einem Mitglied der Organisation.",
 		"The event does not exist or you do not have permission.":
 			"Das Ereignis gibt es nicht oder Sie haben keine Berechtigungen.",
-		"Something went wrong": "Etwas ist schief gelaufen",
+		"Something went wrong.": "Etwas ist schief gelaufen.",
 		"Show reason in payslip": "Notiz in Lohnabrechnung anzeigen",
 
 		// compliance
 		Submit: "Übermitteln",
 		"Submit as test case": "Als Testcase übermitteln",
 		"Display PDF": "PDF anzeigen",
-		"Submission url": "Übermittlungsurl",
-		"Transmitter Certificate": "Transmitterzertifikat",
-		"Enterprise Certificate": "Unternehmenszertifikat",
-		"Default certificate": "Standard Zertifikat",
+		"Submission url": "Übermittlungs-URL",
+		"Transmitter certificate": "Übermittlerzertifikat",
+		"Enterprise certificate": "Unternehmenszertifikat",
+		"Default certificate": "Standardzertifikat",
 		"No certificate": "Kein Zertifikat",
-		"Click to select certificate": "Zum Auswählen von Zertifikat klicken",
+		"Click to select certificate": "Klicken, um ein Zertifikat auszuwählen",
 		"Select certificate": "Zertifikat auswählen",
 		"Upload new certificate": "Neues Zertifikat hochladen",
 		"Second Operand": "Zweiter Operant",
@@ -279,8 +279,8 @@ const translations = {
 		Response: "Antwort",
 		"Encrypted request": "Verschlüsselte Anfrage",
 		"Encrypted response": "Verschlüsselte Antwort",
-		"Drop the files here ...": "Datein hier fallenlassen ...",
-		"Drag and drop your compliance documents here, or click to select files":
+		"Drop the files here ...": "Dateien hier ablegen ...",
+		"Drag and drop your compliance documents here, or click to select files.":
 			"Ziehen Sie Ihre Compliance Dokumente hier hin, oder klick um Datein auszuwählen",
 		"Upload document": "Dokument hochladen",
 		"Generate document": "Dokument generieren",
@@ -295,21 +295,21 @@ const translations = {
 
 		// Payruns
 		"Current period": "Aktuelle Periode",
-		"Open previous period": "Offen Vorperiode",
+		"Open previous period": "Offene Vorperiode",
 		Payout: "Auszahlen",
 		Payouts: "Auszahlungen",
 		Payslip: "Lohnabrechnung",
-		"This employee has blockers": "Dieser Mitarbeiter hat Blocker",
-		"Review period": "Periode kontrollieren",
+		"This employee has blockers.": "Dieser Mitarbeitende hat Blocker.",
+		"Review period": "Periode prüfen",
 		"Close period": "Periode schliessen",
 		"Upon closing the period, these documents will be sent to swissdec.":
-			"Nach Abschluss der Periode, werden diese Dokumente swissdec übermittelt.",
+			"Nach Abschluss der Periode werden diese Dokumente an swissdec übermittelt.",
 		"A closed period cannot be reopened.":
 			"Eine geschlossene Periode kann nicht mehr geöffnet werden.",
 		"Wage statements": "Lohnausweise",
 		"Closed periods": "Abgeschlossene Perioden",
 		"Payrun period closed": "Periode geschlossen",
-		"Could not close period": "Periode konnte nicht geschlossen werden",
+		"Could not close period.": "Periode konnte nicht geschlossen werden.",
 		"Value from previous period": "Wert aus Vorperiode",
 		"Go to period completion...": "Gehe zu Periodenabschluss...",
 		dashboard_payout_header: "Auszahlung",
@@ -323,7 +323,7 @@ const translations = {
 		payrun_period_wage_controlling: "Lohnkontrolle",
 		payrun_period_ready: "Auszahlungsbereit",
 		payrun_period_paid_out: "Ausbezahlt",
-		payrun_period_former_employees: "Frühere Mitarbeiter",
+		payrun_period_former_employees: "Frühere Mitarbeitende",
 		payrun_period_no_wage: "Angestellt aber ohne Lohn",
 		payrun_period_error: "Mit Fehlern (der Support wurde informiert)",
 		"The open period is being created. Please refresh the page in a moment.":
@@ -334,19 +334,19 @@ const translations = {
 		"Generating...": "Wird generiert...",
 		"The period is being processed...": "Die Periode wird aufbereitet...",
 		"In order for the accounting document to be prepared, the wage type account assignments have to be complete.":
-			"Damit der Buchungsbeleg aufbereitet werden kann, muss die Lohnartenkontierung vollständig sein.",
-		"Go to account assignments": "Zur Lohnartenkontierung",
+			"Damit der Buchungsbeleg aufbereitet werden kann, muss die Kontierung der Lohnarten vollständig sein.",
+		"Go to account assignments": "Zur Kontierung der Lohnarten",
 
 		// Headers
-		"Id of the employee": "Id des Mitarbeiters",
+		"Id of the employee": "ID des Mitarbeitenden",
 		"Last name and first name of the employee":
-			"Nachname und Vorname des Mitarbeiters",
+			"Nachname und Vorname des Mitarbeitenden",
 		"Total cost": "Totalkosten",
 		"Total costs from the employer's perspective":
-			"Total Kosten aus Arbeitgebersicht",
+			"Totalkosten aus Sicht Arbeitgeber",
 		"Gross PP": "Brutto VP",
 		"Gross wage previous period": "Bruttolohn Vorperiode",
-		"Diff. gross": "Diff. VP",
+		"Diff. gross": "Diff. Brutto",
 		"Gross wage previous period minus gross wage open period":
 			"Bruttolohn Vorperiode minus Bruttolohn offene Periode",
 		Gross: "Brutto",
@@ -358,7 +358,7 @@ const translations = {
 			"Verrechnungen, d.h. Abzüge und Zuschläge nach dem Nettolohn",
 		Retro: "Retro",
 		"Net amount from all retroactive changes prior to the open period":
-			"Nettobetrag aus allen rückwirkenden Änderungen vor der offenen Perioden",
+			"Nettobetrag aus allen rückwirkenden Änderungen vor der offenen Periode",
 		GPP: "Pfänd. VP",
 		"Garnishments to be paid from the previous period":
 			"Zu bezahlende Lohnpfändungen aus der Vorperiode",
@@ -368,31 +368,31 @@ const translations = {
 		Paid: "Bezahlt",
 		"Already paid out in the open period":
 			"In der offenen Periode bereits ausbezahlt",
-		Garnishment: "Pfänd.",
+		Garnishment: "Pfändung",
 		"Garnishment open period": "Lohnpfändung offene Periode",
 		Open: "Offen",
 		"Outstanding amount to be paid in the open period":
-			"Ausstehender Betrag zur Zahlung der offenen Periode",
+			"Zur Zahlung ausstehender Betrag in der offenen Periode",
 		Amount: "Betrag",
 		Debit: "Soll",
 		Credit: "Haben",
 		Attributes: "Eigenschaften",
-		"Updated!": "Geändert!",
+		"Updated!": "Aktualisiert!",
 		Number: "Nummer",
 		Collectors: "Basen",
 		inactive_collector_chip: "{{count}} inaktive Basen...",
 		"{{count}} checks active": "{{count}} Kontrollen aktiv",
-		"No checks": "Keine Kontrolle",
+		"No checks": "Keine Kontrollen",
 		"In the meantime, there have been changes that require the documents to be reprocessed. Visit this page again as soon as the period has been processed.":
-			"In der Zwischenzeit gab es Änderungen anhand welcher die Dokumente wieder neu aufbereitet werden müssen. Rufen Sie diese Seite wieder auf, sobald die Periode verarbeitet wurde.",
+			"In der Zwischenzeit gab es Änderungen, weshalb die Dokumente erneut aufbereitet werden müssen. Rufen Sie diese Seite erneut auf, sobald die Periode verarbeitet wurde.",
 		"The payrun period is not processed yet. The documents cannot be generated. Please try again after.":
-			"Die Periode wurde noch nicht verarbeitet. Die Dokumente können zu diesem Zeitpunkt nicht erstellet werden. Bitte versuchen Sie es später nochmal.",
-		"There was an error generating the documents. The support has been informed and we will fix the problem as soon as possible.":
-			"Es ist ein Fehler beim Erstellen der Dokumente aufgetreten. Der Support wurde informiert und wir werden das Problem so schnell wie möglich beheben.",
+			"Die Periode wurde noch nicht verarbeitet. Die Dokumente können derzeit nicht erstellt werden. Bitte versuchen Sie es später erneut.",
+		"There was an error generating the documents. The support has been informed. We fix the issue as soon as possible.":
+			"Es ist ein Fehler beim Erstellen der Dokumente aufgetreten. Der Support wurde informiert. Wir beheben das Problem so schnell wie möglich.",
 		"The documents are being generated, this can take up to a few minutes...":
 			"Die Dokumente werden erstellt. Das kann einige Minuten dauern...",
 		"There are employees with open payouts!":
-			"Es gibt noch Mitarbeiter mit offenen Auszahlungen!",
+			"Es gibt noch Mitarbeitende mit offenen Auszahlungen!",
 		"Do you want to move all open payouts to the next period?":
 			"Möchten Sie die offenen Beträge in die nächste Periode übernehmen?",
 		"The wage controlling has not been completed yet. The period cannot be closed.":
@@ -404,14 +404,14 @@ const translations = {
 		Discard: "Verwerfen",
 		"Column visibility": "Spaltensichtbarkeit",
 		"Table width": "Tabellenbreite",
-		"Full width": "Ganze Breite",
+		"Full width": "Volle Breite",
 		"Salary type": "Lohntyp",
-		"Employee search": "Mitarbeitersuche",
-		"Controlling completed.": "Kontrolle abgeschlossen.",
-		"All employees have been paid out.": "Alle Mitarbeiter wurden ausbezahlt.",
+		"Employee search": "Suche Mitarbeitende",
+		"Controlling completed": "Kontrolle abgeschlossen",
+		"All employees have been paid out.": "Alle Mitarbeitenden wurden ausbezahlt.",
 		"No payment has been made yet.": "Es wurde noch keine Auszahlung getätigt.",
-		"No matches.": "Keine Treffer.",
-		"Go to employee data": "Gehe zu Mitarbeiterdaten",
+		"No matches": "Keine Treffer",
+		"Go to employee data": "Gehe zu Personaldaten",
 		"Wage types": "Lohnarten",
 		"Account master": "Kontostamm",
 		"Cost center": "Kostenstellen",
@@ -421,11 +421,11 @@ const translations = {
 		"Delete value": "Wert löschen",
 		"Do you really want to delete this value?":
 			"Möchten Sie diesen Wert wirklich löschen?",
-		"This account is associated with a wage type":
+		"This account is associated with a wage type.":
 			"Dieses Konto ist einer Lohnart zugewiesen",
 		date_accounting_start_date_validation:
-			"Datum muss grösser oder gleich dem Startdatum der Lohnbuchhaltung ({{accountingStartDate}}) sein",
-		date_start_before_end_validation: "Startdatum muss vor dem Enddatum liegen",
+			"Das Datum muss am oder nach dem Startdatum der Lohnbuchhaltung ({{accountingStartDate}}) liegen.",
+		date_start_before_end_validation: "Startdatum muss vor dem Enddatum liegen.",
 		"Without category": "Ohne Kategorie",
 
 		// Command
@@ -434,15 +434,15 @@ const translations = {
 		"Mask for selecting a new event to report":
 			"Maske für das Auswählen eines Ereignisses",
 		"Company event": "Firmenereignis",
-		"No employee found": "Mitarbeiter nicht gefunden",
+		"No employee found": "Mitarbeitenden nicht gefunden",
 		"No event found": "Ereignis nicht gefunden",
 
 		// Culture
 		"Region settings": "Regionseinstellungen",
 		Automatic: "Automatisch",
-		"Could not update region settings":
-			"Regionseinstellungen konnten nicht gespeichert werden",
-		"Region settings updated": "Regionseinstellungen wurden gespeichert",
+		"Could not update region settings.":
+			"Regionseinstellungen konnten nicht gespeichert werden.",
+		"Region settings updated.": "Regionseinstellungen wurden gespeichert.",
 		"de-CH_culturelabel": "Deutsch (Schweiz)",
 		"de-DE_culturelabel": "Deutsch (Deutschland)",
 		"de-AT_culturelabel": "Deutsch (Österreich)",

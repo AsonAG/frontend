@@ -109,7 +109,7 @@ function ErrorView() {
 
 	const state = errorStates[error.status] ?? {
 		severity: "error",
-		text: "There was an error generating the documents. The support has been informed and we will fix the problem as soon as possible.",
+		text: "There was an error generating the documents. The support has been informed. We fix the issue as soon as possible.",
 	};
 	return (
 		<Alert severity={state.severity} variant="filled">
