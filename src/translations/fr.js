@@ -371,7 +371,7 @@ const translations = {
 			"Entre-temps, des modifications ont eu lieu et les documents doivent être retraités. Veuillez recharger cette page une fois la période traitée.",
 		"The payrun period is not processed yet. The documents cannot be generated. Please try again after.":
 			"La période n'a pas encore été traitée. Les documents ne peuvent pas être créés pour le moment. Veuillez réessayer plus tard.",
-		"There was an error generating the documents. The support has been informed. We fix the issue as soon as possible.":
+		"There was an error generating the documents. The support has been informed. We will fix the issue as soon as possible.":
 			"Une erreur s'est produite lors de la création des documents. Le support a été informé. Nous résoudrons le problème dès que possible.",
 		"The documents are being generated, this can take up to a few minutes...":
 			"Les documents sont en cours de création. Cela peut prendre quelques minutes…",

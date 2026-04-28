@@ -295,7 +295,7 @@ const translations = {
 
 		// Payruns
 		"Current period": "Aktuelle Periode",
-		"Open previous period": "Offene Vorperiode",
+		"Open previous period": "Offen aus Vorperiode",
 		Payout: "Auszahlen",
 		Payouts: "Auszahlungen",
 		Payslip: "Lohnabrechnung",
@@ -387,7 +387,7 @@ const translations = {
 			"In der Zwischenzeit gab es Änderungen, weshalb die Dokumente erneut aufbereitet werden müssen. Rufen Sie diese Seite erneut auf, sobald die Periode verarbeitet wurde.",
 		"The payrun period is not processed yet. The documents cannot be generated. Please try again after.":
 			"Die Periode wurde noch nicht verarbeitet. Die Dokumente können derzeit nicht erstellt werden. Bitte versuchen Sie es später erneut.",
-		"There was an error generating the documents. The support has been informed. We fix the issue as soon as possible.":
+		"There was an error generating the documents. The support has been informed. We will fix the issue as soon as possible.":
 			"Es ist ein Fehler beim Erstellen der Dokumente aufgetreten. Der Support wurde informiert. Wir beheben das Problem so schnell wie möglich.",
 		"The documents are being generated, this can take up to a few minutes...":
 			"Die Dokumente werden erstellt. Das kann einige Minuten dauern...",
