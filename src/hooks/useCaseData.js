@@ -92,7 +92,7 @@ export function useCaseData(params, payroll) {
 				setCaseErrors(errors);
 			}
 		} else {
-			setFatalError(new Error("Something went wrong"));
+			setFatalError(new Error("Something went wrong."));
 		}
 	}
 

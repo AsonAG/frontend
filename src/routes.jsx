@@ -579,7 +579,7 @@ const routeData = [
 						const error = JSON.parse(body);
 						toast("error", error.Message);
 					} else {
-						toast("error", "Import was not successful");
+						toast("error", "Import was not successful.");
 					}
 					return null;
 				},
@@ -620,7 +620,7 @@ const routeData = [
 								await requestExportDataDownload({ orgId: params.orgId }, name);
 								toast("success", "Exported organization");
 							} catch {
-								toast("error", "Organization could not be exported");
+								toast("error", "Organization could not be exported.");
 							}
 							return null;
 						case "delete":
@@ -631,7 +631,7 @@ const routeData = [
 									return redirect("/orgs");
 								}
 							} catch {
-								toast("error", "Organization could not be deleted");
+								toast("error", "Organization could not be deleted.");
 							}
 							return null;
 						default:
@@ -786,7 +786,7 @@ const routeData = [
 								toast("success", "Saved!");
 								return redirect("..");
 							} else {
-								toast("error", "Something went wrong");
+								toast("error", "Something went wrong.");
 							}
 							return null;
 						},
@@ -797,10 +797,10 @@ const routeData = [
 						action: async ({ params }) => {
 							const response = await removeUserFromOrganization(params);
 							if (response.ok) {
-								toast("success", "User has been removed");
+								toast("success", "User has been removed.");
 								return redirect("..");
 							} else {
-								toast("error", "Something went wrong");
+								toast("error", "Something went wrong.");
 							}
 							return null;
 						},
@@ -812,10 +812,10 @@ const routeData = [
 							const response =
 								await withdrawUserMembershipInvitationToOrganization(params);
 							if (response.ok) {
-								toast("success", "Invitation has been withdrawn");
+								toast("success", "Invitation has been withdrawn.");
 								return redirect("..");
 							} else {
-								toast("error", "Something went wrong");
+								toast("error", "Something went wrong.");
 							}
 							return null;
 						},
@@ -845,10 +845,10 @@ const routeData = [
 								response.status === 409
 									? toast(
 											"error",
-											"{{email}} already belongs to a member of the organization",
+											"{{email}} already belongs to a member of the organization.",
 											{ email: invitationRequest.email },
 										)
-									: toast("error", "Could not invite user to organization");
+									: toast("error", "Could not invite user to organization.");
 							}
 							return null;
 						},
@@ -1017,7 +1017,7 @@ const routeData = [
 							if (runActionResponse.ok) {
 								toast("success", "Files generated");
 							} else {
-								toast("error", "Something went wrong");
+								toast("error", "Something went wrong.");
 							}
 							return runActionResponse;
 						case "accept":
@@ -1226,7 +1226,7 @@ const routeData = [
 										toast("success", "Payrun period closed");
 										return redirect("..");
 									}
-									toast("error", "Could not close period");
+									toast("error", "Could not close period.");
 								},
 							},
 							{
@@ -1397,7 +1397,7 @@ const routeData = [
 									) {
 										return [
 											false,
-											"This account is associated with a wage type",
+											"This account is associated with a wage type.",
 										];
 									}
 								}

@@ -135,7 +135,7 @@ export function UserMembershipInviteDialog() {
 					required
 				/>
 				<ResponsiveDialogDescription asChild>
-					<Typography>{t("Choose a role")}:</Typography>
+					<Typography>{t("Choose a role.")}:</Typography>
 				</ResponsiveDialogDescription>
 				<RoleSelection state={state} dispatch={dispatch} payrolls={payrolls} />
 				<Stack direction="row" justifyContent="end" spacing={1}>
@@ -163,11 +163,11 @@ export function UserMembershipInviteDialog() {
 function getDisabledText(state: RoleSelectionState, email: string): string {
 	if (state.role === null) {
 		if (state.selectedRole === "PayrollManager") {
-			return "Select at least one payroll";
+			return "Select at least one payroll.";
 		}
 	}
 	if (!email) {
-		return "Email is required";
+		return "Email is required.";
 	}
 	return "";
 }

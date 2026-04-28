@@ -9,7 +9,7 @@ export function ErrorView() {
 	console.log("RouteError", routeError);
 	return (
 		<Centered>
-			<Typography>{t("Something went wrong")}</Typography>
+			<Typography>{t("Something went wrong.")}</Typography>
 		</Centered>
 	);
 }

@@ -145,7 +145,7 @@ function TaskView() {
 								);
 							})
 						) : (
-							<Typography>{t("No files attached.")}</Typography>
+							<Typography>{t("No files attached")}</Typography>
 						)}
 					</Stack>
 				)}

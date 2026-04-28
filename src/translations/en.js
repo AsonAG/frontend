@@ -24,7 +24,7 @@ const translations = {
 		rolename_Owner: "Owner",
 		rolename_Admin: "Administrator",
 		rolename_PayrollManager: "Manager",
-		rolename_SelfService: "Self Service",
+		rolename_SelfService: "Self-Service",
 
 		payout_sum: "Payout {{amount}}",
 		payrun_period_calculating: "Calculating",

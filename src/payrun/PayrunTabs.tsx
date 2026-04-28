@@ -64,7 +64,7 @@ export function PayrunTabContent({
 		itemCount += controllingData.companyControllingCases.length > 0 ? 1 : 0;
 	}
 	if (itemCount === 0) {
-		const text = state.employeeFilter ? "No matches." : emptyText;
+		const text = state.employeeFilter ? "No matches" : emptyText;
 		return <Typography>{t(text)}</Typography>;
 	}
 	return children;
