@@ -29,7 +29,9 @@ export function OrganizationSettings() {
 	return (
 		<ContentLayout title="Settings">
 			<TextField value={org.identifier} disabled label={t("Company name")} />
-			{<ExportOrganization org={org} />}
+			<UIFeatureGate feature={UIFeature.OrganizationExport}>
+				{<ExportOrganization org={org} />}
+			</UIFeatureGate>
 			<UIFeatureGate feature={UIFeature.OrganizationDelete}>
 				<DeleteOrganization org={org} />
 			</UIFeatureGate>
