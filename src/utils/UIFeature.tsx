@@ -7,6 +7,7 @@ export enum UIFeature {
 	HrEmployeesNew,
 	OrganizationsCreate,
 	OrganizationsImport,
+	OrganizationExport,
 	OrganizationDelete,
 	OrganizationUnitCreate,
 	UsersEditRole,
