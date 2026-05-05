@@ -120,7 +120,7 @@ function GeneralPreview({ url }) {
 			}}
 		>
 			<Centered>
-				<Typography>{t("Preview not available.")}</Typography>
+				<Typography>{t("Preview not available")}</Typography>
 			</Centered>
 		</Box>
 	);

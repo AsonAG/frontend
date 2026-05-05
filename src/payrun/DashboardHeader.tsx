@@ -46,7 +46,7 @@ export function DashboardHeader({ index, children }: DashboardHeaderProps) {
 				</IconButton>
 				<PageHeaderTitle title={periodDate} />
 			</Stack>
-			{periodOpen && <Chip color="success" size="small" label={t("Offen")} />}
+			{periodOpen && <Chip color="success" size="small" label={t("Open")} />}
 			{!!index && (
 				<>
 					<Box sx={{ flex: 1 }}>{children}</Box>

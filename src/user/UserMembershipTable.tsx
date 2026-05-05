@@ -81,7 +81,7 @@ function UserMembershipRow({ membership }: { membership: UserMembership }) {
 				{!membership.employeeId && (
 					<Tooltip
 						title={t(
-							"This user is not assigned to an employee of the organization",
+							"This user is not assigned to an employee of the organization.",
 						)}
 					>
 						<Chip variant="outlined" label={t("external")} size="small" />

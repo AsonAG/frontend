@@ -100,7 +100,7 @@ function PayrunPeriodView() {
 					<>
 						<PayrunTabContent
 							tab="Controlling"
-							emptyText="Controlling completed."
+							emptyText="Controlling completed"
 						>
 							<ControllingList />
 						</PayrunTabContent>

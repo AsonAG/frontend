@@ -80,7 +80,7 @@ export function UserMembershipEditDialog() {
 					onChange={setEmployee}
 					employees={employeeList}
 				/>
-				<Typography>{t("Choose a role")}</Typography>
+				<Typography>{t("Choose a role.")}</Typography>
 				<RoleSelection state={state} dispatch={dispatch} payrolls={payrolls} />
 				<Stack direction="row" justifyContent="end" spacing={1}>
 					<Button component={Link} to="..">
@@ -110,7 +110,7 @@ function getDisabledText(
 ): string {
 	if (state.role === null) {
 		if (state.selectedRole === "PayrollManager") {
-			return "Select at least one payroll";
+			return "Select at least one payroll.";
 		}
 	}
 	if (state.selectedRole === "SelfService" && employee === null) {

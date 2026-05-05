@@ -26,7 +26,7 @@ export function InvitationView() {
 							)}
 						</Typography>
 					) : (
-						<Typography>{t("The invitation is invalid")}</Typography>
+						<Typography>{t("The invitation is invalid.")}</Typography>
 					)}
 					<Stack direction="row" justifyContent="end" spacing={1}>
 						<Button component={Link} to="/orgs">

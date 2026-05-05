@@ -44,9 +44,9 @@ export function FieldValueTextComponent() {
 		}
 		let validationError = "";
 		if (isMaskedInput && !validateMask(value, field.attributes)) {
-			validationError = t("Please enter a valid value");
+			validationError = t("Please enter a valid value.");
 		} else if (!value) {
-			validationError = t("Please enter a value");
+			validationError = t("Please enter a value.");
 		}
 		inputRef.current?.setCustomValidity(validationError);
 	}, [value, inputRef.current, isMaskedInput, required]);
