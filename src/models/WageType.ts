@@ -7,6 +7,7 @@ export type WageType = {
 	displayName: string;
 	collectors: string[];
 	attributes: Record<string, string>;
+	isActive : boolean;
 };
 
 export type WageTypeDetailed = WageType & {

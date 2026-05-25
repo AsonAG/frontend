@@ -2,10 +2,12 @@ import {
 	Badge,
 	Box,
 	Button,
+	Checkbox,
 	Dialog,
 	DialogActions,
 	DialogContent,
 	DialogTitle,
+	FormControlLabel,
 	Stack,
 	SxProps,
 	Theme,
@@ -25,6 +27,7 @@ import {
 	useLoaderData,
 	useNavigation,
 	useSubmit,
+	useParams,
 } from "react-router-dom";
 import { columns } from "./WageTypeColumns";
 import {
@@ -40,6 +43,9 @@ import { Collector } from "../models/Collector";
 import { WageTypeDetailed, WageTypeSettings } from "../models/WageType";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { blend } from "@mui/system/colorManipulator";
+import {
+	activateWageType
+} from "../api/FetchClient";
 
 export type WageTypeControllingLoaderData = {
 	wageTypes: WageTypeDetailed[];
@@ -58,6 +64,7 @@ const defaultSettings: WageTypeSettingsContextType = {
 		accountAssignments: {},
 		payrollControlling: {},
 		dirty: false,
+		activatedWageTypes: [],
 	},
 	dispatch: function (value: SettingsAction): void {
 		throw new Error("Function not implemented.");
@@ -69,15 +76,25 @@ export const WageTypeSettingsContext =
 const tableHeaderHeight = 36;
 const headerStickySx = getStickySx(10, { top: 0 });
 export function WageTypeControlling() {
+	const routeParams = useParams();
 	const { t } = useTranslation();
 	const { state: navigationState } = useNavigation();
 	const submit = useSubmit();
 	const actionData = useActionData() as { success: boolean };
 	const { wageTypes, attributeTranslationMap, wageTypeSettings } =
 		useLoaderData() as WageTypeControllingLoaderData;
+
+	const [showAllWageTypes, setShowAllWageTypes] = useState(false);
+
+	const filteredWageTypes = useMemo(() => {
+		return showAllWageTypes
+			? wageTypes
+			: wageTypes.filter((wageType) => wageType.isActive === true);
+	}, [wageTypes, showAllWageTypes]);
+
 	const table = useReactTable({
 		columns: columns,
-		data: wageTypes,
+		data: filteredWageTypes,
 		getCoreRowModel: getCoreRowModel(),
 		getRowId: (originalRow) => originalRow.id,
 	});
@@ -109,7 +126,11 @@ export function WageTypeControlling() {
 		return [result, noCategory];
 	}, [table.getRowModel().rows]);
 
-	const onSubmit = () => {
+	const onSubmit = async () => {
+		for (const wageTypeNumber of state.activatedWageTypes) {
+			await activateWageType(routeParams, wageTypeNumber);
+		}
+
 		submit(
 			{
 				accountAssignments: state.accountAssignments,
@@ -127,6 +148,21 @@ export function WageTypeControlling() {
 	return (
 		<WageTypeSettingsContext.Provider value={{ state, dispatch }}>
 			<Stack>
+
+				<Stack direction="row" justifyContent="end" sx={{ mb: 1 }}>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={showAllWageTypes}
+								onChange={(event) =>
+									setShowAllWageTypes(event.target.checked)
+								}
+							/>
+						}
+						label={t("Show inactive wage types")}
+					/>
+				</Stack>
+
 				<Stack sx={{ overflow: "auto", maxHeight: "calc(100vh - 257px)" }}>
 					{table.getHeaderGroups().map((headerGroup) => {
 						const sx: SxProps<Theme> = {
@@ -238,7 +274,9 @@ function WageTypeCategoryGroup({
 	rowGridSx,
 }: WageTypeCategoryProps) {
 	const [expanded, setExpanded] = useState<boolean>(false);
-	if (!rows || rows.length === 0) return;
+
+	if (!rows || rows.length === 0) return null;
+
 	const hasMissingData =
 		rows.filter((r) => r.original.accountAssignmentRequired).length > 0;
 	const header = (
@@ -350,23 +388,28 @@ function WageTypeCategoryHeader({
 type WageTypeSettingsState = WageTypeSettings & {
 	initialState: WageTypeSettings;
 	dirty: boolean;
+	activatedWageTypes: string[];
 };
 
 export type SettingsAction =
 	| {
-			type: "set_account";
-			kind: "debitAccountNumber" | "creditAccountNumber";
-			wageTypeNumber: string;
-			value: string | null;
-	  }
+		type: "set_account";
+		kind: "debitAccountNumber" | "creditAccountNumber";
+		wageTypeNumber: string;
+		value: string | null;
+	}
 	| {
-			type: "set_controlling";
-			wageTypeNumber: string;
-			value: string[];
-	  }
+		type: "set_controlling";
+		wageTypeNumber: string;
+		value: string[];
+	}
 	| {
-			type: "reset_dirty";
-	  };
+		type: "activate_wage_type";
+		wageTypeNumber: string;
+	}
+	| {
+		type: "reset_dirty";
+	};
 
 function reducer(
 	state: WageTypeSettingsState,
@@ -395,6 +438,15 @@ function reducer(
 				},
 				dirty: true,
 			};
+		case "activate_wage_type":
+			return {
+				...state,
+				activatedWageTypes: [
+					...state.activatedWageTypes,
+					action.wageTypeNumber,
+				],
+				dirty: true,
+			};
 		case "reset_dirty":
 			return {
 				...state,
@@ -407,5 +459,6 @@ function createInitialState(settings: WageTypeSettings): WageTypeSettingsState {
 		...settings,
 		initialState: settings,
 		dirty: false,
+		activatedWageTypes: [],
 	};
 }

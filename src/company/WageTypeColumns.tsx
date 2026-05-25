@@ -9,6 +9,8 @@ import { WageTypeControllingLoaderData } from "./WageTypeControllingLoaderData";
 import { WageTypeDetails } from "./WageTypeDetails";
 import { Info } from "@mui/icons-material";
 import { ControllingPicker } from "./WageTypeControllingPicker";
+import Checkbox from "@mui/material/Checkbox";
+import { ActivateWageTypeCheckbox } from "./ActivateWageType";
 
 const columnHelper = createColumnHelper<WageTypeDetailed>();
 function createColumns() {
@@ -25,6 +27,21 @@ function createColumns() {
 			meta: {
 				flex: 1,
 			},
+		}),
+		columnHelper.accessor("isActive", {
+			id: "isActive",
+			cell: (props) => {
+				const wageType = props.row.original;
+
+				return (
+					<ActivateWageTypeCheckbox
+						wageTypeNumber={wageType.wageTypeNumber.toString()}
+						isActive={props.getValue() === true}
+					/>
+				);
+			},
+			header: ({ t }) => t("Active"),
+			size: 100,
 		}),
 		columnHelper.display({
 			id: "debit",
