@@ -242,6 +242,7 @@ const translations = {
 		"Something went wrong.": "Quelque chose a mal tourné.",
 		"Show reason in payslip": "Afficher la note sur le bulletin de salaire",
 		"Copy wage type": "Copier le type de salaire",
+		"Update wage type": "Mettre à jour le type de salaire",
 
 		// compliance
 		Submit: "Transmettre",
@@ -420,6 +421,7 @@ const translations = {
 		"No event found": "Événement non trouvé",
 		"Record wage type labels" : "Enregistrer les libellés du type de salaire",
 		"Show inactive wage types" : "Afficher les types de salaire inactifs",
+		"Edit wage type label": "Modifier les libellés du type de salaire",
 
 		// Culture
 		"Region settings": "Paramètres régionaux",

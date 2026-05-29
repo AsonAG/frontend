@@ -130,11 +130,6 @@ export function WageTypeControlling() {
 		for (const wageTypeNumber of state.activatedWageTypes) {
 			await activateWageType(routeParams, wageTypeNumber);
 		}
-
-		for (const wageTypeNumber of state.activatedWageTypes) {
-			await activateWageType(routeParams, wageTypeNumber);
-		}
-
 		submit(
 			{
 				accountAssignments: state.accountAssignments,

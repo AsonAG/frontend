@@ -240,6 +240,7 @@ const translations = {
 		"Something went wrong.": "Qualcosa è andato storto.",
 		"Show reason in payslip": "Mostra nota sulla busta paga",
 		"Copy wage type": "Copia tipo di retribuzione",
+		"Update wage type": "Aggiorna tipo di retribuzione",
 
 		// compliance
 		Submit: "Invia",
@@ -420,6 +421,7 @@ const translations = {
 		"No event found": "Evento non trovato",
 		"Record wage type labels" : "Registra etichette tipo di retribuzione",
 		"Show inactive wage types" : "Mostra tipi di retribuzione inattivi",
+		"Edit wage type label": "Modifica etichette tipo di retribuzione",
 
 		// Culture
 		"Region settings": "Impostazioni regionali",

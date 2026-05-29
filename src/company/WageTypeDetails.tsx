@@ -114,7 +114,7 @@ function WageTypeAttributes({ wageType }: { wageType: WageTypeDetailed }) {
 	);
 }
 
-function WageTypeCollectors({
+export function WageTypeCollectors({
 	wageType,
 	collectors,
 }: {

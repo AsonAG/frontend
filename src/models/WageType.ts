@@ -7,6 +7,7 @@ export type WageType = {
 	displayName: string;
 	collectors: string[];
 	attributes: Record<string, string>;
+	nameLocalizations: Record<string, string>;
 	isActive : boolean;
 	isCopyable : boolean;
 	isChangeable: boolean;

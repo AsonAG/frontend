@@ -1,7 +1,7 @@
 import { IconButton, Tooltip, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
-import { WageTypeDetailed } from "../models/WageType";
+import { WageType, WageTypeDetailed } from "../models/WageType";
 import { useTranslation } from "react-i18next";
 import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
 import { useLoaderData } from "react-router-dom";
@@ -11,6 +11,7 @@ import { CreateNewFolderRounded, Info } from "@mui/icons-material";
 import { ControllingPicker } from "./WageTypeControllingPicker";
 import { ActivateWageTypeCheckbox } from "./ActivateWageType";
 import { CopyWageTypeDialog } from "./CopyWageTypeDialog";
+import { UpdateWageTypeDialog } from "./UpdateWageTypeDialog";
 
 
 const columnHelper = createColumnHelper<WageTypeDetailed>();
@@ -140,6 +141,41 @@ function createColumns() {
 						{open && (
 							<CopyWageTypeDialog
 								wageTypeNumber={props.row.original.wageTypeNumber}
+								onClose={() => setOpen(false)}
+							/>
+						)}
+					</>
+				);
+			},
+			size: 80,
+			meta: {
+				alignment: "center",
+			},
+		}),
+
+		columnHelper.display({
+			id: "update wage type",
+			cell: (props) => {
+				const { t } = useTranslation();
+				const { collectors } = useLoaderData() as WageTypeControllingLoaderData;
+				const [open, setOpen] = useState<boolean>(false);
+				const collectorsChangeable = props.row.original.attributes?.["Collectors.Change"];
+				const wageTypeiIsChangeable = props.row.original.isChangeable;
+				if (!collectorsChangeable && !wageTypeiIsChangeable) {
+					return null;
+				}
+				return (
+					<>
+						<Tooltip title={t("Update wage type")}>
+							<IconButton size="small" onClick={() => setOpen(true)}>
+								<CreateNewFolderRounded />
+							</IconButton>
+						</Tooltip>
+
+						{open && (
+							<UpdateWageTypeDialog
+								wageType={props.row.original as WageType}
+								collectors={collectors}
 								onClose={() => setOpen(false)}
 							/>
 						)}

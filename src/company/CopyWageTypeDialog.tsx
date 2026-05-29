@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams, useRevalidator } from "react-router-dom";
 import {
 	copyWageType
 } from "../api/FetchClient";
@@ -29,9 +29,11 @@ export function CopyWageTypeDialog({
 		fr: "",
 		it: "",
 	});
-
+	
+	const revalidator = useRevalidator();
 	const handleSubmit = async () => {
 		await copyWageType(routeParams, wageTypeNumber, form);
+		revalidator.revalidate();
 		onClose();
 	};
 

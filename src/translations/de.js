@@ -252,6 +252,7 @@ const translations = {
 		"Something went wrong.": "Etwas ist schief gelaufen.",
 		"Show reason in payslip": "Notiz in Lohnabrechnung anzeigen",
 		"Copy wage type": "Lohnart kopieren",
+		"Update wage type": "Lohnart aktualisieren",
 
 		// compliance
 		Submit: "Übermitteln",
@@ -439,6 +440,7 @@ const translations = {
 		"No event found": "Ereignis nicht gefunden",
 		"Record wage type labels" : "Bezeichnungen der Lohnart erfassen",
 		"Show inactive wage types" : "Inaktive Lohnarten anzeigen",
+		"Edit wage type label": "Bezeichnungen der Lohnart bearbeiten",
 
 		// Culture
 		"Region settings": "Regionseinstellungen",
