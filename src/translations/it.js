@@ -239,6 +239,7 @@ const translations = {
 			"L'evento non esiste o non hai le autorizzazioni.",
 		"Something went wrong.": "Qualcosa è andato storto.",
 		"Show reason in payslip": "Mostra nota sulla busta paga",
+		"Copy wage type": "Copia tipo di retribuzione",
 
 		// compliance
 		Submit: "Invia",
@@ -417,6 +418,8 @@ const translations = {
 		"Company event": "Evento aziendale",
 		"No employee found": "Dipendente non trovato",
 		"No event found": "Evento non trovato",
+		"Record wage type labels" : "Registra etichette tipo di retribuzione",
+		"Show inactive wage types" : "Mostra tipi di retribuzione inattivi",
 
 		// Culture
 		"Region settings": "Impostazioni regionali",

@@ -7,10 +7,11 @@ import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
 import { useLoaderData } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControllingLoaderData";
 import { WageTypeDetails } from "./WageTypeDetails";
-import { Info } from "@mui/icons-material";
+import { CreateNewFolderRounded, Info } from "@mui/icons-material";
 import { ControllingPicker } from "./WageTypeControllingPicker";
-import Checkbox from "@mui/material/Checkbox";
 import { ActivateWageTypeCheckbox } from "./ActivateWageType";
+import { CopyWageTypeDialog } from "./CopyWageTypeDialog";
+
 
 const columnHelper = createColumnHelper<WageTypeDetailed>();
 function createColumns() {
@@ -113,6 +114,39 @@ function createColumns() {
 				);
 			},
 			size: 40,
+			meta: {
+				alignment: "center",
+			},
+		}),
+
+		columnHelper.display({
+			id: "copy wage type",
+			cell: (props) => {
+				const { t } = useTranslation();
+				const [open, setOpen] = useState<boolean>(false);
+
+				if (!props.row.original.isCopyable) {
+					return null;
+				}
+
+				return (
+					<>
+						<Tooltip title={t("Copy wage type")}>
+							<IconButton size="small" onClick={() => setOpen(true)}>
+								<CreateNewFolderRounded />
+							</IconButton>
+						</Tooltip>
+
+						{open && (
+							<CopyWageTypeDialog
+								wageTypeNumber={props.row.original.wageTypeNumber}
+								onClose={() => setOpen(false)}
+							/>
+						)}
+					</>
+				);
+			},
+			size: 80,
 			meta: {
 				alignment: "center",
 			},

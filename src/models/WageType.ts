@@ -8,6 +8,8 @@ export type WageType = {
 	collectors: string[];
 	attributes: Record<string, string>;
 	isActive : boolean;
+	isCopyable : boolean;
+	isChangeable: boolean;
 };
 
 export type WageTypeDetailed = WageType & {

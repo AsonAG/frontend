@@ -251,6 +251,7 @@ const translations = {
 			"Das Ereignis gibt es nicht oder Sie haben keine Berechtigungen.",
 		"Something went wrong.": "Etwas ist schief gelaufen.",
 		"Show reason in payslip": "Notiz in Lohnabrechnung anzeigen",
+		"Copy wage type": "Lohnart kopieren",
 
 		// compliance
 		Submit: "Übermitteln",
@@ -436,6 +437,8 @@ const translations = {
 		"Company event": "Firmenereignis",
 		"No employee found": "Mitarbeitenden nicht gefunden",
 		"No event found": "Ereignis nicht gefunden",
+		"Record wage type labels" : "Bezeichnungen der Lohnart erfassen",
+		"Show inactive wage types" : "Inaktive Lohnarten anzeigen",
 
 		// Culture
 		"Region settings": "Regionseinstellungen",

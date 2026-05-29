@@ -241,6 +241,7 @@ const translations = {
 			"L'événement n'existe pas ou vous n'avez pas les autorisations.",
 		"Something went wrong.": "Quelque chose a mal tourné.",
 		"Show reason in payslip": "Afficher la note sur le bulletin de salaire",
+		"Copy wage type": "Copier le type de salaire",
 
 		// compliance
 		Submit: "Transmettre",
@@ -417,6 +418,8 @@ const translations = {
 		"Company event": "Événement d'entreprise",
 		"No employee found": "Employé non trouvé",
 		"No event found": "Événement non trouvé",
+		"Record wage type labels" : "Enregistrer les libellés du type de salaire",
+		"Show inactive wage types" : "Afficher les types de salaire inactifs",
 
 		// Culture
 		"Region settings": "Paramètres régionaux",

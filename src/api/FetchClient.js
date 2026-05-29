@@ -49,7 +49,10 @@ const payrollWageTypeSettingsUrl =
 	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
 const activateWageTypeUrl =
 	"/tenants/:orgId/payrolls/:payrollId/activatewagetype";
-
+const copyWageTypeTypeUrl =
+	"/tenants/:orgId/payrolls/:payrollId/copywagetype";
+const updateWageTypeUrl =
+	"/tenants/:orgId/payrolls/:payrollId/updatewagetype";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
@@ -918,6 +921,26 @@ export function activateWageType(routeParams, wageTypeNumber) {
 		routeParams,
 	)
 		.withMethod("POST")
+		.fetch();
+}
+
+export function copyWageType(routeParams, wageTypeNumber, nameLocalizations) {
+	return new FetchRequestBuilder(
+		`${copyWageTypeTypeUrl}?wageTypeNumber=${wageTypeNumber}`,
+		routeParams,
+	)
+		.withMethod("POST")
+		.withBody(nameLocalizations)
+		.fetch();
+}
+
+export function updateWageType(routeParams, wageTypeNumber, wageType) {
+	return new FetchRequestBuilder(
+		`${updateWageTypeUrl}?wageTypeNumber=${wageTypeNumber}`,
+		routeParams,
+	)
+		.withMethod("PUT")
+		.withBody(wageType)
 		.fetch();
 }
 
