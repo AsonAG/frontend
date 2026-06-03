@@ -77,8 +77,8 @@ function LoadingView() {
 	}, []);
 	const text = showText
 		? t(
-				"The documents are being generated, this can take up to a few minutes...",
-			)
+			"The documents are being generated, this can take up to a few minutes...",
+		)
 		: "\u00A0"; // nbsp
 	return (
 		<Stack spacing={2}>
@@ -186,7 +186,7 @@ function WageStatements({
 	);
 }
 
-const noop = () => {};
+const noop = () => { };
 type DocumentSectionProps = {
 	docBasePath: string;
 	document: PayrunDocument;
@@ -311,22 +311,24 @@ function CsvChip({ to, label }: ChipProps) {
 	);
 }
 
-function renderDocumentWithError(document: PayrunDocument) {
+export function renderDocumentWithError(document: PayrunDocument) {
 	const errorCode = document.attributes?.["errorCode"];
 	if (!errorCode) {
 		return null;
 	}
 	var Component = errorMap[errorCode];
 	return (
-		<Stack spacing={1}>
-			<Typography variant="h6" color="textDisabled">
-				{document.name}
-			</Typography>
-			<Stack spacing={1} direction="row">
-				<Warning color="warning" />
-				<Component />
+		<Alert severity="error" color="warning">
+			<Stack spacing={1}>
+				<Typography variant="h6" color="textDisabled">
+					{document.name}
+				</Typography>
+				<Stack spacing={1} direction="row">
+					<Warning color="warning" />
+					<Component />
+				</Stack>
 			</Stack>
-		</Stack>
+		</Alert>
 	);
 }
 
@@ -341,7 +343,7 @@ function WageTypeAccountMappingError() {
 		<>
 			<Typography>
 				{t(
-					"In order for the accounting document to be prepared, the wage type account assignments have to be complete.",
+					"For the accounting document to be processed and the period to be closed, the wage type postings must be complete.",
 				)}
 			</Typography>
 			<Link component={RouterLink} to={to}>
