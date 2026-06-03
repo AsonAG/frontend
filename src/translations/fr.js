@@ -422,6 +422,7 @@ const translations = {
 		"Record wage type labels" : "Enregistrer les libellés du type de salaire",
 		"Show inactive wage types" : "Afficher les types de salaire inactifs",
 		"Edit wage type label": "Modifier les libellés du type de salaire",
+		"Search wage type number": "Rechercher le numéro du type de salaire",
 
 		// Culture
 		"Region settings": "Paramètres régionaux",

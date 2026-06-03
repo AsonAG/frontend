@@ -441,6 +441,7 @@ const translations = {
 		"Record wage type labels" : "Bezeichnungen der Lohnart erfassen",
 		"Show inactive wage types" : "Inaktive Lohnarten anzeigen",
 		"Edit wage type label": "Bezeichnungen der Lohnart bearbeiten",
+		"Search wage type number": "Lohnartnummer suchen",
 
 		// Culture
 		"Region settings": "Regionseinstellungen",

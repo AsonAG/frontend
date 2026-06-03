@@ -147,7 +147,7 @@ function createColumns() {
 					</>
 				);
 			},
-			size: 80,
+			size: 40,
 			meta: {
 				alignment: "center",
 			},
@@ -182,7 +182,7 @@ function createColumns() {
 					</>
 				);
 			},
-			size: 80,
+			size: 40,
 			meta: {
 				alignment: "center",
 			},

@@ -10,6 +10,7 @@ import {
 	FormControlLabel,
 	Stack,
 	SxProps,
+	TextField,
 	Theme,
 	Typography,
 } from "@mui/material";
@@ -85,12 +86,22 @@ export function WageTypeControlling() {
 		useLoaderData() as WageTypeControllingLoaderData;
 
 	const [showAllWageTypes, setShowAllWageTypes] = useState(false);
+	const [wageTypeNumberSearch, setWageTypeNumberSearch] = useState("");
 
 	const filteredWageTypes = useMemo(() => {
-		return showAllWageTypes
-			? wageTypes
-			: wageTypes.filter((wageType) => wageType.isActive === true);
-	}, [wageTypes, showAllWageTypes]);
+		return wageTypes.filter((wageType) => {
+			const matchesActiveFilter =
+				showAllWageTypes || wageType.isActive === true;
+
+			const matchesSearch =
+				wageTypeNumberSearch.trim() === "" ||
+				wageType.wageTypeNumber
+					.toString()
+					.includes(wageTypeNumberSearch.trim());
+
+			return matchesActiveFilter && matchesSearch;
+		});
+	}, [wageTypes, showAllWageTypes, wageTypeNumberSearch]);
 
 	const table = useReactTable({
 		columns: columns,
@@ -148,7 +159,14 @@ export function WageTypeControlling() {
 		<WageTypeSettingsContext.Provider value={{ state, dispatch }}>
 			<Stack>
 
-				<Stack direction="row" justifyContent="end" sx={{ mb: 1 }}>
+				<Stack direction="row" justifyContent="end" spacing={2} sx={{ mb: 1 }}>
+					<TextField
+						size="small"
+						label={t("Search wage type number")}
+						value={wageTypeNumberSearch}
+						onChange={(event) => setWageTypeNumberSearch(event.target.value)}
+					/>
+
 					<FormControlLabel
 						control={
 							<Checkbox
@@ -162,7 +180,7 @@ export function WageTypeControlling() {
 					/>
 				</Stack>
 
-				<Stack sx={{ overflow: "auto", maxHeight: "calc(100vh - 257px)" }}>
+				<Stack sx={{ overflow: "auto", width: "max-content", minWidth: "100%" }}>
 					{table.getHeaderGroups().map((headerGroup) => {
 						const sx: SxProps<Theme> = {
 							...rowGridSx,
