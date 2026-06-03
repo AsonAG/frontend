@@ -28,7 +28,7 @@ import {
 	ResponsiveDialogTrigger,
 } from "../components/ResponsiveDialog";
 import { DashboardHeader } from "./DashboardHeader";
-import { PeriodDocuments} from "./PeriodDocuments";
+import { PeriodDocuments } from "./PeriodDocuments";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 
 export function ReviewOpenPeriod() {
@@ -90,14 +90,12 @@ export function ReviewOpenPeriod() {
 											<Button
 												variant="contained"
 												color="primary"
-												disabled={
-													hasUnresolvedControllingCases || hasErrors
-												}
+												disabled={hasUnresolvedControllingCases || hasErrors}
 											>
 												{t("Close period")}
 											</Button>
 										</ResponsiveDialogTrigger>
-										);
+									);
 								}}
 							</Await>
 						</Suspense>

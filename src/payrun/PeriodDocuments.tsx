@@ -77,8 +77,8 @@ function LoadingView() {
 	}, []);
 	const text = showText
 		? t(
-			"The documents are being generated, this can take up to a few minutes...",
-		)
+				"The documents are being generated, this can take up to a few minutes...",
+			)
 		: "\u00A0"; // nbsp
 	return (
 		<Stack spacing={2}>
@@ -186,7 +186,7 @@ function WageStatements({
 	);
 }
 
-const noop = () => { };
+const noop = () => {};
 type DocumentSectionProps = {
 	docBasePath: string;
 	document: PayrunDocument;
@@ -343,7 +343,7 @@ function WageTypeAccountMappingError() {
 		<>
 			<Typography>
 				{t(
-					"For the accounting document to be processed and the period to be closed, the wage type postings must be complete.",
+					"For the accounting document to be processed and the period to be closed, the wage type accounting assigments must be complete.",
 				)}
 			</Typography>
 			<Link component={RouterLink} to={to}>
