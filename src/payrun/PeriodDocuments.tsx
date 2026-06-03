@@ -311,7 +311,7 @@ function CsvChip({ to, label }: ChipProps) {
 	);
 }
 
-export function renderDocumentWithError(document: PayrunDocument) {
+function renderDocumentWithError(document: PayrunDocument) {
 	const errorCode = document.attributes?.["errorCode"];
 	if (!errorCode) {
 		return null;

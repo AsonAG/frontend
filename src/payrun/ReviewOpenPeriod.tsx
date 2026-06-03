@@ -18,6 +18,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { PayrunPeriod } from "../models/PayrunPeriod";
+import { PayrunDocument } from "../models/PayrunPeriod";
 import { Employee } from "../models/Employee";
 
 import {
@@ -27,7 +28,7 @@ import {
 	ResponsiveDialogTrigger,
 } from "../components/ResponsiveDialog";
 import { DashboardHeader } from "./DashboardHeader";
-import { PeriodDocuments, renderDocumentWithError  } from "./PeriodDocuments";
+import { PeriodDocuments} from "./PeriodDocuments";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 
 export function ReviewOpenPeriod() {
@@ -49,7 +50,6 @@ export function ReviewOpenPeriod() {
 		controllingData.companyControllingCases.length > 0 ||
 		controllingData.employeeControllingCases.length > 0;
 
-	const accountAssignmentsNotCompleted = renderDocumentWithError != null;
 	return (
 		<>
 			<ContentLayout title={<DashboardHeader />}>
@@ -80,17 +80,25 @@ export function ReviewOpenPeriod() {
 									</Button>
 								}
 							>
-								{() => (
-									<ResponsiveDialogTrigger>
-										<Button
-											variant="contained"
-											color="primary"
-											disabled={hasUnresolvedControllingCases || accountAssignmentsNotCompleted}
-										>
-											{t("Close period")}
-										</Button>
-									</ResponsiveDialogTrigger>
-								)}
+								{(docs: PayrunDocument[]) => {
+									const hasErrors = docs.some(
+										(doc) => !!doc.attributes?.["errorCode"],
+									);
+
+									return (
+										<ResponsiveDialogTrigger>
+											<Button
+												variant="contained"
+												color="primary"
+												disabled={
+													hasUnresolvedControllingCases || hasErrors
+												}
+											>
+												{t("Close period")}
+											</Button>
+										</ResponsiveDialogTrigger>
+										);
+								}}
 							</Await>
 						</Suspense>
 						<ResponsiveDialogContent>
