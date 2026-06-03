@@ -335,8 +335,8 @@ const translations = {
 		"Being calculated...": "Werden berechnet...",
 		"Generating...": "Wird generiert...",
 		"The period is being processed...": "Die Periode wird aufbereitet...",
-		"In order for the accounting document to be prepared, the wage type account assignments have to be complete.":
-			"Damit der Buchungsbeleg aufbereitet werden kann, muss die Kontierung der Lohnarten vollständig sein.",
+		"For the accounting document to be processed and the period to be closed, the wage type postings must be complete.":
+			"Damit der Buchungsbeleg aufbereitet und die Periode geschlossen werden kann, muss die Kontierung der Lohnarten vollständig sein.",
 		"Go to account assignments": "Zur Kontierung der Lohnarten",
 
 		// Headers
@@ -399,6 +399,8 @@ const translations = {
 			"Möchten Sie die offenen Beträge in die nächste Periode übernehmen?",
 		"The wage controlling has not been completed yet. The period cannot be closed.":
 			"Die Lohnkontrolle wurde noch nicht beendet. Die Periode kann nicht geschlossen werden.",
+		"The wage type account assignments are not completed yet. The period cannot be closed.":
+			"Die Kontierung der Lohnarten ist noch nicht abgeschlossen. Die Periode kann nicht geschlossen werden.",
 		"Unsaved changes": "Nicht gespeicherte Änderungen",
 		"The settings have not been saved. Do you want to discard them?":
 			"Die Einstellungen wurden nicht gespeichert. Möchten Sie die Änderungen verwerfen?",

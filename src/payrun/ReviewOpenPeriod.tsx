@@ -27,7 +27,7 @@ import {
 	ResponsiveDialogTrigger,
 } from "../components/ResponsiveDialog";
 import { DashboardHeader } from "./DashboardHeader";
-import { PeriodDocuments } from "./PeriodDocuments";
+import { PeriodDocuments, renderDocumentWithError } from "./PeriodDocuments";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 
 export function ReviewOpenPeriod() {
@@ -48,6 +48,8 @@ export function ReviewOpenPeriod() {
 	const hasUnresolvedControllingCases =
 		controllingData.companyControllingCases.length > 0 ||
 		controllingData.employeeControllingCases.length > 0;
+
+	const accountAssignmentsNotCompleted = renderDocumentWithError != null;
 	return (
 		<>
 			<ContentLayout title={<DashboardHeader />}>
@@ -83,7 +85,7 @@ export function ReviewOpenPeriod() {
 										<Button
 											variant="contained"
 											color="primary"
-											disabled={hasUnresolvedControllingCases}
+											disabled={hasUnresolvedControllingCases || accountAssignmentsNotCompleted}
 										>
 											{t("Close period")}
 										</Button>

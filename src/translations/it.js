@@ -321,8 +321,8 @@ const translations = {
 		"Being calculated...": "In calcolo…",
 		"Generating...": "Generazione in corso…",
 		"The period is being processed...": "Il periodo è in elaborazione…",
-		"In order for the accounting document to be prepared, the wage type account assignments have to be complete.":
-			"Affinché il documento contabile possa essere elaborato, l’assegnazione dei conti alle voci salariali deve essere completa.",
+		"For the accounting document to be processed and the period to be closed, the wage type postings must be complete.":
+			"Affinché il documento contabile venga elaborato e il periodo possa essere chiuso, le registrazioni dei tipi di retribuzione devono essere complete.",
 		"Go to account assignments": "Vai all’assegnazione dei conti delle voci salariali",
 
 		// Headers
@@ -382,6 +382,8 @@ const translations = {
 			"Vuoi trasferire gli importi aperti al periodo successivo?",
 		"The wage controlling has not been completed yet. The period cannot be closed.":
 			"Il controllo della retribuzione non è ancora terminato. Il periodo non può essere chiuso.",
+		"The wage type account assignments are not completed yet. The period cannot be closed.":
+			"Le assegnazioni dei conti dei tipi di retribuzione non sono ancora completate. Il periodo non può essere chiuso.",
 		"Unsaved changes": "Modifiche non salvate",
 		"The settings have not been saved. Do you want to discard them?":
 			"Le impostazioni non sono state salvate. Vuoi scartare le modifiche?",
