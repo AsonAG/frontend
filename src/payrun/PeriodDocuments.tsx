@@ -318,15 +318,17 @@ function renderDocumentWithError(document: PayrunDocument) {
 	}
 	var Component = errorMap[errorCode];
 	return (
-		<Stack spacing={1}>
-			<Typography variant="h6" color="textDisabled">
-				{document.name}
-			</Typography>
-			<Stack spacing={1} direction="row">
-				<Warning color="warning" />
-				<Component />
+		<Alert severity="error" color="warning">
+			<Stack spacing={1}>
+				<Typography variant="h6" color="textDisabled">
+					{document.name}
+				</Typography>
+				<Stack spacing={1} direction="row">
+					<Warning color="warning" />
+					<Component />
+				</Stack>
 			</Stack>
-		</Stack>
+		</Alert>
 	);
 }
 
@@ -341,7 +343,7 @@ function WageTypeAccountMappingError() {
 		<>
 			<Typography>
 				{t(
-					"In order for the accounting document to be prepared, the wage type account assignments have to be complete.",
+					"For the accounting document to be processed and the period to be closed, the wage type accounting assigments must be complete.",
 				)}
 			</Typography>
 			<Link component={RouterLink} to={to}>
