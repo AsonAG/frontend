@@ -322,7 +322,7 @@ const translations = {
 		"Generating...": "Génération en cours…",
 		"The period is being processed...": "La période est en cours de traitement…",
 		"For the accounting document to be processed and the period to be closed, the wage type accounting assigments must be complete.":
-			"Damit der Buchungsbeleg aufbereitet und die Periode geschlossen werden kann, muss die Kontierung der Lohnarten vollständig sein.",
+			"Pour que le document comptable soit traité et que la période puisse être clôturée, les imputations des types de salaire doivent être complètes.",
 		"Go to account assignments": "Vers l’attribution des comptes des types de salaire",
 
 		// Headers
