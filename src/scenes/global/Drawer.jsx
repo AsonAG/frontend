@@ -253,11 +253,13 @@ function MenuItemsPayrollAdmin() {
 				activeOn="payrunperiods-root"
 				icon={<PayrollBadgeIcon icon={<PaymentsIcon />} />}
 			/>
-			<NavigationItem
-				label={t("Tasks")}
-				to="hr/tasks"
-				icon={<OpenTasksBadgeIcon />}
-			/>
+			<UIFeatureGate feature={UIFeature.Tasks}>
+				<NavigationItem
+					label={t("Tasks")}
+					to="hr/tasks"
+					icon={<OpenTasksBadgeIcon />}
+				/>
+			</UIFeatureGate>
 		</NavigationGroup>
 	);
 }

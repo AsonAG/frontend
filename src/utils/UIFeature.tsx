@@ -1,4 +1,5 @@
 import React, { PropsWithChildren } from "react";
+import { useUIFeatureRuntimeEnabled } from "./UIFeatureEvaluator";
 
 export enum UIFeature {
 	HrEmployeesEdit,
@@ -13,6 +14,7 @@ export enum UIFeature {
 	UsersEditRole,
 	UsersInvite,
 	UsersRemove,
+	Tasks,
 }
 
 const disabledFeatures: Set<string> = new Set(
@@ -33,8 +35,13 @@ export const UIFeatureGate = ({
 	children,
 }: { feature: UIFeature } & PropsWithChildren) => {
 	const featureName = UIFeature[feature];
+	const runtimeEnabled = useUIFeatureRuntimeEnabled(feature);
 
 	if (disabledFeatures.has(featureName)) {
+		return null;
+	}
+
+	if (runtimeEnabled === null || !runtimeEnabled) {
 		return null;
 	}
 
@@ -49,7 +56,15 @@ export const UIFeatureQuery = ({
 	render: (enabled: boolean) => React.ReactNode;
 }) => {
 	const featureName = UIFeature[feature];
-	const enabled = !disabledFeatures.has(featureName);
+	const runtimeEnabled = useUIFeatureRuntimeEnabled(feature);
 
-	return render(enabled);
+	if (disabledFeatures.has(featureName)) {
+		return render(false);
+	}
+
+	if (runtimeEnabled === null) {
+		return null;
+	}
+
+	return render(runtimeEnabled);
 };
