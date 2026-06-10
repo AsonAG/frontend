@@ -36,9 +36,9 @@ export const UIFeatureGate = ({
 }: { feature: UIFeature } & PropsWithChildren) => {
 	const featureName = UIFeature[feature];
 	const disabledViaEnv = disabledFeatures.has(featureName);
-	const disabledViaEvaluator = !useUIFeatureCheck(feature);
+	const disabledViaCheck = !useUIFeatureCheck(feature);
 
-	if (disabledViaEnv || disabledViaEvaluator) {
+	if (disabledViaEnv || disabledViaCheck) {
 		return null;
 	}
 
@@ -54,7 +54,7 @@ export const UIFeatureQuery = ({
 }) => {
 	const featureName = UIFeature[feature];
 	const enabledViaEnv = !disabledFeatures.has(featureName);
-	const enabledViaEvaluator = useUIFeatureCheck(feature);
+	const enabledViaCheck = useUIFeatureCheck(feature);
 
-	return render(enabledViaEnv && enabledViaEvaluator);
+	return render(enabledViaEnv && enabledViaCheck);
 };
