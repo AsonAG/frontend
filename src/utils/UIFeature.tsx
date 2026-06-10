@@ -41,7 +41,7 @@ export const UIFeatureGate = ({
 		return null;
 	}
 
-	if (runtimeEnabled === null || !runtimeEnabled) {
+	if (!runtimeEnabled) {
 		return null;
 	}
 
@@ -60,10 +60,6 @@ export const UIFeatureQuery = ({
 
 	if (disabledFeatures.has(featureName)) {
 		return render(false);
-	}
-
-	if (runtimeEnabled === null) {
-		return null;
 	}
 
 	return render(runtimeEnabled);

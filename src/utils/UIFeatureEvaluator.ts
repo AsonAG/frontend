@@ -15,9 +15,8 @@ async function isAdmin(): Promise<boolean> {
 	return membership?.role.$type === "Admin";
 }
 
-// Returns true (enabled), false (disabled), or null (still evaluating).
-export function useUIFeatureRuntimeEnabled(feature: UIFeature): boolean | null {
-	const [enabled, setEnabled] = useState<boolean | null>(null);
+export function useUIFeatureRuntimeEnabled(feature: UIFeature): boolean {
+	const [enabled, setEnabled] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
