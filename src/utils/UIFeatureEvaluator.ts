@@ -15,28 +15,39 @@ async function isAdmin(): Promise<boolean> {
 	return membership?.role.$type === "Admin";
 }
 
-export function useUIFeatureRuntimeEnabled(feature: UIFeature): boolean {
+async function evaluateFeature(feature: UIFeature): Promise<boolean> {
+	if (feature !== UIFeature.Tasks) {
+		return true;
+	}
+
+	if (await isAdmin()) {
+		return true;
+	}
+
+	const permissionMode = await getPermissionMode();
+
+	if (!permissionMode || permissionMode === "None") {
+		return false;
+	}
+
+	if (permissionMode === "Restricted") {
+		return false;
+	}
+
+	return true;
+}
+
+export function useUIFeatureEvaluator(feature: UIFeature): boolean {
 	const [enabled, setEnabled] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
 
-		(async () => {
-			if (feature === UIFeature.Tasks) {
-				if (await isAdmin()) {
-					if (!cancelled) setEnabled(true);
-					return;
-				}
-
-				const mode = await getPermissionMode();
-
-				if (!cancelled) {
-					setEnabled(!!mode && mode !== "None" && mode !== "Restricted");
-				}
-			} else {
-				if (!cancelled) setEnabled(true);
+		evaluateFeature(feature).then((result) => {
+			if (!cancelled) {
+				setEnabled(result);
 			}
-		})();
+		});
 
 		return () => {
 			cancelled = true;
