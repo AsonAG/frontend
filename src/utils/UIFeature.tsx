@@ -6,6 +6,7 @@ export enum UIFeature {
 	HrEmployeesEditFirstName,
 	HrEmployeesEditLastName,
 	HrEmployeesNew,
+	HrTasks,
 	OrganizationsCreate,
 	OrganizationsImport,
 	OrganizationExport,
@@ -14,7 +15,6 @@ export enum UIFeature {
 	UsersEditRole,
 	UsersInvite,
 	UsersRemove,
-	Tasks,
 }
 
 const disabledFeatures: Set<string> = new Set(

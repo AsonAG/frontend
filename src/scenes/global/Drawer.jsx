@@ -253,7 +253,7 @@ function MenuItemsPayrollAdmin() {
 				activeOn="payrunperiods-root"
 				icon={<PayrollBadgeIcon icon={<PaymentsIcon />} />}
 			/>
-			<UIFeatureGate feature={UIFeature.Tasks}>
+			<UIFeatureGate feature={UIFeature.HrTasks}>
 				<NavigationItem
 					label={t("Tasks")}
 					to="hr/tasks"
