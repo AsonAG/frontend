@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from "react";
-import { useUIFeatureEvaluator } from "./UIFeatureEvaluator";
+import { useUIFeatureCheck } from "./UIFeatureCheck";
 
 export enum UIFeature {
 	HrEmployeesEdit,
@@ -36,7 +36,7 @@ export const UIFeatureGate = ({
 }: { feature: UIFeature } & PropsWithChildren) => {
 	const featureName = UIFeature[feature];
 	const disabledViaEnv = disabledFeatures.has(featureName);
-	const disabledViaEvaluator = !useUIFeatureEvaluator(feature);
+	const disabledViaEvaluator = !useUIFeatureCheck(feature);
 
 	if (disabledViaEnv || disabledViaEvaluator) {
 		return null;
@@ -54,7 +54,7 @@ export const UIFeatureQuery = ({
 }) => {
 	const featureName = UIFeature[feature];
 	const enabledViaEnv = !disabledFeatures.has(featureName);
-	const enabledViaEvaluator = useUIFeatureEvaluator(feature);
+	const enabledViaEvaluator = useUIFeatureCheck(feature);
 
 	return render(enabledViaEnv && enabledViaEvaluator);
 };

@@ -15,7 +15,7 @@ async function isAdmin(): Promise<boolean> {
 	return membership?.role.$type === "Admin";
 }
 
-async function evaluateFeature(feature: UIFeature): Promise<boolean> {
+async function checkFeature(feature: UIFeature): Promise<boolean> {
 	if (feature !== UIFeature.Tasks) {
 		return true;
 	}
@@ -37,13 +37,13 @@ async function evaluateFeature(feature: UIFeature): Promise<boolean> {
 	return true;
 }
 
-export function useUIFeatureEvaluator(feature: UIFeature): boolean {
+export function useUIFeatureCheck(feature: UIFeature): boolean {
 	const [enabled, setEnabled] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
 
-		evaluateFeature(feature).then((result) => {
+		checkFeature(feature).then((result) => {
 			if (!cancelled) {
 				setEnabled(result);
 			}
