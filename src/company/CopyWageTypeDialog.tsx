@@ -32,7 +32,7 @@ export function CopyWageTypeDialog({
 	
 	const revalidator = useRevalidator();
 	const handleSubmit = async () => {
-		await copyWageType(routeParams, wageTypeNumber, form);
+		await copyWageType(routeParams, wageTypeNumber, wageTypeNumber, form);
 		revalidator.revalidate();
 		onClose();
 	};

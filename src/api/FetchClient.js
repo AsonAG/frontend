@@ -48,11 +48,11 @@ const payrollWageTypeMasterUrl =
 const payrollWageTypeSettingsUrl =
 	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
 const activateWageTypeUrl =
-	"/tenants/:orgId/payrolls/:payrollId/activatewagetype";
+	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber/activate";
 const copyWageTypeTypeUrl =
-	"/tenants/:orgId/payrolls/:payrollId/copywagetype";
+	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
 const updateWageTypeUrl =
-	"/tenants/:orgId/payrolls/:payrollId/updatewagetype";
+	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
@@ -916,18 +916,26 @@ export function setPayrollWageTypeSettings(routeParams, settings) {
 }
 
 export function activateWageType(routeParams, wageTypeNumber) {
-	return new FetchRequestBuilder(
-		`${activateWageTypeUrl}?wageTypeNumber=${wageTypeNumber}`,
-		routeParams,
-	)
+	return new FetchRequestBuilder(activateWageTypeUrl, {
+		...routeParams,
+		wageTypeNumber,
+	})
 		.withMethod("POST")
 		.fetch();
 }
 
-export function copyWageType(routeParams, wageTypeNumber, nameLocalizations) {
+export function copyWageType(
+	routeParams,
+	wageTypeNumber,
+	copyFromWageTypeNumber,
+	nameLocalizations,
+) {
 	return new FetchRequestBuilder(
-		`${copyWageTypeTypeUrl}?wageTypeNumber=${wageTypeNumber}`,
-		routeParams,
+		`${copyWageTypeTypeUrl}?copyFromWageTypeNumber=${copyFromWageTypeNumber}`,
+		{
+			...routeParams,
+			wageTypeNumber,
+		},
 	)
 		.withMethod("POST")
 		.withBody(nameLocalizations)
@@ -936,8 +944,11 @@ export function copyWageType(routeParams, wageTypeNumber, nameLocalizations) {
 
 export function updateWageType(routeParams, wageTypeNumber, wageType) {
 	return new FetchRequestBuilder(
-		`${updateWageTypeUrl}?wageTypeNumber=${wageTypeNumber}`,
-		routeParams,
+		updateWageTypeUrl,
+		{
+			...routeParams,
+			wageTypeNumber,
+		},
 	)
 		.withMethod("PUT")
 		.withBody(wageType)
