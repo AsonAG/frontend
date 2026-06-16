@@ -424,7 +424,7 @@ const translations = {
 		"Record wage type labels" : "Registra etichette tipo di retribuzione",
 		"Show inactive wage types" : "Mostra tipi di retribuzione inattivi",
 		"Edit wage type label": "Modifica etichette tipo di retribuzione",
-		"Search wage type number": "Cerca numero tipo di retribuzione",
+		"Search wage type number or name": "Cerca numero o nome del tipo di retribuzione",
 
 		// Culture
 		"Region settings": "Impostazioni regionali",

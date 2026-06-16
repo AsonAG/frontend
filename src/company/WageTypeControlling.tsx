@@ -44,9 +44,7 @@ import { Collector } from "../models/Collector";
 import { WageTypeDetailed, WageTypeSettings } from "../models/WageType";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { blend } from "@mui/system/colorManipulator";
-import {
-	activateWageType
-} from "../api/FetchClient";
+import { activateWageType } from "../api/FetchClient";
 
 export type WageTypeControllingLoaderData = {
 	wageTypes: WageTypeDetailed[];
@@ -86,22 +84,24 @@ export function WageTypeControlling() {
 		useLoaderData() as WageTypeControllingLoaderData;
 
 	const [showAllWageTypes, setShowAllWageTypes] = useState(false);
-	const [wageTypeNumberSearch, setWageTypeNumberSearch] = useState("");
+	const [search, setSearch] = useState("");
 
 	const filteredWageTypes = useMemo(() => {
+		const searchValue = search.trim().toLowerCase();
+
 		return wageTypes.filter((wageType) => {
 			const matchesActiveFilter =
 				showAllWageTypes || wageType.isActive === true;
 
 			const matchesSearch =
-				wageTypeNumberSearch.trim() === "" ||
-				wageType.wageTypeNumber
-					.toString()
-					.includes(wageTypeNumberSearch.trim());
+				searchValue === "" ||
+				wageType.wageTypeNumber.toString().includes(searchValue) ||
+				wageType.displayName.toLowerCase().includes(searchValue) ||
+				wageType.name.toLowerCase().includes(searchValue);
 
 			return matchesActiveFilter && matchesSearch;
 		});
-	}, [wageTypes, showAllWageTypes, wageTypeNumberSearch]);
+	}, [wageTypes, showAllWageTypes, search]);
 
 	const table = useReactTable({
 		columns: columns,
@@ -158,29 +158,29 @@ export function WageTypeControlling() {
 	return (
 		<WageTypeSettingsContext.Provider value={{ state, dispatch }}>
 			<Stack>
-
 				<Stack direction="row" justifyContent="end" spacing={2} sx={{ mb: 1 }}>
 					<TextField
 						size="small"
-						label={t("Search wage type number")}
-						value={wageTypeNumberSearch}
-						onChange={(event) => setWageTypeNumberSearch(event.target.value)}
+						label={t("Search wage type number or name")}
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+						sx={{ width: 300 }}
 					/>
 
 					<FormControlLabel
 						control={
 							<Checkbox
 								checked={showAllWageTypes}
-								onChange={(event) =>
-									setShowAllWageTypes(event.target.checked)
-								}
+								onChange={(event) => setShowAllWageTypes(event.target.checked)}
 							/>
 						}
 						label={t("Show inactive wage types")}
 					/>
 				</Stack>
 
-				<Stack sx={{ overflow: "auto", width: "max-content", minWidth: "100%" }}>
+				<Stack
+					sx={{ overflow: "auto", width: "max-content", minWidth: "100%" }}
+				>
 					{table.getHeaderGroups().map((headerGroup) => {
 						const sx: SxProps<Theme> = {
 							...rowGridSx,
@@ -410,23 +410,23 @@ type WageTypeSettingsState = WageTypeSettings & {
 
 export type SettingsAction =
 	| {
-		type: "set_account";
-		kind: "debitAccountNumber" | "creditAccountNumber";
-		wageTypeNumber: string;
-		value: string | null;
-	}
+			type: "set_account";
+			kind: "debitAccountNumber" | "creditAccountNumber";
+			wageTypeNumber: string;
+			value: string | null;
+	  }
 	| {
-		type: "set_controlling";
-		wageTypeNumber: string;
-		value: string[];
-	}
+			type: "set_controlling";
+			wageTypeNumber: string;
+			value: string[];
+	  }
 	| {
-		type: "activate_wage_type";
-		wageTypeNumber: string;
-	}
+			type: "activate_wage_type";
+			wageTypeNumber: string;
+	  }
 	| {
-		type: "reset_dirty";
-	};
+			type: "reset_dirty";
+	  };
 
 function reducer(
 	state: WageTypeSettingsState,
