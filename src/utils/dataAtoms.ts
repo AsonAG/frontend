@@ -343,5 +343,5 @@ export const payrollWageTypesWithMissingAccountInfoCountAtom = atom<
 	Promise<number>
 >(async (get) => {
 	const wageTypes = await get(payrollWageTypesAtom);
-	return wageTypes.filter((wt) => wt.accountAssignmentRequired).length;
+	return wageTypes.filter((wt) => wt.isActive === true && wt.accountAssignmentRequired).length;
 });

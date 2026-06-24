@@ -44,11 +44,11 @@ const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
 const payrollEmployeeUrl =
 	"/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
 const payrollWageTypeMasterUrl =
-	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster2";
+	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
 const payrollWageTypeSettingsUrl =
 	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
 const activateWageTypeUrl =
-	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber/activate";
+	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
 const copyWageTypeTypeUrl =
 	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
 const updateWageTypeUrl =
@@ -916,10 +916,12 @@ export function setPayrollWageTypeSettings(routeParams, settings) {
 }
 
 export function activateWageType(routeParams, wageTypeNumber) {
-	return new FetchRequestBuilder(activateWageTypeUrl, {
-		...routeParams,
-		wageTypeNumber,
-	})
+	const url = activateWageTypeUrl.replace(
+		":wageTypeNumber",
+		`${wageTypeNumber}:activate`,
+	);
+
+	return new FetchRequestBuilder(url, routeParams)
 		.withMethod("POST")
 		.fetch();
 }
