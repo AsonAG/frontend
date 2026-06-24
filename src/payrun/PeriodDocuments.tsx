@@ -343,7 +343,7 @@ function WageTypeAccountMappingError() {
 		<>
 			<Typography>
 				{t(
-					"For the accounting document to be processed and the period to be closed, the wage type postings must be complete.",
+					"For the accounting document to be processed and the period to be closed, the wage type accounting assigments must be complete.",
 				)}
 			</Typography>
 			<Link component={RouterLink} to={to}>

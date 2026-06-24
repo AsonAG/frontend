@@ -335,7 +335,7 @@ const translations = {
 		"Being calculated...": "Werden berechnet...",
 		"Generating...": "Wird generiert...",
 		"The period is being processed...": "Die Periode wird aufbereitet...",
-		"For the accounting document to be processed and the period to be closed, the wage type postings must be complete.":
+		"For the accounting document to be processed and the period to be closed, the wage type accounting assigments must be complete.":
 			"Damit der Buchungsbeleg aufbereitet und die Periode geschlossen werden kann, muss die Kontierung der Lohnarten vollständig sein.",
 		"Go to account assignments": "Zur Kontierung der Lohnarten",
 
