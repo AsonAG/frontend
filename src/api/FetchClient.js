@@ -82,6 +82,11 @@ const payoutUrl =
 	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
 const payoutDocumentUrl =
 	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId/document";
+const payrollReportsUrl = "/tenants/:orgId/payrolls/:payrollId/reports";
+const payrollReportBuildUrl =
+	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/build";
+const payrollReportGenerateUrl =
+	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/generate";
 const exportUrl = "/tenants/:orgId/export";
 const invitationUrl = "/user_membership_invitations/:invitationId";
 
@@ -741,6 +746,30 @@ export function getPayrunPeriodEntryDocument(routeParams, report, variant) {
 	return new FetchRequestBuilder(payrunPeriodEntryDocumentUrl, routeParams)
 		.withQueryParam("report", report)
 		.withQueryParam("variant", variant)
+		.fetchJson();
+}
+
+export function getPayrollReports(routeParams, clusterSetName) {
+	return new FetchRequestBuilder(payrollReportsUrl, routeParams)
+		.withQueryParam("clusterSetName", clusterSetName)
+		.withLocalization()
+		.fetchJson();
+}
+
+export function buildPayrollReport(routeParams, reportRequest, language) {
+	return new FetchRequestBuilder(payrollReportBuildUrl, routeParams)
+		.withMethod("POST")
+		.withQueryParam("language", language)
+		.withBody(reportRequest)
+		.withLocalization()
+		.fetchJson();
+}
+
+export function generatePayrollReport(routeParams, reportRequest, format) {
+	return new FetchRequestBuilder(payrollReportGenerateUrl, routeParams)
+		.withMethod("POST")
+		.withQueryParam("format", format)
+		.withBody(reportRequest)
 		.fetchJson();
 }
 

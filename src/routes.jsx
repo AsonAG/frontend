@@ -63,6 +63,7 @@ import {
 	getPayrollCollectors,
 	getPayrunPeriodDocuments,
 	getPayrunPeriodEntryDocument,
+	getPayrollReports,
 	setPayrollWageTypeSettings,
 	getPayroll,
 	getAvailableRegulations,
@@ -137,6 +138,7 @@ import { ClosedPeriodDocuments } from "./payrun/ClosedPeriodDocuments";
 import { PeriodCaseValueDialog } from "./payrun/PeriodCaseValueDialog";
 import { base64ToBytes } from "./services/converters/BinaryConverter";
 import { CompanyTabbedView } from "./company/CompanyTabbedView";
+import { CompanyReports } from "./company/CompanyReports";
 import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
 import { WageTypeControlling } from "./company/WageTypeControlling";
@@ -1414,6 +1416,17 @@ const routeData = [
 						"CostCenterMaster",
 						"Cost center",
 					),
+					{
+						path: "reports",
+						Component: CompanyReports,
+						loader: async ({ params }) => {
+							const reports = await getPayrollReports(
+								params,
+								"AvailableReports",
+							);
+							return { reports };
+						},
+					},
 					createRouteCaseForm("onboarding/:caseName", {}),
 					{
 						path: "new",
