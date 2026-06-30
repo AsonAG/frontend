@@ -7,7 +7,7 @@ import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
 import { useLoaderData } from "react-router-dom";
 import { WageTypeControllingLoaderData } from "./WageTypeControllingLoaderData";
 import { WageTypeDetails } from "./WageTypeDetails";
-import { CreateNewFolderRounded, Info } from "@mui/icons-material";
+import { Add, Refresh, Info } from "@mui/icons-material";
 import { ControllingPicker } from "./WageTypeControllingPicker";
 import { ActivateWageTypeCheckbox } from "./ActivateWageType";
 import { CopyWageTypeDialog } from "./CopyWageTypeDialog";
@@ -134,7 +134,7 @@ function createColumns() {
 					<>
 						<Tooltip title={t("Copy wage type")}>
 							<IconButton size="small" onClick={() => setOpen(true)}>
-								<CreateNewFolderRounded />
+								<Add />
 							</IconButton>
 						</Tooltip>
 
@@ -168,7 +168,7 @@ function createColumns() {
 					<>
 						<Tooltip title={t("Update wage type")}>
 							<IconButton size="small" onClick={() => setOpen(true)}>
-								<CreateNewFolderRounded />
+								<Refresh />
 							</IconButton>
 						</Tooltip>
 
