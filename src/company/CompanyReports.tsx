@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
 	Button,
 	Checkbox,
@@ -15,7 +15,7 @@ import {
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import { useLoaderData, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { generatePayrollReport } from "../api/FetchClient";
+import { buildPayrollReport, generatePayrollReport } from "../api/FetchClient";
 import { toast } from "../utils/dataAtoms";
 import { Language } from "../models/Language";
 
@@ -136,6 +136,22 @@ function isNumber(valueType?: string): boolean {
 	);
 }
 
+// The build function serializes list options as {"dictionary": {label: value}}.
+function getListSelection(
+	parameter: ReportParameter,
+): Array<[string, string]> | null {
+	const raw = parameter.attributes?.["input.listSelection"];
+	if (!raw) return null;
+	try {
+		const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+		const dictionary = parsed?.dictionary;
+		if (!dictionary) return null;
+		return Object.entries(dictionary as Record<string, string>);
+	} catch {
+		return null;
+	}
+}
+
 function GenerateReportDialog({
 	report,
 	onClose,
@@ -147,17 +163,12 @@ function GenerateReportDialog({
 	const params = useParams();
 	const [generating, setGenerating] = useState(false);
 
-	const visibleParameters = useMemo(
-		() =>
-			(report.parameters ?? [])
-				.filter((p) => !isHidden(p))
-				.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
-		[report.parameters],
-	);
+	const language = languageByCode[i18n.language?.split("-")[0]] ?? "German";
 
 	const outputs = report.availableOutputs?.length
 		? report.availableOutputs
 		: ["Pdf"];
+	const [format, setFormat] = useState<string>(outputs[0]);
 
 	const [values, setValues] = useState<Record<string, string>>(() => {
 		const initial: Record<string, string> = {};
@@ -166,7 +177,51 @@ function GenerateReportDialog({
 		}
 		return initial;
 	});
-	const [format, setFormat] = useState<string>(outputs[0]);
+
+	// Parameters shown to the user. The build step enriches them with dynamic
+	// attributes (e.g. an employee dropdown, hidden fields). We fall back to the
+	// static definition until the build result arrives.
+	const [parameters, setParameters] = useState<ReportParameter[]>(
+		report.parameters ?? [],
+	);
+
+	// Re-run the build whenever a boolean parameter changes, since those drive
+	// the build logic (e.g. "All employees?" toggles the employee dropdown).
+	const structuralKey = (report.parameters ?? [])
+		.filter((p) => isBoolean(p.valueType))
+		.map((p) => `${p.name}=${values[p.name]}`)
+		.join("&");
+
+	useEffect(() => {
+		let cancelled = false;
+		async function build() {
+			try {
+				const result = await buildPayrollReport(
+					{ ...params, reportId: report.id },
+					{ language, payrollId: params.payrollId, parameters: values },
+					language,
+				);
+				if (!cancelled && result?.parameters) {
+					setParameters(result.parameters);
+				}
+			} catch {
+				// keep the static parameters on failure
+			}
+		}
+		build();
+		return () => {
+			cancelled = true;
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [structuralKey]);
+
+	const visibleParameters = useMemo(
+		() =>
+			parameters
+				.filter((p) => !isHidden(p))
+				.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+		[parameters],
+	);
 
 	const setValue = (name: string, value: string) =>
 		setValues((prev) => ({ ...prev, [name]: value }));
@@ -174,15 +229,9 @@ function GenerateReportDialog({
 	async function handleGenerate() {
 		setGenerating(true);
 		try {
-			const language = languageByCode[i18n.language?.split("-")[0]] ?? "German";
-			const request = {
-				language,
-				payrollId: params.payrollId,
-				parameters: values,
-			};
 			const file = await generatePayrollReport(
 				{ ...params, reportId: report.id },
-				request,
+				{ language, payrollId: params.payrollId, parameters: values },
 				format,
 			);
 			if (!file?.content) {
@@ -253,6 +302,28 @@ function ParameterInput({
 	onChange: (value: string) => void;
 }) {
 	const label = parameter.displayName ?? parameter.name;
+
+	const listSelection = getListSelection(parameter);
+	if (listSelection) {
+		return (
+			<TextField
+				select
+				label={label}
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				required={parameter.mandatory}
+			>
+				<MenuItem value="">
+					<em>—</em>
+				</MenuItem>
+				{listSelection.map(([optionLabel, optionValue]) => (
+					<MenuItem key={optionValue} value={optionValue}>
+						{optionLabel}
+					</MenuItem>
+				))}
+			</TextField>
+		);
+	}
 
 	if (isBoolean(parameter.valueType)) {
 		return (
