@@ -15,6 +15,7 @@ import {
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import { useLoaderData, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import dayjs from "dayjs";
 import { buildPayrollReport, generatePayrollReport } from "../api/FetchClient";
 import { toast } from "../utils/dataAtoms";
 import { Language } from "../models/Language";
@@ -41,8 +42,15 @@ type ReportSet = {
 	availableOutputs?: string[];
 };
 
+type PayrunPeriod = {
+	id: string;
+	periodStart: string;
+	periodStatus?: string;
+};
+
 type LoaderData = {
 	reports: ReportSet[];
+	periods: PayrunPeriod[];
 };
 
 const languageByCode: Record<string, Language> = {
@@ -52,12 +60,24 @@ const languageByCode: Record<string, Language> = {
 	it: "Italian",
 };
 
+// Only these reports are offered in the company reports tab.
+const ALLOWED_REPORTS = new Set([
+	"WageTypesReport",
+	"EmployeesMasterDataReport",
+	"CompanyMasterDataReport",
+	"CaseFieldExportReport",
+]);
+
 export function CompanyReports() {
 	const { t } = useTranslation();
-	const { reports } = useLoaderData() as LoaderData;
+	const { reports, periods } = useLoaderData() as LoaderData;
 	const [activeReport, setActiveReport] = useState<ReportSet | null>(null);
 
-	if (!reports || reports.length === 0) {
+	const visibleReports = (reports ?? []).filter((r) =>
+		ALLOWED_REPORTS.has(r.name),
+	);
+
+	if (visibleReports.length === 0) {
 		return (
 			<Typography color="text.secondary">
 				{t("No reports available.")}
@@ -68,7 +88,7 @@ export function CompanyReports() {
 	return (
 		<>
 			<Stack spacing={1} sx={{ maxWidth: 720 }}>
-				{reports.map((report) => (
+				{visibleReports.map((report) => (
 					<Stack
 						key={report.id}
 						direction="row"
@@ -101,6 +121,7 @@ export function CompanyReports() {
 				<GenerateReportDialog
 					key={activeReport.id}
 					report={activeReport}
+					periods={periods ?? []}
 					onClose={() => setActiveReport(null)}
 				/>
 			)}
@@ -154,9 +175,11 @@ function getListSelection(
 
 function GenerateReportDialog({
 	report,
+	periods,
 	onClose,
 }: {
 	report: ReportSet;
+	periods: PayrunPeriod[];
 	onClose: () => void;
 }) {
 	const { t, i18n } = useTranslation();
@@ -165,9 +188,14 @@ function GenerateReportDialog({
 
 	const language = languageByCode[i18n.language?.split("-")[0]] ?? "German";
 
+	// Reports with an "Excel" flag can render both tabular (Excel/CSV) and
+	// template (Word/PDF) output; the flag is derived from the chosen format.
+	const hasExcelFlag = (report.parameters ?? []).some((p) => p.name === "Excel");
 	const outputs = report.availableOutputs?.length
 		? report.availableOutputs
-		: ["Pdf"];
+		: hasExcelFlag
+			? ["Word", "Pdf", "Excel", "Csv"]
+			: ["Pdf"];
 	const [format, setFormat] = useState<string>(outputs[0]);
 
 	const [values, setValues] = useState<Record<string, string>>(() => {
@@ -219,8 +247,10 @@ function GenerateReportDialog({
 		() =>
 			parameters
 				.filter((p) => !isHidden(p))
+				// The "Excel" flag is driven by the format selector, so hide it.
+				.filter((p) => !(hasExcelFlag && p.name === "Excel"))
 				.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
-		[parameters],
+		[parameters, hasExcelFlag],
 	);
 
 	const setValue = (name: string, value: string) =>
@@ -229,9 +259,16 @@ function GenerateReportDialog({
 	async function handleGenerate() {
 		setGenerating(true);
 		try {
+			// Tabular formats (Excel/CSV) need the report's "Excel" flag on
+			// (flat data); template formats (Word/PDF) need it off. Keep in sync.
+			const requestValues = { ...values };
+			if (hasExcelFlag) {
+				requestValues["Excel"] =
+					format === "Excel" || format === "Csv" ? "true" : "false";
+			}
 			const file = await generatePayrollReport(
 				{ ...params, reportId: report.id },
-				{ language, payrollId: params.payrollId, parameters: values },
+				{ language, payrollId: params.payrollId, parameters: requestValues },
 				format,
 			);
 			if (!file?.content) {
@@ -241,7 +278,13 @@ function GenerateReportDialog({
 			downloadBase64File(file);
 			onClose();
 		} catch (e) {
-			toast("error", t("The report could not be generated."));
+			const detail = e instanceof Error ? e.message : "";
+			toast(
+				"error",
+				detail
+					? `${t("The report could not be generated.")} ${detail}`
+					: t("The report could not be generated."),
+			);
 		} finally {
 			setGenerating(false);
 		}
@@ -252,10 +295,16 @@ function GenerateReportDialog({
 			<DialogTitle>{report.displayName ?? report.name}</DialogTitle>
 			<DialogContent dividers>
 				<Stack spacing={2} sx={{ pt: 1 }}>
+					{visibleParameters.length === 0 && outputs.length <= 1 && (
+						<Typography color="text.secondary">
+							{t("This report has no options — click Generate to create it.")}
+						</Typography>
+					)}
 					{visibleParameters.map((parameter) => (
 						<ParameterInput
 							key={parameter.name}
 							parameter={parameter}
+							periods={periods}
 							value={values[parameter.name] ?? ""}
 							onChange={(value) => setValue(parameter.name, value)}
 						/>
@@ -294,21 +343,24 @@ function GenerateReportDialog({
 
 function ParameterInput({
 	parameter,
+	periods,
 	value,
 	onChange,
 }: {
 	parameter: ReportParameter;
+	periods: PayrunPeriod[];
 	value: string;
 	onChange: (value: string) => void;
 }) {
+	const { t } = useTranslation();
 	const label = parameter.displayName ?? parameter.name;
 
-	const listSelection = getListSelection(parameter);
-	if (listSelection) {
+	// Let the user pick a payrun period by date instead of typing a raw id.
+	if (parameter.name === "PayrunPeriodId") {
 		return (
 			<TextField
 				select
-				label={label}
+				label={t("Period")}
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				required={parameter.mandatory}
@@ -316,6 +368,37 @@ function ParameterInput({
 				<MenuItem value="">
 					<em>—</em>
 				</MenuItem>
+				{periods.map((period) => (
+					<MenuItem key={period.id} value={period.id}>
+						{dayjs.utc(period.periodStart).format("MMMM YYYY")}
+					</MenuItem>
+				))}
+			</TextField>
+		);
+	}
+
+	const listSelection = getListSelection(parameter);
+	if (listSelection) {
+		// The value is a comma-separated string; the multi-select works on an array.
+		const selected = value
+			? value
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean)
+			: [];
+		return (
+			<TextField
+				select
+				label={label}
+				value={selected}
+				onChange={(e) => {
+					const v = e.target.value as unknown as string[];
+					onChange(Array.isArray(v) ? v.join(",") : v);
+				}}
+				required={parameter.mandatory}
+				helperText={parameter.displayDescription ?? parameter.description}
+				SelectProps={{ multiple: true }}
+			>
 				{listSelection.map(([optionLabel, optionValue]) => (
 					<MenuItem key={optionValue} value={optionValue}>
 						{optionLabel}

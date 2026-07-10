@@ -756,6 +756,12 @@ export function getPayrollReports(routeParams, clusterSetName) {
 		.fetchJson();
 }
 
+export function getPayrollReportPeriods(routeParams) {
+	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
+		.withQueryParam("orderBy", "periodStart desc")
+		.fetchJson();
+}
+
 export function buildPayrollReport(routeParams, reportRequest, language) {
 	return new FetchRequestBuilder(payrollReportBuildUrl, routeParams)
 		.withMethod("POST")
@@ -765,12 +771,20 @@ export function buildPayrollReport(routeParams, reportRequest, language) {
 		.fetchJson();
 }
 
-export function generatePayrollReport(routeParams, reportRequest, format) {
-	return new FetchRequestBuilder(payrollReportGenerateUrl, routeParams)
+export async function generatePayrollReport(routeParams, reportRequest, format) {
+	const response = await new FetchRequestBuilder(
+		payrollReportGenerateUrl,
+		routeParams,
+	)
 		.withMethod("POST")
 		.withQueryParam("format", format)
 		.withBody(reportRequest)
-		.fetchJson();
+		.fetch();
+	if (!response.ok) {
+		const text = await response.text();
+		throw new Error(text || `Report generation failed (${response.status})`);
+	}
+	return response.json();
 }
 
 export function buildCase(routeParams, caseChangeSetup) {

@@ -64,6 +64,7 @@ import {
 	getPayrunPeriodDocuments,
 	getPayrunPeriodEntryDocument,
 	getPayrollReports,
+	getPayrollReportPeriods,
 	setPayrollWageTypeSettings,
 	getPayroll,
 	getAvailableRegulations,
@@ -1420,11 +1421,11 @@ const routeData = [
 						path: "reports",
 						Component: CompanyReports,
 						loader: async ({ params }) => {
-							const reports = await getPayrollReports(
-								params,
-								"AvailableReports",
-							);
-							return { reports };
+							const [reports, periods] = await Promise.all([
+								getPayrollReports(params, "AvailableReports"),
+								getPayrollReportPeriods(params),
+							]);
+							return { reports, periods };
 						},
 					},
 					createRouteCaseForm("onboarding/:caseName", {}),
