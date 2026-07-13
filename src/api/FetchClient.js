@@ -756,12 +756,6 @@ export function getPayrollReports(routeParams, clusterSetName) {
 		.fetchJson();
 }
 
-export function getPayrollReportPeriods(routeParams) {
-	return new FetchRequestBuilder(payrunPeriodsUrl, routeParams)
-		.withQueryParam("orderBy", "periodStart desc")
-		.fetchJson();
-}
-
 export function buildPayrollReport(routeParams, reportRequest, language) {
 	return new FetchRequestBuilder(payrollReportBuildUrl, routeParams)
 		.withMethod("POST")

@@ -15,7 +15,6 @@ import {
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import { useLoaderData, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import dayjs from "dayjs";
 import { buildPayrollReport, generatePayrollReport } from "../api/FetchClient";
 import { toast } from "../utils/dataAtoms";
 import { Language } from "../models/Language";
@@ -42,15 +41,8 @@ type ReportSet = {
 	availableOutputs?: string[];
 };
 
-type PayrunPeriod = {
-	id: string;
-	periodStart: string;
-	periodStatus?: string;
-};
-
 type LoaderData = {
 	reports: ReportSet[];
-	periods: PayrunPeriod[];
 };
 
 const languageByCode: Record<string, Language> = {
@@ -70,7 +62,7 @@ const ALLOWED_REPORTS = new Set([
 
 export function CompanyReports() {
 	const { t } = useTranslation();
-	const { reports, periods } = useLoaderData() as LoaderData;
+	const { reports } = useLoaderData() as LoaderData;
 	const [activeReport, setActiveReport] = useState<ReportSet | null>(null);
 
 	const visibleReports = (reports ?? []).filter((r) =>
@@ -121,7 +113,6 @@ export function CompanyReports() {
 				<GenerateReportDialog
 					key={activeReport.id}
 					report={activeReport}
-					periods={periods ?? []}
 					onClose={() => setActiveReport(null)}
 				/>
 			)}
@@ -175,11 +166,9 @@ function getListSelection(
 
 function GenerateReportDialog({
 	report,
-	periods,
 	onClose,
 }: {
 	report: ReportSet;
-	periods: PayrunPeriod[];
 	onClose: () => void;
 }) {
 	const { t, i18n } = useTranslation();
@@ -304,7 +293,6 @@ function GenerateReportDialog({
 						<ParameterInput
 							key={parameter.name}
 							parameter={parameter}
-							periods={periods}
 							value={values[parameter.name] ?? ""}
 							onChange={(value) => setValue(parameter.name, value)}
 						/>
@@ -343,39 +331,14 @@ function GenerateReportDialog({
 
 function ParameterInput({
 	parameter,
-	periods,
 	value,
 	onChange,
 }: {
 	parameter: ReportParameter;
-	periods: PayrunPeriod[];
 	value: string;
 	onChange: (value: string) => void;
 }) {
-	const { t } = useTranslation();
 	const label = parameter.displayName ?? parameter.name;
-
-	// Let the user pick a payrun period by date instead of typing a raw id.
-	if (parameter.name === "PayrunPeriodId") {
-		return (
-			<TextField
-				select
-				label={t("Period")}
-				value={value}
-				onChange={(e) => onChange(e.target.value)}
-				required={parameter.mandatory}
-			>
-				<MenuItem value="">
-					<em>—</em>
-				</MenuItem>
-				{periods.map((period) => (
-					<MenuItem key={period.id} value={period.id}>
-						{dayjs.utc(period.periodStart).format("MMMM YYYY")}
-					</MenuItem>
-				))}
-			</TextField>
-		);
-	}
 
 	const listSelection = getListSelection(parameter);
 	if (listSelection) {
