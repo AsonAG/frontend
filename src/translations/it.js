@@ -326,8 +326,8 @@ const translations = {
 		"Being calculated...": "In calcolo…",
 		"Generating...": "Generazione in corso…",
 		"The period is being processed...": "Il periodo è in elaborazione…",
-		"In order for the accounting document to be prepared, the wage type account assignments have to be complete.":
-			"Affinché il documento contabile possa essere elaborato, l’assegnazione dei conti alle voci salariali deve essere completa.",
+		"For the accounting document to be processed and the period to be closed, the wage type accounting assigments must be complete.":
+			"Affinché il documento contabile venga elaborato e il periodo possa essere chiuso, le registrazioni dei tipi di retribuzione devono essere complete.",
 		"Go to account assignments": "Vai all’assegnazione dei conti delle voci salariali",
 
 		// Headers

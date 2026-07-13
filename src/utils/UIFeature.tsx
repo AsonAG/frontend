@@ -1,10 +1,12 @@
 import React, { PropsWithChildren } from "react";
+import { useUIFeatureCheck } from "./UIFeatureCheck";
 
 export enum UIFeature {
 	HrEmployeesEdit,
 	HrEmployeesEditFirstName,
 	HrEmployeesEditLastName,
 	HrEmployeesNew,
+	HrTasks,
 	OrganizationsCreate,
 	OrganizationsImport,
 	OrganizationExport,
@@ -33,8 +35,10 @@ export const UIFeatureGate = ({
 	children,
 }: { feature: UIFeature } & PropsWithChildren) => {
 	const featureName = UIFeature[feature];
+	const disabledViaEnv = disabledFeatures.has(featureName);
+	const disabledViaCheck = !useUIFeatureCheck(feature);
 
-	if (disabledFeatures.has(featureName)) {
+	if (disabledViaEnv || disabledViaCheck) {
 		return null;
 	}
 
@@ -49,7 +53,8 @@ export const UIFeatureQuery = ({
 	render: (enabled: boolean) => React.ReactNode;
 }) => {
 	const featureName = UIFeature[feature];
-	const enabled = !disabledFeatures.has(featureName);
+	const enabledViaEnv = !disabledFeatures.has(featureName);
+	const enabledViaCheck = useUIFeatureCheck(feature);
 
-	return render(enabled);
+	return render(enabledViaEnv && enabledViaCheck);
 };

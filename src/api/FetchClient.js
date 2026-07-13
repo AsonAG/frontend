@@ -3,6 +3,7 @@ import { authUserAtom, localUserEmailAtom } from "../auth/getUser";
 import { getDefaultStore } from "jotai";
 import { payrollAtom, userAtom } from "../utils/dataAtoms";
 import { useOidc } from "../auth/authConfig";
+import { employeeCasesFilter, companyCasesFilter } from "./ClientFilters";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const availableRegulationsUrl = "/regulations/available";
@@ -107,6 +108,7 @@ class FetchRequestBuilder {
 	fallbackValue = null;
 	timeout = 60000;
 	retries = 0;
+	clientFilter = null;
 
 	constructor(url, routeParams) {
 		if (!url) {
@@ -202,6 +204,11 @@ class FetchRequestBuilder {
 		return this;
 	}
 
+	withClientFilter(filter) {
+		this.clientFilter = filter;
+		return this;
+	}
+
 	withIgnoreErrors(fallbackValue) {
 		this.ignoreErrors = true;
 		if (fallbackValue !== undefined) {
@@ -265,8 +272,18 @@ class FetchRequestBuilder {
 		if (this.ignoreErrors && !response.ok) {
 			return this.fallbackValue;
 		}
-		const result = await response.json();
+		let result = await response.json();
 		if (!result) return result;
+		if (this.clientFilter) {
+			result = await this.clientFilter(result, {
+				url: this.url,
+				method: this.method,
+				headers: this.headers,
+				searchParams: this.searchParams,
+				routeParams: this.routeParams,
+				body: this.body,
+			});
+		}
 		if (result.items !== undefined && result.count !== undefined) {
 			// query result
 			const queryResultType = this.searchParams.get("result");
@@ -492,6 +509,7 @@ export function getEmployeeCases(
 		.withSignal(signal)
 		.withLocalization()
 		.withIgnoreErrors([])
+		.withClientFilter(employeeCasesFilter)
 		.fetchJson();
 }
 
@@ -566,6 +584,7 @@ export function getCompanyCases(routeParams, clusterSetName, signal) {
 		.withSignal(signal)
 		.withLocalization()
 		.withIgnoreErrors([])
+		.withClientFilter(companyCasesFilter)
 		.fetchJson();
 }
 
