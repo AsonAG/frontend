@@ -1,5 +1,6 @@
 const translations = {
 	translation: {
+		Reports: "Report",
 		"No reports available.": "Nessun report disponibile.",
 		Format: "Formato",
 		"This report has no options — click Generate to create it.":
