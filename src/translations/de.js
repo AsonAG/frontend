@@ -1,5 +1,11 @@
 const translations = {
 	translation: {
+		"No reports available.": "Keine Reports verfügbar.",
+		Format: "Format",
+		"This report has no options — click Generate to create it.":
+			"Dieser Report hat keine Optionen — auf Generieren klicken.",
+		"The report could not be generated.":
+			"Der Report konnte nicht generiert werden.",
 		Organization: "Organisation",
 		Organizations: "Organisationen",
 		"Organization unit": "Organisationseinheit",
