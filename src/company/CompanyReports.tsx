@@ -211,11 +211,10 @@ function GenerateReportDialog({
 		report.parameters ?? [],
 	);
 
-	// Re-run the build whenever a boolean parameter changes, since those drive
-	// the build logic (e.g. "All employees?" toggles the employee dropdown).
+	// Re-run the build after every parameter change, since the build function
+	// may derive attributes (dropdowns, hidden fields) from any of them.
 	const structuralKey = (report.parameters ?? [])
-		.filter((p) => isBoolean(p.valueType))
-		.map((p) => `${p.name}=${values[p.name]}`)
+		.map((p) => `${p.name}=${values[p.name] ?? ""}`)
 		.join("&");
 
 	useEffect(() => {
