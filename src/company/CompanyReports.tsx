@@ -81,32 +81,11 @@ export function CompanyReports() {
 		<>
 			<Stack spacing={1} sx={{ maxWidth: 720 }}>
 				{visibleReports.map((report) => (
-					<Stack
+					<ReportListItem
 						key={report.id}
-						direction="row"
-						alignItems="center"
-						spacing={2}
-						sx={{
-							p: 1.5,
-							borderRadius: 1,
-							border: (theme) => `1px solid ${theme.palette.divider}`,
-						}}
-					>
-						<DescriptionRoundedIcon color="action" />
-						<Stack sx={{ flex: 1, minWidth: 0 }}>
-							<Typography fontWeight="bold">
-								{report.displayName ?? report.name}
-							</Typography>
-							{(report.displayDescription ?? report.description) && (
-								<Typography variant="body2" color="text.secondary" noWrap>
-									{report.displayDescription ?? report.description}
-								</Typography>
-							)}
-						</Stack>
-						<Button variant="outlined" onClick={() => setActiveReport(report)}>
-							{t("Generate")}
-						</Button>
-					</Stack>
+						report={report}
+						onGenerate={() => setActiveReport(report)}
+					/>
 				))}
 			</Stack>
 			{activeReport && (
@@ -117,6 +96,43 @@ export function CompanyReports() {
 				/>
 			)}
 		</>
+	);
+}
+
+function ReportListItem({
+	report,
+	onGenerate,
+}: {
+	report: ReportSet;
+	onGenerate: () => void;
+}) {
+	const { t } = useTranslation();
+	return (
+		<Stack
+			direction="row"
+			alignItems="center"
+			spacing={2}
+			sx={{
+				p: 1.5,
+				borderRadius: 1,
+				border: (theme) => `1px solid ${theme.palette.divider}`,
+			}}
+		>
+			<DescriptionRoundedIcon color="action" />
+			<Stack sx={{ flex: 1, minWidth: 0 }}>
+				<Typography fontWeight="bold">
+					{report.displayName ?? report.name}
+				</Typography>
+				{(report.displayDescription ?? report.description) && (
+					<Typography variant="body2" color="text.secondary" noWrap>
+						{report.displayDescription ?? report.description}
+					</Typography>
+				)}
+			</Stack>
+			<Button variant="outlined" onClick={onGenerate}>
+				{t("Generate")}
+			</Button>
+		</Stack>
 	);
 }
 
