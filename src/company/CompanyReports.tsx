@@ -193,14 +193,7 @@ function GenerateReportDialog({
 
 	const language = languageByCode[i18n.language?.split("-")[0]] ?? "German";
 
-	// Reports with an "Excel" flag can render both tabular (Excel/CSV) and
-	// template (Word/PDF) output; the flag is derived from the chosen format.
-	const hasExcelFlag = (report.parameters ?? []).some((p) => p.name === "Excel");
-	const outputs = report.availableOutputs?.length
-		? report.availableOutputs
-		: hasExcelFlag
-			? ["Word", "Pdf", "Excel", "Csv"]
-			: ["Pdf"];
+	const outputs = report.availableOutputs ?? [];
 	const [format, setFormat] = useState<string>(outputs[0]);
 
 	const [values, setValues] = useState<Record<string, string>>(() => {
@@ -251,10 +244,8 @@ function GenerateReportDialog({
 		() =>
 			parameters
 				.filter((p) => !isHidden(p))
-				// The "Excel" flag is driven by the format selector, so hide it.
-				.filter((p) => !(hasExcelFlag && p.name === "Excel"))
 				.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
-		[parameters, hasExcelFlag],
+		[parameters],
 	);
 
 	const setValue = (name: string, value: string) =>
@@ -263,16 +254,9 @@ function GenerateReportDialog({
 	async function handleGenerate() {
 		setGenerating(true);
 		try {
-			// Tabular formats (Excel/CSV) need the report's "Excel" flag on
-			// (flat data); template formats (Word/PDF) need it off. Keep in sync.
-			const requestValues = { ...values };
-			if (hasExcelFlag) {
-				requestValues["Excel"] =
-					format === "Excel" || format === "Csv" ? "true" : "false";
-			}
 			const file = await generatePayrollReport(
 				{ ...params, reportId: report.id },
-				{ language, payrollId: params.payrollId, parameters: requestValues },
+				{ language, payrollId: params.payrollId, parameters: values },
 				format,
 			);
 			if (!file?.content) {
