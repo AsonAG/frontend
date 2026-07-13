@@ -232,7 +232,6 @@ function GenerateReportDialog({
 				const result = await buildPayrollReport(
 					{ ...params, reportId: report.id },
 					{ language, payrollId: params.payrollId, parameters: values },
-					language,
 				);
 				if (!cancelled && result?.parameters) {
 					setParameters(result.parameters);

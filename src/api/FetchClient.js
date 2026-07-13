@@ -756,10 +756,9 @@ export function getPayrollReports(routeParams, clusterSetName) {
 		.fetchJson();
 }
 
-export function buildPayrollReport(routeParams, reportRequest, language) {
+export function buildPayrollReport(routeParams, reportRequest) {
 	return new FetchRequestBuilder(payrollReportBuildUrl, routeParams)
 		.withMethod("POST")
-		.withQueryParam("language", language)
 		.withBody(reportRequest)
 		.withLocalization()
 		.fetchJson();
