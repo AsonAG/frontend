@@ -167,6 +167,19 @@ function isNumber(valueType?: string): boolean {
 	);
 }
 
+// A date parameter defaults to the current date. The report definition uses the
+// literal "today" as default value, which is no date the picker can show.
+function getInitialValue(parameter: ReportParameter): string {
+	const value = parameter.value ?? "";
+	if (!isDate(parameter.valueType)) {
+		return value;
+	}
+	const date = value ? dayjs.utc(value) : null;
+	return date?.isValid()
+		? date.format("YYYY-MM-DD")
+		: dayjs.utc().format("YYYY-MM-DD");
+}
+
 // The build function serializes list options as {"dictionary": {label: value}}.
 function getListSelection(
 	parameter: ReportParameter,
@@ -202,7 +215,7 @@ function GenerateReportDialog({
 	const [values, setValues] = useState<Record<string, string>>(() => {
 		const initial: Record<string, string> = {};
 		for (const parameter of report.parameters ?? []) {
-			initial[parameter.name] = parameter.value ?? "";
+			initial[parameter.name] = getInitialValue(parameter);
 		}
 		return initial;
 	});
