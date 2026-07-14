@@ -15,6 +15,9 @@ import {
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import { useLoaderData, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import dayjs from "dayjs";
+import { DatePicker } from "../components/DatePicker";
+import { getDatePickerVariant } from "../components/case/field/value/FieldValueDateComponent";
 import { buildPayrollReport, generatePayrollReport } from "../api/FetchClient";
 import { toast } from "../utils/dataAtoms";
 import { Language } from "../models/Language";
@@ -164,6 +167,19 @@ function isNumber(valueType?: string): boolean {
 	);
 }
 
+// A date parameter defaults to the current date. The report definition uses the
+// literal "today" as default value, which is no date the picker can show.
+function getInitialValue(parameter: ReportParameter): string {
+	const value = parameter.value ?? "";
+	if (!isDate(parameter.valueType)) {
+		return value;
+	}
+	const date = value ? dayjs.utc(value) : null;
+	return date?.isValid()
+		? date.format("YYYY-MM-DD")
+		: dayjs.utc().format("YYYY-MM-DD");
+}
+
 // The build function serializes list options as {"dictionary": {label: value}}.
 function getListSelection(
 	parameter: ReportParameter,
@@ -199,7 +215,7 @@ function GenerateReportDialog({
 	const [values, setValues] = useState<Record<string, string>>(() => {
 		const initial: Record<string, string> = {};
 		for (const parameter of report.parameters ?? []) {
-			initial[parameter.name] = parameter.value ?? "";
+			initial[parameter.name] = getInitialValue(parameter);
 		}
 		return initial;
 	});
@@ -385,13 +401,14 @@ function ParameterInput({
 
 	if (isDate(parameter.valueType)) {
 		return (
-			<TextField
-				type="date"
+			<DatePicker
+				variant={getDatePickerVariant(
+					parameter.attributes?.["input.datePicker"],
+				)}
 				label={label}
-				value={value ? value.substring(0, 10) : ""}
-				onChange={(e) => onChange(e.target.value)}
+				value={value ? dayjs.utc(value) : null}
 				required={parameter.mandatory}
-				slotProps={{ inputLabel: { shrink: true } }}
+				onChange={(date) => onChange(date ? date.format("YYYY-MM-DD") : "")}
 			/>
 		);
 	}
