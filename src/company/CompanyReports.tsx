@@ -15,6 +15,9 @@ import {
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import { useLoaderData, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import dayjs from "dayjs";
+import { DatePicker } from "../components/DatePicker";
+import { getDatePickerVariant } from "../components/case/field/value/FieldValueDateComponent";
 import { buildPayrollReport, generatePayrollReport } from "../api/FetchClient";
 import { toast } from "../utils/dataAtoms";
 import { Language } from "../models/Language";
@@ -385,13 +388,14 @@ function ParameterInput({
 
 	if (isDate(parameter.valueType)) {
 		return (
-			<TextField
-				type="date"
+			<DatePicker
+				variant={getDatePickerVariant(
+					parameter.attributes?.["input.datePicker"],
+				)}
 				label={label}
-				value={value ? value.substring(0, 10) : ""}
-				onChange={(e) => onChange(e.target.value)}
+				value={value ? dayjs.utc(value) : null}
 				required={parameter.mandatory}
-				slotProps={{ inputLabel: { shrink: true } }}
+				onChange={(date) => onChange(date ? date.format("YYYY-MM-DD") : "")}
 			/>
 		);
 	}
