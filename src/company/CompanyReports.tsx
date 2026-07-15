@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+	Autocomplete,
 	Button,
 	Checkbox,
 	Dialog,
@@ -356,32 +357,39 @@ function ParameterInput({
 
 	const listSelection = getListSelection(parameter);
 	if (listSelection) {
-		// The value is a comma-separated string; the multi-select works on an array.
-		const selected = value
+		// The value is a comma-separated string; each pick becomes a removable chip.
+		const options = listSelection.map(([optionLabel, optionValue]) => ({
+			label: optionLabel,
+			value: optionValue,
+		}));
+		const selectedValues = value
 			? value
 					.split(",")
 					.map((s) => s.trim())
 					.filter(Boolean)
 			: [];
+		const selected = selectedValues.map(
+			(v) => options.find((o) => o.value === v) ?? { label: v, value: v },
+		);
 		return (
-			<TextField
-				select
-				label={label}
+			<Autocomplete
+				multiple
+				options={options}
 				value={selected}
-				onChange={(e) => {
-					const v = e.target.value as unknown as string[];
-					onChange(Array.isArray(v) ? v.join(",") : v);
-				}}
-				required={parameter.mandatory}
-				helperText={parameter.displayDescription ?? parameter.description}
-				SelectProps={{ multiple: true }}
-			>
-				{listSelection.map(([optionLabel, optionValue]) => (
-					<MenuItem key={optionValue} value={optionValue}>
-						{optionLabel}
-					</MenuItem>
-				))}
-			</TextField>
+				getOptionLabel={(option) => option.label}
+				isOptionEqualToValue={(a, b) => a.value === b.value}
+				onChange={(_, newValue) =>
+					onChange(newValue.map((o) => o.value).join(","))
+				}
+				renderInput={(params) => (
+					<TextField
+						{...params}
+						label={label}
+						required={parameter.mandatory && selected.length === 0}
+						helperText={parameter.displayDescription ?? parameter.description}
+					/>
+				)}
+			/>
 		);
 	}
 
