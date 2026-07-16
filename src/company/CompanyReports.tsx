@@ -195,7 +195,10 @@ async function generateReportFile(
 			toast("error", t("The report could not be generated."));
 			return false;
 		}
-		downloadBase64File(file);
+		downloadBase64File({
+			...file,
+			name: buildDownloadName(report, values, file.name),
+		});
 		return true;
 	} catch (e) {
 		const detail = e instanceof Error ? e.message : "";
@@ -207,6 +210,25 @@ async function generateReportFile(
 		);
 		return false;
 	}
+}
+
+// Output file name: report name + the report date. The date comes from the
+// report's date parameter; reports without one (e.g. wage types) use today.
+function buildDownloadName(
+	report: ReportSet,
+	values: Record<string, string>,
+	originalName: string,
+): string {
+	const dateParameter = (report.parameters ?? []).find((p) =>
+		isDate(p.valueType),
+	);
+	const raw = dateParameter ? values[dateParameter.name] : "";
+	const date = raw ? dayjs.utc(raw) : null;
+	const label = (date?.isValid() ? date : dayjs.utc()).format("DD.MM.YYYY");
+	const base = report.displayName ?? report.name;
+	const dot = originalName.lastIndexOf(".");
+	const extension = dot >= 0 ? originalName.slice(dot) : "";
+	return `${base}_${label}${extension}`;
 }
 
 function isBoolean(valueType?: string): boolean {
