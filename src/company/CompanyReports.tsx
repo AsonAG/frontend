@@ -65,9 +65,13 @@ const ALLOWED_REPORTS = new Set([
 ]);
 
 export function CompanyReports() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const { reports } = useLoaderData() as LoaderData;
+	const params = useParams();
 	const [activeReport, setActiveReport] = useState<ReportSet | null>(null);
+	const [busyReportId, setBusyReportId] = useState<string | null>(null);
+
+	const language = languageByCode[i18n.language?.split("-")[0]] ?? "German";
 
 	const visibleReports = (reports ?? []).filter((r) =>
 		ALLOWED_REPORTS.has(r.name),
@@ -81,6 +85,22 @@ export function CompanyReports() {
 		);
 	}
 
+	async function handleGenerate(report: ReportSet) {
+		// Reports with options open the dialog; option-less reports generate at once.
+		if (hasOptions(report)) {
+			setActiveReport(report);
+			return;
+		}
+		setBusyReportId(report.id);
+		const values: Record<string, string> = {};
+		for (const parameter of report.parameters ?? []) {
+			values[parameter.name] = getInitialValue(parameter);
+		}
+		const format = (report.availableOutputs ?? [])[0];
+		await generateReportFile(params, report, language, values, format, t);
+		setBusyReportId(null);
+	}
+
 	return (
 		<>
 			<Stack spacing={1} sx={{ maxWidth: 720 }}>
@@ -88,7 +108,8 @@ export function CompanyReports() {
 					<ReportListItem
 						key={report.id}
 						report={report}
-						onGenerate={() => setActiveReport(report)}
+						busy={busyReportId === report.id}
+						onGenerate={() => handleGenerate(report)}
 					/>
 				))}
 			</Stack>
@@ -105,9 +126,11 @@ export function CompanyReports() {
 
 function ReportListItem({
 	report,
+	busy,
 	onGenerate,
 }: {
 	report: ReportSet;
+	busy: boolean;
 	onGenerate: () => void;
 }) {
 	const { t } = useTranslation();
@@ -133,7 +156,7 @@ function ReportListItem({
 					</Typography>
 				)}
 			</Stack>
-			<Button variant="outlined" onClick={onGenerate}>
+			<Button variant="outlined" onClick={onGenerate} loading={busy}>
 				{t("Generate")}
 			</Button>
 		</Stack>
@@ -143,6 +166,47 @@ function ReportListItem({
 function isHidden(parameter: ReportParameter): boolean {
 	const hidden = parameter.attributes?.["input.hidden"];
 	return hidden === true || hidden === "true";
+}
+
+// A report needs the parameter dialog only if there is something to choose:
+// at least one visible parameter or more than one output format.
+function hasOptions(report: ReportSet): boolean {
+	const visibleParameters = (report.parameters ?? []).filter((p) => !isHidden(p));
+	const outputs = report.availableOutputs ?? [];
+	return visibleParameters.length > 0 || outputs.length > 1;
+}
+
+// Generate the report and trigger the file download. Returns true on success.
+async function generateReportFile(
+	params: Record<string, string | undefined>,
+	report: ReportSet,
+	language: Language,
+	values: Record<string, string>,
+	format: string,
+	t: (key: string) => string,
+): Promise<boolean> {
+	try {
+		const file = await generatePayrollReport(
+			{ ...params, reportId: report.id },
+			{ language, payrollId: params.payrollId, parameters: values },
+			format,
+		);
+		if (!file?.content) {
+			toast("error", t("The report could not be generated."));
+			return false;
+		}
+		downloadBase64File(file);
+		return true;
+	} catch (e) {
+		const detail = e instanceof Error ? e.message : "";
+		toast(
+			"error",
+			detail
+				? `${t("The report could not be generated.")} ${detail}`
+				: t("The report could not be generated."),
+		);
+		return false;
+	}
 }
 
 function isBoolean(valueType?: string): boolean {
@@ -269,28 +333,10 @@ function GenerateReportDialog({
 
 	async function handleGenerate() {
 		setGenerating(true);
-		try {
-			const file = await generatePayrollReport(
-				{ ...params, reportId: report.id },
-				{ language, payrollId: params.payrollId, parameters: values },
-				format,
-			);
-			if (!file?.content) {
-				toast("error", t("The report could not be generated."));
-				return;
-			}
-			downloadBase64File(file);
+		const ok = await generateReportFile(params, report, language, values, format, t);
+		setGenerating(false);
+		if (ok) {
 			onClose();
-		} catch (e) {
-			const detail = e instanceof Error ? e.message : "";
-			toast(
-				"error",
-				detail
-					? `${t("The report could not be generated.")} ${detail}`
-					: t("The report could not be generated."),
-			);
-		} finally {
-			setGenerating(false);
 		}
 	}
 
