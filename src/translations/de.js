@@ -444,6 +444,7 @@ const translations = {
 		"Show inactive wage types" : "Inaktive Lohnarten anzeigen",
 		"Edit wage type label": "Bezeichnungen der Lohnart bearbeiten",
 		"Search wage type number or name": "Lohnartnummer oder Name suchen",
+		"The maximum number of copies has been reached.": "Die maximale Anzahl der Kopien ist erreicht.",
 
 		// Culture
 		"Region settings": "Regionseinstellungen",

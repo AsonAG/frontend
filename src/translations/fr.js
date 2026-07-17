@@ -425,6 +425,7 @@ const translations = {
 		"Show inactive wage types" : "Afficher les types de salaire inactifs",
 		"Edit wage type label": "Modifier les libellés du type de salaire",
 		"Search wage type number or name": "Rechercher le numéro ou le nom du type de salaire",
+		"The maximum number of copies has been reached.": "Le nombre maximum de copies a été atteint.",
 
 		// Culture
 		"Region settings": "Paramètres régionaux",

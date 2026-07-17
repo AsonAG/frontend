@@ -1,4 +1,5 @@
 import {
+	Alert,
 	Button,
 	Dialog,
 	DialogActions,
@@ -7,12 +8,10 @@ import {
 	Stack,
 	TextField,
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useRevalidator } from "react-router-dom";
-import {
-	copyWageType
-} from "../api/FetchClient";
+import { copyWageType } from "../api/FetchClient";
 
 export function CopyWageTypeDialog({
 	wageTypeNumber,
@@ -23,63 +22,118 @@ export function CopyWageTypeDialog({
 }) {
 	const routeParams = useParams();
 	const { t } = useTranslation();
+	const revalidator = useRevalidator();
+
 	const [form, setForm] = useState({
 		en: "",
 		de: "",
 		fr: "",
 		it: "",
 	});
-	
-	const revalidator = useRevalidator();
+
+	const [error, setError] = useState<string | null>(null);
+
 	const handleSubmit = async () => {
-		await copyWageType(routeParams, wageTypeNumber, wageTypeNumber, form);
-		revalidator.revalidate();
-		onClose();
+		setError(null);
+
+		try {
+			const response = await copyWageType(
+				routeParams,
+				wageTypeNumber,
+				wageTypeNumber,
+				form,
+			);
+
+			if (
+				response &&
+				typeof response === "object" &&
+				"status" in response &&
+				Number(response.status) !== 201
+			) {
+				setError(
+					t("The maximum number of copies has been reached."),
+				);
+				return;
+			}
+
+			await revalidator.revalidate();
+			onClose();
+		} catch {
+			setError(
+				t("The maximum number of copies has been reached."),
+			);
+		}
 	};
 
 	return (
 		<Dialog open onClose={onClose}>
-			<DialogTitle>{t("Record wage type labels")}</DialogTitle>
+			<DialogTitle>
+				{t("Record wage type labels")}
+			</DialogTitle>
 
 			<DialogContent>
 				<Stack spacing={2} sx={{ mt: 1 }}>
+					{error && (
+						<Alert severity="error">
+							{error}
+						</Alert>
+					)}
+
 					<TextField
 						label={t("en_culturelabel")}
 						value={form.en}
-						onChange={(e) =>
-							setForm({ ...form, en: e.target.value })
+						onChange={(event) =>
+							setForm({
+								...form,
+								en: event.target.value,
+							})
 						}
 					/>
 
 					<TextField
 						label={t("de_culturelabel")}
 						value={form.de}
-						onChange={(e) =>
-							setForm({ ...form, de: e.target.value })
+						onChange={(event) =>
+							setForm({
+								...form,
+								de: event.target.value,
+							})
 						}
 					/>
 
 					<TextField
 						label={t("fr_culturelabel")}
 						value={form.fr}
-						onChange={(e) =>
-							setForm({ ...form, fr: e.target.value })
+						onChange={(event) =>
+							setForm({
+								...form,
+								fr: event.target.value,
+							})
 						}
 					/>
 
 					<TextField
 						label={t("it_culturelabel")}
 						value={form.it}
-						onChange={(e) =>
-							setForm({ ...form, it: e.target.value })
+						onChange={(event) =>
+							setForm({
+								...form,
+								it: event.target.value,
+							})
 						}
 					/>
 				</Stack>
 			</DialogContent>
 
 			<DialogActions>
-				<Button onClick={onClose}>{t("Cancel")}</Button>
-				<Button variant="contained" onClick={handleSubmit}>
+				<Button onClick={onClose}>
+					{t("Cancel")}
+				</Button>
+
+				<Button
+					variant="contained"
+					onClick={handleSubmit}
+				>
 					{t("Save")}
 				</Button>
 			</DialogActions>
