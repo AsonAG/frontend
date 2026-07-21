@@ -56,14 +56,6 @@ const languageByCode: Record<string, Language> = {
 	it: "Italian",
 };
 
-// Only these reports are offered in the company reports tab.
-const ALLOWED_REPORTS = new Set([
-	"WageTypesReport",
-	"EmployeesMasterDataReport",
-	"CompanyMasterDataReport",
-	"CaseFieldExportReport",
-]);
-
 export function CompanyReports() {
 	const { t, i18n } = useTranslation();
 	const { reports } = useLoaderData() as LoaderData;
@@ -73,9 +65,9 @@ export function CompanyReports() {
 
 	const language = languageByCode[i18n.language?.split("-")[0]] ?? "German";
 
-	const visibleReports = (reports ?? []).filter((r) =>
-		ALLOWED_REPORTS.has(r.name),
-	);
+	// Which reports appear is controlled by the AvailableReports cluster set,
+	// not by the frontend.
+	const visibleReports = reports ?? [];
 
 	if (visibleReports.length === 0) {
 		return (
