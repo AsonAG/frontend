@@ -10,7 +10,8 @@ export type WageType = {
 	nameLocalizations: Record<string, string>;
 	isActive : boolean;
 	isCopyable : boolean;
-	isChangeable: boolean;
+	isLocalizable: boolean;
+	isCollectorChangeable: boolean;
 };
 
 export type WageTypeDetailed = WageType & {

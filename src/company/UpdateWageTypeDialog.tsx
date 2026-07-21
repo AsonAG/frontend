@@ -44,7 +44,7 @@ export function UpdateWageTypeDialog({
 		const body = {
 			...wageType,
 			collectors: selectedCollectors,
-			...(wageType.isChangeable && {
+			...(wageType.isLocalizable && {
 				nameLocalizations,
 			}),
 		};
@@ -60,7 +60,7 @@ export function UpdateWageTypeDialog({
 
 			<DialogContent>
 				<Stack spacing={3} sx={{ mt: 1 }}>
-					{wageType.attributes?.["Collectors.Change"] === "Y" && (<Stack spacing={2}>
+					{wageType.isCollectorChangeable && (<Stack spacing={2}>
 						<Typography variant="h6">{t("Collectors")}</Typography>
 
 						<Stack direction="row" flexWrap="wrap" gap={1}>
@@ -94,7 +94,7 @@ export function UpdateWageTypeDialog({
 					</Stack>
 					)}
 
-					{wageType.isChangeable && (
+					{wageType.isLocalizable && (
 						<Stack spacing={2}>
 							<Typography variant="h6">
 								{t("Edit wage type label")}

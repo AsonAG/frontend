@@ -159,8 +159,8 @@ function createColumns() {
 				const { t } = useTranslation();
 				const { collectors } = useLoaderData() as WageTypeControllingLoaderData;
 				const [open, setOpen] = useState<boolean>(false);
-				const collectorsChangeable = props.row.original.attributes?.["Collectors.Change"] === "Y";
-				const wageTypeiIsChangeable = props.row.original.isChangeable;
+				const collectorsChangeable = props.row.original.isCollectorChangeable;
+				const wageTypeiIsChangeable = props.row.original.isLocalizable;
 				if (!collectorsChangeable && !wageTypeiIsChangeable) {
 					return null;
 				}
