@@ -296,11 +296,8 @@ function GenerateReportDialog({
 	);
 
 	// Re-run the build after every parameter change, since the build function
-	// may derive attributes (dropdowns, hidden fields) from any of them.
-	const structuralKey = (report.parameters ?? [])
-		.map((p) => `${p.name}=${values[p.name] ?? ""}`)
-		.join("&");
-
+	// may derive attributes (dropdowns, hidden fields) from any of them. `values`
+	// only changes reference when a parameter is edited, so it drives the rebuild.
 	useEffect(() => {
 		let cancelled = false;
 		async function build() {
@@ -320,8 +317,7 @@ function GenerateReportDialog({
 		return () => {
 			cancelled = true;
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [structuralKey]);
+	}, [params, report.id, values]);
 
 	const visibleParameters = useMemo(
 		() =>
