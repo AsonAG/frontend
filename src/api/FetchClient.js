@@ -791,6 +791,7 @@ export async function generatePayrollReport(routeParams, reportRequest, format) 
 		.withMethod("POST")
 		.withQueryParam("format", format)
 		.withBody(reportRequest)
+		.withLocalization()
 		.fetch();
 	if (!response.ok) {
 		const text = await response.text();

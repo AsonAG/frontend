@@ -21,7 +21,6 @@ import { DatePicker } from "../components/DatePicker";
 import { getDatePickerVariant } from "../components/case/field/value/FieldValueDateComponent";
 import { buildPayrollReport, generatePayrollReport } from "../api/FetchClient";
 import { toast } from "../utils/dataAtoms";
-import { Language } from "../models/Language";
 
 type ReportParameter = {
 	name: string;
@@ -49,21 +48,12 @@ type LoaderData = {
 	reports: ReportSet[];
 };
 
-const languageByCode: Record<string, Language> = {
-	de: "German",
-	en: "English",
-	fr: "French",
-	it: "Italian",
-};
-
 export function CompanyReports() {
-	const { t, i18n } = useTranslation();
+	const { t } = useTranslation();
 	const { reports } = useLoaderData() as LoaderData;
 	const params = useParams();
 	const [activeReport, setActiveReport] = useState<ReportSet | null>(null);
 	const [busyReportId, setBusyReportId] = useState<string | null>(null);
-
-	const language = languageByCode[i18n.language?.split("-")[0]] ?? "German";
 
 	// Which reports appear is controlled by the AvailableReports cluster set,
 	// not by the frontend.
@@ -89,7 +79,7 @@ export function CompanyReports() {
 			values[parameter.name] = getInitialValue(parameter);
 		}
 		const format = (report.availableOutputs ?? [])[0];
-		await generateReportFile(params, report, language, values, format, t);
+		await generateReportFile(params, report, values, format, t);
 		setBusyReportId(null);
 	}
 
@@ -172,7 +162,6 @@ function hasOptions(report: ReportSet): boolean {
 async function generateReportFile(
 	params: Record<string, string | undefined>,
 	report: ReportSet,
-	language: Language,
 	values: Record<string, string>,
 	format: string,
 	t: (key: string) => string,
@@ -180,7 +169,7 @@ async function generateReportFile(
 	try {
 		const file = await generatePayrollReport(
 			{ ...params, reportId: report.id },
-			{ language, payrollId: params.payrollId, parameters: values },
+			{ payrollId: params.payrollId, parameters: values },
 			format,
 		);
 		if (!file?.content) {
@@ -282,11 +271,9 @@ function GenerateReportDialog({
 	report: ReportSet;
 	onClose: () => void;
 }) {
-	const { t, i18n } = useTranslation();
+	const { t } = useTranslation();
 	const params = useParams();
 	const [generating, setGenerating] = useState(false);
-
-	const language = languageByCode[i18n.language?.split("-")[0]] ?? "German";
 
 	const outputs = report.availableOutputs ?? [];
 	const [format, setFormat] = useState<string>(outputs[0]);
@@ -318,7 +305,7 @@ function GenerateReportDialog({
 			try {
 				const result = await buildPayrollReport(
 					{ ...params, reportId: report.id },
-					{ language, payrollId: params.payrollId, parameters: values },
+					{ payrollId: params.payrollId, parameters: values },
 				);
 				if (!cancelled && result?.parameters) {
 					setParameters(result.parameters);
@@ -347,7 +334,7 @@ function GenerateReportDialog({
 
 	async function handleGenerate() {
 		setGenerating(true);
-		const ok = await generateReportFile(params, report, language, values, format, t);
+		const ok = await generateReportFile(params, report, values, format, t);
 		setGenerating(false);
 		if (ok) {
 			onClose();
