@@ -163,7 +163,7 @@ async function generateReportFile(
 	params: Record<string, string | undefined>,
 	report: ReportSet,
 	values: Record<string, string>,
-	format: string,
+	format: string | undefined,
 	t: (key: string) => string,
 ): Promise<boolean> {
 	try {
@@ -276,7 +276,9 @@ function GenerateReportDialog({
 	const [generating, setGenerating] = useState(false);
 
 	const outputs = report.availableOutputs ?? [];
-	const [format, setFormat] = useState<string>(outputs[0]);
+	// May be undefined when the report defines no output format; the backend
+	// falls back to its default and withQueryParam skips an empty value.
+	const [format, setFormat] = useState<string | undefined>(outputs[0]);
 
 	const [values, setValues] = useState<Record<string, string>>(() => {
 		const initial: Record<string, string> = {};
