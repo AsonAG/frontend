@@ -40,6 +40,7 @@ function ConfigTabs() {
 			/>
 			<TabLink title={t("Account master")} to="accountmaster" />
 			<TabLink title={t("Cost center")} to="costcentermaster" />
+			<TabLink title={t("Reports")} to="reports" />
 		</>
 	);
 }
