@@ -83,6 +83,11 @@ const payoutUrl =
 	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId";
 const payoutDocumentUrl =
 	"/tenants/:orgId/payrolls/:payrollId/payrunperiods/:payrunPeriodId/payouts/:payoutId/document";
+const payrollReportsUrl = "/tenants/:orgId/payrolls/:payrollId/reports";
+const payrollReportBuildUrl =
+	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/build";
+const payrollReportGenerateUrl =
+	"/tenants/:orgId/payrolls/:payrollId/reports/:reportId/generate";
 const exportUrl = "/tenants/:orgId/export";
 const invitationUrl = "/user_membership_invitations/:invitationId";
 
@@ -761,6 +766,37 @@ export function getPayrunPeriodEntryDocument(routeParams, report, variant) {
 		.withQueryParam("report", report)
 		.withQueryParam("variant", variant)
 		.fetchJson();
+}
+
+export function getPayrollReports(routeParams, clusterSetName) {
+	return new FetchRequestBuilder(payrollReportsUrl, routeParams)
+		.withQueryParam("clusterSetName", clusterSetName)
+		.withLocalization()
+		.fetchJson();
+}
+
+export function buildPayrollReport(routeParams, reportRequest) {
+	return new FetchRequestBuilder(payrollReportBuildUrl, routeParams)
+		.withMethod("POST")
+		.withBody(reportRequest)
+		.withLocalization()
+		.fetchJson();
+}
+
+export async function generatePayrollReport(routeParams, reportRequest, format) {
+	const response = await new FetchRequestBuilder(
+		payrollReportGenerateUrl,
+		routeParams,
+	)
+		.withMethod("POST")
+		.withQueryParam("format", format)
+		.withBody(reportRequest)
+		.fetch();
+	if (!response.ok) {
+		const text = await response.text();
+		throw new Error(text || `Report generation failed (${response.status})`);
+	}
+	return response.json();
 }
 
 export function buildCase(routeParams, caseChangeSetup) {
