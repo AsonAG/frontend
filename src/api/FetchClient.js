@@ -47,12 +47,8 @@ const payrollWageTypeMasterUrl =
 	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
 const payrollWageTypeSettingsUrl =
 	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
-const activateWageTypeUrl =
-	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
-const copyWageTypeTypeUrl =
-	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
-const updateWageTypeUrl =
-	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
+const wageTypeUrl =
+    "/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
@@ -916,37 +912,33 @@ export function setPayrollWageTypeSettings(routeParams, settings) {
 }
 
 export function activateWageType(routeParams, wageTypeNumber) {
-	const url = activateWageTypeUrl.replace(
-		":wageTypeNumber",
-		`${wageTypeNumber}:activate`,
-	);
-
-	return new FetchRequestBuilder(url, routeParams)
+	return new FetchRequestBuilder(wageTypeUrl, {
+		...routeParams,
+		wageTypeNumber: `${wageTypeNumber}:activate`,
+	})
 		.withMethod("POST")
 		.fetch();
 }
 
 export function copyWageType(
-	routeParams,
-	wageTypeNumber,
-	copyFromWageTypeNumber,
-	nameLocalizations,
+    routeParams,
+    wageTypeNumber,
+    copyFromWageTypeNumber,
+    nameLocalizations,
 ) {
-	return new FetchRequestBuilder(
-		`${copyWageTypeTypeUrl}?copyFromWageTypeNumber=${copyFromWageTypeNumber}`,
-		{
-			...routeParams,
-			wageTypeNumber,
-		},
-	)
-		.withMethod("POST")
-		.withBody(nameLocalizations)
-		.fetch();
+    return new FetchRequestBuilder(wageTypeUrl, {
+        ...routeParams,
+        wageTypeNumber,
+    })
+        .withQueryParam("copyFromWageTypeNumber", copyFromWageTypeNumber)
+        .withMethod("POST")
+        .withBody(nameLocalizations)
+        .fetch();
 }
 
 export function updateWageType(routeParams, wageTypeNumber, wageType) {
 	return new FetchRequestBuilder(
-		updateWageTypeUrl,
+		wageTypeUrl,
 		{
 			...routeParams,
 			wageTypeNumber,

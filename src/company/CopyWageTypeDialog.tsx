@@ -8,10 +8,15 @@ import {
 	Stack,
 	TextField,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useRevalidator } from "react-router-dom";
-import { copyWageType } from "../api/FetchClient";
+import { useFetcher } from "react-router-dom";
+
+type CopyWageTypeActionData = {
+	intent?: "copyWageType";
+	success?: boolean;
+	error?: string;
+};
 
 export function CopyWageTypeDialog({
 	wageTypeNumber,
@@ -20,9 +25,8 @@ export function CopyWageTypeDialog({
 	wageTypeNumber: number;
 	onClose: () => void;
 }) {
-	const routeParams = useParams();
 	const { t } = useTranslation();
-	const revalidator = useRevalidator();
+	const fetcher = useFetcher<CopyWageTypeActionData>();
 
 	const [form, setForm] = useState({
 		en: "",
@@ -31,62 +35,50 @@ export function CopyWageTypeDialog({
 		it: "",
 	});
 
-	const [error, setError] = useState<string | null>(null);
-
-	const handleSubmit = async () => {
-		setError(null);
-
-		try {
-			const response = await copyWageType(
-				routeParams,
+	const handleSubmit = () => {
+		fetcher.submit(
+			{
+				intent: "copyWageType",
 				wageTypeNumber,
-				wageTypeNumber,
-				form,
-			);
-
-			if (
-				response &&
-				typeof response === "object" &&
-				"status" in response &&
-				Number(response.status) !== 201
-			) {
-				setError(
-					t("The maximum number of copies has been reached."),
-				);
-				return;
-			}
-
-			await revalidator.revalidate();
-			onClose();
-		} catch {
-			setError(
-				t("The maximum number of copies has been reached."),
-			);
-		}
+				copyFromWageTypeNumber: wageTypeNumber,
+				nameLocalizations: form,
+			},
+			{
+				method: "post",
+				encType: "application/json",
+			},
+		);
 	};
 
+	useEffect(() => {
+		if (
+			fetcher.data?.intent === "copyWageType" &&
+			fetcher.data.success === true
+		) {
+			onClose();
+		}
+	}, [fetcher.data, onClose]);
+
+	const isSubmitting = fetcher.state !== "idle";
+
 	return (
-		<Dialog open onClose={onClose}>
-			<DialogTitle>
-				{t("Record wage type labels")}
-			</DialogTitle>
+		<Dialog open onClose={isSubmitting ? undefined : onClose}>
+			<DialogTitle>{t("Record wage type labels")}</DialogTitle>
 
 			<DialogContent>
 				<Stack spacing={2} sx={{ mt: 1 }}>
-					{error && (
-						<Alert severity="error">
-							{error}
-						</Alert>
+					{fetcher.data?.error && (
+						<Alert severity="error">{t(fetcher.data.error)}</Alert>
 					)}
 
 					<TextField
 						label={t("en_culturelabel")}
 						value={form.en}
 						onChange={(event) =>
-							setForm({
-								...form,
+							setForm((current) => ({
+								...current,
 								en: event.target.value,
-							})
+							}))
 						}
 					/>
 
@@ -94,10 +86,10 @@ export function CopyWageTypeDialog({
 						label={t("de_culturelabel")}
 						value={form.de}
 						onChange={(event) =>
-							setForm({
-								...form,
+							setForm((current) => ({
+								...current,
 								de: event.target.value,
-							})
+							}))
 						}
 					/>
 
@@ -105,10 +97,10 @@ export function CopyWageTypeDialog({
 						label={t("fr_culturelabel")}
 						value={form.fr}
 						onChange={(event) =>
-							setForm({
-								...form,
+							setForm((current) => ({
+								...current,
 								fr: event.target.value,
-							})
+							}))
 						}
 					/>
 
@@ -116,23 +108,25 @@ export function CopyWageTypeDialog({
 						label={t("it_culturelabel")}
 						value={form.it}
 						onChange={(event) =>
-							setForm({
-								...form,
+							setForm((current) => ({
+								...current,
 								it: event.target.value,
-							})
+							}))
 						}
 					/>
 				</Stack>
 			</DialogContent>
 
 			<DialogActions>
-				<Button onClick={onClose}>
+				<Button onClick={onClose} disabled={isSubmitting}>
 					{t("Cancel")}
 				</Button>
 
 				<Button
 					variant="contained"
 					onClick={handleSubmit}
+					loading={isSubmitting}
+					disabled={isSubmitting}
 				>
 					{t("Save")}
 				</Button>

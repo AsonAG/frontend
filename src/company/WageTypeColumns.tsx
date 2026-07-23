@@ -37,7 +37,7 @@ function createColumns() {
 
 				return (
 					<ActivateWageTypeCheckbox
-						wageTypeNumber={wageType.wageTypeNumber.toString()}
+						wageTypeNumber={wageType.wageTypeNumber}
 						isActive={props.getValue() === true}
 					/>
 				);

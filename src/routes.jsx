@@ -64,6 +64,9 @@ import {
 	getPayrunPeriodDocuments,
 	getPayrunPeriodEntryDocument,
 	setPayrollWageTypeSettings,
+	activateWageType,
+	copyWageType,
+	updateWageType,
 	getPayroll,
 	getAvailableRegulations,
 	getPayrollRegulations,
@@ -1365,18 +1368,114 @@ const routeData = [
 							};
 						},
 						action: async ({ params, request }) => {
-							const settings = await request.json();
-							const response = await setPayrollWageTypeSettings(
-								{ ...params },
-								settings,
-							);
-							if (response.ok) {
-								toast("success", "Updated!");
-								return { success: true };
-							} else {
-								toast("error", "Action failed");
-								return null;
+							const data = await request.json();
+
+							if (data.intent === "activateWageType") {
+								try {
+									const response = await activateWageType(
+										params,
+										data.wageTypeNumber,
+									);
+
+									if (!response.ok) {
+										return {
+											intent: "activateWageType",
+											error: "Action failed",
+										};
+									}
+
+									return {
+										intent: "activateWageType",
+										success: true,
+									};
+								} catch {
+									return {
+										intent: "activateWageType",
+										error: "Action failed",
+									};
+								}
 							}
+							if (data.intent === "copyWageType") {
+								try {
+									const response = await copyWageType(
+										params,
+										data.wageTypeNumber,
+										data.copyFromWageTypeNumber,
+										data.nameLocalizations,
+									);
+									if (
+										response &&
+										typeof response === "object" &&
+										"status" in response &&
+										Number(response.status) !== 201
+									) {
+										return {
+											intent: "copyWageType",
+											error: "The maximum number of copies has been reached.",
+										};
+									}
+									return {
+										intent: "copyWageType",
+										success: true,
+									};
+								} catch {
+									return {
+										intent: "copyWageType",
+										error: "The maximum number of copies has been reached.",
+									};
+								}
+							}
+
+							if (data.intent === "updateWageType") {
+								try {
+									const response = await updateWageType(
+										params,
+										data.wageTypeNumber,
+										data.wageType,
+									);
+									if (!response.ok) {
+										return {
+											intent: "updateWageType",
+											error: "Action failed",
+										};
+									}
+									return {
+										intent: "updateWageType",
+										success: true,
+									};
+								} catch {
+									return {
+										intent: "updateWageType",
+										error: "Action failed",
+									};
+								}
+							}
+
+							if (data.intent === "saveWageTypeSettings") {
+								const response = await setPayrollWageTypeSettings(
+									{ ...params },
+									{
+										accountAssignments: data.accountAssignments,
+										payrollControlling: data.payrollControlling,
+									},
+								);
+								if (response.ok) {
+									toast("success", "Updated!");
+
+									return {
+										intent: "saveWageTypeSettings",
+										success: true,
+									};
+								}
+								toast("error", "Action failed");
+								return {
+									intent: "saveWageTypeSettings",
+									success: false,
+								};
+							}
+							return {
+								error: "Unsupported action.",
+							};
 						},
 					},
 					createRouteLookupForm(

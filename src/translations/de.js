@@ -253,6 +253,7 @@ const translations = {
 		"Show reason in payslip": "Notiz in Lohnabrechnung anzeigen",
 		"Copy wage type": "Lohnart kopieren",
 		"Update wage type": "Lohnart aktualisieren",
+		"Activate wage type": "Lohnart aktivieren",
 
 		// compliance
 		Submit: "Übermitteln",
@@ -443,6 +444,7 @@ const translations = {
 		"Record wage type labels" : "Bezeichnungen der Lohnart erfassen",
 		"Show inactive wage types" : "Inaktive Lohnarten anzeigen",
 		"Edit wage type label": "Bezeichnungen der Lohnart bearbeiten",
+		"Do you really want to activate this wage type?": "Möchten Sie diesen Lohnart wirklich aktivieren?",
 		"Search wage type number or name": "Lohnartnummer oder Name suchen",
 		"The maximum number of copies has been reached.": "Die maximale Anzahl der Kopien ist erreicht.",
 

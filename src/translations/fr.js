@@ -243,6 +243,7 @@ const translations = {
 		"Show reason in payslip": "Afficher la note sur le bulletin de salaire",
 		"Copy wage type": "Copier le type de salaire",
 		"Update wage type": "Mettre à jour le type de salaire",
+		"Activate wage type": "Activer le type de salaire",
 
 		// compliance
 		Submit: "Transmettre",
@@ -424,6 +425,7 @@ const translations = {
 		"Record wage type labels" : "Enregistrer les libellés du type de salaire",
 		"Show inactive wage types" : "Afficher les types de salaire inactifs",
 		"Edit wage type label": "Modifier les libellés du type de salaire",
+		"Do you really want to activate this wage type?": "Voulez-vous vraiment activer ce type de salaire ?",
 		"Search wage type number or name": "Rechercher le numéro ou le nom du type de salaire",
 		"The maximum number of copies has been reached.": "Le nombre maximum de copies a été atteint.",
 

@@ -28,7 +28,6 @@ import {
 	useLoaderData,
 	useNavigation,
 	useSubmit,
-	useParams,
 } from "react-router-dom";
 import { columns } from "./WageTypeColumns";
 import {
@@ -44,7 +43,6 @@ import { Collector } from "../models/Collector";
 import { WageTypeDetailed, WageTypeSettings } from "../models/WageType";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { blend } from "@mui/system/colorManipulator";
-import { activateWageType } from "../api/FetchClient";
 
 export type WageTypeControllingLoaderData = {
 	wageTypes: WageTypeDetailed[];
@@ -63,7 +61,6 @@ const defaultSettings: WageTypeSettingsContextType = {
 		accountAssignments: {},
 		payrollControlling: {},
 		dirty: false,
-		activatedWageTypes: [],
 	},
 	dispatch: function (value: SettingsAction): void {
 		throw new Error("Function not implemented.");
@@ -75,13 +72,21 @@ export const WageTypeSettingsContext =
 const tableHeaderHeight = 36;
 const headerStickySx = getStickySx(10, { top: 0 });
 export function WageTypeControlling() {
-	const routeParams = useParams();
 	const { t } = useTranslation();
 	const { state: navigationState } = useNavigation();
 	const submit = useSubmit();
-	const actionData = useActionData() as { success: boolean };
+	const actionData = useActionData() as {
+		intent?: "saveWageTypeSettings";
+		success?: boolean;
+	};
 	const { wageTypes, attributeTranslationMap, wageTypeSettings } =
 		useLoaderData() as WageTypeControllingLoaderData;
+
+	const [state, dispatch] = useReducer(
+		reducer,
+		wageTypeSettings,
+		createInitialState,
+	);
 
 	const [showAllWageTypes, setShowAllWageTypes] = useState(false);
 	const [search, setSearch] = useState("");
@@ -111,7 +116,10 @@ export function WageTypeControlling() {
 	});
 
 	useEffect(() => {
-		if (actionData?.success) {
+		if (
+			actionData?.intent === "saveWageTypeSettings" &&
+			actionData.success === true
+		) {
 			dispatch({ type: "reset_dirty" });
 		}
 	}, [actionData]);
@@ -137,23 +145,16 @@ export function WageTypeControlling() {
 		return [result, noCategory];
 	}, [table.getRowModel().rows]);
 
-	const onSubmit = async () => {
-		for (const wageTypeNumber of state.activatedWageTypes) {
-			await activateWageType(routeParams, wageTypeNumber);
-		}
+	const onSubmit = () => {
 		submit(
 			{
+				intent: "saveWageTypeSettings",
 				accountAssignments: state.accountAssignments,
 				payrollControlling: state.payrollControlling,
 			},
 			{ method: "post", encType: "application/json" },
 		);
 	};
-	const [state, dispatch] = useReducer(
-		reducer,
-		wageTypeSettings,
-		createInitialState,
-	);
 
 	return (
 		<WageTypeSettingsContext.Provider value={{ state, dispatch }}>
@@ -405,7 +406,6 @@ function WageTypeCategoryHeader({
 type WageTypeSettingsState = WageTypeSettings & {
 	initialState: WageTypeSettings;
 	dirty: boolean;
-	activatedWageTypes: string[];
 };
 
 export type SettingsAction =
@@ -419,10 +419,6 @@ export type SettingsAction =
 			type: "set_controlling";
 			wageTypeNumber: string;
 			value: string[];
-	  }
-	| {
-			type: "activate_wage_type";
-			wageTypeNumber: string;
 	  }
 	| {
 			type: "reset_dirty";
@@ -455,15 +451,6 @@ function reducer(
 				},
 				dirty: true,
 			};
-		case "activate_wage_type":
-			return {
-				...state,
-				activatedWageTypes: [
-					...state.activatedWageTypes,
-					action.wageTypeNumber,
-				],
-				dirty: true,
-			};
 		case "reset_dirty":
 			return {
 				...state,
@@ -476,6 +463,5 @@ function createInitialState(settings: WageTypeSettings): WageTypeSettingsState {
 		...settings,
 		initialState: settings,
 		dirty: false,
-		activatedWageTypes: [],
 	};
 }
