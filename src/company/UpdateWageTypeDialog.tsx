@@ -1,5 +1,7 @@
 import {
+	Alert,
 	Button,
+	Chip,
 	Dialog,
 	DialogActions,
 	DialogContent,
@@ -8,12 +10,13 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import Chip from "@mui/material/Chip";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router-dom";
-import { Collector } from "../models/Collector";
-import { WageType } from "../models/WageType";
+import {
+	WageType,
+	WageTypeLocalizationLanguage,
+} from "../models/WageType";
 
 type UpdateWageTypeActionData = {
 	intent?: "updateWageType";
@@ -23,25 +26,23 @@ type UpdateWageTypeActionData = {
 
 export function UpdateWageTypeDialog({
 	wageType,
-	collectors,
 	onClose,
 }: {
 	wageType: WageType;
-	collectors: Collector[];
 	onClose: () => void;
 }) {
 	const { t } = useTranslation();
 	const fetcher = useFetcher<UpdateWageTypeActionData>();
-
 	const [nameLocalizations, setNameLocalizations] = useState({
 		en: wageType.nameLocalizations?.en ?? "",
 		de: wageType.nameLocalizations?.de ?? "",
 		fr: wageType.nameLocalizations?.fr ?? "",
 		it: wageType.nameLocalizations?.it ?? "",
 	});
+	const [collectors, setCollectors] = useState(wageType.collectors);
 
 	const setLocalization = (
-		language: "en" | "de" | "fr" | "it",
+		language: WageTypeLocalizationLanguage,
 		value: string,
 	) => {
 		setNameLocalizations((current) => ({
@@ -50,24 +51,25 @@ export function UpdateWageTypeDialog({
 		}));
 	};
 
-	const [selectedCollectors, setSelectedCollectors] = useState<string[]>(
-		wageType.collectors ?? [],
-	);
+	const toggleCollector = (collectorName: string) => {
+		setCollectors((current) =>
+			current.map((collector) =>
+				collector.name === collectorName
+					? { ...collector, isActive: !collector.isActive }
+					: collector,
+			),
+		);
+	};
 
 	const handleSubmit = () => {
-		const body = {
-			...wageType,
-			collectors: selectedCollectors,
-			...(wageType.isLocalizable && {
-				nameLocalizations,
-			}),
-		};
-
 		fetcher.submit(
 			{
 				intent: "updateWageType",
-				wageTypeNumber: wageType.wageTypeNumber,
-				wageType: body,
+				wageType: {
+					...wageType,
+					collectors,
+					...(wageType.isLocalizable ? { nameLocalizations } : {}),
+				},
 			},
 			{
 				method: "post",
@@ -86,6 +88,9 @@ export function UpdateWageTypeDialog({
 	}, [fetcher.data, onClose]);
 
 	const isSubmitting = fetcher.state !== "idle";
+	const hasChangeableCollectors = collectors.some(
+		(collector) => collector.isChangeable,
+	);
 
 	return (
 		<Dialog
@@ -95,76 +100,71 @@ export function UpdateWageTypeDialog({
 			fullWidth
 		>
 			<DialogTitle>{t("Update wage type")}</DialogTitle>
-
 			<DialogContent>
 				<Stack spacing={3} sx={{ mt: 1 }}>
-					{wageType.isCollectorChangeable && (
+					{fetcher.data?.error && (
+						<Alert severity="error">{t(fetcher.data.error)}</Alert>
+					)}
+
+					{hasChangeableCollectors && (
 						<Stack spacing={2}>
 							<Typography variant="h6">{t("Collectors")}</Typography>
-
 							<Stack direction="row" flexWrap="wrap" gap={1}>
-								{collectors.map((collector) => {
-									const active = selectedCollectors.includes(collector.name);
-									const isChangeable =
-										collector.attributes?.["Changeable"] === "Y";
-
-									return (
-										<Chip
-											key={collector.id}
-											label={collector.displayName}
-											color={active ? "primary" : "default"}
-											variant={active ? "filled" : "outlined"}
-											disabled={!isChangeable}
-											onClick={() => {
-												setSelectedCollectors((current) =>
-													active
-														? current.filter((x) => x !== collector.name)
-														: [...current, collector.name],
-												);
-											}}
-										/>
-									);
-								})}
+								{collectors.map((collector) => (
+									<Chip
+										key={collector.name}
+										label={collector.displayName}
+										color={collector.isActive ? "primary" : "default"}
+										variant={collector.isActive ? "filled" : "outlined"}
+										disabled={!collector.isChangeable}
+										onClick={() => toggleCollector(collector.name)}
+									/>
+								))}
 							</Stack>
 						</Stack>
 					)}
 
 					{wageType.isLocalizable && (
 						<Stack spacing={2}>
-							<Typography variant="h6">{t("Edit wage type label")}</Typography>
-
+							<Typography variant="h6">
+								{t("Edit wage type label")}
+							</Typography>
 							<TextField
 								label={t("en_culturelabel")}
 								value={nameLocalizations.en}
-								onChange={(e) => setLocalization("en", e.target.value)}
+								onChange={(event) =>
+									setLocalization("en", event.target.value)
+								}
 								fullWidth
 							/>
-
 							<TextField
 								label={t("de_culturelabel")}
 								value={nameLocalizations.de}
-								onChange={(e) => setLocalization("de", e.target.value)}
+								onChange={(event) =>
+									setLocalization("de", event.target.value)
+								}
 								fullWidth
 							/>
-
 							<TextField
 								label={t("fr_culturelabel")}
-								value={nameLocalizations.fr}	
-								onChange={(e) => setLocalization("fr", e.target.value)}
+								value={nameLocalizations.fr}
+								onChange={(event) =>
+									setLocalization("fr", event.target.value)
+								}
 								fullWidth
 							/>
-
 							<TextField
 								label={t("it_culturelabel")}
 								value={nameLocalizations.it}
-								onChange={(e) => setLocalization("it", e.target.value)}
+								onChange={(event) =>
+									setLocalization("it", event.target.value)
+								}
 								fullWidth
 							/>
 						</Stack>
 					)}
 				</Stack>
 			</DialogContent>
-
 			<DialogActions>
 				<Button onClick={onClose} disabled={isSubmitting}>
 					{t("Cancel")}

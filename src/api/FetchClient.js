@@ -42,13 +42,15 @@ const payrollLookupValuesUrl =
 	"/tenants/:orgId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
 const payrollEmployeeUrl =
-	"/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
+	"/v2/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
 const payrollWageTypeMasterUrl =
-	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster";
+	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes";
+const payrollWageTypeActivateUrl =
+	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes/:wageTypeNumber:activate";
 const payrollWageTypeSettingsUrl =
 	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
 const wageTypeUrl =
-    "/tenants/:orgId/payrolls/:payrollId/wagetypemaster/:wageTypeNumber";
+	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes/:wageTypeNumber";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
@@ -785,7 +787,11 @@ export function buildPayrollReport(routeParams, reportRequest) {
 		.fetchJson();
 }
 
-export async function generatePayrollReport(routeParams, reportRequest, format) {
+export async function generatePayrollReport(
+	routeParams,
+	reportRequest,
+	format,
+) {
 	const response = await new FetchRequestBuilder(
 		payrollReportGenerateUrl,
 		routeParams,
@@ -934,55 +940,40 @@ export function getPayrollWageTypes(routeParams) {
 		.withLocalization()
 		.fetchJson();
 }
-export function getPayrollWageTypeSettings(routeParams) {
-	return new FetchRequestBuilder(
-		payrollWageTypeSettingsUrl,
-		routeParams,
-	).fetchJson();
-}
-export function setPayrollWageTypeSettings(routeParams, settings) {
-	return new FetchRequestBuilder(payrollWageTypeSettingsUrl, routeParams)
-		.withMethod("PATCH")
-		.withBody(settings)
-		.fetch();
-}
 
 export function activateWageType(routeParams, wageTypeNumber) {
-	return new FetchRequestBuilder(wageTypeUrl, {
+	return new FetchRequestBuilder(payrollWageTypeActivateUrl, {
 		...routeParams,
-		wageTypeNumber: `${wageTypeNumber}:activate`,
+		wageTypeNumber,
 	})
 		.withMethod("POST")
 		.fetch();
 }
 
 export function copyWageType(
-    routeParams,
-    wageTypeNumber,
-    copyFromWageTypeNumber,
-    nameLocalizations,
+	routeParams,
+	copyFromWageTypeNumber,
+	nameLocalizations,
 ) {
-    return new FetchRequestBuilder(wageTypeUrl, {
-        ...routeParams,
-        wageTypeNumber,
-    })
-        .withQueryParam("copyFromWageTypeNumber", copyFromWageTypeNumber)
-        .withMethod("POST")
-        .withBody(nameLocalizations)
-        .fetch();
+	return new FetchRequestBuilder(payrollWageTypeMasterUrl, routeParams)
+		.withMethod("POST")
+		.withQueryParam("copyFromWageTypeNumber", copyFromWageTypeNumber)
+		.withBody(nameLocalizations)
+		.fetch();
 }
 
-export function updateWageType(routeParams, wageTypeNumber, wageType) {
-	return new FetchRequestBuilder(
-		wageTypeUrl,
-		{
-			...routeParams,
-			wageTypeNumber,
-		},
-	)
-		.withMethod("PUT")
-		.withBody(wageType)
+export function updateWageTypes(routeParams, wageTypeUpdates) {
+	return new FetchRequestBuilder(payrollWageTypeMasterUrl, routeParams)
+		.withMethod("PATCH")
+		.withBody(wageTypeUpdates)
 		.fetch();
+}
+
+export function updateWageType(routeParams, wageTypeOrUpdates) {
+	return updateWageTypes(
+		routeParams,
+		Array.isArray(wageTypeOrUpdates) ? wageTypeOrUpdates : [wageTypeOrUpdates],
+	);
 }
 
 export function getPayrollCollectors(routeParams) {

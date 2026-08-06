@@ -11,7 +11,6 @@ import {
 	getPayrunPeriodControllingTasks,
 	getClientRegulation,
 	getPayrollWageTypes,
-	getPayrollWageTypeSettings,
 	getOrganizationUserMembership,
 	getEmployee,
 } from "../api/FetchClient";
@@ -31,11 +30,7 @@ import { ExpandedState } from "@tanstack/react-table";
 import { SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 import { AvailableCase } from "../models/AvailableCase";
 import { ControllingData } from "../payrun/types";
-import {
-	WageType,
-	WageTypeDetailed,
-	WageTypeSettings,
-} from "../models/WageType";
+import { WageType } from "../models/WageType";
 import { UserMembership } from "../models/User";
 import { getSupportedCulture } from "../models/Culture";
 
@@ -298,50 +293,41 @@ export const payrollControllingDataTotalCountAtom = atom(async (get) => {
 	);
 });
 
-export const payrollWageTypeSettingsAtom = atomWithRefresh<
-	Promise<WageTypeSettings>
->(async (get) => {
-	const orgId = get(orgIdAtom);
-	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return [];
-	var wageTypeSettings = await getPayrollWageTypeSettings({ orgId, payrollId });
-	return wageTypeSettings;
-});
-
 export const payrollWageTypesAtom = atomWithRefresh<
-	Promise<WageTypeDetailed[]>
+	Promise<WageType[]>
 >(async (get) => {
 	const orgId = get(orgIdAtom);
 	const payrollId = get(payrollIdAtom);
 	if (orgId === null || payrollId === null) return [];
-	const [wageTypes, settings]: [WageType[], WageTypeSettings] =
-		await Promise.all([
-			getPayrollWageTypes({ orgId, payrollId }),
-			get(payrollWageTypeSettingsAtom),
-		]);
 
-	return wageTypes.map((wt) => {
-		const wageTypeNumber = wt.wageTypeNumber.toString();
-		const assignment = settings.accountAssignments[wageTypeNumber];
-		const accountAssignmentRequired =
-			wt.attributes?.["Accounting.Relevant"] === "Y" &&
-			(!assignment?.creditAccountNumber || !assignment?.debitAccountNumber);
-		return {
-			...wt,
-			accountAssignmentRequired,
-		};
-	});
+	return getPayrollWageTypes({ orgId, payrollId });
 });
 
 export function refreshPayrollWageTypes() {
-	const store = getDefaultStore();
-	store.set(payrollWageTypeSettingsAtom);
-	store.set(payrollWageTypesAtom);
+	getDefaultStore().set(payrollWageTypesAtom);
 }
 
 export const payrollWageTypesWithMissingAccountInfoCountAtom = atom<
 	Promise<number>
 >(async (get) => {
 	const wageTypes = await get(payrollWageTypesAtom);
-	return wageTypes.filter((wt) => wt.isActive === true && wt.accountAssignmentRequired).length;
+
+	return wageTypes.filter((wageType) => {
+		if (!wageType.isActive) {
+			return false;
+		}
+
+		const accountingRelevant =
+			wageType.attributes?.["Accounting.Relevant"] === "Y" ||
+			Number(wageType.attributes?.["ParentWageTypeNumber"] ?? 0) > 0;
+
+		if (!accountingRelevant) {
+			return false;
+		}
+
+		return (
+			!wageType.accountAssignment?.debitAccountNumber ||
+			!wageType.accountAssignment?.creditAccountNumber
+		);
+	}).length;
 });

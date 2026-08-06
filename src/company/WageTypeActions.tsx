@@ -1,58 +1,85 @@
 import type { ActionFunctionArgs } from "react-router-dom";
-import { copyWageType } from "../api/FetchClient";
+import {
+	activateWageType,
+	copyWageType,
+	updatePayrollWageTypes,
+} from "../api/FetchClient";
+import { WageType, WageTypeNameLocalizations } from "../models/WageType";
 
-type CopyWageTypeActionRequest = {
-	intent: string;
-	wageTypeNumber: number;
-	copyFromWageTypeNumber: number;
-	nameLocalizations: {
-		en: string;
-		de: string;
-		fr: string;
-		it: string;
-	};
-};
+type WageTypeActionRequest =
+	| {
+			intent: "copyWageType";
+			wageTypeNumber: number;
+			copyFromWageTypeNumber: number;
+			nameLocalizations: WageTypeNameLocalizations;
+	  }
+	| {
+			intent: "updateWageType";
+			wageType: WageType;
+	  }
+	| {
+			intent: "updateWageTypes";
+			wageTypes: WageType[];
+	  }
+	| {
+			intent: "activateWageType";
+			wageTypeNumber: number;
+	  };
 
 export async function wageTypeAction({
 	request,
 	params,
 }: ActionFunctionArgs) {
-	const data =
-		(await request.json()) as CopyWageTypeActionRequest;
-
-	if (data.intent !== "copyWageType") {
-		return {
-			error: "Unsupported wage type action.",
-		};
-	}
+	const data = (await request.json()) as WageTypeActionRequest;
 
 	try {
-		const response = await copyWageType(
-			params,
-			data.wageTypeNumber,
-			data.copyFromWageTypeNumber,
-			data.nameLocalizations,
-		);
-
-		if (
-			response &&
-			typeof response === "object" &&
-			"status" in response &&
-			Number(response.status) !== 201
-		) {
-			return {
-				error:
-					"The maximum number of copies has been reached.",
-			};
+		switch (data.intent) {
+			case "copyWageType": {
+				const response = await copyWageType(
+					params,
+					data.wageTypeNumber,
+					data.copyFromWageTypeNumber,
+					data.nameLocalizations,
+				);
+				return createActionResult("copyWageType", response, 201);
+			}
+			case "updateWageType": {
+				const response = await updatePayrollWageTypes(params, [data.wageType]);
+				return createActionResult("updateWageType", response);
+			}
+			case "updateWageTypes": {
+				const response = await updatePayrollWageTypes(params, data.wageTypes);
+				return createActionResult("updateWageTypes", response);
+			}
+			case "activateWageType": {
+				const response = await activateWageType(params, data.wageTypeNumber);
+				return createActionResult("activateWageType", response);
+			}
 		}
-
+	} catch (error) {
+		console.error("Wage type action failed", error);
 		return {
-			success: true,
-		};
-	} catch {
-		return {
-			error:
-				"The maximum number of copies has been reached.",
+			intent: data.intent,
+			error: "Action failed",
 		};
 	}
+}
+
+function createActionResult(
+	intent: WageTypeActionRequest["intent"],
+	response: unknown,
+	expectedStatus?: number,
+) {
+	const status =
+		response && typeof response === "object" && "status" in response
+			? Number(response.status)
+			: undefined;
+	const ok =
+		response && typeof response === "object" && "ok" in response
+			? Boolean(response.ok)
+			: expectedStatus === undefined || status === expectedStatus;
+
+	return ok
+		? { intent, success: true }
+		: { intent, error: "Action failed" };
 }

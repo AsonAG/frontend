@@ -8,62 +8,66 @@ import {
 } from "@mui/material";
 import React, { useContext, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { WageTypeSettingsContext } from "./WageTypeControlling";
+import { WageType } from "../models/WageType";
+import { WageTypeContext } from "./WageTypeControlling";
 
-export function ControllingPicker({
-	wageTypeNumber,
-	controlTypes,
-	multiple,
-}: {
-	wageTypeNumber: string;
-	controlTypes: Map<string, string>;
-	multiple: boolean;
-}) {
+export function ControllingPicker({ wageType }: { wageType: WageType }) {
 	const { t } = useTranslation();
-	const { state, dispatch } = useContext(WageTypeSettingsContext);
-	const value = state.payrollControlling[wageTypeNumber] ?? [];
+	const { state, dispatch } = useContext(WageTypeContext);
+	const currentWageType =
+		state.wageTypesByNumber[wageType.wageTypeNumber.toString()] ?? wageType;
+	const value = currentWageType.activeControllingTriggers ?? [];
 
-	const handleChange = (event: SelectChangeEvent<typeof value>) => {
-		const {
-			target: { value },
-		} = event;
+	const options = useMemo(
+		() =>
+			(currentWageType.availableControllingTriggers ?? []).map((trigger) => (
+				<MenuItem key={trigger} value={trigger}>
+					{t(trigger)}
+				</MenuItem>
+			)),
+		[currentWageType.availableControllingTriggers, t],
+	);
+
+	if (currentWageType.availableControllingTriggers.length === 0) {
+		return <Typography noWrap>{t("automatic")}</Typography>;
+	}
+
+	const handleChange = (event: SelectChangeEvent<string[]>) => {
+		const selectedValue = event.target.value;
 		const values =
-			value === "" ? [] : typeof value === "string" ? value.split(",") : value;
-		dispatch({ type: "set_controlling", wageTypeNumber, value: values });
+			typeof selectedValue === "string"
+				? selectedValue.split(",")
+				: selectedValue;
+
+		dispatch({
+			type: "set_controlling",
+			wageTypeNumber: wageType.wageTypeNumber,
+			value: values,
+		});
 	};
-	const options = useMemo(() => {
-		return [...controlTypes].map((kv) => (
-			<MenuItem key={kv[0]} value={kv[0]}>
-				{kv[1]}
-			</MenuItem>
-		));
-	}, [controlTypes]);
 
 	return (
 		<Select
-			multiple={multiple}
+			multiple
 			value={value}
 			sx={selectSx}
 			onChange={handleChange}
 			displayEmpty
 			renderValue={(selected) => {
-				let label = "No checks";
+				if (selected.length === 0) {
+					return <Typography noWrap>{t("No checks")}</Typography>;
+				}
 				if (selected.length === 1) {
-					label = controlTypes.get(selected[0])!;
-				} else if (selected.length > 1) {
-					label = "{{count}} checks active";
+					return <Typography noWrap>{t(selected[0])}</Typography>;
 				}
 				return (
-					<Typography noWrap>{t(label, { count: selected.length })}</Typography>
+					<Typography noWrap>
+						{t("{{count}} checks active", { count: selected.length })}
+					</Typography>
 				);
 			}}
 			size="small"
 		>
-			{!multiple && (
-				<MenuItem key="" value="">
-					{t("No checks")}
-				</MenuItem>
-			)}
 			{options}
 		</Select>
 	);

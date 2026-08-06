@@ -14,13 +14,16 @@ import {
 	Theme,
 	Typography,
 } from "@mui/material";
-import React, {
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { blend } from "@mui/system/colorManipulator";
+import {
 	createContext,
 	Dispatch,
+	useContext,
+	useEffect,
 	useMemo,
 	useReducer,
 	useState,
-	useEffect,
 } from "react";
 import {
 	useActionData,
@@ -29,7 +32,6 @@ import {
 	useNavigation,
 	useSubmit,
 } from "react-router-dom";
-import { columns } from "./WageTypeColumns";
 import {
 	flexRender,
 	getCoreRowModel,
@@ -37,101 +39,117 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
+import { columns } from "./WageTypeColumns";
 import { getRowGridSx, getStickySx } from "../payrun/utils";
-import { LookupSet, LookupValue } from "../models/LookupSet";
-import { Collector } from "../models/Collector";
-import { WageTypeDetailed, WageTypeSettings } from "../models/WageType";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { blend } from "@mui/system/colorManipulator";
+import { LookupSet } from "../models/LookupSet";
+import { WageType } from "../models/WageType";
 
 export type WageTypeControllingLoaderData = {
-	wageTypes: WageTypeDetailed[];
-	wageTypeSettings: WageTypeSettings;
-	collectors: Collector[];
+	wageTypes: WageType[];
 	accountMaster: LookupSet;
-	controlTypesMap: Map<string, Map<string, string>>;
-	attributeTranslationMap: Map<string, LookupValue>;
 };
-type WageTypeSettingsContextType = {
-	state: WageTypeSettingsState;
-	dispatch: Dispatch<SettingsAction>;
+
+type WageTypeState = {
+	wageTypesByNumber: Record<string, WageType>;
+	changedWageTypeNumbers: string[];
+	dirty: boolean;
 };
-const defaultSettings: WageTypeSettingsContextType = {
-	state: {
-		accountAssignments: {},
-		payrollControlling: {},
-		dirty: false,
+
+type WageTypeContextType = {
+	state: WageTypeState;
+	dispatch: Dispatch<WageTypeAction>;
+};
+
+const defaultState: WageTypeState = {
+	wageTypesByNumber: {},
+	changedWageTypeNumbers: [],
+	dirty: false,
+};
+
+export const WageTypeContext = createContext<WageTypeContextType>({
+	state: defaultState,
+	dispatch: () => {
+		throw new Error("WageTypeContext is not initialized.");
 	},
-	dispatch: function (value: SettingsAction): void {
-		throw new Error("Function not implemented.");
-	},
-};
-export const WageTypeSettingsContext =
-	createContext<WageTypeSettingsContextType>(defaultSettings);
+});
 
 const tableHeaderHeight = 36;
 const headerStickySx = getStickySx(10, { top: 0 });
+
+const defaultRowSx: SxProps<Theme> = {
+	minHeight: 42,
+	maxHeight: 42,
+	alignItems: "center",
+};
+
+type WageTypeActionData = {
+	intent?: "updateWageTypes";
+	success?: boolean;
+	error?: string;
+};
+
 export function WageTypeControlling() {
 	const { t } = useTranslation();
 	const { state: navigationState } = useNavigation();
 	const submit = useSubmit();
-	const actionData = useActionData() as {
-		intent?: "saveWageTypeSettings";
-		success?: boolean;
-	};
-	const { wageTypes, attributeTranslationMap, wageTypeSettings } =
-		useLoaderData() as WageTypeControllingLoaderData;
+	const actionData = useActionData() as WageTypeActionData | undefined;
+	const { wageTypes } = useLoaderData() as WageTypeControllingLoaderData;
 
-	const [state, dispatch] = useReducer(
-		reducer,
-		wageTypeSettings,
-		createInitialState,
-	);
-
+	const [state, dispatch] = useReducer(reducer, wageTypes, createInitialState);
 	const [showAllWageTypes, setShowAllWageTypes] = useState(false);
 	const [search, setSearch] = useState("");
+
+	const currentWageTypes = useMemo(
+		() =>
+			wageTypes.map(
+				(wageType) =>
+					state.wageTypesByNumber[
+						formatWageTypeNumber(wageType.wageTypeNumber)
+					] ?? wageType,
+			),
+		[wageTypes, state.wageTypesByNumber],
+	);
 
 	const filteredWageTypes = useMemo(() => {
 		const searchValue = search.trim().toLowerCase();
 
-		return wageTypes.filter((wageType) => {
-			const matchesActiveFilter =
-				showAllWageTypes || wageType.isActive === true;
-
+		return currentWageTypes.filter((wageType) => {
+			const matchesActiveFilter = showAllWageTypes || wageType.isActive;
 			const matchesSearch =
 				searchValue === "" ||
-				wageType.wageTypeNumber.toString().includes(searchValue) ||
+				formatWageTypeNumber(wageType.wageTypeNumber).includes(searchValue) ||
 				wageType.displayName.toLowerCase().includes(searchValue) ||
 				wageType.name.toLowerCase().includes(searchValue);
 
 			return matchesActiveFilter && matchesSearch;
 		});
-	}, [wageTypes, showAllWageTypes, search]);
+	}, [currentWageTypes, search, showAllWageTypes]);
 
 	const table = useReactTable({
-		columns: columns,
+		columns,
 		data: filteredWageTypes,
 		getCoreRowModel: getCoreRowModel(),
-		getRowId: (originalRow) => originalRow.id,
+		getRowId: (wageType) => formatWageTypeNumber(wageType.wageTypeNumber),
 	});
 
 	useEffect(() => {
 		if (
-			actionData?.intent === "saveWageTypeSettings" &&
+			actionData?.intent === "updateWageTypes" &&
 			actionData.success === true
 		) {
 			dispatch({ type: "reset_dirty" });
 		}
 	}, [actionData]);
 
-	let blocker = useBlocker(
+	const blocker = useBlocker(
 		({ currentLocation, nextLocation }) =>
 			state.dirty && currentLocation.pathname !== nextLocation.pathname,
 	);
+
 	const rowGridSx = getRowGridSx(
-		table.getVisibleLeafColumns().map((col) => ({
-			width: col.getSize(),
-			flex: col.columnDef.meta?.flex,
+		table.getVisibleLeafColumns().map((column) => ({
+			width: column.getSize(),
+			flex: column.columnDef.meta?.flex,
 		})),
 		1,
 	);
@@ -139,25 +157,41 @@ export function WageTypeControlling() {
 	const [rowsByCategory, withoutCategory] = useMemo(() => {
 		const grouped = Object.groupBy(
 			table.getRowModel().rows,
-			({ original }) => original.attributes?.["Wage.Category"] ?? "noCategory",
-		) as Record<string, Array<Row<WageTypeDetailed>>>;
-		const { noCategory, ...result } = grouped;
-		return [result, noCategory];
+			({ original }) => original.category?.trim() || "noCategory",
+		) as Record<string, Array<Row<WageType>>>;
+
+		const { noCategory, ...categories } = grouped;
+		return [categories, noCategory ?? []] as const;
 	}, [table.getRowModel().rows]);
 
 	const onSubmit = () => {
+		const wageTypeUpdates = state.changedWageTypeNumbers
+			.map((wageTypeNumber) => state.wageTypesByNumber[wageTypeNumber])
+			.filter((wageType): wageType is WageType => wageType !== undefined)
+			.map((wageType) => ({
+				wageTypeNumber: wageType.wageTypeNumber,
+				accountAssignment: wageType.accountAssignment,
+				activeControllingTriggers: wageType.activeControllingTriggers,
+			}));
+
+		if (wageTypeUpdates.length === 0) {
+			return;
+		}
+
 		submit(
 			{
-				intent: "saveWageTypeSettings",
-				accountAssignments: state.accountAssignments,
-				payrollControlling: state.payrollControlling,
+				intent: "updateWageTypes",
+				wageTypes: wageTypeUpdates,
 			},
-			{ method: "post", encType: "application/json" },
+			{
+				method: "post",
+				encType: "application/json",
+			},
 		);
 	};
 
 	return (
-		<WageTypeSettingsContext.Provider value={{ state, dispatch }}>
+		<WageTypeContext.Provider value={{ state, dispatch }}>
 			<Stack>
 				<Stack direction="row" justifyContent="end" spacing={2} sx={{ mb: 1 }}>
 					<TextField
@@ -182,50 +216,52 @@ export function WageTypeControlling() {
 				<Stack
 					sx={{ overflow: "auto", width: "max-content", minWidth: "100%" }}
 				>
-					{table.getHeaderGroups().map((headerGroup) => {
-						const sx: SxProps<Theme> = {
-							...rowGridSx,
-							...headerStickySx,
-							backgroundColor: (theme) => theme.palette.background.default,
-							minHeight: tableHeaderHeight,
-							maxHeight: tableHeaderHeight,
-						};
-						return (
-							<Box key={headerGroup.id} sx={sx}>
-								{headerGroup.headers.map((header) => {
-									const alignment = header.column.columnDef.meta?.alignment;
-									const context = { ...header.getContext(), t };
-									return (
-										<Typography
-											key={header.id}
-											variant="h6"
-											align={alignment}
-											noWrap
-											sx={{ px: 0.25, py: 0.5 }}
-										>
-											{flexRender(header.column.columnDef.header, context)}
-										</Typography>
-									);
-								})}
-							</Box>
-						);
-					})}
+					{table.getHeaderGroups().map((headerGroup) => (
+						<Box
+							key={headerGroup.id}
+							sx={{
+								...rowGridSx,
+								...headerStickySx,
+								backgroundColor: (theme) => theme.palette.background.default,
+								minHeight: tableHeaderHeight,
+								maxHeight: tableHeaderHeight,
+							}}
+						>
+							{headerGroup.headers.map((header) => {
+								const alignment = header.column.columnDef.meta?.alignment;
+								const context = { ...header.getContext(), t };
+
+								return (
+									<Typography
+										key={header.id}
+										variant="h6"
+										align={alignment}
+										noWrap
+										sx={{ px: 0.25, py: 0.5 }}
+									>
+										{flexRender(header.column.columnDef.header, context)}
+									</Typography>
+								);
+							})}
+						</Box>
+					))}
+
 					{Object.entries(rowsByCategory).map(([category, rows]) => (
 						<WageTypeCategoryGroup
 							key={category}
-							category={
-								attributeTranslationMap.get(category)?.value ?? category
-							}
+							category={category}
 							rows={rows}
 							rowGridSx={rowGridSx}
 						/>
 					))}
+
 					<WageTypeCategoryGroup
 						category={t("Without category")}
 						rows={withoutCategory}
 						rowGridSx={rowGridSx}
 					/>
 				</Stack>
+
 				<Stack
 					direction="row"
 					justifyContent="end"
@@ -247,7 +283,8 @@ export function WageTypeControlling() {
 						<Typography>{t("Save")}</Typography>
 					</Button>
 				</Stack>
-				{blocker.state === "blocked" ? (
+
+				{blocker.state === "blocked" && (
 					<Dialog open onClose={() => blocker.reset()}>
 						<DialogTitle>{t("Unsaved changes")}</DialogTitle>
 						<DialogContent>
@@ -268,21 +305,15 @@ export function WageTypeControlling() {
 							</Button>
 						</DialogActions>
 					</Dialog>
-				) : null}
+				)}
 			</Stack>
-		</WageTypeSettingsContext.Provider>
+		</WageTypeContext.Provider>
 	);
 }
 
-const defaultRowSx: SxProps<Theme> = {
-	minHeight: 42,
-	maxHeight: 42,
-	alignItems: "center",
-};
-
 type WageTypeCategoryProps = {
 	category: string;
-	rows: Array<Row<WageTypeDetailed>>;
+	rows: Array<Row<WageType>>;
 	rowGridSx: SxProps<Theme>;
 };
 
@@ -291,32 +322,46 @@ function WageTypeCategoryGroup({
 	rows,
 	rowGridSx,
 }: WageTypeCategoryProps) {
-	const [expanded, setExpanded] = useState<boolean>(false);
+	const { state } = useContext(WageTypeContext);
+	const [expanded, setExpanded] = useState(false);
 
-	if (!rows || rows.length === 0) return null;
-
-	const hasMissingData =
-		rows.filter((r) => r.original.accountAssignmentRequired).length > 0;
-	const header = (
-		<WageTypeCategoryHeader
-			header={category}
-			expanded={expanded}
-			onClick={() => setExpanded((p) => !p)}
-			hasMissingData={hasMissingData}
-		/>
-	);
-	if (!expanded) {
-		return header;
+	if (rows.length === 0) {
+		return null;
 	}
+
+	const hasMissingData = rows.some(({ original }) => {
+		const currentWageType =
+			state.wageTypesByNumber[original.wageTypeNumber.toString()] ?? original;
+
+		const accountingRelevant =
+			currentWageType.accountAssignment !== null ||
+			!Number.isInteger(currentWageType.wageTypeNumber);
+
+		if (!accountingRelevant) {
+			return false;
+		}
+
+		return (
+			!currentWageType.accountAssignment?.debitAccountNumber ||
+			!currentWageType.accountAssignment?.creditAccountNumber
+		);
+	});
+
 	return (
 		<>
-			{header}
-			{rows.map((row) => {
-				const rowSx = { ...rowGridSx, ...defaultRowSx };
-				return (
-					<Box key={row.id} sx={rowSx}>
+			<WageTypeCategoryHeader
+				header={category}
+				expanded={expanded}
+				onClick={() => setExpanded((current) => !current)}
+				hasMissingData={hasMissingData}
+			/>
+
+			{expanded &&
+				rows.map((row) => (
+					<Box key={row.id} sx={{ ...rowGridSx, ...defaultRowSx }}>
 						{row.getVisibleCells().map((cell) => {
 							const { alignment } = cell.column.columnDef.meta || {};
+
 							return (
 								<Box
 									key={cell.id}
@@ -328,8 +373,7 @@ function WageTypeCategoryGroup({
 							);
 						})}
 					</Box>
-				);
-			})}
+				))}
 		</>
 	);
 }
@@ -341,7 +385,7 @@ type WageTypeCategoryHeaderProps = {
 	hasMissingData: boolean;
 };
 
-const headerSx: SxProps<Theme> = {
+const categoryHeaderSx: SxProps<Theme> = {
 	...getStickySx(10, { top: tableHeaderHeight }),
 	minHeight: 36,
 	maxHeight: 36,
@@ -373,17 +417,15 @@ function WageTypeCategoryHeader({
 	onClick,
 	hasMissingData,
 }: WageTypeCategoryHeaderProps) {
-	const { attributeTranslationMap } =
-		useLoaderData() as WageTypeControllingLoaderData;
-	const text = attributeTranslationMap.get(header)?.value ?? header;
 	const icon = expanded ? <ExpandLess /> : <ExpandMore />;
+
 	return (
 		<Stack
 			direction="row"
 			onClick={onClick}
 			spacing={1}
 			sx={{
-				...headerSx,
+				...categoryHeaderSx,
 				borderBottomWidth: expanded ? 1 : 0,
 			}}
 		>
@@ -397,71 +439,88 @@ function WageTypeCategoryHeader({
 					},
 				}}
 			>
-				<Typography pr={0.5}>{text}</Typography>
+				<Typography pr={0.5}>{header}</Typography>
 			</Badge>
 		</Stack>
 	);
 }
 
-type WageTypeSettingsState = WageTypeSettings & {
-	initialState: WageTypeSettings;
-	dirty: boolean;
-};
-
-export type SettingsAction =
+export type WageTypeAction =
 	| {
 			type: "set_account";
-			kind: "debitAccountNumber" | "creditAccountNumber";
-			wageTypeNumber: string;
+			accountType: "debitAccountNumber" | "creditAccountNumber";
+			wageTypeNumber: number;
 			value: string | null;
 	  }
 	| {
 			type: "set_controlling";
-			wageTypeNumber: string;
+			wageTypeNumber: number;
 			value: string[];
 	  }
 	| {
 			type: "reset_dirty";
 	  };
 
-function reducer(
-	state: WageTypeSettingsState,
-	action: SettingsAction,
-): WageTypeSettingsState {
-	switch (action.type) {
-		case "set_account": {
-			return {
-				...state,
-				accountAssignments: {
-					...state.accountAssignments,
-					[action.wageTypeNumber]: {
-						...state.accountAssignments[action.wageTypeNumber],
-						[action.kind]: action.value,
-					},
-				},
-				dirty: true,
-			};
-		}
-		case "set_controlling":
-			return {
-				...state,
-				payrollControlling: {
-					...state.payrollControlling,
-					[action.wageTypeNumber]: action.value,
-				},
-				dirty: true,
-			};
-		case "reset_dirty":
-			return {
-				...state,
-				dirty: false,
-			};
+function reducer(state: WageTypeState, action: WageTypeAction): WageTypeState {
+	if (action.type === "reset_dirty") {
+		return {
+			...state,
+			changedWageTypeNumbers: [],
+			dirty: false,
+		};
 	}
-}
-function createInitialState(settings: WageTypeSettings): WageTypeSettingsState {
+
+	const wageTypeNumber = formatWageTypeNumber(action.wageTypeNumber);
+	const wageType = state.wageTypesByNumber[wageTypeNumber];
+	if (!wageType) {
+		return state;
+	}
+
+	const updatedWageType: WageType =
+		action.type === "set_account"
+			? {
+					...wageType,
+					accountAssignment: {
+						debitAccountNumber:
+							wageType.accountAssignment?.debitAccountNumber ?? null,
+						creditAccountNumber:
+							wageType.accountAssignment?.creditAccountNumber ?? null,
+						[action.accountType]: action.value,
+					},
+				}
+			: {
+					...wageType,
+					activeControllingTriggers: action.value,
+				};
+
 	return {
-		...settings,
-		initialState: settings,
+		...state,
+		wageTypesByNumber: {
+			...state.wageTypesByNumber,
+			[wageTypeNumber]: updatedWageType,
+		},
+		changedWageTypeNumbers: state.changedWageTypeNumbers.includes(
+			wageTypeNumber,
+		)
+			? state.changedWageTypeNumbers
+			: [...state.changedWageTypeNumbers, wageTypeNumber],
+		dirty: true,
+	};
+}
+
+function createInitialState(wageTypes: WageType[]): WageTypeState {
+	return {
+		wageTypesByNumber: Object.fromEntries(
+			wageTypes.map((wageType) => [
+				formatWageTypeNumber(wageType.wageTypeNumber),
+				wageType,
+			]),
+		),
+		changedWageTypeNumbers: [],
 		dirty: false,
 	};
+}
+
+function formatWageTypeNumber(wageTypeNumber: number): string {
+	return wageTypeNumber.toString();
 }
