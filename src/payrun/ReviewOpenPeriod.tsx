@@ -17,9 +17,7 @@ import {
 	Stack,
 	Typography,
 } from "@mui/material";
-import { PayrunPeriod } from "../models/PayrunPeriod";
 import { PayrunDocument } from "../models/PayrunPeriod";
-import { Employee } from "../models/Employee";
 
 import {
 	ResponsiveDialog,
@@ -28,7 +26,7 @@ import {
 	ResponsiveDialogTrigger,
 } from "../components/ResponsiveDialog";
 import { DashboardHeader } from "./DashboardHeader";
-import { PeriodDocuments, renderDocumentWithError } from "./PeriodDocuments";
+import { PeriodDocuments } from "./PeriodDocuments";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 
 export function ReviewOpenPeriod() {

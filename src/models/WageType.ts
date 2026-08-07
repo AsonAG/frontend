@@ -7,7 +7,6 @@ export type WageTypeNameLocalizations = Partial<
 >;
 
 export type WageTypeCollector = {
-	id?: IdType;
 	name: string;
 	displayName: string;
 	isActive: boolean;
@@ -31,7 +30,7 @@ export type WageType = {
 	isActive: boolean;
 	isCopyable: boolean;
 	isLocalizable: boolean;
-    category: string;
+	category: string;
 	accountAssignment: WageTypeAccountAssignment | null;
 	activeControllingTriggers: string[];
 	availableControllingTriggers: string[];

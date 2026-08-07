@@ -42,15 +42,11 @@ const payrollLookupValuesUrl =
 	"/tenants/:orgId/payrolls/:payrollId/lookups/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
 const payrollEmployeeUrl =
-	"/v2/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
+	"/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
 const payrollWageTypeMasterUrl =
 	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes";
 const payrollWageTypeActivateUrl =
 	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes/:wageTypeNumber:activate";
-const payrollWageTypeSettingsUrl =
-	"/tenants/:orgId/payrolls/:payrollId/wagetypemaster/settings";
-const wageTypeUrl =
-	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes/:wageTypeNumber";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
