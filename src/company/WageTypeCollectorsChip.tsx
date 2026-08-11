@@ -8,17 +8,20 @@ import {
 	Stack,
 	Typography,
 } from "@mui/material";
-import { useContext, useMemo, useRef, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { WageType } from "../models/WageType";
-import { WageTypeContext } from "./WageTypeControlling";
+import { useWageTypeDispatch } from "./WageTypeControlling";
 
-export function WageTypeCollectorsChip({ wageType }: { wageType: WageType }) {
+export const WageTypeCollectorsChip = memo(function WageTypeCollectorsChip({
+	wageType,
+}: {
+	wageType: WageType;
+}) {
 	const { t } = useTranslation();
-	const { state, dispatch } = useContext(WageTypeContext);
-	const currentWageType =
-		state.wageTypesByNumber[wageType.wageTypeNumber.toString()] ?? wageType;
-	const collectors = currentWageType.collectors;
+	const dispatch = useWageTypeDispatch();
+	// wageType comes from row.original, which already has the pending changes applied.
+	const collectors = wageType.collectors;
 
 	const anchorRef = useRef<HTMLDivElement>(null);
 	const [open, setOpen] = useState(false);
@@ -74,7 +77,7 @@ export function WageTypeCollectorsChip({ wageType }: { wageType: WageType }) {
 											onClick={() =>
 												dispatch({
 													type: "set_collector_active",
-													wageTypeNumber: currentWageType.wageTypeNumber,
+													wageTypeNumber: wageType.wageTypeNumber,
 													collectorName: collector.name,
 													isActive: !collector.isActive,
 												})
@@ -89,4 +92,4 @@ export function WageTypeCollectorsChip({ wageType }: { wageType: WageType }) {
 			</Popper>
 		</>
 	);
-}
+});

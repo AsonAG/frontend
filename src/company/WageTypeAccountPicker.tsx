@@ -8,12 +8,12 @@ import {
 	Theme,
 	Typography,
 } from "@mui/material";
-import React, { memo, useContext, useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { useLoaderData } from "react-router-dom";
 import { LookupValue } from "../models/LookupSet";
 import { WageType } from "../models/WageType";
 import {
-	WageTypeContext,
+	useWageTypeDispatch,
 	WageTypeControllingLoaderData,
 } from "./WageTypeControlling";
 
@@ -30,16 +30,12 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 	wageType,
 	accountType,
 }: WageTypeAccountPickerProps) {
-	const { accountMaster, wageTypes } =
-		useLoaderData() as WageTypeControllingLoaderData;
+	const { accountMaster } = useLoaderData() as WageTypeControllingLoaderData;
 
-	const { state, dispatch } = useContext(WageTypeContext);
+	const dispatch = useWageTypeDispatch();
 
-	const wageTypeNumber = wageType.wageTypeNumber.toString();
-
-	const currentWageType = state.wageTypesByNumber[wageTypeNumber] ?? wageType;
-
-	const assignment = currentWageType.accountAssignment?.[accountType] ?? null;
+	// wageType comes from row.original, which already has the pending changes applied.
+	const assignment = wageType.accountAssignment?.[accountType] ?? null;
 
 	const value = useMemo(
 		() =>
@@ -49,8 +45,8 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 	);
 
 	const accountingRelevant =
-		currentWageType.accountAssignment !== null ||
-		!Number.isInteger(currentWageType.wageTypeNumber);
+		wageType.accountAssignment !== null ||
+		!Number.isInteger(wageType.wageTypeNumber);
 
 	if (!accountingRelevant) {
 		return null;

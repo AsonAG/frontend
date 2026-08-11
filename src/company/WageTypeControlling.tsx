@@ -19,7 +19,9 @@ import { blend } from "@mui/system/colorManipulator";
 import {
 	createContext,
 	Dispatch,
+	memo,
 	useContext,
+	useDeferredValue,
 	useEffect,
 	useMemo,
 	useReducer,
@@ -69,24 +71,19 @@ type WageTypeState = {
 	dirty: boolean;
 };
 
-type WageTypeContextType = {
-	state: WageTypeState;
-	dispatch: Dispatch<WageTypeAction>;
-};
-
-const defaultState: WageTypeState = {
-	wageTypesByNumber: {},
-	originalWageTypesByNumber: {},
-	changesByNumber: {},
-	dirty: false,
-};
-
-export const WageTypeContext = createContext<WageTypeContextType>({
-	state: defaultState,
-	dispatch: () => {
-		throw new Error("WageTypeContext is not initialized.");
+// Only the dispatch function is shared through context. The state itself reaches the
+// cells as `row.original`, which already carries the pending changes layered on top —
+// sharing the state here as well would re-render every consumer on every keystroke,
+// since a context value change bypasses memo().
+export const WageTypeDispatchContext = createContext<Dispatch<WageTypeAction>>(
+	() => {
+		throw new Error("WageTypeDispatchContext is not initialized.");
 	},
-});
+);
+
+export function useWageTypeDispatch(): Dispatch<WageTypeAction> {
+	return useContext(WageTypeDispatchContext);
+}
 
 const tableHeaderHeight = 36;
 const headerStickySx = getStickySx(10, { top: 0 });
@@ -125,8 +122,12 @@ export function WageTypeControlling() {
 		[wageTypes, state.wageTypesByNumber],
 	);
 
+	// Filtering remounts every visible row, so it trails the input by a frame instead of
+	// blocking the keystroke that caused it.
+	const deferredSearch = useDeferredValue(search);
+
 	const filteredWageTypes = useMemo(() => {
-		const searchValue = search.trim().toLowerCase();
+		const searchValue = deferredSearch.trim().toLowerCase();
 
 		return currentWageTypes.filter((wageType) => {
 			const matchesActiveFilter = showAllWageTypes || wageType.isActive;
@@ -138,7 +139,7 @@ export function WageTypeControlling() {
 
 			return matchesActiveFilter && matchesSearch;
 		});
-	}, [currentWageTypes, search, showAllWageTypes]);
+	}, [currentWageTypes, deferredSearch, showAllWageTypes]);
 
 	const table = useReactTable({
 		columns,
@@ -161,12 +162,25 @@ export function WageTypeControlling() {
 			state.dirty && currentLocation.pathname !== nextLocation.pathname,
 	);
 
-	const rowGridSx = getRowGridSx(
-		table.getVisibleLeafColumns().map((column) => ({
-			width: column.getSize(),
-			flex: column.columnDef.meta?.flex,
-		})),
-		1,
+	// Both of these are spread into the sx of every rendered Box. Rebuilding them each
+	// render forces emotion to re-serialize the styles of the entire table.
+	const leafColumns = table.getVisibleLeafColumns();
+
+	const rowGridSx = useMemo(
+		() =>
+			getRowGridSx(
+				leafColumns.map((column) => ({
+					width: column.getSize(),
+					flex: column.columnDef.meta?.flex,
+				})),
+				1,
+			),
+		[leafColumns],
+	);
+
+	const rowSx = useMemo(
+		() => ({ ...rowGridSx, ...defaultRowSx }) as SxProps<Theme>,
+		[rowGridSx],
 	);
 
 	const [rowsByCategory, withoutCategory] = useMemo(() => {
@@ -206,7 +220,7 @@ export function WageTypeControlling() {
 	};
 
 	return (
-		<WageTypeContext.Provider value={{ state, dispatch }}>
+		<WageTypeDispatchContext.Provider value={dispatch}>
 			<Stack>
 				<Stack direction="row" justifyContent="end" spacing={2} sx={{ mb: 1 }}>
 					<TextField
@@ -266,14 +280,14 @@ export function WageTypeControlling() {
 							key={category}
 							category={category}
 							rows={rows}
-							rowGridSx={rowGridSx}
+							rowSx={rowSx}
 						/>
 					))}
 
 					<WageTypeCategoryGroup
 						category={t("Without category")}
 						rows={withoutCategory}
-						rowGridSx={rowGridSx}
+						rowSx={rowSx}
 					/>
 				</Stack>
 
@@ -322,43 +336,41 @@ export function WageTypeControlling() {
 					</Dialog>
 				)}
 			</Stack>
-		</WageTypeContext.Provider>
+		</WageTypeDispatchContext.Provider>
 	);
 }
 
 type WageTypeCategoryProps = {
 	category: string;
 	rows: Array<Row<WageType>>;
-	rowGridSx: SxProps<Theme>;
+	rowSx: SxProps<Theme>;
 };
 
 function WageTypeCategoryGroup({
 	category,
 	rows,
-	rowGridSx,
+	rowSx,
 }: WageTypeCategoryProps) {
-	const { state } = useContext(WageTypeContext);
 	const [expanded, setExpanded] = useState(false);
 
 	if (rows.length === 0) {
 		return null;
 	}
 
+	// row.original is already the wage type with its pending changes applied, so there is
+	// nothing to look up in the state here.
 	const hasMissingData = rows.some(({ original }) => {
-		const currentWageType =
-			state.wageTypesByNumber[original.wageTypeNumber.toString()] ?? original;
-
 		const accountingRelevant =
-			currentWageType.accountAssignment !== null ||
-			!Number.isInteger(currentWageType.wageTypeNumber);
+			original.accountAssignment !== null ||
+			!Number.isInteger(original.wageTypeNumber);
 
 		if (!accountingRelevant) {
 			return false;
 		}
 
 		return (
-			!currentWageType.accountAssignment?.debitAccountNumber ||
-			!currentWageType.accountAssignment?.creditAccountNumber
+			!original.accountAssignment?.debitAccountNumber ||
+			!original.accountAssignment?.creditAccountNumber
 		);
 	});
 
@@ -372,26 +384,43 @@ function WageTypeCategoryGroup({
 			/>
 
 			{expanded &&
-				rows.map((row) => (
-					<Box key={row.id} sx={{ ...rowGridSx, ...defaultRowSx }}>
-						{row.getVisibleCells().map((cell) => {
-							const { alignment } = cell.column.columnDef.meta || {};
-
-							return (
-								<Box
-									key={cell.id}
-									sx={{ px: 0.25, py: 0.5 }}
-									justifySelf={alignment}
-								>
-									{flexRender(cell.column.columnDef.cell, cell.getContext())}
-								</Box>
-							);
-						})}
-					</Box>
-				))}
+				rows.map((row) => <WageTypeRow key={row.id} row={row} rowSx={rowSx} />)}
 		</>
 	);
 }
+
+const cellSx: SxProps<Theme> = { px: 0.25, py: 0.5 };
+
+type WageTypeRowProps = {
+	row: Row<WageType>;
+	rowSx: SxProps<Theme>;
+};
+
+// Editing one wage type replaces the table's data array, so every Row instance is rebuilt
+// even though only a single wage type actually changed. Comparing row.original instead of
+// the Row wrapper lets the untouched rows — and the ~15 MUI components each of them
+// renders — bail out. Cells only ever read row.original (directly or through getValue), so
+// holding on to the previous Row while its original is unchanged renders the same output.
+const WageTypeRow = memo(
+	function WageTypeRow({ row, rowSx }: WageTypeRowProps) {
+		return (
+			<Box sx={rowSx}>
+				{row.getVisibleCells().map((cell) => {
+					const { alignment } = cell.column.columnDef.meta || {};
+
+					return (
+						<Box key={cell.id} sx={cellSx} justifySelf={alignment}>
+							{flexRender(cell.column.columnDef.cell, cell.getContext())}
+						</Box>
+					);
+				})}
+			</Box>
+		);
+	},
+	(previous, next) =>
+		previous.row.original === next.row.original &&
+		previous.rowSx === next.rowSx,
+);
 
 type WageTypeCategoryHeaderProps = {
 	header: string;
@@ -574,18 +603,21 @@ function applyWageTypeUpdate(
 	return wageType;
 }
 
-// Derives the full displayed wage type map from scratch: original server data with
-// every pending change layered on top. This is the only place wageTypesByNumber is set.
-function deriveWageTypesByNumber(
-	originalWageTypesByNumber: Record<string, WageType>,
+// Re-derives the single wage type an action touched, leaving every other entry at its
+// existing object identity. Deriving the whole map instead would hand out a fresh object
+// for each wage type that already carries a change, re-rendering all of those rows too.
+function deriveWageType(
+	state: WageTypeState,
+	key: string,
 	changesByNumber: Record<string, WageTypeChange>,
 ): Record<string, WageType> {
-	return Object.fromEntries(
-		Object.entries(originalWageTypesByNumber).map(([key, originalWageType]) => [
-			key,
-			applyWageTypeUpdate(originalWageType, changesByNumber[key]),
-		]),
-	);
+	return {
+		...state.wageTypesByNumber,
+		[key]: applyWageTypeUpdate(
+			state.originalWageTypesByNumber[key],
+			changesByNumber[key],
+		),
+	};
 }
 
 function isSameCollectors(
@@ -727,10 +759,7 @@ function reducer(state: WageTypeState, action: WageTypeAction): WageTypeState {
 		...state,
 		changesByNumber,
 		dirty: Object.keys(changesByNumber).length > 0,
-		wageTypesByNumber: deriveWageTypesByNumber(
-			state.originalWageTypesByNumber,
-			changesByNumber,
-		),
+		wageTypesByNumber: deriveWageType(state, wageTypeKey, changesByNumber),
 	};
 }
 

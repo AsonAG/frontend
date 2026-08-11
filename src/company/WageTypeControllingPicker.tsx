@@ -6,29 +6,32 @@ import {
 	Theme,
 	Typography,
 } from "@mui/material";
-import React, { useContext, useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { WageType } from "../models/WageType";
-import { WageTypeContext } from "./WageTypeControlling";
+import { useWageTypeDispatch } from "./WageTypeControlling";
 
-export function ControllingPicker({ wageType }: { wageType: WageType }) {
+export const ControllingPicker = memo(function ControllingPicker({
+	wageType,
+}: {
+	wageType: WageType;
+}) {
 	const { t } = useTranslation();
-	const { state, dispatch } = useContext(WageTypeContext);
-	const currentWageType =
-		state.wageTypesByNumber[wageType.wageTypeNumber.toString()] ?? wageType;
-	const value = currentWageType.activeControllingTriggers ?? [];
+	const dispatch = useWageTypeDispatch();
+	// wageType comes from row.original, which already has the pending changes applied.
+	const value = wageType.activeControllingTriggers ?? [];
 
 	const options = useMemo(
 		() =>
-			(currentWageType.availableControllingTriggers ?? []).map((trigger) => (
+			(wageType.availableControllingTriggers ?? []).map((trigger) => (
 				<MenuItem key={trigger} value={trigger}>
 					{t(trigger)}
 				</MenuItem>
 			)),
-		[currentWageType.availableControllingTriggers, t],
+		[wageType.availableControllingTriggers, t],
 	);
 
-	if (currentWageType.availableControllingTriggers.length === 0) {
+	if (wageType.availableControllingTriggers.length === 0) {
 		return <Typography noWrap>{t("automatic")}</Typography>;
 	}
 
@@ -71,7 +74,7 @@ export function ControllingPicker({ wageType }: { wageType: WageType }) {
 			{options}
 		</Select>
 	);
-}
+});
 
 const selectSx: SxProps<Theme> = {
 	width: "100%",
