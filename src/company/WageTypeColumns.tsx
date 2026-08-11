@@ -1,4 +1,4 @@
-import { Add, Info, Refresh } from "@mui/icons-material";
+import { Add, Info } from "@mui/icons-material";
 import { IconButton, Tooltip, Typography } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 import React, { useState } from "react";
@@ -6,10 +6,11 @@ import { useTranslation } from "react-i18next";
 import { WageType } from "../models/WageType";
 import { ActivateWageTypeCheckbox } from "./ActivateWageType";
 import { CopyWageTypeDialog } from "./CopyWageTypeDialog";
-import { UpdateWageTypeDialog } from "./UpdateWageTypeDialog";
 import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
+import { WageTypeCollectorsChip } from "./WageTypeCollectorsChip";
 import { ControllingPicker } from "./WageTypeControllingPicker";
 import { WageTypeDetails } from "./WageTypeDetails";
+import { WageTypeNameLocalizationEdit } from "./WageTypeNameLocalizationEdit";
 
 const columnHelper = createColumnHelper<WageType>();
 
@@ -21,7 +22,9 @@ function createColumns() {
 			size: 80,
 		}),
 		columnHelper.accessor("displayName", {
-			cell: (props) => <Typography noWrap>{props.getValue()}</Typography>,
+			cell: (props) => (
+				<WageTypeNameLocalizationEdit wageType={props.row.original} />
+			),
 			header: ({ t }) => t("Name"),
 			size: 250,
 			meta: { flex: 1 },
@@ -35,7 +38,7 @@ function createColumns() {
 				/>
 			),
 			header: ({ t }) => t("Active"),
-			size: 100,
+			size: 55,
 		}),
 		columnHelper.display({
 			id: "debit",
@@ -66,6 +69,12 @@ function createColumns() {
 			size: 180,
 		}),
 		columnHelper.display({
+			id: "collectors",
+			cell: (props) => <WageTypeCollectorsChip wageType={props.row.original} />,
+			header: ({ t }) => t("Collectors"),
+			size: 100,
+		}),
+		columnHelper.display({
 			id: "details",
 			cell: (props) => {
 				const { t } = useTranslation();
@@ -90,7 +99,7 @@ function createColumns() {
 			meta: { alignment: "center" },
 		}),
 		columnHelper.display({
-			id: "copy wage type",
+			id: "copy",
 			cell: (props) => {
 				const { t } = useTranslation();
 				const [open, setOpen] = useState(false);
@@ -106,37 +115,6 @@ function createColumns() {
 						{open && (
 							<CopyWageTypeDialog
 								wageTypeNumber={props.row.original.wageTypeNumber}
-								onClose={() => setOpen(false)}
-							/>
-						)}
-					</>
-				);
-			},
-			size: 40,
-			meta: { alignment: "center" },
-		}),
-		columnHelper.display({
-			id: "update wage type",
-			cell: (props) => {
-				const { t } = useTranslation();
-				const [open, setOpen] = useState(false);
-				const wageType = props.row.original;
-				const hasChangeableCollectors = wageType.collectors.some(
-					(collector) => collector.isChangeable,
-				);
-
-				if (!hasChangeableCollectors && !wageType.isLocalizable) return null;
-
-				return (
-					<>
-						<Tooltip title={t("Update wage type")}>
-							<IconButton size="small" onClick={() => setOpen(true)}>
-								<Refresh />
-							</IconButton>
-						</Tooltip>
-						{open && (
-							<UpdateWageTypeDialog
-								wageType={wageType}
 								onClose={() => setOpen(false)}
 							/>
 						)}

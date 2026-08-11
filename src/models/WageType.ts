@@ -1,5 +1,3 @@
-import { IdType } from "./IdType";
-
 export type WageTypeLocalizationLanguage = "en" | "de" | "fr" | "it";
 
 export type WageTypeNameLocalizations = Partial<
@@ -19,7 +17,6 @@ export type WageTypeAccountAssignment = {
 };
 
 export type WageType = {
-	id?: IdType;
 	wageTypeNumber: number;
 	name: string;
 	nameLocalizations?: WageTypeNameLocalizations;

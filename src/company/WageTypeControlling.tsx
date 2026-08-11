@@ -42,16 +42,30 @@ import { useTranslation } from "react-i18next";
 import { columns } from "./WageTypeColumns";
 import { getRowGridSx, getStickySx } from "../payrun/utils";
 import { LookupSet } from "../models/LookupSet";
-import { WageType } from "../models/WageType";
+import {
+	WageType,
+	WageTypeAccountAssignment,
+	WageTypeCollector,
+	WageTypeNameLocalizations,
+} from "../models/WageType";
+import { WageTypeUpdate } from "../models/WageTypeUpdate";
 
 export type WageTypeControllingLoaderData = {
 	wageTypes: WageType[];
 	accountMaster: LookupSet;
 };
 
+// Pending changes are tracked with the richer WageTypeCollector shape (rather than
+// WageTypeUpdate's plain collector names) so the UI can keep showing each collector's
+// full state; this gets flattened to names only when the update is submitted.
+type WageTypeChange = Omit<WageTypeUpdate, "collectors"> & {
+	collectors?: WageTypeCollector[] | null;
+};
+
 type WageTypeState = {
 	wageTypesByNumber: Record<string, WageType>;
-	changedWageTypeNumbers: string[];
+	originalWageTypesByNumber: Record<string, WageType>;
+	changesByNumber: Record<string, WageTypeChange>;
 	dirty: boolean;
 };
 
@@ -62,7 +76,8 @@ type WageTypeContextType = {
 
 const defaultState: WageTypeState = {
 	wageTypesByNumber: {},
-	changedWageTypeNumbers: [],
+	originalWageTypesByNumber: {},
+	changesByNumber: {},
 	dirty: false,
 };
 
@@ -165,14 +180,14 @@ export function WageTypeControlling() {
 	}, [table.getRowModel().rows]);
 
 	const onSubmit = () => {
-		const wageTypeUpdates = state.changedWageTypeNumbers
-			.map((wageTypeNumber) => state.wageTypesByNumber[wageTypeNumber])
-			.filter((wageType): wageType is WageType => wageType !== undefined)
-			.map((wageType) => ({
-				wageTypeNumber: wageType.wageTypeNumber,
-				accountAssignment: wageType.accountAssignment,
-				activeControllingTriggers: wageType.activeControllingTriggers,
-			}));
+		const wageTypeUpdates: WageTypeUpdate[] = Object.values(
+			state.changesByNumber,
+		).map((change) => ({
+			...change,
+			collectors: change.collectors
+				? activeCollectorNames(change.collectors)
+				: change.collectors,
+		}));
 
 		if (wageTypeUpdates.length === 0) {
 			return;
@@ -458,65 +473,279 @@ export type WageTypeAction =
 			value: string[];
 	  }
 	| {
+			type: "set_name_localizations";
+			wageTypeNumber: number;
+			value: WageTypeNameLocalizations;
+	  }
+	| {
+			type: "set_collector_active";
+			wageTypeNumber: number;
+			collectorName: string;
+			isActive: boolean;
+	  }
+	| {
 			type: "reset_dirty";
 	  };
+
+const localizationLanguages: Array<keyof WageTypeNameLocalizations> = [
+	"en",
+	"de",
+	"fr",
+	"it",
+];
+
+function isSameNameLocalizations(
+	a: WageTypeNameLocalizations | null | undefined,
+	b: WageTypeNameLocalizations | null | undefined,
+): boolean {
+	return localizationLanguages.every(
+		(language) => (a?.[language] ?? "") === (b?.[language] ?? ""),
+	);
+}
+
+function isSameAccountAssignment(
+	a: WageTypeAccountAssignment | null | undefined,
+	b: WageTypeAccountAssignment | null | undefined,
+): boolean {
+	return (
+		(a?.debitAccountNumber ?? null) === (b?.debitAccountNumber ?? null) &&
+		(a?.creditAccountNumber ?? null) === (b?.creditAccountNumber ?? null)
+	);
+}
+
+function isSameStringSet(
+	a: string[] | null | undefined,
+	b: string[] | null | undefined,
+): boolean {
+	const sortedA = [...(a ?? [])].sort();
+	const sortedB = [...(b ?? [])].sort();
+
+	return (
+		sortedA.length === sortedB.length &&
+		sortedA.every((value, index) => value === sortedB[index])
+	);
+}
+
+function activeCollectorNames(collectors: WageTypeCollector[]): string[] {
+	return collectors
+		.filter((collector) => collector.isActive)
+		.map((collector) => collector.name);
+}
+
+function withoutKey<T extends object, K extends keyof T>(
+	record: T,
+	key: K,
+): Omit<T, K> {
+	const { [key]: _removed, ...rest } = record;
+	return rest;
+}
+
+// Reconstructs the currently-displayed WageType by layering a pending WageTypeChange
+// (only the fields it actually carries) on top of the server's original WageType.
+function applyWageTypeUpdate(
+	originalWageType: WageType,
+	change: WageTypeChange | undefined,
+): WageType {
+	if (!change) {
+		return originalWageType;
+	}
+
+	let wageType = originalWageType;
+
+	if (change.accountAssignment !== undefined) {
+		wageType = { ...wageType, accountAssignment: change.accountAssignment };
+	}
+	if (change.activeControllingTriggers !== undefined) {
+		wageType = {
+			...wageType,
+			activeControllingTriggers: change.activeControllingTriggers ?? [],
+		};
+	}
+	if (change.nameLocalizations !== undefined) {
+		wageType = {
+			...wageType,
+			nameLocalizations: change.nameLocalizations ?? undefined,
+		};
+	}
+	if (change.collectors !== undefined) {
+		wageType = { ...wageType, collectors: change.collectors ?? [] };
+	}
+
+	return wageType;
+}
+
+// Derives the full displayed wage type map from scratch: original server data with
+// every pending change layered on top. This is the only place wageTypesByNumber is set.
+function deriveWageTypesByNumber(
+	originalWageTypesByNumber: Record<string, WageType>,
+	changesByNumber: Record<string, WageTypeChange>,
+): Record<string, WageType> {
+	return Object.fromEntries(
+		Object.entries(originalWageTypesByNumber).map(([key, originalWageType]) => [
+			key,
+			applyWageTypeUpdate(originalWageType, changesByNumber[key]),
+		]),
+	);
+}
+
+function isSameCollectors(
+	a: WageTypeCollector[] | null | undefined,
+	b: WageTypeCollector[] | null | undefined,
+): boolean {
+	return isSameStringSet(
+		activeCollectorNames(a ?? []),
+		activeCollectorNames(b ?? []),
+	);
+}
+
+// Applies a single field update on top of a wage type's existing pending change,
+// dropping the field once it matches the server value again. Returns undefined once no
+// field differs from the server anymore — there's nothing left worth tracking.
+function createWageTypeChange<
+	K extends Exclude<keyof WageTypeChange, "wageTypeNumber">,
+>(
+	existingChange: WageTypeChange | undefined,
+	wageTypeNumber: number,
+	field: K,
+	updatedValue: WageTypeChange[K],
+	originalValue: WageTypeChange[K],
+	isEqual: (a: WageTypeChange[K], b: WageTypeChange[K]) => boolean,
+): WageTypeChange | undefined {
+	const remainingFields = existingChange
+		? withoutKey(existingChange, field)
+		: {};
+
+	const changedFields = isEqual(updatedValue, originalValue)
+		? remainingFields
+		: { ...remainingFields, [field]: updatedValue };
+
+	return Object.keys(changedFields).length > 0
+		? { ...changedFields, wageTypeNumber }
+		: undefined;
+}
+
+// Handles one field-setting action by creating the updated per-wage-type change, then
+// applying it to the map. wageTypesByNumber is derived separately afterwards, from this.
+function computeChangesByNumber(
+	state: WageTypeState,
+	action: Exclude<WageTypeAction, { type: "reset_dirty" }>,
+	wageType: WageType,
+): Record<string, WageTypeChange> {
+	const key = formatWageTypeNumber(action.wageTypeNumber);
+	const originalWageType = state.originalWageTypesByNumber[key];
+	const existingChange = state.changesByNumber[key];
+
+	let change: WageTypeChange | undefined;
+
+	switch (action.type) {
+		case "set_account": {
+			const accountAssignment: WageTypeAccountAssignment = {
+				debitAccountNumber:
+					wageType.accountAssignment?.debitAccountNumber ?? "",
+				creditAccountNumber:
+					wageType.accountAssignment?.creditAccountNumber ?? "",
+				[action.accountType]: action.value,
+			};
+
+			change = createWageTypeChange(
+				existingChange,
+				action.wageTypeNumber,
+				"accountAssignment",
+				accountAssignment,
+				originalWageType.accountAssignment,
+				isSameAccountAssignment,
+			);
+			break;
+		}
+		case "set_controlling": {
+			change = createWageTypeChange(
+				existingChange,
+				action.wageTypeNumber,
+				"activeControllingTriggers",
+				action.value,
+				originalWageType.activeControllingTriggers,
+				isSameStringSet,
+			);
+			break;
+		}
+		case "set_name_localizations": {
+			change = createWageTypeChange(
+				existingChange,
+				action.wageTypeNumber,
+				"nameLocalizations",
+				action.value,
+				originalWageType.nameLocalizations,
+				isSameNameLocalizations,
+			);
+			break;
+		}
+		case "set_collector_active": {
+			const collectors = wageType.collectors.map((collector) =>
+				collector.name === action.collectorName
+					? { ...collector, isActive: action.isActive }
+					: collector,
+			);
+
+			change = createWageTypeChange(
+				existingChange,
+				action.wageTypeNumber,
+				"collectors",
+				collectors,
+				originalWageType.collectors,
+				isSameCollectors,
+			);
+			break;
+		}
+	}
+
+	// Step 2: places the recomputed change back into the map, or removes the entry entirely
+	// once it comes back undefined (i.e. every field reverted to the server value).
+	return change
+		? { ...state.changesByNumber, [key]: change }
+		: withoutKey(state.changesByNumber, key);
+}
 
 function reducer(state: WageTypeState, action: WageTypeAction): WageTypeState {
 	if (action.type === "reset_dirty") {
 		return {
 			...state,
-			changedWageTypeNumbers: [],
+			originalWageTypesByNumber: state.wageTypesByNumber,
+			changesByNumber: {},
 			dirty: false,
 		};
 	}
 
-	const wageTypeNumber = formatWageTypeNumber(action.wageTypeNumber);
-	const wageType = state.wageTypesByNumber[wageTypeNumber];
+	const wageTypeKey = formatWageTypeNumber(action.wageTypeNumber);
+	const wageType = state.wageTypesByNumber[wageTypeKey];
 	if (!wageType) {
 		return state;
 	}
 
-	const updatedWageType: WageType =
-		action.type === "set_account"
-			? {
-					...wageType,
-					accountAssignment: {
-						debitAccountNumber:
-							wageType.accountAssignment?.debitAccountNumber ?? null,
-						creditAccountNumber:
-							wageType.accountAssignment?.creditAccountNumber ?? null,
-						[action.accountType]: action.value,
-					},
-				}
-			: {
-					...wageType,
-					activeControllingTriggers: action.value,
-				};
+	const changesByNumber = computeChangesByNumber(state, action, wageType);
 
 	return {
 		...state,
-		wageTypesByNumber: {
-			...state.wageTypesByNumber,
-			[wageTypeNumber]: updatedWageType,
-		},
-		changedWageTypeNumbers: state.changedWageTypeNumbers.includes(
-			wageTypeNumber,
-		)
-			? state.changedWageTypeNumbers
-			: [...state.changedWageTypeNumbers, wageTypeNumber],
-		dirty: true,
+		changesByNumber,
+		dirty: Object.keys(changesByNumber).length > 0,
+		wageTypesByNumber: deriveWageTypesByNumber(
+			state.originalWageTypesByNumber,
+			changesByNumber,
+		),
 	};
 }
 
 function createInitialState(wageTypes: WageType[]): WageTypeState {
+	const wageTypesByNumber = Object.fromEntries(
+		wageTypes.map((wageType) => [
+			formatWageTypeNumber(wageType.wageTypeNumber),
+			wageType,
+		]),
+	);
+
 	return {
-		wageTypesByNumber: Object.fromEntries(
-			wageTypes.map((wageType) => [
-				formatWageTypeNumber(wageType.wageTypeNumber),
-				wageType,
-			]),
-		),
-		changedWageTypeNumbers: [],
+		wageTypesByNumber,
+		originalWageTypesByNumber: wageTypesByNumber,
+		changesByNumber: {},
 		dirty: false,
 	};
 }

@@ -87,14 +87,23 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 
 				return (
 					<Box key={key} component="li" {...optionProps} sx={{ gap: 1 }}>
-						<Typography width={70}>{option.key}</Typography>
-
-						<Typography>{option.value}</Typography>
+						<Typography width={70} display="inline-block">
+							{option.key}
+						</Typography>
+						<Typography display="inline-block">{option.value}</Typography>
 					</Box>
 				);
 			}}
-			size="small"
+			slotProps={{
+				popper: {
+					placement: "bottom-start",
+					style: {
+						width: "fit-content",
+					},
+				},
+			}}
 			sx={autoCompleteSx}
+			size="small"
 		/>
 	);
 });

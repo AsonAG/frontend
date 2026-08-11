@@ -5,6 +5,7 @@ import {
 	updatePayrollWageTypes,
 } from "../api/FetchClient";
 import { WageType, WageTypeNameLocalizations } from "../models/WageType";
+import { WageTypeUpdate } from "../models/WageTypeUpdate";
 
 type WageTypeActionRequest =
 	| {
@@ -19,7 +20,7 @@ type WageTypeActionRequest =
 	  }
 	| {
 			intent: "updateWageTypes";
-			wageTypes: WageType[];
+			wageTypes: WageTypeUpdate[];
 	  }
 	| {
 			intent: "activateWageType";
