@@ -44,7 +44,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { columns } from "./WageTypeColumns";
 import { getRowGridSx, getStickySx } from "../payrun/utils";
-import { LookupSet } from "../models/LookupSet";
+import { LookupSet, LookupValue } from "../models/LookupSet";
 import {
 	WageType,
 	WageTypeAccountAssignment,
@@ -57,6 +57,7 @@ import { WageTypeSaveConfirmDialog } from "./WageTypeChangeSummary";
 export type WageTypeControllingLoaderData = {
 	wageTypes: WageType[];
 	accountMaster: LookupSet;
+	attributeTranslationMap: Map<string, LookupValue>;
 };
 
 // Pending changes are tracked with the richer WageTypeCollector shape (rather than

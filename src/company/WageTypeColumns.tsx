@@ -1,4 +1,4 @@
-import { Add, Info } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import { IconButton, Tooltip, Typography } from "@mui/material";
 import { createColumnHelper } from "@tanstack/react-table";
 import React, { useState } from "react";
@@ -72,29 +72,11 @@ function createColumns() {
 			id: "collectors",
 			cell: (props) => <WageTypeCollectorsChip wageType={props.row.original} />,
 			header: ({ t }) => t("Collectors"),
-			size: 100,
+			size: 90,
 		}),
 		columnHelper.display({
 			id: "details",
-			cell: (props) => {
-				const { t } = useTranslation();
-				const [open, setOpen] = useState(false);
-				return (
-					<>
-						<Tooltip title={t("Details")}>
-							<IconButton size="small" onClick={() => setOpen(true)}>
-								<Info />
-							</IconButton>
-						</Tooltip>
-						{open && (
-							<WageTypeDetails
-								wageType={props.row.original}
-								onClose={() => setOpen(false)}
-							/>
-						)}
-					</>
-				);
-			},
+			cell: (props) => <WageTypeDetails wageType={props.row.original} />,
 			size: 40,
 			meta: { alignment: "center" },
 		}),

@@ -1,103 +1,124 @@
+import { Info } from "@mui/icons-material";
 import {
-	Box,
-	Button,
 	Chip,
-	Dialog,
-	DialogContent,
-	DialogTitle,
+	ClickAwayListener,
+	Fade,
+	IconButton,
+	Paper,
+	Popper,
 	Stack,
+	Tooltip,
 	Typography,
 } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import { memo, useMemo, useRef, useState } from "react";
+import { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
-import { WageType, WageTypeCollector } from "../models/WageType";
-import { getRowGridSx } from "../payrun/utils";
+import { useLoaderData } from "react-router-dom";
+import { WageType } from "../models/WageType";
+import { WageTypeControllingLoaderData } from "./WageTypeControlling";
 
-const dialogColumns = getRowGridSx(
-	[{ width: 150 }, { width: 150, flex: 1 }],
-	2,
-);
+// The attributes the details popper surfaces, in the order they are shown. Everything else
+// on the wage type either has its own column or is not meant for this view.
+const detailAttributes = [
+	"Accounting.Credit",
+	"Accounting.PlusMinus",
+	"Wage.Statement",
+	"Stats.Month",
+	"Stats.Year",
+	"Cost.Center",
+	"Bvg.Prospective",
+	"Bvg.Factor",
+	"Bvg.Retrospective",
+	"Payslip",
+	"FAK.billing",
+];
 
-export function WageTypeDetails({
+export const WageTypeDetails = memo(function WageTypeDetails({
 	wageType,
-	onClose,
 }: {
 	wageType: WageType;
-	onClose: () => void;
 }) {
 	const { t } = useTranslation();
 
-	return (
-		<Dialog open onClose={onClose} maxWidth="md" fullWidth>
-			<DialogTitle>{wageType.displayName}</DialogTitle>
-			<DialogContent dividers>
-				<Stack spacing={3}>
-					{wageType.description && (
-						<Box sx={dialogColumns}>
-							<Typography>{t("Description")}</Typography>
-							<Typography>{wageType.description}</Typography>
-						</Box>
-					)}
-					<Box sx={dialogColumns}>
-						<Typography>{t("Collectors")}</Typography>
-						<WageTypeCollectors collectors={wageType.collectors} />
-					</Box>
-					<Box sx={dialogColumns}>
-						<Typography>{t("Controlling")}</Typography>
-						<Stack direction="row" flexWrap="wrap" gap={0.5}>
-							{wageType.activeControllingTriggers.map((trigger) => (
-								<Chip key={trigger} label={t(trigger)} size="small" />
-							))}
-						</Stack>
-					</Box>
-					<Stack direction="row" justifyContent="end">
-						<Button onClick={onClose}>{t("Close")}</Button>
-					</Stack>
-				</Stack>
-			</DialogContent>
-		</Dialog>
-	);
-}
+	const anchorRef = useRef<HTMLButtonElement>(null);
+	const [open, setOpen] = useState(false);
 
-function WageTypeCollectors({ collectors }: { collectors: WageTypeCollector[] }) {
-	const { t } = useTranslation();
-	const [showInactive, setShowInactive] = useState(false);
-	const [activeCollectors, inactiveCollectors] = useMemo(
-		() => [
-			collectors.filter((collector) => collector.isActive),
-			collectors.filter((collector) => !collector.isActive),
-		],
-		[collectors],
+	const hasDetails = useMemo(
+		() =>
+			Boolean(wageType.description) ||
+			detailAttributes.some((attribute) => wageType.attributes?.[attribute]),
+		[wageType.attributes, wageType.description],
 	);
+
+	if (!hasDetails) {
+		return null;
+	}
+
+	return (
+		<>
+			<Tooltip title={t("Details")}>
+				<IconButton
+					ref={anchorRef}
+					size="small"
+					onClick={() => setOpen((current) => !current)}
+				>
+					<Info />
+				</IconButton>
+			</Tooltip>
+			<Popper
+				open={open}
+				anchorEl={anchorRef.current}
+				placement="bottom-end"
+				transition
+				sx={{ zIndex: (theme) => theme.zIndex.tooltip }}
+			>
+				{({ TransitionProps }) => (
+					<Fade {...TransitionProps} timeout={150}>
+						<Paper elevation={4} sx={{ p: 1, maxWidth: 350 }}>
+							<ClickAwayListener onClickAway={() => setOpen(false)}>
+								<Stack spacing={1}>
+									{wageType.description && (
+										<Typography variant="body2">
+											{wageType.description}
+										</Typography>
+									)}
+									<WageTypeAttributes wageType={wageType} />
+								</Stack>
+							</ClickAwayListener>
+						</Paper>
+					</Fade>
+				)}
+			</Popper>
+		</>
+	);
+});
+
+function WageTypeAttributes({ wageType }: { wageType: WageType }) {
+	const { t } = useTranslation();
+	const { attributeTranslationMap } =
+		useLoaderData() as WageTypeControllingLoaderData;
 
 	return (
 		<Stack direction="row" flexWrap="wrap" gap={0.5}>
-			{activeCollectors.map((collector) => (
-				<Chip
-					key={collector.name}
-					label={collector.displayName}
-					size="small"
-				/>
-			))}
-			{inactiveCollectors.length > 0 && !showInactive && (
-				<Chip
-					label={t("inactive_collector_chip", {
-						count: inactiveCollectors.length,
-					})}
-					size="small"
-					variant="outlined"
-					onClick={() => setShowInactive(true)}
-				/>
-			)}
-			{showInactive &&
-				inactiveCollectors.map((collector) => (
+			{detailAttributes.map((attribute) => {
+				const value = wageType.attributes?.[attribute];
+				if (!value) return null;
+				const label =
+					attributeTranslationMap.get(attribute)?.value ?? attribute;
+				return (
 					<Chip
-						key={collector.name}
-						label={collector.displayName}
+						key={attribute}
+						label={`${label}: ${getAttributeValueLabel(value, t)}`}
 						size="small"
-						variant="outlined"
 					/>
-				))}
+				);
+			})}
 		</Stack>
 	);
+}
+
+function getAttributeValueLabel(value: string, t: TFunction) {
+	if (value === "Y") return t("Yes");
+	if (value === "N") return t("No");
+	return value;
 }

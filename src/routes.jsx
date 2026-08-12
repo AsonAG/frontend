@@ -1328,12 +1328,17 @@ const routeData = [
 						path: "wagetypemaster",
 						Component: WageTypeControlling,
 						loader: async ({ params }) => {
-							const [wageTypes, accountMaster] = await Promise.all([
-								store.get(payrollWageTypesAtom),
-								getLookupValues(params, "AccountMaster"),
-							]);
+							const [wageTypes, accountMaster, wageTypeAttributes] =
+								await Promise.all([
+									store.get(payrollWageTypesAtom),
+									getLookupValues(params, "AccountMaster"),
+									getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
+								]);
+							const attributeTranslationMap = new Map(
+								wageTypeAttributes.values.map((value) => [value.key, value]),
+							);
 
-							return { wageTypes, accountMaster };
+							return { wageTypes, accountMaster, attributeTranslationMap };
 						},
 						action: async ({ params, request }) => {
 							const data = await request.json();
