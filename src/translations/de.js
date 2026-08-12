@@ -453,6 +453,7 @@ const translations = {
 		"Record wage type labels" : "Bezeichnungen der Lohnart erfassen",
 		"Show inactive wage types" : "Inaktive Lohnarten anzeigen",
 		"Edit wage type label": "Bezeichnungen der Lohnart bearbeiten",
+		"This label is required.": "Diese Bezeichnung ist erforderlich.",
 		"Do you really want to activate this wage type?": "Möchten Sie diesen Lohnart wirklich aktivieren?",
 		"Search wage type number or name": "Lohnartnummer oder Name suchen",
 		"The maximum number of copies has been reached.": "Die maximale Anzahl der Kopien ist erreicht.",

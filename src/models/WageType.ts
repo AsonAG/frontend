@@ -1,5 +1,12 @@
 export type WageTypeLocalizationLanguage = "en" | "de" | "fr" | "it";
 
+export const localizationLanguages: WageTypeLocalizationLanguage[] = [
+	"en",
+	"de",
+	"fr",
+	"it",
+];
+
 export type WageTypeNameLocalizations = Partial<
 	Record<WageTypeLocalizationLanguage, string>
 >;

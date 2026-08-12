@@ -434,6 +434,7 @@ const translations = {
 		"Record wage type labels" : "Registra etichette tipo di retribuzione",
 		"Show inactive wage types" : "Mostra tipi di retribuzione inattivi",
 		"Edit wage type label": "Modifica etichette tipo di retribuzione",
+		"This label is required.": "Questa etichetta è obbligatoria.",
 		"Do you really want to activate this wage type?": "Vuoi davvero attivare questo tipo di retribuzione?",
 		"Search wage type number or name": "Cerca numero o nome del tipo di retribuzione",
 		"The maximum number of copies has been reached.": "È stato raggiunto il numero massimo di copie.",

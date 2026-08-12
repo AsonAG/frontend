@@ -434,6 +434,7 @@ const translations = {
 		"Record wage type labels" : "Enregistrer les libellés du type de salaire",
 		"Show inactive wage types" : "Afficher les types de salaire inactifs",
 		"Edit wage type label": "Modifier les libellés du type de salaire",
+		"This label is required.": "Ce libellé est obligatoire.",
 		"Do you really want to activate this wage type?": "Voulez-vous vraiment activer ce type de salaire ?",
 		"Search wage type number or name": "Rechercher le numéro ou le nom du type de salaire",
 		"The maximum number of copies has been reached.": "Le nombre maximum de copies a été atteint.",
