@@ -30,5 +30,10 @@ export type WageType = {
 	category: string;
 	accountAssignment: WageTypeAccountAssignment | null;
 	activeControllingTriggers: string[];
-	availableControllingTriggers: string[];
+	availableControllingTriggers: ControllingTriggerOption[];
+};
+
+type ControllingTriggerOption = {
+	value: string;
+	displayName: string;
 };

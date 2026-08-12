@@ -24,11 +24,22 @@ export const ControllingPicker = memo(function ControllingPicker({
 	const options = useMemo(
 		() =>
 			(wageType.availableControllingTriggers ?? []).map((trigger) => (
-				<MenuItem key={trigger} value={trigger}>
-					{t(trigger)}
+				<MenuItem key={trigger.value} value={trigger.value}>
+					{trigger.displayName}
 				</MenuItem>
 			)),
-		[wageType.availableControllingTriggers, t],
+		[wageType.availableControllingTriggers],
+	);
+
+	const displayNames = useMemo(
+		() =>
+			new Map(
+				(wageType.availableControllingTriggers ?? []).map((trigger) => [
+					trigger.value,
+					trigger.displayName,
+				]),
+			),
+		[wageType.availableControllingTriggers],
 	);
 
 	if (wageType.availableControllingTriggers.length === 0) {
@@ -61,7 +72,11 @@ export const ControllingPicker = memo(function ControllingPicker({
 					return <Typography noWrap>{t("No checks")}</Typography>;
 				}
 				if (selected.length === 1) {
-					return <Typography noWrap>{t(selected[0])}</Typography>;
+					return (
+						<Typography noWrap>
+							{displayNames.get(selected[0]) ?? selected[0]}
+						</Typography>
+					);
 				}
 				return (
 					<Typography noWrap>
