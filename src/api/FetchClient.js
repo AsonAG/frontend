@@ -45,8 +45,8 @@ const payrollEmployeeUrl =
 	"/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
 const payrollWageTypeMasterUrl =
 	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes";
-const payrollWageTypeActivateUrl =
-	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes/:wageTypeNumber:activate";
+const payrollWageTypeUrl =
+	"/v2/tenants/:orgId/payrolls/:payrollId/wagetypes/:wageTypeNumber";
 const payrollCollectorsUrl = "/tenants/:orgId/payrolls/:payrollId/collectors";
 const caseFieldsUrl = "/tenants/:orgId/payrolls/:payrollId/casefields";
 const employeesUrl = "/tenants/:orgId/employees";
@@ -109,12 +109,16 @@ class FetchRequestBuilder {
 	timeout = 60000;
 	retries = 0;
 	clientFilter = null;
+	customMethod = null;
 
 	constructor(url, routeParams) {
 		if (!url) {
 			throw new Error("Url cannot be empty");
 		}
 		this.url = baseUrl + generatePath(url, routeParams);
+		if (this.customMethod) {
+			this.url = `${this.url}:${this.customMethod}`;
+		}
 		this.routeParams = routeParams || {};
 
 		if (useOidc) {
@@ -134,6 +138,11 @@ class FetchRequestBuilder {
 
 	withMethod(method) {
 		this.method = method;
+		return this;
+	}
+
+	withCustomMethod(customMethod) {
+		this.customMethod = customMethod;
 		return this;
 	}
 
@@ -938,11 +947,12 @@ export function getPayrollWageTypes(routeParams) {
 }
 
 export function activateWageType(routeParams, wageTypeNumber) {
-	return new FetchRequestBuilder(payrollWageTypeActivateUrl, {
+	return new FetchRequestBuilder(payrollWageTypeUrl, {
 		...routeParams,
 		wageTypeNumber,
 	})
 		.withMethod("POST")
+		.withCustomMethod("activate")
 		.fetch();
 }
 
