@@ -435,6 +435,11 @@ const translations = {
 		"Do you really want to activate this wage type?": "Vuoi davvero attivare questo tipo di retribuzione?",
 		"Search wage type number or name": "Cerca numero o nome del tipo di retribuzione",
 		"The maximum number of copies has been reached.": "È stato raggiunto il numero massimo di copie.",
+		"{{count}} unsaved": "{{count}} non salvate",
+		"Apply changes": "Applica le modifiche",
+		"{{count}} wage types will be updated": "{{count}} tipi di retribuzione saranno aggiornati",
+		"There are no changes to save.": "Non ci sono modifiche da salvare.",
+		"Not set": "Non impostato",
 
 		// Culture
 		"Region settings": "Impostazioni regionali",

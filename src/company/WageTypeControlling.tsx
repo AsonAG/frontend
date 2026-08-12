@@ -3,6 +3,7 @@ import {
 	Box,
 	Button,
 	Checkbox,
+	Chip,
 	Dialog,
 	DialogActions,
 	DialogContent,
@@ -12,10 +13,11 @@ import {
 	SxProps,
 	TextField,
 	Theme,
+	Tooltip,
 	Typography,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { blend } from "@mui/system/colorManipulator";
+import { alpha, blend } from "@mui/system/colorManipulator";
 import {
 	createContext,
 	Dispatch,
@@ -50,6 +52,7 @@ import {
 	WageTypeNameLocalizations,
 } from "../models/WageType";
 import { WageTypeUpdate } from "../models/WageTypeUpdate";
+import { WageTypeSaveConfirmDialog } from "./WageTypeChangeSummary";
 
 export type WageTypeControllingLoaderData = {
 	wageTypes: WageType[];
@@ -108,6 +111,15 @@ const defaultRowSx: SxProps<Theme> = {
 	alignItems: "center",
 };
 
+// The leading grid track every row reserves for its pending-change marker. The track is
+// part of the shared grid template, so it exists on the header and on every row whether or
+// not the row has changes — marking a row fills the cell in without moving anything.
+const pendingChangeMarkerWidth = 10;
+
+const pendingChangeRowSx = {
+	backgroundColor: (theme: Theme) => alpha(theme.palette.primary.main, 0.08),
+};
+
 export function WageTypeControlling() {
 	const { t } = useTranslation();
 	const { state: navigationState } = useNavigation();
@@ -118,6 +130,7 @@ export function WageTypeControlling() {
 	const [state, dispatch] = useReducer(reducer, wageTypes, createInitialState);
 	const [showAllWageTypes, setShowAllWageTypes] = useState(false);
 	const [search, setSearch] = useState("");
+	const [confirmingSave, setConfirmingSave] = useState(false);
 
 	// The loader refetches whenever an action succeeds — a save, but also an activation or
 	// a copy — and the fresh server wage types then become the baseline the UI edits from.
@@ -176,10 +189,13 @@ export function WageTypeControlling() {
 	const rowGridSx = useMemo(
 		() =>
 			getRowGridSx(
-				leafColumns.map((column) => ({
-					width: column.getSize(),
-					flex: column.columnDef.meta?.flex,
-				})),
+				[
+					{ width: pendingChangeMarkerWidth },
+					...leafColumns.map((column) => ({
+						width: column.getSize(),
+						flex: column.columnDef.meta?.flex,
+					})),
+				],
 				1,
 			),
 		[leafColumns],
@@ -188,6 +204,26 @@ export function WageTypeControlling() {
 	const rowSx = useMemo(
 		() => ({ ...rowGridSx, ...defaultRowSx }) as SxProps<Theme>,
 		[rowGridSx],
+	);
+
+	// A second stable sx object, handed to the changed rows in place of rowSx. Picking
+	// between two memoized objects keeps WageTypeRow's identity comparison working: a row
+	// only re-renders when it crosses between changed and unchanged.
+	const changedRowSx = useMemo(
+		() =>
+			({
+				...rowGridSx,
+				...defaultRowSx,
+				...pendingChangeRowSx,
+			}) as SxProps<Theme>,
+		[rowGridSx],
+	);
+
+	// Row ids are the formatted wage type numbers the changes are keyed by, so this set is
+	// what the rows and category headers test themselves against.
+	const changedWageTypeKeys = useMemo(
+		() => new Set(Object.keys(state.changesByNumber)),
+		[state.changesByNumber],
 	);
 
 	const [rowsByCategory, withoutCategory] = useMemo(() => {
@@ -263,6 +299,9 @@ export function WageTypeControlling() {
 								maxHeight: tableHeaderHeight,
 							}}
 						>
+							{/* Fills the pending-change marker track the rows reserve. */}
+							<Box />
+
 							{headerGroup.headers.map((header) => {
 								const alignment = header.column.columnDef.meta?.alignment;
 								const context = { ...header.getContext(), t };
@@ -288,6 +327,8 @@ export function WageTypeControlling() {
 							category={category}
 							rows={rows}
 							rowSx={rowSx}
+							changedRowSx={changedRowSx}
+							changedWageTypeKeys={changedWageTypeKeys}
 						/>
 					))}
 
@@ -295,6 +336,8 @@ export function WageTypeControlling() {
 						category={t("Without category")}
 						rows={withoutCategory}
 						rowSx={rowSx}
+						changedRowSx={changedRowSx}
+						changedWageTypeKeys={changedWageTypeKeys}
 					/>
 				</Stack>
 
@@ -314,11 +357,24 @@ export function WageTypeControlling() {
 						variant="contained"
 						color="primary"
 						size="large"
-						onClick={onSubmit}
+						onClick={() => setConfirmingSave(true)}
 					>
 						<Typography>{t("Save")}</Typography>
 					</Button>
 				</Stack>
+
+				{confirmingSave && (
+					<WageTypeSaveConfirmDialog
+						changedWageTypeKeys={changedWageTypeKeys}
+						originalWageTypesByNumber={state.originalWageTypesByNumber}
+						wageTypesByNumber={state.wageTypesByNumber}
+						onCancel={() => setConfirmingSave(false)}
+						onConfirm={() => {
+							setConfirmingSave(false);
+							onSubmit();
+						}}
+					/>
+				)}
 
 				{blocker.state === "blocked" && (
 					<Dialog open onClose={() => blocker.reset()}>
@@ -351,12 +407,16 @@ type WageTypeCategoryProps = {
 	category: string;
 	rows: Array<Row<WageType>>;
 	rowSx: SxProps<Theme>;
+	changedRowSx: SxProps<Theme>;
+	changedWageTypeKeys: ReadonlySet<string>;
 };
 
 function WageTypeCategoryGroup({
 	category,
 	rows,
 	rowSx,
+	changedRowSx,
+	changedWageTypeKeys,
 }: WageTypeCategoryProps) {
 	const [expanded, setExpanded] = useState(false);
 
@@ -381,6 +441,12 @@ function WageTypeCategoryGroup({
 		);
 	});
 
+	// Categories start collapsed, so the count is the only sign that a change is waiting
+	// inside a group the user cannot currently see.
+	const pendingChangeCount = rows.filter((row) =>
+		changedWageTypeKeys.has(row.id),
+	).length;
+
 	return (
 		<>
 			<WageTypeCategoryHeader
@@ -388,10 +454,22 @@ function WageTypeCategoryGroup({
 				expanded={expanded}
 				onClick={() => setExpanded((current) => !current)}
 				hasMissingData={hasMissingData}
+				pendingChangeCount={pendingChangeCount}
 			/>
 
 			{expanded &&
-				rows.map((row) => <WageTypeRow key={row.id} row={row} rowSx={rowSx} />)}
+				rows.map((row) => {
+					const hasPendingChanges = changedWageTypeKeys.has(row.id);
+
+					return (
+						<WageTypeRow
+							key={row.id}
+							row={row}
+							rowSx={hasPendingChanges ? changedRowSx : rowSx}
+							hasPendingChanges={hasPendingChanges}
+						/>
+					);
+				})}
 		</>
 	);
 }
@@ -401,7 +479,44 @@ const cellSx: SxProps<Theme> = { px: 0.25, py: 0.5 };
 type WageTypeRowProps = {
 	row: Row<WageType>;
 	rowSx: SxProps<Theme>;
+	hasPendingChanges: boolean;
 };
+
+const pendingChangeMarkerSx: SxProps<Theme> = {
+	alignSelf: "stretch",
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "center",
+};
+
+const pendingChangeMarkerBarSx: SxProps<Theme> = {
+	width: 4,
+	height: 18,
+	borderRadius: 2,
+	backgroundColor: (theme) => theme.palette.primary.main,
+};
+
+function WageTypePendingChangeMarker({
+	hasPendingChanges,
+}: {
+	hasPendingChanges: boolean;
+}) {
+	const { t } = useTranslation();
+
+	// The empty cell still has to be rendered: it is what holds the marker track open on
+	// the rows that have no changes.
+	if (!hasPendingChanges) {
+		return <Box />;
+	}
+
+	return (
+		<Tooltip title={t("Unsaved changes")}>
+			<Box sx={pendingChangeMarkerSx}>
+				<Box sx={pendingChangeMarkerBarSx} />
+			</Box>
+		</Tooltip>
+	);
+}
 
 // Editing one wage type replaces the table's data array, so every Row instance is rebuilt
 // even though only a single wage type actually changed. Comparing row.original instead of
@@ -409,9 +524,11 @@ type WageTypeRowProps = {
 // renders — bail out. Cells only ever read row.original (directly or through getValue), so
 // holding on to the previous Row while its original is unchanged renders the same output.
 const WageTypeRow = memo(
-	function WageTypeRow({ row, rowSx }: WageTypeRowProps) {
+	function WageTypeRow({ row, rowSx, hasPendingChanges }: WageTypeRowProps) {
 		return (
 			<Box sx={rowSx}>
+				<WageTypePendingChangeMarker hasPendingChanges={hasPendingChanges} />
+
 				{row.getVisibleCells().map((cell) => {
 					const { alignment } = cell.column.columnDef.meta || {};
 
@@ -426,7 +543,8 @@ const WageTypeRow = memo(
 	},
 	(previous, next) =>
 		previous.row.original === next.row.original &&
-		previous.rowSx === next.rowSx,
+		previous.rowSx === next.rowSx &&
+		previous.hasPendingChanges === next.hasPendingChanges,
 );
 
 type WageTypeCategoryHeaderProps = {
@@ -434,6 +552,7 @@ type WageTypeCategoryHeaderProps = {
 	expanded: boolean;
 	onClick: () => void;
 	hasMissingData: boolean;
+	pendingChangeCount: number;
 };
 
 const categoryHeaderSx: SxProps<Theme> = {
@@ -467,7 +586,9 @@ function WageTypeCategoryHeader({
 	expanded,
 	onClick,
 	hasMissingData,
+	pendingChangeCount,
 }: WageTypeCategoryHeaderProps) {
+	const { t } = useTranslation();
 	const icon = expanded ? <ExpandLess /> : <ExpandMore />;
 
 	return (
@@ -492,6 +613,16 @@ function WageTypeCategoryHeader({
 			>
 				<Typography pr={0.5}>{header}</Typography>
 			</Badge>
+
+			{pendingChangeCount > 0 && (
+				<Chip
+					size="small"
+					color="primary"
+					variant="outlined"
+					label={t("{{count}} unsaved", { count: pendingChangeCount })}
+					sx={{ cursor: "inherit" }}
+				/>
+			)}
 		</Stack>
 	);
 }
