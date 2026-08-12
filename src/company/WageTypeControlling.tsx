@@ -22,7 +22,6 @@ import {
 	memo,
 	useContext,
 	useDeferredValue,
-	useEffect,
 	useMemo,
 	useReducer,
 	useState,
@@ -64,7 +63,22 @@ type WageTypeChange = Omit<WageTypeUpdate, "collectors"> & {
 	collectors?: WageTypeCollector[] | null;
 };
 
+// Activating and copying a wage type submit through fetchers, so useActionData only ever
+// carries the result of this component's own save.
+type WageTypeActionData = {
+	intent?: "updateWageTypes";
+	success?: boolean;
+	error?: string;
+};
+
 type WageTypeState = {
+	// The loader array this state was built from. Kept so a render can tell whether the
+	// loader has since refetched and the state needs to be rebuilt from the server data.
+	sourceWageTypes: WageType[];
+	// The action result the last rebuild accounted for. useActionData keeps returning a
+	// successful save long after that save, so identity is what separates "this refetch
+	// came from our save" from "some later refetch, with that save still hanging around".
+	syncedActionData: WageTypeActionData | undefined;
 	wageTypesByNumber: Record<string, WageType>;
 	originalWageTypesByNumber: Record<string, WageType>;
 	changesByNumber: Record<string, WageTypeChange>;
@@ -94,12 +108,6 @@ const defaultRowSx: SxProps<Theme> = {
 	alignItems: "center",
 };
 
-type WageTypeActionData = {
-	intent?: "updateWageTypes";
-	success?: boolean;
-	error?: string;
-};
-
 export function WageTypeControlling() {
 	const { t } = useTranslation();
 	const { state: navigationState } = useNavigation();
@@ -110,6 +118,14 @@ export function WageTypeControlling() {
 	const [state, dispatch] = useReducer(reducer, wageTypes, createInitialState);
 	const [showAllWageTypes, setShowAllWageTypes] = useState(false);
 	const [search, setSearch] = useState("");
+
+	// The loader refetches whenever an action succeeds — a save, but also an activation or
+	// a copy — and the fresh server wage types then become the baseline the UI edits from.
+	// Adjusting the state while rendering rather than in an effect keeps the table from
+	// painting a frame of the superseded data first.
+	if (state.sourceWageTypes !== wageTypes) {
+		dispatch({ type: "sync_server_wage_types", wageTypes, actionData });
+	}
 
 	const currentWageTypes = useMemo(
 		() =>
@@ -147,15 +163,6 @@ export function WageTypeControlling() {
 		getCoreRowModel: getCoreRowModel(),
 		getRowId: (wageType) => formatWageTypeNumber(wageType.wageTypeNumber),
 	});
-
-	useEffect(() => {
-		if (
-			actionData?.intent === "updateWageTypes" &&
-			actionData.success === true
-		) {
-			dispatch({ type: "reset_dirty" });
-		}
-	}, [actionData]);
 
 	const blocker = useBlocker(
 		({ currentLocation, nextLocation }) =>
@@ -513,7 +520,9 @@ export type WageTypeAction =
 			isActive: boolean;
 	  }
 	| {
-			type: "reset_dirty";
+			type: "sync_server_wage_types";
+			wageTypes: WageType[];
+			actionData: WageTypeActionData | undefined;
 	  };
 
 const localizationLanguages: Array<keyof WageTypeNameLocalizations> = [
@@ -660,7 +669,7 @@ function createWageTypeChange<
 // applying it to the map. wageTypesByNumber is derived separately afterwards, from this.
 function computeChangesByNumber(
 	state: WageTypeState,
-	action: Exclude<WageTypeAction, { type: "reset_dirty" }>,
+	action: Exclude<WageTypeAction, { type: "sync_server_wage_types" }>,
 	wageType: WageType,
 ): Record<string, WageTypeChange> {
 	const key = formatWageTypeNumber(action.wageTypeNumber);
@@ -730,7 +739,7 @@ function computeChangesByNumber(
 		}
 	}
 
-	// Step 2: places the recomputed change back into the map, or removes the entry entirely
+	// place the recomputed change back into the map, or removes the entry entirely
 	// once it comes back undefined (i.e. every field reverted to the server value).
 	return change
 		? { ...state.changesByNumber, [key]: change }
@@ -738,12 +747,86 @@ function computeChangesByNumber(
 }
 
 function reducer(state: WageTypeState, action: WageTypeAction): WageTypeState {
-	if (action.type === "reset_dirty") {
+	if (action.type === "sync_server_wage_types") {
+		// Only our own save makes the pending changes obsolete — the server has just
+		// persisted them, so its response supersedes the local state outright. A refetch
+		// triggered by anything else (an activation, a copy, coming back to the page) says
+		// nothing about those edits, so they are re-applied on top of the new server data.
+		const savedByThisComponent =
+			action.actionData !== state.syncedActionData &&
+			action.actionData?.intent === "updateWageTypes" &&
+			action.actionData.success === true;
+
+		let synced: WageTypeState = {
+			...createInitialState(action.wageTypes),
+			syncedActionData: action.actionData,
+		};
+
+		if (savedByThisComponent) {
+			return synced;
+		}
+
+		for (const [key, change] of Object.entries(state.changesByNumber)) {
+			const originalWageType = synced.originalWageTypesByNumber[key];
+			// The server stopped returning this wage type, so there is nothing left to update.
+			if (!originalWageType) {
+				continue;
+			}
+
+			// Re-running the edited wage type field by field against the new baseline is the
+			// same bookkeeping editing does: every field the server has caught up with drops
+			// out, and the change disappears entirely once none of them differ.
+			const editedWageType = applyWageTypeUpdate(originalWageType, change);
+			const wageTypeNumber = change.wageTypeNumber;
+
+			let rebased = createWageTypeChange(
+				undefined,
+				wageTypeNumber,
+				"accountAssignment",
+				editedWageType.accountAssignment,
+				originalWageType.accountAssignment,
+				isSameAccountAssignment,
+			);
+			rebased = createWageTypeChange(
+				rebased,
+				wageTypeNumber,
+				"activeControllingTriggers",
+				editedWageType.activeControllingTriggers,
+				originalWageType.activeControllingTriggers,
+				isSameStringSet,
+			);
+			rebased = createWageTypeChange(
+				rebased,
+				wageTypeNumber,
+				"nameLocalizations",
+				editedWageType.nameLocalizations,
+				originalWageType.nameLocalizations,
+				isSameNameLocalizations,
+			);
+			rebased = createWageTypeChange(
+				rebased,
+				wageTypeNumber,
+				"collectors",
+				editedWageType.collectors,
+				originalWageType.collectors,
+				isSameCollectors,
+			);
+
+			if (!rebased) {
+				continue;
+			}
+
+			const changesByNumber = { ...synced.changesByNumber, [key]: rebased };
+			synced = {
+				...synced,
+				changesByNumber,
+				wageTypesByNumber: deriveWageType(synced, key, changesByNumber),
+			};
+		}
+
 		return {
-			...state,
-			originalWageTypesByNumber: state.wageTypesByNumber,
-			changesByNumber: {},
-			dirty: false,
+			...synced,
+			dirty: Object.keys(synced.changesByNumber).length > 0,
 		};
 	}
 
@@ -772,6 +855,8 @@ function createInitialState(wageTypes: WageType[]): WageTypeState {
 	);
 
 	return {
+		sourceWageTypes: wageTypes,
+		syncedActionData: undefined,
 		wageTypesByNumber,
 		originalWageTypesByNumber: wageTypesByNumber,
 		changesByNumber: {},
