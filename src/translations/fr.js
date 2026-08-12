@@ -250,6 +250,7 @@ const translations = {
 		"Show reason in payslip": "Afficher la note sur le bulletin de salaire",
 		"Copy wage type": "Copier le type de salaire",
 		"Update wage type": "Mettre à jour le type de salaire",
+		Activate: "Activer",
 		"Activate wage type": "Activer le type de salaire",
 
 		// compliance
@@ -375,6 +376,7 @@ const translations = {
 		Number: "Numéro",
 		Collectors: "Bases",
 		inactive_collector_chip: "{{count}} bases inactives…",
+		"{{count}} active": "{{count}} actives",
 		"{{count}} checks active": "{{count}} contrôles actifs",
 		"No checks": "Aucun contrôle",
 		"In the meantime, there have been changes that require the documents to be reprocessed. Visit this page again as soon as the period has been processed.":
