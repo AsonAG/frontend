@@ -541,13 +541,24 @@ function isSameNameLocalizations(
 	);
 }
 
+// An unassigned account reaches this comparison spelled three different ways: null from
+// the picker clearing it, undefined from a wage type with no assignment at all, and ""
+// from a server value of either. None of them is an account, so they all compare equal.
+function normalizeAccountNumber(
+	accountNumber: string | null | undefined,
+): string | null {
+	return accountNumber || null;
+}
+
 function isSameAccountAssignment(
 	a: WageTypeAccountAssignment | null | undefined,
 	b: WageTypeAccountAssignment | null | undefined,
 ): boolean {
 	return (
-		(a?.debitAccountNumber ?? null) === (b?.debitAccountNumber ?? null) &&
-		(a?.creditAccountNumber ?? null) === (b?.creditAccountNumber ?? null)
+		normalizeAccountNumber(a?.debitAccountNumber) ===
+			normalizeAccountNumber(b?.debitAccountNumber) &&
+		normalizeAccountNumber(a?.creditAccountNumber) ===
+			normalizeAccountNumber(b?.creditAccountNumber)
 	);
 }
 
@@ -652,8 +663,11 @@ function createWageTypeChange<
 	originalValue: WageTypeChange[K],
 	isEqual: (a: WageTypeChange[K], b: WageTypeChange[K]) => boolean,
 ): WageTypeChange | undefined {
+	// wageTypeNumber is dropped alongside the updated field: it identifies the change
+	// rather than being one of the edited values, so leaving it in would make the
+	// emptiness check below always see a leftover key and keep the change alive.
 	const remainingFields = existingChange
-		? withoutKey(existingChange, field)
+		? withoutKey(withoutKey(existingChange, field), "wageTypeNumber")
 		: {};
 
 	const changedFields = isEqual(updatedValue, originalValue)
@@ -680,11 +694,14 @@ function computeChangesByNumber(
 
 	switch (action.type) {
 		case "set_account": {
+			// The side this action does not touch is carried over as null rather than "" so
+			// the assignment keeps the same shape the server uses, both for the comparison
+			// above and for the update that eventually gets submitted.
 			const accountAssignment: WageTypeAccountAssignment = {
 				debitAccountNumber:
-					wageType.accountAssignment?.debitAccountNumber ?? "",
+					wageType.accountAssignment?.debitAccountNumber ?? null,
 				creditAccountNumber:
-					wageType.accountAssignment?.creditAccountNumber ?? "",
+					wageType.accountAssignment?.creditAccountNumber ?? null,
 				[action.accountType]: action.value,
 			};
 
