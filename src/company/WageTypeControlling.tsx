@@ -28,13 +28,7 @@ import {
 	useReducer,
 	useState,
 } from "react";
-import {
-	useActionData,
-	useBlocker,
-	useLoaderData,
-	useNavigation,
-	useSubmit,
-} from "react-router-dom";
+import { useBlocker, useFetcher, useLoaderData } from "react-router-dom";
 import {
 	flexRender,
 	getCoreRowModel,
@@ -67,8 +61,8 @@ type WageTypeChange = Omit<WageTypeUpdate, "collectors"> & {
 	collectors?: WageTypeCollector[] | null;
 };
 
-// Activating and copying a wage type submit through fetchers, so useActionData only ever
-// carries the result of this component's own save.
+// The save runs on its own fetcher, so this only ever carries the result of this
+// component's own save — never an activation, a copy or a single-wage-type update.
 type WageTypeActionData = {
 	intent?: "updateWageTypes";
 	success?: boolean;
@@ -79,7 +73,7 @@ type WageTypeState = {
 	// The loader array this state was built from. Kept so a render can tell whether the
 	// loader has since refetched and the state needs to be rebuilt from the server data.
 	sourceWageTypes: WageType[];
-	// The action result the last rebuild accounted for. useActionData keeps returning a
+	// The action result the last rebuild accounted for. The fetcher keeps holding on to a
 	// successful save long after that save, so identity is what separates "this refetch
 	// came from our save" from "some later refetch, with that save still hanging around".
 	syncedActionData: WageTypeActionData | undefined;
@@ -123,15 +117,24 @@ const pendingChangeRowSx = {
 
 export function WageTypeControlling() {
 	const { t } = useTranslation();
-	const { state: navigationState } = useNavigation();
-	const submit = useSubmit();
-	const actionData = useActionData() as WageTypeActionData | undefined;
+	// Saving through a fetcher rather than a navigation submission keeps this save on its
+	// own timeline. A navigation commits its action result and its fresh loader data only
+	// once every fetcher the page has in flight has settled as well, so an activation or a
+	// copy running alongside the save would hold the saved changes on screen until it too
+	// was done. The fetcher revalidates and lands its loader data on its own.
+	const fetcher = useFetcher<WageTypeActionData>();
 	const { wageTypes } = useLoaderData() as WageTypeControllingLoaderData;
 
 	const [state, dispatch] = useReducer(reducer, wageTypes, createInitialState);
 	const [showAllWageTypes, setShowAllWageTypes] = useState(false);
 	const [search, setSearch] = useState("");
 	const [confirmingSave, setConfirmingSave] = useState(false);
+
+	// The fetcher already carries its action result while it is still revalidating, one
+	// render before the loader data that save produced arrives. Reading it only once the
+	// fetcher is idle keeps a refetch that some other action caused in the meantime from
+	// being mistaken for the save's own — the two land in the same render.
+	const actionData = fetcher.state === "idle" ? fetcher.data : undefined;
 
 	// The loader refetches whenever an action succeeds — a save, but also an activation or
 	// a copy — and the fresh server wage types then become the baseline the UI edits from.
@@ -251,7 +254,7 @@ export function WageTypeControlling() {
 			return;
 		}
 
-		submit(
+		fetcher.submit(
 			{
 				intent: "updateWageTypes",
 				wageTypes: wageTypeUpdates,
@@ -352,7 +355,7 @@ export function WageTypeControlling() {
 					}}
 				>
 					<Button
-						loading={navigationState === "submitting"}
+						loading={fetcher.state === "submitting"}
 						disabled={!state.dirty}
 						disableRipple
 						variant="contained"
