@@ -38,9 +38,12 @@ export type WageType = {
 	accountAssignment: WageTypeAccountAssignment | null;
 	activeControllingTriggers: string[];
 	availableControllingTriggers: ControllingTriggerOption[];
+	controllingTriggerSelectionMode: ControllingTriggerSelectionMode;
 };
 
 type ControllingTriggerOption = {
 	value: string;
 	displayName: string;
 };
+
+type ControllingTriggerSelectionMode = "Automatic" | "Single" | "Multiple";

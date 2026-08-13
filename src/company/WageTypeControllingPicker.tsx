@@ -42,7 +42,7 @@ export const ControllingPicker = memo(function ControllingPicker({
 		[wageType.availableControllingTriggers],
 	);
 
-	if (wageType.availableControllingTriggers.length === 0) {
+	if (wageType.controllingTriggerSelectionMode === "Automatic") {
 		return <Typography noWrap>{t("automatic")}</Typography>;
 	}
 
@@ -62,7 +62,7 @@ export const ControllingPicker = memo(function ControllingPicker({
 
 	return (
 		<Select
-			multiple
+			multiple={wageType.controllingTriggerSelectionMode === "Multiple"}
 			value={value}
 			sx={selectSx}
 			onChange={handleChange}
