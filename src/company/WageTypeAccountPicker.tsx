@@ -46,7 +46,7 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 
 	const accountingRelevant =
 		wageType.attributes?.["Accounting.Relevant"] === "Y";
-	if (!accountingRelevant) {
+	if (!accountingRelevant || !wageType.isActive) {
 		return null;
 	}
 
