@@ -46,6 +46,8 @@ export const ControllingPicker = memo(function ControllingPicker({
 		return <Typography noWrap>{t("automatic")}</Typography>;
 	}
 
+	const isMultiple = wageType.controllingTriggerSelectionMode === "Multiple";
+
 	const handleChange = (event: SelectChangeEvent<string[]>) => {
 		const selectedValue = event.target.value;
 		const values =
@@ -53,16 +55,25 @@ export const ControllingPicker = memo(function ControllingPicker({
 				? selectedValue.split(",")
 				: selectedValue;
 
+		// MUI's single-select mode has no built-in deselect: clicking the
+		// already-selected item just reselects it. Detect that case and
+		// clear the value instead, so single-select can be deselected too.
+		const isReselectingSameValue =
+			!isMultiple &&
+			values.length === 1 &&
+			value.length === 1 &&
+			value[0] === values[0];
+
 		dispatch({
 			type: "set_controlling",
 			wageTypeNumber: wageType.wageTypeNumber,
-			value: values,
+			value: isReselectingSameValue ? [] : values,
 		});
 	};
 
 	return (
 		<Select
-			multiple={wageType.controllingTriggerSelectionMode === "Multiple"}
+			multiple={isMultiple}
 			value={value}
 			sx={selectSx}
 			onChange={handleChange}
