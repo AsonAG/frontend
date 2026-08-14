@@ -92,8 +92,8 @@ function WageTypeAttributes({ wageType }: { wageType: WageType }) {
 	);
 }
 
-function getAttributeValueLabel(value: any, t: TFunction) {
-	if (value === true) return t("Yes");
-	if (value === false) return t("No");
+function getAttributeValueLabel(value: string, t: TFunction) {
+	if (value === "Y") return t("Yes");
+	if (value === "N") return t("No");
 	return value;
 }

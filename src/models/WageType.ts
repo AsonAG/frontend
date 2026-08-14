@@ -28,7 +28,7 @@ export type WageType = {
 	name: string;
 	nameLocalizations?: WageTypeNameLocalizations;
 	attributes: Record<string, string>;
-	properties: Record<string, any>;
+	properties: Record<string, string>;
 	displayName: string;
 	description?: string | null;
 	collectors: WageTypeCollector[];
