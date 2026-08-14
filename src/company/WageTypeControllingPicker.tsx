@@ -48,6 +48,9 @@ export const ControllingPicker = memo(function ControllingPicker({
 
 	const isMultiple = wageType.controllingTriggerSelectionMode === "Multiple";
 
+	// select expects empty string in case there are no values and multiple = false..
+	const selectValue = !isMultiple && value.length === 0 ? "" : value;
+
 	const handleChange = (event: SelectChangeEvent<string[]>) => {
 		const selectedValue = event.target.value;
 		const values =
@@ -74,7 +77,7 @@ export const ControllingPicker = memo(function ControllingPicker({
 	return (
 		<Select
 			multiple={isMultiple}
-			value={value}
+			value={selectValue}
 			sx={selectSx}
 			onChange={handleChange}
 			displayEmpty
