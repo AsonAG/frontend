@@ -16,12 +16,13 @@ import {
 	Tooltip,
 	Typography,
 } from "@mui/material";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { ExpandLess, ExpandMore, HorizontalRule } from "@mui/icons-material";
 import { alpha, blend } from "@mui/system/colorManipulator";
 import {
 	createContext,
 	Dispatch,
 	memo,
+	useCallback,
 	useContext,
 	useDeferredValue,
 	useMemo,
@@ -159,6 +160,10 @@ export function WageTypeControlling() {
 	// Filtering remounts every visible row, so it trails the input by a frame instead of
 	// blocking the keystroke that caused it.
 	const deferredSearch = useDeferredValue(search);
+
+	// Derived from the deferred value rather than the input, so the groups open in the same
+	// render the filtered rows appear in.
+	const searchActive = deferredSearch.trim() !== "";
 
 	const filteredWageTypes = useMemo(() => {
 		const searchValue = deferredSearch.trim().toLowerCase();
@@ -334,6 +339,7 @@ export function WageTypeControlling() {
 							rowSx={rowSx}
 							changedRowSx={changedRowSx}
 							changedWageTypeKeys={changedWageTypeKeys}
+							searchActive={searchActive}
 						/>
 					))}
 
@@ -343,7 +349,16 @@ export function WageTypeControlling() {
 						rowSx={rowSx}
 						changedRowSx={changedRowSx}
 						changedWageTypeKeys={changedWageTypeKeys}
+						searchActive={searchActive}
 					/>
+
+					{filteredWageTypes.length === 0 && (
+						<Box sx={rowGridSx}>
+							<Typography color="text.secondary" sx={{ gridColumn: "2/-1" }}>
+								{t("No wage types found")}
+							</Typography>
+						</Box>
+					)}
 				</Stack>
 
 				<Stack
@@ -414,6 +429,7 @@ type WageTypeCategoryProps = {
 	rowSx: SxProps<Theme>;
 	changedRowSx: SxProps<Theme>;
 	changedWageTypeKeys: ReadonlySet<string>;
+	searchActive: boolean;
 };
 
 function WageTypeCategoryGroup({
@@ -422,8 +438,18 @@ function WageTypeCategoryGroup({
 	rowSx,
 	changedRowSx,
 	changedWageTypeKeys,
+	searchActive,
 }: WageTypeCategoryProps) {
 	const [expanded, setExpanded] = useState(false);
+	const setExpandedStable = useCallback(
+		() => setExpanded((current) => !current),
+		[setExpanded],
+	);
+
+	// A search opens every group, so the matching wage types are visible without having to
+	// click through the categories first. `expanded` is left untouched while it does, so
+	// clearing the search brings back the expansion the user had before searching.
+	const isExpanded = searchActive || expanded;
 
 	if (rows.length === 0) {
 		return null;
@@ -445,13 +471,15 @@ function WageTypeCategoryGroup({
 		<>
 			<WageTypeCategoryHeader
 				header={category}
-				expanded={expanded}
-				onClick={() => setExpanded((current) => !current)}
+				expanded={isExpanded}
+				// While the search holds the group open there is nothing left to toggle, so
+				// the header stops acting like a button.
+				onClick={searchActive ? undefined : setExpandedStable}
 				hasMissingData={hasMissingData}
 				pendingChangeCount={pendingChangeCount}
 			/>
 
-			{expanded &&
+			{isExpanded &&
 				rows.map((row) => {
 					const hasPendingChanges = changedWageTypeKeys.has(row.id);
 
@@ -544,7 +572,9 @@ const WageTypeRow = memo(
 type WageTypeCategoryHeaderProps = {
 	header: string;
 	expanded: boolean;
-	onClick: () => void;
+	// Left out when the group's expansion is not the user's to change — the header then
+	// drops its interactive styling and shows a flat icon in place of the expand chevron.
+	onClick?: () => void;
 	hasMissingData: boolean;
 	pendingChangeCount: number;
 };
@@ -564,6 +594,10 @@ const categoryHeaderSx: SxProps<Theme> = {
 	borderStyle: "solid",
 	borderWidth: 0,
 	borderTopWidth: 1,
+};
+
+const clickableCategoryHeaderSx: SxProps<Theme> = {
+	...categoryHeaderSx,
 	"&:hover": {
 		cursor: "pointer",
 		backgroundColor: (theme) =>
@@ -583,7 +617,6 @@ function WageTypeCategoryHeader({
 	pendingChangeCount,
 }: WageTypeCategoryHeaderProps) {
 	const { t } = useTranslation();
-	const icon = expanded ? <ExpandLess /> : <ExpandMore />;
 
 	return (
 		<Stack
@@ -591,11 +624,17 @@ function WageTypeCategoryHeader({
 			onClick={onClick}
 			spacing={1}
 			sx={{
-				...categoryHeaderSx,
+				...(onClick ? clickableCategoryHeaderSx : categoryHeaderSx),
 				borderBottomWidth: expanded ? 1 : 0,
 			}}
 		>
-			{icon}
+			{!onClick ? (
+				<HorizontalRule />
+			) : expanded ? (
+				<ExpandLess />
+			) : (
+				<ExpandMore />
+			)}
 			<Badge
 				variant={hasMissingData ? "dot" : "standard"}
 				color="warning"

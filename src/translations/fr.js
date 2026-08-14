@@ -437,6 +437,7 @@ const translations = {
 		"This label is required.": "Ce libellé est obligatoire.",
 		"Do you really want to activate this wage type?": "Voulez-vous vraiment activer ce type de salaire ?",
 		"Search wage type number or name": "Rechercher le numéro ou le nom du type de salaire",
+		"No wage types found": "Aucun type de salaire trouvé",
 		"The maximum number of copies has been reached.": "Le nombre maximum de copies a été atteint.",
 		"{{count}} unsaved": "{{count}} non enregistré(s)",
 		"Apply changes": "Appliquer les modifications",
