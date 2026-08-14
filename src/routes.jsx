@@ -65,7 +65,7 @@ import {
 	getPayrollReports,
 	activateWageType,
 	copyWageType,
-	updateWageType,
+	updateWageTypes,
 	getPayroll,
 	getAvailableRegulations,
 	getPayrollRegulations,
@@ -1380,17 +1380,13 @@ const routeData = [
 								}
 							}
 
-							if (
-								data.intent === "updateWageType" ||
-								data.intent === "updateWageTypes"
-							) {
+							if (data.intent === "updateWageTypes") {
 								const intent = data.intent;
-								const wageTypes =
-									intent === "updateWageType"
-										? [data.wageType]
-										: data.wageTypes;
 								try {
-									const response = await updateWageType(params, wageTypes);
+									const response = await updateWageTypes(
+										params,
+										data.wageTypes,
+									);
 									if (!response.ok) {
 										let error = "Action failed";
 										try {

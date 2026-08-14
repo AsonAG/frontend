@@ -77,8 +77,8 @@ function LoadingView() {
 	}, []);
 	const text = showText
 		? t(
-			"The documents are being generated, this can take up to a few minutes...",
-		)
+				"The documents are being generated, this can take up to a few minutes...",
+			)
 		: "\u00A0"; // nbsp
 	return (
 		<Stack spacing={2}>
@@ -186,7 +186,7 @@ function WageStatements({
 	);
 }
 
-const noop = () => { };
+const noop = () => {};
 type DocumentSectionProps = {
 	docBasePath: string;
 	document: PayrunDocument;
@@ -311,7 +311,7 @@ function CsvChip({ to, label }: ChipProps) {
 	);
 }
 
-export function renderDocumentWithError(document: PayrunDocument) {
+function renderDocumentWithError(document: PayrunDocument) {
 	const errorCode = document.attributes?.["errorCode"];
 	if (!errorCode) {
 		return null;

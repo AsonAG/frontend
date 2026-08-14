@@ -975,13 +975,6 @@ export function updateWageTypes(routeParams, wageTypeUpdates) {
 		.fetch();
 }
 
-export function updateWageType(routeParams, wageTypeOrUpdates) {
-	return updateWageTypes(
-		routeParams,
-		Array.isArray(wageTypeOrUpdates) ? wageTypeOrUpdates : [wageTypeOrUpdates],
-	);
-}
-
 export function getPayrollCollectors(routeParams) {
 	return new FetchRequestBuilder(payrollCollectorsUrl, routeParams)
 		.withLocalization()
