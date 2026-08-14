@@ -293,15 +293,15 @@ export const payrollControllingDataTotalCountAtom = atom(async (get) => {
 	);
 });
 
-export const payrollWageTypesAtom = atomWithRefresh<
-	Promise<WageType[]>
->(async (get) => {
-	const orgId = get(orgIdAtom);
-	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return [];
+export const payrollWageTypesAtom = atomWithRefresh<Promise<WageType[]>>(
+	async (get) => {
+		const orgId = get(orgIdAtom);
+		const payrollId = get(payrollIdAtom);
+		if (orgId === null || payrollId === null) return [];
 
-	return getPayrollWageTypes({ orgId, payrollId });
-});
+		return getPayrollWageTypes({ orgId, payrollId });
+	},
+);
 
 export function refreshPayrollWageTypes() {
 	getDefaultStore().set(payrollWageTypesAtom);
@@ -312,22 +312,23 @@ export const payrollWageTypesWithMissingAccountInfoCountAtom = atom<
 >(async (get) => {
 	const wageTypes = await get(payrollWageTypesAtom);
 
-	return wageTypes.filter((wageType) => {
-		if (!wageType.isActive) {
-			return false;
-		}
-
-		const accountingRelevant =
-			wageType.attributes?.["Accounting.Relevant"] === "Y" ||
-			Number(wageType.attributes?.["ParentWageTypeNumber"] ?? 0) > 0;
-
-		if (!accountingRelevant) {
-			return false;
-		}
-
-		return (
-			!wageType.accountAssignment?.debitAccountNumber ||
-			!wageType.accountAssignment?.creditAccountNumber
-		);
-	}).length;
+	return wageTypes.filter(isAccountingAssignmentRequired).length;
 });
+
+export const isAccountingAssignmentRequired = (wageType: WageType): boolean => {
+	if (!wageType.isActive) {
+		return false;
+	}
+
+	const accountingRelevant =
+		wageType.attributes?.["Accounting.Relevant"] === "Y";
+
+	if (!accountingRelevant) {
+		return false;
+	}
+
+	return (
+		!wageType.accountAssignment?.debitAccountNumber ||
+		!wageType.accountAssignment?.creditAccountNumber
+	);
+};

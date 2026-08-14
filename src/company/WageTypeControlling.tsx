@@ -47,6 +47,7 @@ import {
 } from "../models/WageType";
 import { WageTypeUpdate } from "../models/WageTypeUpdate";
 import { WageTypeSaveConfirmDialog } from "./WageTypeChangeSummary";
+import { isAccountingAssignmentRequired } from "../utils/dataAtoms";
 
 export type WageTypeControllingLoaderData = {
 	wageTypes: WageType[];
@@ -431,18 +432,7 @@ function WageTypeCategoryGroup({
 	// row.original is already the wage type with its pending changes applied, so there is
 	// nothing to look up in the state here.
 	const hasMissingData = rows.some(({ original }) => {
-		const accountingRelevant =
-			original.accountAssignment !== null ||
-			!Number.isInteger(original.wageTypeNumber);
-
-		if (!accountingRelevant) {
-			return false;
-		}
-
-		return (
-			!original.accountAssignment?.debitAccountNumber ||
-			!original.accountAssignment?.creditAccountNumber
-		);
+		return isAccountingAssignmentRequired(original);
 	});
 
 	// Categories start collapsed, so the count is the only sign that a change is waiting
