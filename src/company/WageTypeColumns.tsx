@@ -26,7 +26,6 @@ function createColumns() {
 				<WageTypeNameLocalizationEdit wageType={props.row.original} />
 			),
 			header: ({ t }) => t("Name"),
-			size: 250,
 			meta: { flex: 1 },
 		}),
 		columnHelper.accessor("isActive", {

@@ -65,7 +65,12 @@ export const WageTypeNameLocalizationEdit = memo(
 
 		return (
 			<Stack direction="row" alignItems="center" spacing={0.5}>
-				<Typography noWrap component="span" ref={anchorRef}>
+				<Typography
+					noWrap
+					component="span"
+					ref={anchorRef}
+					title={wageType.displayName}
+				>
 					{wageType.displayName}
 				</Typography>
 				{wageType.isLocalizable && (
