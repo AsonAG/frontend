@@ -48,12 +48,11 @@ import {
 } from "../models/WageType";
 import { WageTypeUpdate } from "../models/WageTypeUpdate";
 import { WageTypeSaveConfirmDialog } from "./WageTypeChangeSummary";
-import { isAccountingAssignmentRequired } from "../utils/dataAtoms";
+import { isAccountAssignmentRequired } from "../utils/dataAtoms";
 
 export type WageTypeControllingLoaderData = {
 	wageTypes: WageType[];
 	accountMaster: LookupSet;
-	attributeTranslationMap: Map<string, LookupValue>;
 };
 
 // Pending changes are tracked with the richer WageTypeCollector shape (rather than
@@ -458,7 +457,7 @@ function WageTypeCategoryGroup({
 	// row.original is already the wage type with its pending changes applied, so there is
 	// nothing to look up in the state here.
 	const hasMissingData = rows.some(({ original }) => {
-		return isAccountingAssignmentRequired(original);
+		return isAccountAssignmentRequired(original);
 	});
 
 	// Categories start collapsed, so the count is the only sign that a change is waiting

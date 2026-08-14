@@ -28,12 +28,14 @@ export type WageType = {
 	name: string;
 	nameLocalizations?: WageTypeNameLocalizations;
 	attributes: Record<string, string>;
+	properties: Record<string, any>;
 	displayName: string;
 	description?: string | null;
 	collectors: WageTypeCollector[];
 	isActive: boolean;
 	isCopyable: boolean;
 	isLocalizable: boolean;
+	isAccountingRelevant: boolean;
 	category: string;
 	accountAssignment: WageTypeAccountAssignment | null;
 	activeControllingTriggers: string[];

@@ -13,25 +13,7 @@ import {
 import { memo, useMemo, useRef, useState } from "react";
 import { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
-import { useLoaderData } from "react-router-dom";
 import { WageType } from "../models/WageType";
-import { WageTypeControllingLoaderData } from "./WageTypeControlling";
-
-// The attributes the details popper surfaces, in the order they are shown. Everything else
-// on the wage type either has its own column or is not meant for this view.
-const detailAttributes = [
-	"Accounting.Credit",
-	"Accounting.PlusMinus",
-	"Wage.Statement",
-	"Stats.Month",
-	"Stats.Year",
-	"Cost.Center",
-	"Bvg.Prospective",
-	"Bvg.Factor",
-	"Bvg.Retrospective",
-	"Payslip",
-	"FAK.billing",
-];
 
 export const WageTypeDetails = memo(function WageTypeDetails({
 	wageType,
@@ -46,8 +28,8 @@ export const WageTypeDetails = memo(function WageTypeDetails({
 	const hasDetails = useMemo(
 		() =>
 			Boolean(wageType.description) ||
-			detailAttributes.some((attribute) => wageType.attributes?.[attribute]),
-		[wageType.attributes, wageType.description],
+			Object.entries(wageType.properties ?? {}).length > 0,
+		[wageType.properties, wageType.description],
 	);
 
 	if (!hasDetails) {
@@ -95,19 +77,12 @@ export const WageTypeDetails = memo(function WageTypeDetails({
 
 function WageTypeAttributes({ wageType }: { wageType: WageType }) {
 	const { t } = useTranslation();
-	const { attributeTranslationMap } =
-		useLoaderData() as WageTypeControllingLoaderData;
-
 	return (
 		<Stack direction="row" flexWrap="wrap" gap={0.5}>
-			{detailAttributes.map((attribute) => {
-				const value = wageType.attributes?.[attribute];
-				if (!value) return null;
-				const label =
-					attributeTranslationMap.get(attribute)?.value ?? attribute;
+			{Object.entries(wageType.properties ?? {}).map(([label, value]) => {
 				return (
 					<Chip
-						key={attribute}
+						key={label}
 						label={`${label}: ${getAttributeValueLabel(value, t)}`}
 						size="small"
 					/>
@@ -117,8 +92,8 @@ function WageTypeAttributes({ wageType }: { wageType: WageType }) {
 	);
 }
 
-function getAttributeValueLabel(value: string, t: TFunction) {
-	if (value === "Y") return t("Yes");
-	if (value === "N") return t("No");
+function getAttributeValueLabel(value: any, t: TFunction) {
+	if (value === true) return t("Yes");
+	if (value === false) return t("No");
 	return value;
 }
