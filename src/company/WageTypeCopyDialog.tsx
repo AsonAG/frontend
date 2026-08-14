@@ -23,7 +23,7 @@ type CopyWageTypeActionData = {
 	error?: string;
 };
 
-export function CopyWageTypeDialog({
+export function WageTypeCopyDialog({
 	wageTypeNumber,
 	onClose,
 }: {

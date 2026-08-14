@@ -18,7 +18,7 @@ import {
 	WageTypeLocalizationLanguage,
 	WageTypeNameLocalizations,
 } from "../models/WageType";
-import { useWageTypeDispatch } from "./WageTypeControlling";
+import { useWageTypeDispatch } from "./WageTypeList";
 
 export const WageTypeNameLocalizationEdit = memo(
 	function WageTypeNameLocalizationEdit({ wageType }: { wageType: WageType }) {

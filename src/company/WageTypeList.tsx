@@ -37,9 +37,9 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
-import { columns } from "./WageTypeColumns";
+import { columns } from "./WageTypeListColumns";
 import { getRowGridSx, getStickySx } from "../payrun/utils";
-import { LookupSet, LookupValue } from "../models/LookupSet";
+import { LookupSet } from "../models/LookupSet";
 import {
 	WageType,
 	WageTypeAccountAssignment,
@@ -50,7 +50,7 @@ import { WageTypeUpdate } from "../models/WageTypeUpdate";
 import { WageTypeSaveConfirmDialog } from "./WageTypeChangeSummary";
 import { isAccountAssignmentRequired } from "../utils/dataAtoms";
 
-export type WageTypeControllingLoaderData = {
+export type WageTypeListLoaderData = {
 	wageTypes: WageType[];
 	accountMaster: LookupSet;
 };
@@ -116,7 +116,7 @@ const pendingChangeRowSx = {
 	backgroundColor: (theme: Theme) => alpha(theme.palette.primary.main, 0.08),
 };
 
-export function WageTypeControlling() {
+export function WageTypeList() {
 	const { t } = useTranslation();
 	// Saving through a fetcher rather than a navigation submission keeps this save on its
 	// own timeline. A navigation commits its action result and its fresh loader data only
@@ -124,7 +124,7 @@ export function WageTypeControlling() {
 	// copy running alongside the save would hold the saved changes on screen until it too
 	// was done. The fetcher revalidates and lands its loader data on its own.
 	const fetcher = useFetcher<WageTypeActionData>();
-	const { wageTypes } = useLoaderData() as WageTypeControllingLoaderData;
+	const { wageTypes } = useLoaderData() as WageTypeListLoaderData;
 
 	const [state, dispatch] = useReducer(reducer, wageTypes, createInitialState);
 	const [showAllWageTypes, setShowAllWageTypes] = useState(false);

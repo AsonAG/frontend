@@ -141,7 +141,7 @@ import { CompanyTabbedView } from "./company/CompanyTabbedView";
 import { CompanyReports } from "./company/CompanyReports";
 import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
-import { WageTypeControlling } from "./company/WageTypeControlling";
+import { WageTypeList } from "./company/WageTypeList";
 import { PayrollSettings, ConfirmTransmissionDialog } from "./payroll/Settings";
 import { NewPayrollView } from "./payroll/NewPayrollView";
 import { UserMembershipTable } from "./user/UserMembershipTable";
@@ -1326,7 +1326,7 @@ const routeData = [
 					},
 					{
 						path: "wagetypemaster",
-						Component: WageTypeControlling,
+						Component: WageTypeList,
 						loader: async ({ params }) => {
 							const [wageTypes, accountMaster] = await Promise.all([
 								store.get(payrollWageTypesAtom),

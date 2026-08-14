@@ -9,7 +9,7 @@ import {
 import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { WageType } from "../models/WageType";
-import { useWageTypeDispatch } from "./WageTypeControlling";
+import { useWageTypeDispatch } from "./WageTypeList";
 
 export const ControllingPicker = memo(function ControllingPicker({
 	wageType,

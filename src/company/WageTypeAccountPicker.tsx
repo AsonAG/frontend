@@ -12,10 +12,7 @@ import React, { memo, useMemo } from "react";
 import { useLoaderData } from "react-router-dom";
 import { LookupValue } from "../models/LookupSet";
 import { WageType } from "../models/WageType";
-import {
-	useWageTypeDispatch,
-	WageTypeControllingLoaderData,
-} from "./WageTypeControlling";
+import { useWageTypeDispatch, WageTypeListLoaderData } from "./WageTypeList";
 
 type WageTypeAccountPickerProps = {
 	wageType: WageType;
@@ -30,7 +27,7 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 	wageType,
 	accountType,
 }: WageTypeAccountPickerProps) {
-	const { accountMaster } = useLoaderData() as WageTypeControllingLoaderData;
+	const { accountMaster } = useLoaderData() as WageTypeListLoaderData;
 
 	const dispatch = useWageTypeDispatch();
 

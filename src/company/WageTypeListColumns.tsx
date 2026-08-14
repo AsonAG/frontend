@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { WageType } from "../models/WageType";
 import { ActivateWageTypeCheckbox } from "./ActivateWageType";
-import { CopyWageTypeDialog } from "./CopyWageTypeDialog";
+import { WageTypeCopyDialog } from "./WageTypeCopyDialog";
 import { WageTypeAccountPicker } from "./WageTypeAccountPicker";
 import { WageTypeCollectorsChip } from "./WageTypeCollectorsChip";
 import { ControllingPicker } from "./WageTypeControllingPicker";
@@ -94,7 +94,7 @@ function createColumns() {
 							</IconButton>
 						</Tooltip>
 						{open && (
-							<CopyWageTypeDialog
+							<WageTypeCopyDialog
 								wageTypeNumber={props.row.original.wageTypeNumber}
 								onClose={() => setOpen(false)}
 							/>

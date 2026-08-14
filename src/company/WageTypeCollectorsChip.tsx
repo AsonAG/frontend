@@ -11,7 +11,7 @@ import {
 import { memo, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { WageType } from "../models/WageType";
-import { useWageTypeDispatch } from "./WageTypeControlling";
+import { useWageTypeDispatch } from "./WageTypeList";
 
 export const WageTypeCollectorsChip = memo(function WageTypeCollectorsChip({
 	wageType,

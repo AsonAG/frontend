@@ -21,7 +21,7 @@ import {
 	WageTypeCollector,
 	WageTypeLocalizationLanguage,
 } from "../models/WageType";
-import { WageTypeControllingLoaderData } from "./WageTypeControlling";
+import { WageTypeListLoaderData } from "./WageTypeList";
 
 // A single edited field, rendered as "old value → new value". Values are already formatted
 // for display; null stands for "no value", whichever of the several empty spellings the
@@ -215,7 +215,7 @@ export function WageTypeSaveConfirmDialog({
 	onConfirm,
 }: WageTypeSaveConfirmDialogProps) {
 	const { t } = useTranslation();
-	const { accountMaster } = useLoaderData() as WageTypeControllingLoaderData;
+	const { accountMaster } = useLoaderData() as WageTypeListLoaderData;
 
 	const entries = useMemo(
 		() =>
