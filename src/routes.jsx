@@ -60,11 +60,12 @@ import {
 	updateLookupValue,
 	deleteLookupValue,
 	getLookupValues,
-	getPayrollCollectors,
 	getPayrunPeriodDocuments,
 	getPayrunPeriodEntryDocument,
 	getPayrollReports,
-	setPayrollWageTypeSettings,
+	activateWageType,
+	copyWageType,
+	updateWageTypes,
 	getPayroll,
 	getAvailableRegulations,
 	getPayrollRegulations,
@@ -111,7 +112,6 @@ import {
 	payrollWageTypesWithMissingAccountInfoCountAtom,
 	refreshPayrollWageTypes,
 	payrollWageTypesAtom,
-	payrollWageTypeSettingsAtom,
 	userMembershipAtom,
 } from "./utils/dataAtoms";
 import { paramsAtom } from "./utils/routeParamAtoms";
@@ -141,7 +141,7 @@ import { CompanyTabbedView } from "./company/CompanyTabbedView";
 import { CompanyReports } from "./company/CompanyReports";
 import { OnboardingView } from "./company/OnboardingView";
 import { PayrunErrorBoundary } from "./payrun/PayrunErrorBoundary";
-import { WageTypeControlling } from "./company/WageTypeControlling";
+import { WageTypeList } from "./company/WageTypeList";
 import { PayrollSettings, ConfirmTransmissionDialog } from "./payroll/Settings";
 import { NewPayrollView } from "./payroll/NewPayrollView";
 import { UserMembershipTable } from "./user/UserMembershipTable";
@@ -1326,89 +1326,107 @@ const routeData = [
 					},
 					{
 						path: "wagetypemaster",
-						Component: WageTypeControlling,
+						Component: WageTypeList,
 						loader: async ({ params }) => {
-							const regulation = await store.get(clientRegulationAtom);
-							if (!regulation) return null;
-							const [
-								wageTypes,
-								wageTypeSettings,
-								accountMaster,
-								wageTypeControlTypes,
-								wageTypeAttributeTranslations,
-								collectors,
-							] = await Promise.all([
+							const [wageTypes, accountMaster] = await Promise.all([
 								store.get(payrollWageTypesAtom),
-								store.get(payrollWageTypeSettingsAtom),
 								getLookupValues(params, "AccountMaster"),
-								getLookupValues(params, "CH.Swissdec.WageTypesControlTypes"),
-								getLookupValues(params, "CH.Swissdec.WageTypeAttributes"),
-								getPayrollCollectors(params),
 							]);
-							const attributeTranslationMap = new Map(
-								wageTypeAttributeTranslations.values.map((x) => [x.key, x]),
-							);
-							const controlTypesMap = new Map();
-							for (const value of wageTypeControlTypes.values) {
-								const keys = JSON.parse(value.key);
-								if (!Array.isArray(keys) || keys.length !== 2) continue;
-								if (!controlTypesMap.has(keys[0])) {
-									controlTypesMap.set(keys[0], new Map());
-								}
-								controlTypesMap.get(keys[0]).set(keys[1], value.value);
-							}
-							return {
-								wageTypes,
-								wageTypeSettings,
-								collectors,
-								controlTypesMap,
-								accountMaster,
-								attributeTranslationMap,
-							};
+
+							return { wageTypes, accountMaster };
 						},
 						action: async ({ params, request }) => {
-							const settings = await request.json();
-							const response = await setPayrollWageTypeSettings(
-								{ ...params },
-								settings,
-							);
-							if (response.ok) {
-								toast("success", "Updated!");
-								return { success: true };
-							} else {
-								toast("error", "Action failed");
-								return null;
+							const data = await request.json();
+
+							if (data.intent === "activateWageType") {
+								try {
+									const response = await activateWageType(
+										params,
+										data.wageTypeNumber,
+									);
+									if (!response.ok) {
+										return {
+											intent: "activateWageType",
+											error: "Action failed",
+										};
+									}
+									toast("success", "Updated!");
+									return { intent: "activateWageType", success: true };
+								} catch {
+									return { intent: "activateWageType", error: "Action failed" };
+								}
 							}
+
+							if (data.intent === "copyWageType") {
+								try {
+									const response = await copyWageType(
+										params,
+										data.copyFromWageTypeNumber,
+										data.nameLocalizations,
+									);
+									if (!response.ok) {
+										return {
+											intent: "copyWageType",
+											error: "The maximum number of copies has been reached.",
+										};
+									}
+									toast("success", "Updated!");
+									return { intent: "copyWageType", success: true };
+								} catch {
+									return {
+										intent: "copyWageType",
+										error: "The maximum number of copies has been reached.",
+									};
+								}
+							}
+
+							if (data.intent === "updateWageTypes") {
+								const intent = data.intent;
+								try {
+									const response = await updateWageTypes(
+										params,
+										data.wageTypes,
+									);
+									if (!response.ok) {
+										let error = "Action failed";
+										try {
+											const responseError = await response.json();
+											if (typeof responseError === "string")
+												error = responseError;
+										} catch {}
+										toast("error", error);
+										return { intent, error };
+									}
+									toast("success", "Updated!");
+									return { intent, success: true };
+								} catch {
+									toast("error", "Action failed");
+									return { intent, error: "Action failed" };
+								}
+							}
+
+							return { error: "Unsupported action." };
 						},
 					},
 					createRouteLookupForm(
 						"accountmaster",
 						"AccountMaster",
 						"Account number",
-						async (data, { params }) => {
-							const wageTypeSettings = await store.get(
-								payrollWageTypeSettingsAtom,
-							);
+						async (data) => {
+							const wageTypes = await store.get(payrollWageTypesAtom);
 							const canDelete = (key) => {
-								for (const assignment of Object.values(
-									wageTypeSettings?.accountAssignments ?? [],
-								)) {
-									if (
-										assignment.creditAccountNumber === key ||
-										assignment.debitAccountNumber === key
-									) {
-										return [
-											false,
-											"This account is associated with a wage type.",
-										];
-									}
-								}
-								return [true, null];
+								const accountIsAssigned = wageTypes.some((wageType) => {
+									const assignment = wageType.accountAssignment;
+									return (
+										assignment?.creditAccountNumber === key ||
+										assignment?.debitAccountNumber === key
+									);
+								});
+								return accountIsAssigned
+									? [false, "This account is associated with a wage type."]
+									: [true, null];
 							};
-							return {
-								...data,
-								canDelete,
-							};
+							return { ...data, canDelete };
 						},
 					),
 					createRouteLookupForm(

@@ -6,68 +6,104 @@ import {
 	Theme,
 	Typography,
 } from "@mui/material";
-import React, { useContext, useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { WageTypeSettingsContext } from "./WageTypeControlling";
+import { WageType } from "../models/WageType";
+import { useWageTypeDispatch } from "./WageTypeList";
 
-export function ControllingPicker({
-	wageTypeNumber,
-	controlTypes,
-	multiple,
+export const ControllingPicker = memo(function ControllingPicker({
+	wageType,
 }: {
-	wageTypeNumber: string;
-	controlTypes: Map<string, string>;
-	multiple: boolean;
+	wageType: WageType;
 }) {
 	const { t } = useTranslation();
-	const { state, dispatch } = useContext(WageTypeSettingsContext);
-	const value = state.payrollControlling[wageTypeNumber] ?? [];
+	const dispatch = useWageTypeDispatch();
+	// wageType comes from row.original, which already has the pending changes applied.
+	const value = wageType.activeControllingTriggers ?? [];
 
-	const handleChange = (event: SelectChangeEvent<typeof value>) => {
-		const {
-			target: { value },
-		} = event;
+	const options = useMemo(
+		() =>
+			(wageType.availableControllingTriggers ?? []).map((trigger) => (
+				<MenuItem key={trigger.value} value={trigger.value}>
+					{trigger.displayName}
+				</MenuItem>
+			)),
+		[wageType.availableControllingTriggers],
+	);
+
+	const displayNames = useMemo(
+		() =>
+			new Map(
+				(wageType.availableControllingTriggers ?? []).map((trigger) => [
+					trigger.value,
+					trigger.displayName,
+				]),
+			),
+		[wageType.availableControllingTriggers],
+	);
+
+	if (wageType.controllingTriggerSelectionMode === "Automatic") {
+		return <Typography noWrap>{t("automatic")}</Typography>;
+	}
+
+	const isMultiple = wageType.controllingTriggerSelectionMode === "Multiple";
+
+	// select expects empty string in case there are no values and multiple = false..
+	const selectValue = !isMultiple && value.length === 0 ? "" : value;
+
+	const handleChange = (event: SelectChangeEvent<string[]>) => {
+		const selectedValue = event.target.value;
 		const values =
-			value === "" ? [] : typeof value === "string" ? value.split(",") : value;
-		dispatch({ type: "set_controlling", wageTypeNumber, value: values });
+			typeof selectedValue === "string"
+				? selectedValue.split(",")
+				: selectedValue;
+
+		// MUI's single-select mode has no built-in deselect: clicking the
+		// already-selected item just reselects it. Detect that case and
+		// clear the value instead, so single-select can be deselected too.
+		const isReselectingSameValue =
+			!isMultiple &&
+			values.length === 1 &&
+			value.length === 1 &&
+			value[0] === values[0];
+
+		dispatch({
+			type: "set_controlling",
+			wageTypeNumber: wageType.wageTypeNumber,
+			value: isReselectingSameValue ? [] : values,
+		});
 	};
-	const options = useMemo(() => {
-		return [...controlTypes].map((kv) => (
-			<MenuItem key={kv[0]} value={kv[0]}>
-				{kv[1]}
-			</MenuItem>
-		));
-	}, [controlTypes]);
 
 	return (
 		<Select
-			multiple={multiple}
-			value={value}
+			multiple={isMultiple}
+			value={selectValue}
 			sx={selectSx}
 			onChange={handleChange}
 			displayEmpty
 			renderValue={(selected) => {
-				let label = "No checks";
+				if (selected.length === 0) {
+					return <Typography noWrap>{t("No checks")}</Typography>;
+				}
 				if (selected.length === 1) {
-					label = controlTypes.get(selected[0])!;
-				} else if (selected.length > 1) {
-					label = "{{count}} checks active";
+					return (
+						<Typography noWrap>
+							{displayNames.get(selected[0]) ?? selected[0]}
+						</Typography>
+					);
 				}
 				return (
-					<Typography noWrap>{t(label, { count: selected.length })}</Typography>
+					<Typography noWrap>
+						{t("{{count}} checks active", { count: selected.length })}
+					</Typography>
 				);
 			}}
 			size="small"
 		>
-			{!multiple && (
-				<MenuItem key="" value="">
-					{t("No checks")}
-				</MenuItem>
-			)}
 			{options}
 		</Select>
 	);
-}
+});
 
 const selectSx: SxProps<Theme> = {
 	width: "100%",

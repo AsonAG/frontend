@@ -248,6 +248,10 @@ const translations = {
 			"L'événement n'existe pas ou vous n'avez pas les autorisations.",
 		"Something went wrong.": "Quelque chose a mal tourné.",
 		"Show reason in payslip": "Afficher la note sur le bulletin de salaire",
+		"Copy wage type": "Copier le type de salaire",
+		"Update wage type": "Mettre à jour le type de salaire",
+		Activate: "Activer",
+		"Activate wage type": "Activer le type de salaire",
 
 		// compliance
 		Submit: "Transmettre",
@@ -372,6 +376,7 @@ const translations = {
 		Number: "Numéro",
 		Collectors: "Bases",
 		inactive_collector_chip: "{{count}} bases inactives…",
+		"{{count}} active": "{{count}} actives",
 		"{{count}} checks active": "{{count}} contrôles actifs",
 		"No checks": "Aucun contrôle",
 		"In the meantime, there have been changes that require the documents to be reprocessed. Visit this page again as soon as the period has been processed.":
@@ -388,6 +393,8 @@ const translations = {
 			"Voulez-vous reporter les montants ouverts à la période suivante ?",
 		"The wage controlling has not been completed yet. The period cannot be closed.":
 			"Le contrôle de la paie n'a pas encore été terminé. La période ne peut pas être clôturée.",
+		"The wage type account assignments are not completed yet. The period cannot be closed.":
+			"Les imputations des types de salaire ne sont pas encore terminées. La période ne peut pas être clôturée.",
 		"Unsaved changes": "Modifications non enregistrées",
 		"The settings have not been saved. Do you want to discard them?":
 			"Les paramètres n'ont pas été enregistrés. Voulez-vous annuler les modifications?",
@@ -424,6 +431,19 @@ const translations = {
 		"Company event": "Événement d'entreprise",
 		"No employee found": "Employé non trouvé",
 		"No event found": "Événement non trouvé",
+		"Record wage type labels" : "Enregistrer les libellés du type de salaire",
+		"Show inactive wage types" : "Afficher les types de salaire inactifs",
+		"Edit wage type label": "Modifier les libellés du type de salaire",
+		"This label is required.": "Ce libellé est obligatoire.",
+		"Do you really want to activate this wage type?": "Voulez-vous vraiment activer ce type de salaire ?",
+		"Search wage type number or name": "Rechercher le numéro ou le nom du type de salaire",
+		"No wage types found": "Aucun type de salaire trouvé",
+		"The maximum number of copies has been reached.": "Le nombre maximum de copies a été atteint.",
+		"{{count}} unsaved": "{{count}} non enregistré(s)",
+		"Apply changes": "Appliquer les modifications",
+		"{{count}} wage types will be updated": "{{count}} types de salaire seront mis à jour",
+		"There are no changes to save.": "Il n'y a aucune modification à enregistrer.",
+		"Not set": "Non défini",
 
 		// Culture
 		"Region settings": "Paramètres régionaux",

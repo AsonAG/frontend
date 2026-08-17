@@ -258,6 +258,10 @@ const translations = {
 			"Das Ereignis gibt es nicht oder Sie haben keine Berechtigungen.",
 		"Something went wrong.": "Etwas ist schief gelaufen.",
 		"Show reason in payslip": "Notiz in Lohnabrechnung anzeigen",
+		"Copy wage type": "Lohnart kopieren",
+		"Update wage type": "Lohnart aktualisieren",
+		Activate: "Aktivieren",
+		"Activate wage type": "Lohnart aktivieren",
 
 		// compliance
 		Submit: "Übermitteln",
@@ -388,6 +392,7 @@ const translations = {
 		Number: "Nummer",
 		Collectors: "Basen",
 		inactive_collector_chip: "{{count}} inaktive Basen...",
+		"{{count}} active": "{{count}} aktiv",
 		"{{count}} checks active": "{{count}} Kontrollen aktiv",
 		"No checks": "Keine Kontrollen",
 		"In the meantime, there have been changes that require the documents to be reprocessed. Visit this page again as soon as the period has been processed.":
@@ -404,6 +409,8 @@ const translations = {
 			"Möchten Sie die offenen Beträge in die nächste Periode übernehmen?",
 		"The wage controlling has not been completed yet. The period cannot be closed.":
 			"Die Lohnkontrolle wurde noch nicht beendet. Die Periode kann nicht geschlossen werden.",
+		"The wage type account assignments are not completed yet. The period cannot be closed.":
+			"Die Kontierung der Lohnarten ist noch nicht abgeschlossen. Die Periode kann nicht geschlossen werden.",
 		"Unsaved changes": "Nicht gespeicherte Änderungen",
 		"The settings have not been saved. Do you want to discard them?":
 			"Die Einstellungen wurden nicht gespeichert. Möchten Sie die Änderungen verwerfen?",
@@ -443,6 +450,19 @@ const translations = {
 		"Company event": "Firmenereignis",
 		"No employee found": "Mitarbeitenden nicht gefunden",
 		"No event found": "Ereignis nicht gefunden",
+		"Record wage type labels" : "Bezeichnungen der Lohnart erfassen",
+		"Show inactive wage types" : "Inaktive Lohnarten anzeigen",
+		"Edit wage type label": "Bezeichnungen der Lohnart bearbeiten",
+		"This label is required.": "Diese Bezeichnung ist erforderlich.",
+		"Do you really want to activate this wage type?": "Möchten Sie diesen Lohnart wirklich aktivieren?",
+		"Search wage type number or name": "Lohnartnummer oder Name suchen",
+		"No wage types found": "Keine Lohnarten gefunden",
+		"The maximum number of copies has been reached.": "Die maximale Anzahl der Kopien ist erreicht.",
+		"{{count}} unsaved": "{{count}} nicht gespeichert",
+		"Apply changes": "Änderungen übernehmen",
+		"{{count}} wage types will be updated": "{{count}} Lohnarten werden aktualisiert",
+		"There are no changes to save.": "Es gibt keine Änderungen zum Speichern.",
+		"Not set": "Nicht gesetzt",
 
 		// Culture
 		"Region settings": "Regionseinstellungen",

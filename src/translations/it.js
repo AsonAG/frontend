@@ -246,6 +246,10 @@ const translations = {
 			"L'evento non esiste o non hai le autorizzazioni.",
 		"Something went wrong.": "Qualcosa è andato storto.",
 		"Show reason in payslip": "Mostra nota sulla busta paga",
+		"Copy wage type": "Copia tipo di retribuzione",
+		"Update wage type": "Aggiorna tipo di retribuzione",
+		Activate: "Attiva",
+		"Activate wage type": "Attiva tipo di retribuzione",
 
 		// compliance
 		Submit: "Invia",
@@ -372,6 +376,7 @@ const translations = {
 		Number: "Numero",
 		Collectors: "Basi",
 		inactive_collector_chip: "{{count}} basi inattive…",
+		"{{count}} active": "{{count}} attive",
 		"{{count}} checks active": "{{count}} controlli attivi",
 		"No checks": "Nessun controllo",
 		"In the meantime, there have been changes that require the documents to be reprocessed. Visit this page again as soon as the period has been processed.":
@@ -387,6 +392,8 @@ const translations = {
 			"Vuoi trasferire gli importi aperti al periodo successivo?",
 		"The wage controlling has not been completed yet. The period cannot be closed.":
 			"Il controllo della retribuzione non è ancora terminato. Il periodo non può essere chiuso.",
+		"The wage type account assignments are not completed yet. The period cannot be closed.":
+			"Le assegnazioni dei conti dei tipi di retribuzione non sono ancora completate. Il periodo non può essere chiuso.",
 		"Unsaved changes": "Modifiche non salvate",
 		"The settings have not been saved. Do you want to discard them?":
 			"Le impostazioni non sono state salvate. Vuoi scartare le modifiche?",
@@ -424,6 +431,19 @@ const translations = {
 		"Company event": "Evento aziendale",
 		"No employee found": "Dipendente non trovato",
 		"No event found": "Evento non trovato",
+		"Record wage type labels" : "Registra etichette tipo di retribuzione",
+		"Show inactive wage types" : "Mostra tipi di retribuzione inattivi",
+		"Edit wage type label": "Modifica etichette tipo di retribuzione",
+		"This label is required.": "Questa etichetta è obbligatoria.",
+		"Do you really want to activate this wage type?": "Vuoi davvero attivare questo tipo di retribuzione?",
+		"Search wage type number or name": "Cerca numero o nome del tipo di retribuzione",
+		"No wage types found": "Nessun tipo di retribuzione trovato",
+		"The maximum number of copies has been reached.": "È stato raggiunto il numero massimo di copie.",
+		"{{count}} unsaved": "{{count}} non salvate",
+		"Apply changes": "Applica le modifiche",
+		"{{count}} wage types will be updated": "{{count}} tipi di retribuzione saranno aggiornati",
+		"There are no changes to save.": "Non ci sono modifiche da salvare.",
+		"Not set": "Non impostato",
 
 		// Culture
 		"Region settings": "Impostazioni regionali",

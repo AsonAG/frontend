@@ -8,12 +8,11 @@ import {
 	Theme,
 	Typography,
 } from "@mui/material";
-import React, { memo, useContext, useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { useLoaderData } from "react-router-dom";
-import { WageTypeControllingLoaderData } from "./WageTypeControllingLoaderData";
 import { LookupValue } from "../models/LookupSet";
-import { WageTypeSettingsContext } from "./WageTypeControlling";
 import { WageType } from "../models/WageType";
+import { useWageTypeDispatch, WageTypeListLoaderData } from "./WageTypeList";
 
 type WageTypeAccountPickerProps = {
 	wageType: WageType;
@@ -28,49 +27,53 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 	wageType,
 	accountType,
 }: WageTypeAccountPickerProps) {
-	const { accountMaster } = useLoaderData() as WageTypeControllingLoaderData;
-	const { state, dispatch } = useContext(WageTypeSettingsContext);
-	const wageTypeNumber = wageType.wageTypeNumber.toString();
-	const assignment = state.accountAssignments[wageTypeNumber]?.[accountType];
+	const { accountMaster } = useLoaderData() as WageTypeListLoaderData;
+
+	const dispatch = useWageTypeDispatch();
+
+	// wageType comes from row.original, which already has the pending changes applied.
+	const assignment = wageType.accountAssignment?.[accountType] ?? null;
 
 	const value = useMemo(
-		() => accountMaster.values.find((x) => x.key === assignment) ?? null,
-		[assignment, accountMaster.values],
+		() =>
+			accountMaster.values.find((account) => account.key === assignment) ??
+			null,
+		[accountMaster.values, assignment],
 	);
-	const onChange = (value: LookupValue | null) => {
-		dispatch({
-			type: "set_account",
-			wageTypeNumber,
-			value: value?.key ?? null,
-			kind: accountType,
-		});
-	};
 
-	if (wageType.attributes?.["Accounting.Relevant"] !== "Y") {
+	if (!wageType.isAccountingRelevant) {
 		return null;
 	}
+
+	const handleChange = (selectedValue: LookupValue | null) => {
+		dispatch({
+			type: "set_account",
+			wageTypeNumber: wageType.wageTypeNumber,
+			accountType,
+			value: selectedValue?.key ?? null,
+		});
+	};
 
 	return (
 		<Autocomplete
 			value={value}
 			options={accountMaster.values}
 			filterOptions={filterOptions}
-			renderInput={(params) => {
-				return (
-					<Badge
-						variant={!assignment ? "dot" : "standard"}
-						color="warning"
-						component="div"
-						sx={{ width: "100%" }}
-					>
-						<TextField {...params} />
-					</Badge>
-				);
-			}}
-			onChange={(_, value, __, ___) => onChange(value)}
+			renderInput={(params) => (
+				<Badge
+					variant={!assignment ? "dot" : "standard"}
+					color="warning"
+					component="div"
+					sx={{ width: "100%" }}
+				>
+					<TextField {...params} />
+				</Badge>
+			)}
+			onChange={(_, selectedValue) => handleChange(selectedValue)}
 			getOptionLabel={(option) => `${option.key} ${option.value}`}
 			renderOption={(props, option) => {
 				const { key, ...optionProps } = props;
+
 				return (
 					<Box key={key} component="li" {...optionProps} sx={{ gap: 1 }}>
 						<Typography width={70} display="inline-block">
@@ -90,7 +93,7 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 			}}
 			sx={autoCompleteSx}
 			size="small"
-		></Autocomplete>
+		/>
 	);
 });
 
