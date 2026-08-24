@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from "react";
 import { useUIFeatureCheck } from "./UIFeatureCheck";
 
 export enum UIFeature {
+	CompanyReports,
 	HrEmployeesEdit,
 	HrEmployeesEditFirstName,
 	HrEmployeesEditLastName,

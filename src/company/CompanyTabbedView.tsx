@@ -4,6 +4,7 @@ import { Navigate, useLoaderData, useOutlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { EventTabbedView } from "../components/EventTabbedView";
 import { TabLink } from "../components/TabLink";
+import { UIFeature, UIFeatureGate } from "../utils/UIFeature";
 
 type LoaderData = {
 	onboardingTaskCount: number;
@@ -40,7 +41,9 @@ function ConfigTabs() {
 			/>
 			<TabLink title={t("Account master")} to="accountmaster" />
 			<TabLink title={t("Cost center")} to="costcentermaster" />
-			<TabLink title={t("Reports")} to="reports" />
+			<UIFeatureGate feature={UIFeature.CompanyReports}>
+				<TabLink title={t("Reports")} to="reports" />
+			</UIFeatureGate>
 		</>
 	);
 }
