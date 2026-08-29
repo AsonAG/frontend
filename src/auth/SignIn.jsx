@@ -4,10 +4,15 @@ import { Centered } from "../components/Centered";
 import { Loading } from "../components/Loading";
 import { getDefaultStore } from "jotai";
 import { authUserAtom } from "./getUser";
+import { setAuthClient } from "./reauthenticate";
 
 function SignIn({ children }) {
 	const auth = useAuth();
 	const [hasTriedSignin, setHasTriedSignin] = useState(false);
+
+	useEffect(() => {
+		setAuthClient(auth);
+	}, [auth]);
 
 	// automatically sign-in
 	useEffect(() => {

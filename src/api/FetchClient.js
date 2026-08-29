@@ -3,6 +3,10 @@ import { authUserAtom, localUserEmailAtom } from "../auth/getUser";
 import { getDefaultStore } from "jotai";
 import { payrollAtom, userAtom } from "../utils/dataAtoms";
 import { useOidc } from "../auth/authConfig";
+import {
+	redirectToSignin,
+	silentlyReauthenticate,
+} from "../auth/reauthenticate";
 import { employeeCasesFilter, companyCasesFilter } from "./ClientFilters";
 
 const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
@@ -256,24 +260,39 @@ class FetchRequestBuilder {
 			url = `${url}?${this.searchParams}`;
 		}
 
-		if (this.retries > 0) {
-			return fetchWithTimeoutAndRetry(
-				url,
-				{
-					method: this.method,
-					headers: this.headers,
-					body: this.body,
-				},
-				this.timeout,
-				this.retries,
-			);
+		const response = await this.executeRequest(url);
+
+		if (response.status !== 401 || !useOidc) {
+			return response;
 		}
-		return fetch(url, {
+
+		try {
+			const user = await silentlyReauthenticate();
+			this.headers.set("Authorization", `Bearer ${user.access_token}`);
+			return this.executeRequest(url);
+		} catch {
+			try {
+				await redirectToSignin();
+				return new Promise(() => {});
+			} catch {
+				// Preserve the original unauthorized response if navigation cannot start.
+				return response;
+			}
+		}
+	}
+
+	async executeRequest(url) {
+		const options = {
 			method: this.method,
 			headers: this.headers,
 			body: this.body,
-			signal: this.signal,
-		});
+		};
+
+		if (this.retries > 0) {
+			return fetchWithTimeoutAndRetry(url, options, this.timeout, this.retries);
+		}
+
+		return fetch(url, { ...options, signal: this.signal });
 	}
 
 	async fetchJson() {
