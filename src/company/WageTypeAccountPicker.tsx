@@ -75,10 +75,18 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 				const { key, ...optionProps } = props;
 
 				return (
-					<Box key={key} component="li" {...optionProps} sx={{ gap: 1 }}>
-						<Typography width={70} display="inline-block">
-							{option.key}
-						</Typography>
+					<Box
+						key={key}
+						component="li"
+						{...optionProps}
+						sx={{
+							gridColumn: "1 / -1",
+							display: "grid !important",
+							gridTemplateColumns: "subgrid",
+							gap: 1,
+						}}
+					>
+						<Typography display="inline-block">{option.key}</Typography>
 						<Typography display="inline-block">{option.value}</Typography>
 					</Box>
 				);
@@ -88,6 +96,12 @@ export const WageTypeAccountPicker = memo(function WageTypeAccountPicker({
 					placement: "bottom-start",
 					style: {
 						width: "fit-content",
+					},
+				},
+				listbox: {
+					sx: {
+						display: "grid",
+						gridTemplateColumns: "max-content max-content",
 					},
 				},
 			}}
