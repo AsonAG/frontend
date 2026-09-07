@@ -9,8 +9,12 @@ export function FieldValueLinkComponent() {
 	const { field, displayName } = useContext(FieldContext);
 
 	const isEmployeeLink = !!field.attributes?.["employeeLink"];
+	const isCompanyLink = !!field.attributes?.["companyLink"];
 	if (isEmployeeLink) {
 		return <EmployeeLink text={displayName} />;
+	}
+	if (isCompanyLink) {
+		return <CompanyLink text={displayName} />;
 	}
 
 	return (
@@ -30,6 +34,16 @@ export function FieldValueLinkComponent() {
 function EmployeeLink({ text }: { text: string }) {
 	const { orgId, payrollId, employeeId } = useParams();
 	const to = `/orgs/${orgId}/payrolls/${payrollId}/hr/employees/${employeeId}`;
+	return (
+		<Link component={RouterLink} to={to}>
+			{text}
+		</Link>
+	);
+}
+
+function CompanyLink({ text }: { text: string }) {
+	const { orgId, payrollId} = useParams();
+	const to = `/orgs/${orgId}/payrolls/${payrollId}/company/onboarding`;
 	return (
 		<Link component={RouterLink} to={to}>
 			{text}
