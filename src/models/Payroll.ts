@@ -8,4 +8,5 @@ export type Payroll = {
 	accountingStartDate: string;
 	transmissionStartDate: string;
 	language: Language | null;
+	foundedDuringYear: boolean;
 };

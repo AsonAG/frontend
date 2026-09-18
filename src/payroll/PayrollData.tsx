@@ -9,6 +9,9 @@ import {
 	Button,
 	Box,
 	Chip,
+	Alert,
+	Checkbox,
+	FormControlLabel,
 } from "@mui/material";
 import { useRef, useState, useReducer, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -45,10 +48,22 @@ export function PayrollData() {
 			? dayjs.utc(payroll.accountingStartDate)
 			: dayjs().utc().startOf("year"),
 	);
+	const [foundedDuringYear, setFoundedDuringYear] = useState(
+		payroll?.foundedDuringYear ?? false,
+	);
 	const [language, setLanguage] = useState<Language>(
 		payroll?.language ?? "German",
 	);
 	const { state: navigationState } = useNavigation();
+
+	const hasNonDefaultStartDate = !payroll && accountingStartDate.month() !== 0;
+
+	const handleAccountingStartDateChange = (value: dayjs.Dayjs) => {
+		setAccountingStartDate(value);
+		if (value.month() === 0) {
+			setFoundedDuringYear(false);
+		}
+	};
 
 	const createInitialStateArgs = {
 		payrollRegulations: payrollRegulations ?? {
@@ -82,6 +97,7 @@ export function PayrollData() {
 				payroll: {
 					name: payrollName,
 					accountingStartDate: accountingStartDate.toISOString(),
+					foundedDuringYear,
 					language,
 					culture: "de-ch",
 				},
@@ -121,10 +137,27 @@ export function PayrollData() {
 					value={accountingStartDate}
 					variant="month"
 					minDate={dayjs("2024-01-01T0:00:00.000Z")}
-					onChange={(e) => setAccountingStartDate(e)}
+					onChange={(e) => e && handleAccountingStartDateChange(e)}
 					required
 					disabled={!!payroll}
 				/>
+				{hasNonDefaultStartDate && (
+					<Stack spacing={1}>
+						<Alert severity="warning">
+							{t("start_date_warning_founded_company")}
+						</Alert>
+						<FormControlLabel
+							control={
+								<Checkbox
+									checked={foundedDuringYear}
+									onChange={(e) => setFoundedDuringYear(e.target.checked)}
+									required
+								/>
+							}
+							label={t("confirm_founded_during_year")}
+						/>
+					</Stack>
+				)}
 				<LanguagePicker
 					label={t("Language for documents")}
 					language={language}

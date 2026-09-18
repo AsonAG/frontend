@@ -40,6 +40,10 @@ const translations = {
 		date_accounting_start_date_validation:
 			"Date has to be greater than or equal to the payroll accounting start date ({{accountingStartDate}})",
 		date_start_before_end_validation: "Start date must be before the end date",
+		start_date_warning_founded_company:
+			"A start date other than January 1st only makes sense for companies founded during the year.",
+		confirm_founded_during_year:
+			"I confirm that the company was founded during the year. Any resulting correction work by Ason will be invoiced.",
 
 		// culture
 		"de-CH_culturelabel": "German (Switzerland)",
