@@ -136,7 +136,7 @@ export function PayrollData() {
 					label={t("Payroll accounting start date")}
 					value={accountingStartDate}
 					variant="month"
-					minDate={dayjs("2024-01-01T0:00:00.000Z")}
+					minDate={dayjs("2024-01-01T00:00:00.000Z")}
 					onChange={(e) => e && handleAccountingStartDateChange(e)}
 					required
 					disabled={!!payroll}
