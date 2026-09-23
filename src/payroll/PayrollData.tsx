@@ -58,13 +58,6 @@ export function PayrollData() {
 
 	const hasNonDefaultStartDate = !payroll && accountingStartDate.month() !== 0;
 
-	const handleAccountingStartDateChange = (value: dayjs.Dayjs) => {
-		setAccountingStartDate(value);
-		if (value.month() === 0) {
-			setFoundedDuringYear(false);
-		}
-	};
-
 	const createInitialStateArgs = {
 		payrollRegulations: payrollRegulations ?? {
 			countryRegulation: availableRegulations?.[0]?.name,
@@ -136,8 +129,7 @@ export function PayrollData() {
 					label={t("Payroll accounting start date")}
 					value={accountingStartDate}
 					variant="month"
-					minDate={dayjs("2024-01-01T00:00:00.000Z")}
-					onChange={(e) => e && handleAccountingStartDateChange(e)}
+					onChange={(e) => e && setAccountingStartDate(e)}
 					required
 					disabled={!!payroll}
 				/>

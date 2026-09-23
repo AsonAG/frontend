@@ -149,13 +149,7 @@ export function DatePicker<T extends DatePickerVariants>({
 		if (variant !== "month-short") {
 			const setNewValue = (v: Dayjs | null | undefined) => {
 				if (!v) return;
-				let validationError: DateValidationError | null = null;
-				if (datePickerProps.minDate && v.isBefore(datePickerProps.minDate, "day")) {
-					validationError = "minDate";
-				} else if (datePickerProps.maxDate && v.isAfter(datePickerProps.maxDate, "day")) {
-					validationError = "maxDate";
-				}
-				updateLocalState(v, { validationError });
+				updateLocalState(v, { validationError: null });
 				handleChange(v);
 			};
 			slots = {
