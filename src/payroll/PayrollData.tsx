@@ -203,6 +203,7 @@ export function PayrollData() {
 						onClick={onSubmit}
 						loading={navigationState === "submitting"}
 						loadingPosition="start"
+						disabled={hasNonDefaultStartDate && !foundedDuringYear}
 					>
 						{t(!payroll ? "Create" : "Save")}
 					</Button>

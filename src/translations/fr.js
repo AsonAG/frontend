@@ -114,7 +114,7 @@ const translations = {
 		start_date_warning_founded_company:
 			"Une date de début autre que le 1er janvier n'a de sens que pour les entreprises fondées en cours d'année.",
 		confirm_founded_during_year:
-			"Je confirme que l'entreprise a été fondée en cours d'année. Les éventuels travaux de correction effectués par Ason seront facturés.",
+			"Je confirme que l'entreprise a été fondée en cours d'année. Les éventuels travaux de correction seront facturés.",
 		"Loaded industry regulations cannot be removed!":
 			"Les règlements sectoriels chargés ne peuvent pas être supprimés!",
 		"Loaded ERP regulations cannot be removed!":
