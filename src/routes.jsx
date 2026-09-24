@@ -1228,6 +1228,14 @@ const routeData = [
 										toast("success", "Payrun period closed");
 										return redirect("..");
 									}
+									if (closePeriodResponse.status === 422) {
+										// the backend rejects closing while the wage type account assignments are incomplete
+										toast(
+											"error",
+											"The wage type account assignments are not completed yet. The period cannot be closed.",
+										);
+										return null;
+									}
 									toast("error", "Could not close period.");
 								},
 							},

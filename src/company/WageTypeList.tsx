@@ -48,7 +48,6 @@ import {
 } from "../models/WageType";
 import { WageTypeUpdate } from "../models/WageTypeUpdate";
 import { WageTypeSaveConfirmDialog } from "./WageTypeChangeSummary";
-import { isAccountAssignmentRequired } from "../utils/dataAtoms";
 
 export type WageTypeListLoaderData = {
 	wageTypes: WageType[];
@@ -454,11 +453,11 @@ function WageTypeCategoryGroup({
 		return null;
 	}
 
-	// row.original is already the wage type with its pending changes applied, so there is
-	// nothing to look up in the state here.
-	const hasMissingData = rows.some(({ original }) => {
-		return isAccountAssignmentRequired(original);
-	});
+	// The backend decides whether the account assignment is complete, so this reflects the
+	// saved state. Unsaved account changes are flagged on the account pickers themselves.
+	const hasMissingData = rows.some(
+		({ original }) => !original.isAccountAssignmentComplete,
+	);
 
 	// Categories start collapsed, so the count is the only sign that a change is waiting
 	// inside a group the user cannot currently see.

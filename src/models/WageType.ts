@@ -38,6 +38,8 @@ export type WageType = {
 	isAccountingRelevant: boolean;
 	category: string;
 	accountAssignment: WageTypeAccountAssignment | null;
+	/** Determined by the backend from the saved account assignment. */
+	isAccountAssignmentComplete: boolean;
 	activeControllingTriggers: string[];
 	availableControllingTriggers: ControllingTriggerOption[];
 	controllingTriggerSelectionMode: ControllingTriggerSelectionMode;
