@@ -111,6 +111,10 @@ const translations = {
 		Industry: "Secteur",
 		"Accounting document": "Pièce comptable",
 		"Payroll accounting start date": "Date de début de la comptabilité des salaires",
+		start_date_warning_founded_company:
+			"Une date de début autre que le 1er janvier n'a de sens que pour les entreprises fondées en cours d'année.",
+		confirm_founded_during_year:
+			"Je confirme que l'entreprise a été fondée en cours d'année.",
 		"Loaded industry regulations cannot be removed!":
 			"Les règlements sectoriels chargés ne peuvent pas être supprimés!",
 		"Loaded ERP regulations cannot be removed!":

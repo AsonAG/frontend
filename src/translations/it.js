@@ -111,6 +111,10 @@ const translations = {
 		Industry: "Settore",
 		"Accounting document": "Documento contabile",
 		"Payroll accounting start date": "Data di inizio della contabilità salariale",
+		start_date_warning_founded_company:
+			"Una data di inizio diversa dal 1° gennaio ha senso solo per aziende fondate nel corso dell'anno.",
+		confirm_founded_during_year:
+			"Confermo che l'azienda è stata fondata nel corso dell'anno.",
 		"Loaded industry regulations cannot be removed!":
 			"Le normative di settore caricate non possono essere rimosse!",
 		"Loaded ERP regulations cannot be removed!":
