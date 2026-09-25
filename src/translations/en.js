@@ -43,7 +43,7 @@ const translations = {
 		start_date_warning_founded_company:
 			"A start date other than January 1st only makes sense for companies founded during the year.",
 		confirm_founded_during_year:
-			"I confirm that the company was founded during the year. Any resulting correction work will be invoiced.",
+			"I confirm that the company was founded during the year.",
 
 		// culture
 		"de-CH_culturelabel": "German (Switzerland)",
