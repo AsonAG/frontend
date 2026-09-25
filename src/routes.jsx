@@ -1228,7 +1228,7 @@ const routeData = [
 										toast("success", "Payrun period closed");
 										return redirect("..");
 									}
-									if (closePeriodResponse.status === 422) {
+									if (closePeriodResponse.status === 400) {
 										// the backend rejects closing while the wage type account assignments are incomplete
 										toast(
 											"error",
