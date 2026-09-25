@@ -312,15 +312,6 @@ export const payrollWageTypesWithMissingAccountInfoCountAtom = atom<
 >(async (get) => {
 	const wageTypes = await get(payrollWageTypesAtom);
 
-	return wageTypes.filter(isAccountAssignmentRequired).length;
+	return wageTypes.filter((wageType) => !wageType.isAccountAssignmentComplete)
+		.length;
 });
-
-export const isAccountAssignmentRequired = (wageType: WageType): boolean => {
-	if (!wageType.isAccountingRelevant) {
-		return false;
-	}
-	return (
-		!wageType.accountAssignment?.debitAccountNumber ||
-		!wageType.accountAssignment?.creditAccountNumber
-	);
-};
