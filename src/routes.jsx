@@ -1228,8 +1228,13 @@ const routeData = [
 										toast("success", "Payrun period closed");
 										return redirect("..");
 									}
-									if (closePeriodResponse.status === 400) {
-										// the backend rejects closing while the wage type account assignments are incomplete
+									// the backend rejects closing for several reasons, the reloaded wage types tell
+									// whether the account assignments are the reason
+									refreshPayrollWageTypes();
+									const missingAccountAssignmentCount = await store.get(
+										payrollWageTypesWithMissingAccountInfoCountAtom,
+									);
+									if (missingAccountAssignmentCount > 0) {
 										toast(
 											"error",
 											"The wage type account assignments are not completed yet. The period cannot be closed.",
