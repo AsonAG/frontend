@@ -111,6 +111,10 @@ const translations = {
 		Industry: "Branche",
 		"Accounting document": "Buchungsbeleg",
 		"Payroll accounting start date": "Startdatum der Lohnbuchhaltung",
+		start_date_warning_founded_company:
+			"Ein vom 1. Januar abweichendes Startdatum ist nur bei unterjährig gegründeten Firmen sinnvoll.",
+		confirm_founded_during_year:
+			"Ich bestätige, dass die Firma unter dem Jahr gegründet wurde.",
 		"Loaded industry regulations cannot be removed!":
 			"Geladene Branchen-Regelwerke können nicht entfernt werden!",
 		"Loaded ERP regulations cannot be removed!":
