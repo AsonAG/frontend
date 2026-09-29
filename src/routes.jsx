@@ -1228,7 +1228,15 @@ const routeData = [
 										toast("success", "Payrun period closed");
 										return redirect("..");
 									}
+									// the close button is disabled when the period cannot be closed, a rejection
+									// only happens on stale data (e.g. reports with errors)
+									if (closePeriodResponse.status === 400) {
+										const reason = await closePeriodResponse.text();
+										toast("error", "Could not close period: {{reason}}", { reason });
+										return null;
+									}
 									toast("error", "Could not close period.");
+									return null;
 								},
 							},
 							{
