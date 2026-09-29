@@ -310,6 +310,8 @@ const translations = {
 		"Closed periods": "Périodes clôturées",
 		"Payrun period closed": "Période clôturée",
 		"Could not close period.": "La période n'a pas pu être clôturée.",
+		"Could not close period: {{reason}}":
+			"La période n'a pas pu être clôturée : {{reason}}",
 		"Value from previous period": "Valeur de la période précédente",
 		"Go to period completion...": "Aller à la clôture de période…",
 		dashboard_payout_header: "Paiement",

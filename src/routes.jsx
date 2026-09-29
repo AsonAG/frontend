@@ -1228,7 +1228,14 @@ const routeData = [
 										toast("success", "Payrun period closed");
 										return redirect("..");
 									}
+									// the backend rejects closing with the reason, e.g. reports with errors
+									const reason = await closePeriodResponse.text();
+									if (reason) {
+										toast("error", "Could not close period: {{reason}}", { reason });
+										return null;
+									}
 									toast("error", "Could not close period.");
+									return null;
 								},
 							},
 							{
