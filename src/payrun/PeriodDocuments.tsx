@@ -316,7 +316,8 @@ function renderDocumentWithError(document: PayrunDocument) {
 	if (!errorCode) {
 		return null;
 	}
-	var Component = errorMap[errorCode];
+	const errorMessage = document.attributes?.["errorMessage"];
+	const Component = errorMap[errorCode] ?? UnknownDocumentError;
 	return (
 		<Alert severity="error" color="warning">
 			<Stack spacing={1}>
@@ -325,10 +326,24 @@ function renderDocumentWithError(document: PayrunDocument) {
 				</Typography>
 				<Stack spacing={1} direction="row">
 					<Warning color="warning" />
-					<Component />
+					<Stack spacing={1}>
+						<Component />
+						{errorMessage && (
+							<Typography fontWeight="bold">{errorMessage}</Typography>
+						)}
+					</Stack>
 				</Stack>
 			</Stack>
 		</Alert>
+	);
+}
+
+function UnknownDocumentError() {
+	const { t } = useTranslation();
+	return (
+		<Typography>
+			{t("The document could not be generated because of an error.")}
+		</Typography>
 	);
 }
 
