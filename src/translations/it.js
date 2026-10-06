@@ -339,6 +339,8 @@ const translations = {
 		"For the accounting document to be processed and the period to be closed, the wage type accounting assigments must be complete.":
 			"Affinché il documento contabile venga elaborato e il periodo possa essere chiuso, le registrazioni dei tipi di retribuzione devono essere complete.",
 		"Go to account assignments": "Vai all’assegnazione dei conti delle voci salariali",
+		"The document could not be generated because of an error.":
+			"Non è stato possibile generare il documento a causa di un errore.",
 
 		// Headers
 		"Id of the employee": "ID del dipendente",

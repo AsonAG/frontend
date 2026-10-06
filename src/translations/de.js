@@ -353,6 +353,8 @@ const translations = {
 		"For the accounting document to be processed and the period to be closed, the wage type accounting assigments must be complete.":
 			"Damit der Buchungsbeleg aufbereitet und die Periode geschlossen werden kann, muss die Kontierung der Lohnarten vollständig sein.",
 		"Go to account assignments": "Zur Kontierung der Lohnarten",
+		"The document could not be generated because of an error.":
+			"Das Dokument konnte wegen eines Fehlers nicht erstellt werden.",
 
 		// Headers
 		"Id of the employee": "ID des Mitarbeitenden",

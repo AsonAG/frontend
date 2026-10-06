@@ -46,6 +46,7 @@ type PayrunDocumentAttributes = {
 	type: string;
 	reports?: DocumentReportDefinition[];
 	errorCode?: number;
+	errorMessage?: string;
 };
 type DocumentReportDefinition = {
 	Name: string;
