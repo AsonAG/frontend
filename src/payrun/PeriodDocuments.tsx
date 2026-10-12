@@ -177,9 +177,11 @@ function WageStatements({
 				<Stack direction="row" spacing={1}>
 					<Typography>{label}</Typography>
 					<XmlChip to={`${entryId}/doc/${doc.id}`} />
-					<PdfChip
-						to={`${payrunPeriodId}/entries/${entryId}/doc/${doc.id}?report=${encodeURIComponent(doc.attributes?.reports?.[0].Name ?? "")}`}
-					/>
+					{doc.attributes?.reports?.[0]?.Name && (
+						<PdfChip
+							to={`${payrunPeriodId}/entries/${entryId}/doc/${doc.id}?report=${encodeURIComponent(doc.attributes.reports[0].Name)}`}
+						/>
+					)}
 				</Stack>
 			))}
 		</Stack>
