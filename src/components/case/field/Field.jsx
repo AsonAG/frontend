@@ -47,10 +47,14 @@ export function Field({ field, labelAbove = false }) {
 						label={field.displayName}
 						labelPlacement="top"
 						required={required}
-						slotProps={{
-							typography: { variant: "body2", color: "text.secondary" },
+						slotProps={{ typography: { variant: "inherit" } }}
+						sx={{
+							m: 0,
+							gap: 0.5,
+							alignItems: "stretch",
+							color: "text.secondary",
+							typography: "body2",
 						}}
-						sx={{ m: 0, gap: 0.5, alignItems: "stretch" }}
 						control={
 							<DefaultLayout
 								field={field}
