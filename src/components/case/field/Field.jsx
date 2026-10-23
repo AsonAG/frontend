@@ -1,5 +1,15 @@
-import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
-import { FieldValueComponent } from "./value/FieldValueComponent";
+import {
+	Box,
+	FormControl,
+	FormControlLabel,
+	Stack,
+	Typography,
+	useMediaQuery,
+} from "@mui/material";
+import {
+	FieldValueComponent,
+	hasInputLabel,
+} from "./value/FieldValueComponent";
 import { FieldDetails } from "./FieldDescription";
 import { createContext, useContext } from "react";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
@@ -8,14 +18,15 @@ import { FieldPeriodSelector } from "./FieldPeriodSelector";
 
 export const FieldContext = createContext();
 
-export function Field({ field }) {
+export function Field({ field, labelAbove = false }) {
 	const { buildCase, attachments, renderFieldPeriods } =
 		useContext(CaseFormContext);
 	const isReadonly = field.attributes?.["input.readOnly"] ?? false;
 	const required = !field.optional;
 	const theme = useTheme();
 	const mobile = useMediaQuery(theme.breakpoints.down(725));
-	const displayName = !mobile ? field.displayName : "";
+	const showLabelAbove = labelAbove && !mobile && hasInputLabel(field);
+	const displayName = !mobile && !showLabelAbove ? field.displayName : "";
 
 	return (
 		<FieldContext.Provider
@@ -30,6 +41,20 @@ export function Field({ field }) {
 		>
 			{mobile ? (
 				<MobileLayout field={field} renderPeriodSelector={renderFieldPeriods} />
+			) : showLabelAbove ? (
+				<FormControl fullWidth>
+					<FormControlLabel
+						label={field.displayName}
+						labelPlacement="top"
+						required={required}
+						control={
+							<DefaultLayout
+								field={field}
+								renderPeriodSelector={renderFieldPeriods}
+							/>
+						}
+					/>
+				</FormControl>
 			) : (
 				<DefaultLayout
 					field={field}

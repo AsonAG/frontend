@@ -32,10 +32,14 @@ function FieldGroup({ fields }) {
 	const theme = useTheme();
 	const mobile = useMediaQuery(theme.breakpoints.down(725));
 	return (
-		<Stack direction={mobile ? "column" : "row"} gap={1.5}>
+		<Stack
+			direction={mobile ? "column" : "row"}
+			gap={1.5}
+			alignItems={mobile ? undefined : "flex-end"}
+		>
 			{fields.map((field) => (
 				<Box key={field.id} flex="1 1 0" minWidth={0}>
-					<Field field={field} />
+					<Field field={field} labelAbove />
 				</Box>
 			))}
 		</Stack>
