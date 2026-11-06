@@ -2,6 +2,7 @@ import React, {
 	Dispatch,
 	memo,
 	PropsWithChildren,
+	useEffect,
 	useMemo,
 	useReducer,
 } from "react";
@@ -38,6 +39,10 @@ export type PayrunTableState = {
 
 export type PayrunTableAction =
 	| {
+			type: "set_entries";
+			entries: Array<EntryRow>;
+	  }
+	| {
 			type: "set_selected";
 			id: IdType;
 			selected: boolean;
@@ -71,6 +76,10 @@ export const PayrunTable = memo(function PayrunTable({
 	) as PayrunPeriodLoaderData;
 
 	const [state, dispatch] = useReducer(reducer, entries, createInitialState);
+
+	useEffect(() => {
+		dispatch({ type: "set_entries", entries });
+	}, [entries]);
 
 	const configuredColumnVisibility = useAtomValue(columnVisibilityAtom);
 	const columnVisibility: VisibilityState = { ...configuredColumnVisibility };
@@ -383,6 +392,21 @@ function reducer(
 ): PayrunTableState {
 	let newState: PayrunTableState;
 	switch (action.type) {
+		case "set_entries":
+			if (action.entries === state.entries) {
+				return state;
+			}
+			newState = {
+				...state,
+				entries: action.entries,
+				selected: getSelectionForEntries(
+					state.selected,
+					state.entries,
+					action.entries,
+				),
+				fullSelectionCount: getSelectionCount(getSelectedState(action.entries)),
+			};
+			break;
 		case "set_selected":
 			const selected = {
 				...state.selected,
@@ -411,10 +435,31 @@ function reducer(
 			break;
 	}
 	newState.payoutTotals = getPayoutTotals(newState.entries, newState.selected);
-	newState.selectedEmployeeCount = Object.values(newState.selected).filter(
-		Boolean,
+	// only rows in the table are paid out, rows hidden by a filter stay selected but don't count
+	newState.selectedEmployeeCount = newState.entries.filter(
+		(entry) => newState.selected[entry.id],
 	).length;
 	return newState;
+}
+
+// Rows hidden by a filter keep their selection. A row whose open amount has changed
+// is deselected, so that it cannot be paid out with the new amount unnoticed.
+function getSelectionForEntries(
+	selected: RowSelectionState,
+	previousEntries: Array<EntryRow>,
+	entries: Array<EntryRow>,
+): RowSelectionState {
+	const previousById = new Map(previousEntries.map((e) => [e.id, e]));
+	const newSelected = { ...selected };
+	for (const entry of entries) {
+		const previous = previousById.get(entry.id);
+		const amountChanged =
+			!!previous && previous.openPayout !== entry.openPayout;
+		if (amountChanged || !isRowSelectionEnabled(entry)) {
+			delete newSelected[entry.id];
+		}
+	}
+	return newSelected;
 }
 
 function createInitialState(entries: EntryRow[]): PayrunTableState {

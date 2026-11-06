@@ -5,6 +5,7 @@ import React, {
 	Ref,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useReducer,
 } from "react";
@@ -26,6 +27,7 @@ import { PayrunTable } from "./PayrollTable";
 import { CalculatingIndicator } from "./CalculatingIndicator";
 import { SearchField } from "../components/SearchField";
 import { MissingDataCase } from "../models/MissingData";
+import { usePayrunPeriodPolling } from "./usePayrunPeriodPolling";
 
 type PayrollTableContextProps = {
 	state: DashboardState;
@@ -75,8 +77,14 @@ function PayrunPeriodView() {
 		previousPayrunPeriod?.entries,
 		isOpen,
 		controllingData,
+		salaryTypes,
 	]);
 	const [state, dispatch] = useReducer(reducer, rows, createInitialState);
+
+	useEffect(() => {
+		dispatch({ type: "set_entries", entries: rows });
+	}, [rows]);
+	usePayrunPeriodPolling(payrunPeriod);
 
 	const header = (
 		<DashboardHeader index>
@@ -168,6 +176,10 @@ export type DashboardState = {
 
 export type DashboardAction =
 	| {
+			type: "set_entries";
+			entries: Array<EntryRow>;
+	  }
+	| {
 			type: "set_salary_type";
 			salaryType: string | null;
 	  }
@@ -186,6 +198,15 @@ function reducer(
 ): DashboardState {
 	let newState: DashboardState;
 	switch (action.type) {
+		case "set_entries":
+			if (action.entries === state.entries) {
+				return state;
+			}
+			newState = {
+				...state,
+				entries: keepEnteredAmounts(action.entries, state.entries),
+			};
+			break;
 		case "set_tab": {
 			if (action.tab === state.selectedTab) {
 				return state;
@@ -222,6 +243,20 @@ function reducer(
 		newState.selectedTab = getSelectedTabAfterSearch(newState);
 	}
 	return newState;
+}
+
+// An entered amount only stays valid as long as the open amount has not changed.
+function keepEnteredAmounts(
+	entries: Array<EntryRow>,
+	previousEntries: Array<EntryRow>,
+): Array<EntryRow> {
+	const previousById = new Map(previousEntries.map((e) => [e.id, e]));
+	return entries.map((entry) => {
+		const previous = previousById.get(entry.id);
+		return previous && previous.openPayout === entry.openPayout
+			? { ...entry, amount: previous.amount }
+			: entry;
+	});
 }
 
 function filterBySalaryType(entry: EntryRow, salaryType: string | null) {
