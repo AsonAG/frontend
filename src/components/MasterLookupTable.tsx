@@ -30,7 +30,11 @@ export function MasterLookupTable() {
 		<Stack spacing={1}>
 			<TableHeader />
 			{values.map((value) => (
-				<ValueRow key={value.key} value={value} />
+				// remount when the loaded value changes (e.g. after a reset) to refresh the edit state
+				<ValueRow
+					key={`${value.key}|${value.source}|${value.value}`}
+					value={value}
+				/>
 			))}
 			<NewValueRow />
 		</Stack>
