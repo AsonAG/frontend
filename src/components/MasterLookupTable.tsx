@@ -16,7 +16,7 @@ import { alpha } from "@mui/system/colorManipulator";
 import React, { useState } from "react";
 import { useBlocker, useFetcher, useLoaderData } from "react-router-dom";
 import { PayrollLookupValue } from "../models/LookupSet";
-import { Delete, RestartAlt, SettingsBackupRestore } from "@mui/icons-material";
+import { Delete, Replay, RestartAlt } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { getStickySx } from "../payrun/utils";
 
@@ -286,7 +286,7 @@ function RowActionButton({
 		return (
 			<Tooltip title={t("Undo")}>
 				<IconButton tabIndex={-1} onClick={onUndo}>
-					<SettingsBackupRestore />
+					<Replay />
 				</IconButton>
 			</Tooltip>
 		);
