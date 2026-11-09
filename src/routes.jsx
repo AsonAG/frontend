@@ -229,46 +229,23 @@ function createRouteLookupForm(path, lookupName, keyName, loader) {
 			return data;
 		},
 		action: async ({ params, request }) => {
-			const formData = await request.formData();
-			const key = formData.get("key");
-			const value = formData.get("value");
-			// the PUT endpoint replaces the whole list, so apply the change to the current values
-			let values = await getPayrollMasterLookupValues(params, lookupName);
-			let successMessage;
-			switch (request.method) {
-				case "POST":
-					if (values.some((v) => v.key === key)) {
-						toast("error", "Key already exists");
-						return null;
-					}
-					values = [...values, { key, value, valueLocalizations: null }];
-					successMessage = "Created!";
-					break;
-				case "PUT":
-					values = values.map((v) => (v.key === key ? { ...v, value } : v));
-					successMessage = "Updated!";
-					break;
-				case "DELETE":
-					values = values.filter((v) => v.key !== key);
-					successMessage = "Deleted!";
-					break;
-				default:
-					throw new Response("", { status: 405 });
-			}
+			// the table always sends the complete list, which replaces all values
+			const values = await request.json();
 			const response = await updatePayrollMasterLookupValues(
 				params,
 				lookupName,
 				values,
 			);
-
 			if (response.ok) {
-				toast("success", successMessage);
+				toast("success", "Saved!");
 				return { success: true };
-			} else {
-				toast("error", "Action failed");
-				return null;
 			}
+			toast("error", "Action failed");
+			return { success: false };
 		},
+		// keep the unsaved edits on screen when the save failed
+		shouldRevalidate: ({ actionResult, defaultShouldRevalidate }) =>
+			actionResult?.success === false ? false : defaultShouldRevalidate,
 	};
 }
 

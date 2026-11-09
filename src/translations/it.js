@@ -425,9 +425,9 @@ const translations = {
 		automatic: "Automatico",
 		"Delete value": "Elimina valore",
 		"Do you really want to delete this value?": "Vuoi davvero eliminare questo valore?",
-		"Reset value": "Ripristina valore",
-		"Do you really want to reset this value to the regulation value?": "Vuoi davvero ripristinare questo valore al valore del regolamento?",
-		Reset: "Ripristina",
+		Undo: "Annulla",
+		Required: "Obbligatorio",
+		"Reset to regulation value": "Ripristina al valore del regolamento",
 		"Key already exists": "La chiave esiste già",
 		"This account is associated with a wage type.":
 			"Questo conto è assegnato a un tipo di retribuzione.",
