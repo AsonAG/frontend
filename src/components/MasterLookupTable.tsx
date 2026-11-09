@@ -8,9 +8,8 @@ import {
 } from "@mui/material";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Form, useActionData, useLoaderData } from "react-router-dom";
-import { LookupSet, LookupValue } from "../models/LookupSet";
-import { IdType } from "../models/IdType";
-import { Delete, Save } from "@mui/icons-material";
+import { PayrollLookupValue } from "../models/LookupSet";
+import { Delete, RestartAlt, Save } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import {
 	ResponsiveDialog,
@@ -20,20 +19,17 @@ import {
 } from "./ResponsiveDialog";
 
 type LoaderData = {
-	lookup: LookupSet;
-	clientLookupMap: Map<string, LookupValue>;
-	payrollLookup: LookupSet;
-	regulationId: IdType;
+	values: PayrollLookupValue[];
 	keyName: string;
 	canDelete: (key: string) => [boolean, string];
 };
 
 export function MasterLookupTable() {
-	const { payrollLookup } = useLoaderData() as LoaderData;
+	const { values } = useLoaderData() as LoaderData;
 	return (
 		<Stack spacing={1}>
 			<TableHeader />
-			{(payrollLookup.values ?? []).map((value) => (
+			{values.map((value) => (
 				<ValueRow key={value.key} value={value} />
 			))}
 			<NewValueRow />
@@ -41,21 +37,15 @@ export function MasterLookupTable() {
 	);
 }
 
-function ValueRow({ value }: { value: LookupValue }) {
-	const { clientLookupMap } = useLoaderData() as LoaderData;
-	const [lookupData, setLookupData] = useState(
-		value ? { ...value } : { key: "", value: "" },
-	);
+function ValueRow({ value }: { value: PayrollLookupValue }) {
+	const [lookupData, setLookupData] = useState({ ...value });
 
-	const clientLookupValue = clientLookupMap.get(value.key);
 	const isDirty =
 		lookupData.key !== value.key || lookupData.value !== value.value;
-	const idElements = <HiddenIdElements value={clientLookupValue} />;
 
 	return (
 		<Stack direction="row">
-			<Form method={!!clientLookupValue ? "PUT" : "POST"} style={{ flex: 1 }}>
-				{idElements}
+			<Form method="PUT" style={{ flex: 1 }}>
 				<Stack direction="row" spacing={1}>
 					<TextField
 						name="key"
@@ -84,30 +74,42 @@ function ValueRow({ value }: { value: LookupValue }) {
 					</IconButton>
 				</Stack>
 			</Form>
-			<DeleteButton value={value} disabled={!clientLookupValue}>
-				{idElements}
-			</DeleteButton>
+			<DeleteButton value={value} />
 		</Stack>
 	);
 }
 
-function DeleteButton({ children, value, disabled }) {
+function DeleteButton({ value }: { value: PayrollLookupValue }) {
 	const { t } = useTranslation();
 	const { canDelete } = useLoaderData() as LoaderData;
+	// removing an override only resets the key to the regulation value, so it stays usable
+	const isReset = value.source === "PayrollOverride";
 	const [deletable, reason] = useMemo(
-		() => canDelete?.(value.key) ?? [true, null],
-		[canDelete, value.key],
+		() => (isReset ? [true, null] : (canDelete?.(value.key) ?? [true, null])),
+		[canDelete, value.key, isReset],
 	);
 	return (
 		<ResponsiveDialog>
 			<ResponsiveDialogTrigger>
-				<IconButton type="submit" tabIndex={-1} disabled={disabled}>
-					<Delete />
+				<IconButton
+					type="submit"
+					tabIndex={-1}
+					disabled={value.source === "Regulation"}
+				>
+					{isReset ? <RestartAlt /> : <Delete />}
 				</IconButton>
 			</ResponsiveDialogTrigger>
 			<ResponsiveDialogContent>
-				<Typography variant="h6">{t("Delete value")}</Typography>
-				<Typography>{t("Do you really want to delete this value?")}</Typography>
+				<Typography variant="h6">
+					{t(isReset ? "Reset value" : "Delete value")}
+				</Typography>
+				<Typography>
+					{t(
+						isReset
+							? "Do you really want to reset this value to the regulation value?"
+							: "Do you really want to delete this value?",
+					)}
+				</Typography>
 				<Typography>
 					{value.key} {value.value}
 				</Typography>
@@ -117,7 +119,7 @@ function DeleteButton({ children, value, disabled }) {
 					</Alert>
 				)}
 				<Form method="DELETE">
-					{children}
+					<input type="hidden" name="key" value={value.key} />
 					<Stack direction="row" justifyContent="end" spacing={1}>
 						<ResponsiveDialogClose>
 							<Button>{t("Cancel")}</Button>
@@ -128,7 +130,7 @@ function DeleteButton({ children, value, disabled }) {
 							color="destructive"
 							disabled={!deletable}
 						>
-							{t("Delete")}
+							{t(isReset ? "Reset" : "Delete")}
 						</Button>
 					</Stack>
 				</Form>
@@ -165,7 +167,6 @@ function NewValueRow() {
 		}
 	}, [actionData]);
 
-	const idElements = <HiddenIdElements />;
 	return (
 		<Form method={"POST"} ref={formRef}>
 			<Stack direction="row" spacing={1}>
@@ -178,22 +179,10 @@ function NewValueRow() {
 					size="small"
 				/>
 				<TextField name="value" defaultValue="" sx={{ flex: 1 }} size="small" />
-				{idElements}
 				<Button type="submit" variant="contained" tabIndex={-1}>
 					{t("Save")}
 				</Button>
 			</Stack>
 		</Form>
-	);
-}
-
-function HiddenIdElements({ value }: { value?: LookupValue }) {
-	const { lookup, regulationId } = useLoaderData() as LoaderData;
-	return (
-		<>
-			<input type="hidden" name="regulationId" value={regulationId} />
-			<input type="hidden" name="lookupId" value={lookup.id} />
-			{value && <input type="hidden" name="lookupValueId" value={value.id} />}
-		</>
 	);
 }
