@@ -11,3 +11,15 @@ export type LookupValue = {
 	created?: string;
 	value: string;
 };
+
+export type PayrollLookupValueSource =
+	| "Regulation"
+	| "PayrollOverride"
+	| "Payroll";
+
+export type PayrollLookupValue = {
+	key: string;
+	value: string;
+	valueLocalizations?: Record<string, string> | null;
+	source: PayrollLookupValueSource;
+};

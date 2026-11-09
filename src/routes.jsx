@@ -55,10 +55,8 @@ import {
 	getCompanyBankDetails as getCompanyBankAccountDetails,
 	getEmployeeSalaryType,
 	getPreviousPayrunPeriod,
-	getLookupSet,
-	addLookupValue,
-	updateLookupValue,
-	deleteLookupValue,
+	getPayrollMasterLookupValues,
+	updatePayrollMasterLookupValues,
 	getLookupValues,
 	getPayrunPeriodDocuments,
 	getPayrunPeriodEntryDocument,
@@ -108,7 +106,6 @@ import {
 	missingDataCompanyAtom,
 	onboardingCompanyAtom,
 	payrollControllingDataAtom,
-	clientRegulationAtom,
 	payrollWageTypesWithMissingAccountInfoCountAtom,
 	refreshPayrollWageTypes,
 	payrollWageTypesAtom,
@@ -218,23 +215,8 @@ function createRouteCaseForm(path, data) {
 
 function createRouteLookupForm(path, lookupName, keyName, loader) {
 	const defaultLoader = async ({ params }) => {
-		const regulation = await store.get(clientRegulationAtom);
-		if (!regulation) return null;
-		const lookup = await getLookupSet(
-			{ regulationId: regulation.id, ...params },
-			lookupName,
-		);
-		const payrollLookup = await getLookupValues(params, lookupName);
-		const clientLookupMap = new Map(
-			(lookup.values ?? []).map((value) => [value.key, value]),
-		);
-		return {
-			lookup,
-			clientLookupMap,
-			payrollLookup,
-			keyName,
-			regulationId: regulation.id,
-		};
+		const values = await getPayrollMasterLookupValues(params, lookupName);
+		return { values, keyName };
 	};
 	return {
 		path,
@@ -247,46 +229,23 @@ function createRouteLookupForm(path, lookupName, keyName, loader) {
 			return data;
 		},
 		action: async ({ params, request }) => {
-			const formData = await request.formData();
-			const regulationId = formData.get("regulationId");
-			const lookupId = formData.get("lookupId");
-			const lookupValueId = formData.get("lookupValueId");
-			const actionParams = { regulationId, lookupId, lookupValueId, ...params };
-			let successMessage;
-			let action;
-			switch (request.method) {
-				case "POST":
-					action = addLookupValue(actionParams, {
-						key: formData.get("key"),
-						value: formData.get("value"),
-					});
-					successMessage = "Created!";
-					break;
-				case "PUT":
-					action = updateLookupValue(actionParams, {
-						id: formData.get("lookupValueId"),
-						key: formData.get("key"),
-						value: formData.get("value"),
-					});
-					successMessage = "Updated!";
-					break;
-				case "DELETE":
-					action = deleteLookupValue(actionParams);
-					successMessage = "Deleted!";
-					break;
-				default:
-					throw new Response("", { status: 405 });
-			}
-			const response = await action;
-
+			// the table always sends the complete list, which replaces all values
+			const values = await request.json();
+			const response = await updatePayrollMasterLookupValues(
+				params,
+				lookupName,
+				values,
+			);
 			if (response.ok) {
-				toast("success", successMessage);
+				toast("success", "Saved!");
 				return { success: true };
-			} else {
-				toast("error", "Action failed");
-				return null;
 			}
+			toast("error", "Action failed");
+			return { success: false };
 		},
+		// keep the unsaved edits on screen when the save failed
+		shouldRevalidate: ({ actionResult, defaultShouldRevalidate }) =>
+			actionResult?.success === false ? false : defaultShouldRevalidate,
 	};
 }
 

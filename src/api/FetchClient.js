@@ -26,12 +26,6 @@ const payrollsSimpleUrl = "/tenants/:orgId/payrolls/simple";
 const payrollUrl = "/tenants/:orgId/payrolls/:payrollId";
 const payrollRegulationsUrl = "/tenants/:orgId/payrolls/:payrollId/regulations";
 const divisionsUrl = "/tenants/:orgId/divisions";
-const regulationsUrl = "/tenants/:orgId/regulations";
-const lookupSetUrl = "/tenants/:orgId/regulations/:regulationId/lookups/sets";
-const lookupValuesUrl =
-	"/tenants/:orgId/regulations/:regulationId/lookups/:lookupId/values";
-const lookupValueUrl =
-	"/tenants/:orgId/regulations/:regulationId/lookups/:lookupId/values/:lookupValueId";
 const caseSetsUrl = "/tenants/:orgId/payrolls/:payrollId/cases/sets";
 const caseChangeCaseValuesUrl =
 	"/tenants/:orgId/payrolls/:payrollId/changes/values";
@@ -44,6 +38,8 @@ const missingDataEmployeeUrl =
 	"/tenants/:orgId/payrolls/:payrollId/missingdata/employees";
 const payrollLookupValuesUrl =
 	"/tenants/:orgId/payrolls/:payrollId/lookups/values";
+const payrollMasterLookupValuesUrl =
+	"/tenants/:orgId/payrolls/:payrollId/lookups/:lookupName/values";
 const payrollEmployeesUrl = "/tenants/:orgId/payrolls/:payrollId/employees";
 const payrollEmployeeUrl =
 	"/tenants/:orgId/payrolls/:payrollId/employees/:employeeId";
@@ -926,36 +922,24 @@ export function cancelPayout(routeParams) {
 		.fetch();
 }
 
-export function getClientRegulation(routeParams) {
-	return new FetchRequestBuilder(regulationsUrl, routeParams)
-		.withQueryParam(
-			"filter",
-			`name eq 'ClientRegulation:${routeParams.payrollId}'`,
-		)
-		.fetchSingle();
+export function getPayrollMasterLookupValues(routeParams, lookupName) {
+	return new FetchRequestBuilder(payrollMasterLookupValuesUrl, {
+		...routeParams,
+		lookupName,
+	}).fetchJson();
 }
 
-export function getLookupSet(routeParams, lookupName) {
-	return new FetchRequestBuilder(lookupSetUrl, routeParams)
-		.withQueryParam("filter", `name eq '${lookupName}'`)
-		.fetchSingle();
-}
-
-export function addLookupValue(routeParams, lookupValue) {
-	return new FetchRequestBuilder(lookupValuesUrl, routeParams)
-		.withMethod("POST")
-		.withBody(lookupValue)
-		.fetch();
-}
-export function updateLookupValue(routeParams, lookupValue) {
-	return new FetchRequestBuilder(lookupValueUrl, routeParams)
+export function updatePayrollMasterLookupValues(
+	routeParams,
+	lookupName,
+	values,
+) {
+	return new FetchRequestBuilder(payrollMasterLookupValuesUrl, {
+		...routeParams,
+		lookupName,
+	})
 		.withMethod("PUT")
-		.withBody(lookupValue)
-		.fetch();
-}
-export function deleteLookupValue(routeParams) {
-	return new FetchRequestBuilder(lookupValueUrl, routeParams)
-		.withMethod("DELETE")
+		.withBody(values)
 		.fetch();
 }
 
