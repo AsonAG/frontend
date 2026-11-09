@@ -16,7 +16,7 @@ import { alpha } from "@mui/system/colorManipulator";
 import React, { useState } from "react";
 import { useBlocker, useFetcher, useLoaderData } from "react-router-dom";
 import { PayrollLookupValue } from "../models/LookupSet";
-import { Delete, RestartAlt, Undo } from "@mui/icons-material";
+import { Delete, RestartAlt, SettingsBackupRestore } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { getStickySx } from "../payrun/utils";
 
@@ -255,8 +255,11 @@ function ValueRow({
 				sx={{ width: 120 }}
 				size="small"
 				disabled={!isNew}
+				// saved keys stay selectable, unless the row is marked for removal
 				slotProps={
-					isNew ? undefined : { htmlInput: { readOnly: true, disabled: false } }
+					isNew || row.removed
+						? undefined
+						: { htmlInput: { readOnly: true, disabled: false } }
 				}
 			/>
 			<TextField
@@ -283,7 +286,7 @@ function RowActionButton({
 		return (
 			<Tooltip title={t("Undo")}>
 				<IconButton tabIndex={-1} onClick={onUndo}>
-					<Undo />
+					<SettingsBackupRestore />
 				</IconButton>
 			</Tooltip>
 		);
