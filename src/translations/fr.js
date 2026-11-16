@@ -426,6 +426,10 @@ const translations = {
 		automatic: "Automatique",
 		"Delete value": "Supprimer la valeur",
 		"Do you really want to delete this value?": "Voulez-vous vraiment supprimer cette valeur?",
+		Undo: "Annuler",
+		Required: "Obligatoire",
+		"Reset to regulation value": "Réinitialiser à la valeur de la réglementation",
+		"Key already exists": "La clé existe déjà",
 		"This account is associated with a wage type.": "Ce compte est affecté à un type de salaire.",
 		date_accounting_start_date_validation:
 			"La date doit être postérieure ou égale à la date de début de la comptabilité salariale ({{accountingStartDate}}).",

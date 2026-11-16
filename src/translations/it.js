@@ -425,6 +425,10 @@ const translations = {
 		automatic: "Automatico",
 		"Delete value": "Elimina valore",
 		"Do you really want to delete this value?": "Vuoi davvero eliminare questo valore?",
+		Undo: "Annulla",
+		Required: "Obbligatorio",
+		"Reset to regulation value": "Ripristina al valore del regolamento",
+		"Key already exists": "La chiave esiste già",
 		"This account is associated with a wage type.":
 			"Questo conto è assegnato a un tipo di retribuzione.",
 		date_accounting_start_date_validation:

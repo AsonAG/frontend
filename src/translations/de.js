@@ -443,6 +443,10 @@ const translations = {
 		"Delete value": "Wert löschen",
 		"Do you really want to delete this value?":
 			"Möchten Sie diesen Wert wirklich löschen?",
+		Undo: "Rückgängig",
+		Required: "Erforderlich",
+		"Reset to regulation value": "Auf Wert der Regulierung zurücksetzen",
+		"Key already exists": "Schlüssel existiert bereits",
 		"This account is associated with a wage type.":
 			"Dieses Konto ist einer Lohnart zugewiesen",
 		date_accounting_start_date_validation:
