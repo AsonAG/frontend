@@ -9,7 +9,6 @@ import {
 	getEmployeeCases,
 	getCompanyCases,
 	getPayrunPeriodControllingTasks,
-	getClientRegulation,
 	getPayrollWageTypes,
 	getOrganizationUserMembership,
 	getEmployee,
@@ -163,13 +162,6 @@ export const onboardingCompanyAtom = atomWithRefresh<
 		return companyOnboardingCases;
 	}
 	return [];
-});
-
-export const clientRegulationAtom = atom(async (get) => {
-	const orgId = get(orgIdAtom);
-	const payrollId = get(payrollIdAtom);
-	if (orgId === null || payrollId === null) return [];
-	return await getClientRegulation({ orgId, payrollId });
 });
 
 export const companyMissingDataCountAtom = atom(async (get) => {

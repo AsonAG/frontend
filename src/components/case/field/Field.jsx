@@ -1,21 +1,38 @@
-import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
-import { FieldValueComponent } from "./value/FieldValueComponent";
+import {
+	Box,
+	FormControl,
+	FormControlLabel,
+	Stack,
+	Typography,
+	useMediaQuery,
+} from "@mui/material";
+import {
+	FieldValueComponent,
+	hasInputLabel,
+} from "./value/FieldValueComponent";
 import { FieldDetails } from "./FieldDescription";
 import { createContext, useContext } from "react";
 import { CaseFormContext } from "../../../scenes/global/CaseForm";
 import { useTheme } from "@emotion/react";
-import { FieldPeriodSelector } from "./FieldPeriodSelector";
+import {
+	FieldPeriodSelector,
+	hasPeriodSelector,
+} from "./FieldPeriodSelector";
 
 export const FieldContext = createContext();
 
-export function Field({ field }) {
+export function Field({ field, grouped = false }) {
 	const { buildCase, attachments, renderFieldPeriods } =
 		useContext(CaseFormContext);
 	const isReadonly = field.attributes?.["input.readOnly"] ?? false;
 	const required = !field.optional;
 	const theme = useTheme();
 	const mobile = useMediaQuery(theme.breakpoints.down(725));
-	const displayName = !mobile ? field.displayName : "";
+	// ungrouped fields keep the period columns even when empty, so they align
+	const renderPeriodSelector =
+		renderFieldPeriods && (!grouped || hasPeriodSelector(field));
+	const showLabelAbove = grouped && !mobile && hasInputLabel(field);
+	const displayName = !mobile && !showLabelAbove ? field.displayName : "";
 
 	return (
 		<FieldContext.Provider
@@ -29,11 +46,36 @@ export function Field({ field }) {
 			}}
 		>
 			{mobile ? (
-				<MobileLayout field={field} renderPeriodSelector={renderFieldPeriods} />
+				<MobileLayout
+					field={field}
+					renderPeriodSelector={renderPeriodSelector}
+				/>
+			) : showLabelAbove ? (
+				<FormControl fullWidth>
+					<FormControlLabel
+						label={field.displayName}
+						labelPlacement="top"
+						required={required}
+						slotProps={{ typography: { variant: "inherit" } }}
+						sx={{
+							m: 0,
+							gap: 0.5,
+							alignItems: "stretch",
+							color: "text.secondary",
+							typography: "body2",
+						}}
+						control={
+							<DefaultLayout
+								field={field}
+								renderPeriodSelector={renderPeriodSelector}
+							/>
+						}
+					/>
+				</FormControl>
 			) : (
 				<DefaultLayout
 					field={field}
-					renderPeriodSelector={renderFieldPeriods}
+					renderPeriodSelector={renderPeriodSelector}
 				/>
 			)}
 		</FieldContext.Provider>

@@ -15,6 +15,13 @@ import { FieldValueBooleanComponent } from "./FieldValueBooleanComponent";
 import { FieldContext } from "../Field";
 import { FieldValueLinkComponent } from "./FieldValueLinkComponent";
 
+// whether the control renders displayName as a label inside the input
+export function hasInputLabel(field) {
+	if (field.lookupSettings && "lookupName" in field.lookupSettings) return true;
+	if (field.attributes?.["input.list"]) return true;
+	return !["None", "Boolean", "WebResource"].includes(field.valueType);
+}
+
 export function FieldValueComponent() {
 	const { field } = useContext(FieldContext);
 	if (field.attributes["input.hidden"]) return null;

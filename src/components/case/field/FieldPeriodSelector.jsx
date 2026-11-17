@@ -10,6 +10,12 @@ import { useMemo } from "react";
 
 dayjs.extend(utc);
 
+export function hasPeriodSelector(field) {
+	return (
+		field.timeType !== "Timeless" && !field.attributes?.["input.hideStartEnd"]
+	);
+}
+
 export function FieldPeriodSelector({ field }) {
 	const { t } = useTranslation();
 
@@ -31,10 +37,7 @@ export function FieldPeriodSelector({ field }) {
 		end: endValue,
 	});
 
-	if (
-		field.timeType === "Timeless" ||
-		field.attributes?.["input.hideStartEnd"]
-	) {
+	if (!hasPeriodSelector(field)) {
 		return null;
 	}
 
