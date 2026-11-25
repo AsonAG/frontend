@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { useMatches } from "react-router-dom";
+import { Link } from "react-router";
+import { useMatches } from "react-router";
 
 export default function Logo({ paddingLeft }) {
 	const matches = useMatches();

@@ -7,7 +7,7 @@ import {
 	IconButton,
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useAuth } from "react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { useAtom, useAtomValue } from "jotai";

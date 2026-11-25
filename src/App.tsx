@@ -11,7 +11,7 @@ import {
 import Topbar from "./scenes/global/Topbar";
 import Drawer from "./scenes/global/Drawer";
 
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import { Container } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "./components/Logo";

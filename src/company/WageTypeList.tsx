@@ -29,7 +29,7 @@ import {
 	useReducer,
 	useState,
 } from "react";
-import { useBlocker, useFetcher, useLoaderData } from "react-router-dom";
+import { useBlocker, useFetcher, useLoaderData } from "react-router";
 import {
 	flexRender,
 	getCoreRowModel,

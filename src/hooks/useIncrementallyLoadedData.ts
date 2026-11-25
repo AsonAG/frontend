@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useFetcher } from "react-router-dom";
+import { useFetcher } from "react-router";
 
 type PaginatedData<T> = {
 	items: Array<T>;

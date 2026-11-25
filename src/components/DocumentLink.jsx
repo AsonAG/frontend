@@ -1,5 +1,5 @@
 import { Stack, Typography, Link } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router";
 import { Attachment } from "@mui/icons-material";
 
 export function DocumentLink({ name, ...linkProps }) {

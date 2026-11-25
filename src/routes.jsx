@@ -2,11 +2,10 @@ import * as React from "react";
 
 import {
 	createBrowserRouter,
-	defer,
 	matchRoutes,
 	Navigate,
 	redirect,
-} from "react-router-dom";
+} from "react-router";
 
 import { OrganizationList } from "./organization/List";
 import Dashboard from "./scenes/dashboard";
@@ -186,7 +185,7 @@ function paginatedLoader({
 				.withPagination(page, pageCount)
 				.fetchJson(),
 		};
-		return defer(result);
+		return result;
 	};
 }
 
@@ -307,9 +306,9 @@ function createRouteDocument(showTitle) {
 					return redirect("..");
 				},
 				loader: ({ params }) => {
-					return defer({
+					return {
 						document: getDocument(params),
-					});
+					};
 				},
 			},
 		],
@@ -355,10 +354,10 @@ function createRouteEmployeeTable(path, showButtons = true) {
 		path,
 		Component: AsyncEmployeeTable,
 		loader: async ({ params }) => {
-			return defer({
+			return {
 				showButtons,
 				data: getPayrollEmployees(params).fetchJson(),
-			});
+			};
 		},
 	};
 }
@@ -438,9 +437,9 @@ function createRoutePayrunPeriodDocument() {
 			loader: async ({ params, request }) => {
 				const report = getQueryParam(request, "report");
 				const variant = getQueryParam(request, "variant");
-				return defer({
+				return {
 					document: getPayrunPeriodDocument(params, report, variant),
-				});
+				};
 			},
 		},
 		{
@@ -449,9 +448,9 @@ function createRoutePayrunPeriodDocument() {
 			loader: async ({ params, request }) => {
 				const report = getQueryParam(request, "report");
 				const variant = getQueryParam(request, "variant");
-				return defer({
+				return {
 					document: getPayrunPeriodEntryDocument(params, report, variant),
-				});
+				};
 			},
 		},
 	];
@@ -886,9 +885,9 @@ const routeData = [
 						path: "new",
 						Component: AsyncCaseTable,
 						loader: ({ params }) => {
-							return defer({
+							return {
 								data: getEmployeeCases(params, "NewEvent"),
-							});
+							};
 						},
 					},
 					createRouteCaseForm("new/:caseName"),
@@ -918,10 +917,10 @@ const routeData = [
 						path: "missingdata",
 						Component: AsyncCaseTable,
 						loader: ({ params }) => {
-							return defer({
+							return {
 								data: getEmployeeCases(params, "HRCT"),
 								noDataAvailableText: "Data complete.",
-							});
+							};
 						},
 					},
 				],
@@ -941,9 +940,9 @@ const routeData = [
 						store.set(openTasksAtom);
 						dataPromise = store.get(openTasksAtom);
 					}
-					return defer({
+					return {
 						data: dataPromise,
-					});
+					};
 				},
 			},
 			{
@@ -964,9 +963,9 @@ const routeData = [
 				path: "hr/tasks/:taskId",
 				Component: AsyncTaskView,
 				loader: ({ params }) => {
-					return defer({
+					return {
 						data: getTask(params),
-					});
+					};
 				},
 				action: async ({ params, request }) => {
 					const data = await request.json();
@@ -1027,9 +1026,9 @@ const routeData = [
 						loader: async ({ params, request }) => {
 							const report = getQueryParam(request, "report");
 							const variant = getQueryParam(request, "variant");
-							return defer({
+							return {
 								document: getTaskAttachment(params, report, variant),
-							});
+							};
 						},
 					},
 				],
@@ -1041,10 +1040,10 @@ const routeData = [
 					// refresh missing data
 					store.set(missingDataEmployeesAtom);
 
-					return defer({
+					return {
 						data: store.get(missingEmployeeDataMapAtom),
 						title: "Missing data",
-					});
+					};
 				},
 			},
 			...createRouteCaseForms("hr/missingdata"),
@@ -1172,9 +1171,9 @@ const routeData = [
 										}
 										return response.json();
 									}
-									return defer({
+									return {
 										documents: errorHandlingPeriodDocuments(),
-									});
+									};
 								},
 								action: async ({ params, request }) => {
 									const formData = await request.formData();
@@ -1417,9 +1416,9 @@ const routeData = [
 						path: "new",
 						Component: AsyncCaseTable,
 						loader: ({ params }) => {
-							return defer({
+							return {
 								data: getCompanyCases(params, "NewEvent"),
-							});
+							};
 						},
 					},
 					createRouteCaseForm("new/:caseName"),
@@ -1456,9 +1455,9 @@ const routeData = [
 						path: "new",
 						Component: withPage("New event", AsyncCaseTable, true),
 						loader: ({ params }) => {
-							return defer({
+							return {
 								data: getEmployeeCases(params, "ESS"),
-							});
+							};
 						},
 						children: [createRouteCaseForm(":caseName", { redirect: ".." })],
 					},
@@ -1469,9 +1468,9 @@ const routeData = [
 						loader: () => {
 							// refresh missing data
 							store.set(ESSMissingDataAtom);
-							return defer({
+							return {
 								data: store.get(ESSMissingDataAtom),
-							});
+							};
 						},
 						children: [createRouteCaseForm(":caseName", { redirect: ".." })],
 					},
@@ -1514,11 +1513,7 @@ updateParamsAtom({
 	navigation: { state: "loading", location: window.location },
 });
 
-const browserRouter = createBrowserRouter(routeData, {
-	future: {
-		v7_normalizeFormMethod: true,
-	},
-});
+const browserRouter = createBrowserRouter(routeData);
 
 browserRouter.subscribe(updateParamsAtom);
 

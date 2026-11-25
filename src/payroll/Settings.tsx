@@ -15,7 +15,7 @@ import {
 	Outlet,
 	useLoaderData,
 	useRouteLoaderData,
-} from "react-router-dom";
+} from "react-router";
 import { useTranslation } from "react-i18next";
 import { Payroll } from "../models/Payroll";
 import { formatDate } from "../utils/DateUtils";

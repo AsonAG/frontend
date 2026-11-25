@@ -1,6 +1,6 @@
 import { Stack, Typography } from "@mui/material";
 import { React, forwardRef } from "react";
-import { Link as RouterLink, useSearchParams } from "react-router-dom";
+import { Link as RouterLink, useSearchParams } from "react-router";
 import styled from "@emotion/styled";
 import { Assignment, Check } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";

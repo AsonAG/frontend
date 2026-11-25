@@ -3,7 +3,7 @@ import {
 	Link as RouterLink,
 	useAsyncValue,
 	useLocation,
-} from "react-router-dom";
+} from "react-router";
 import {
 	Stack,
 	Typography,

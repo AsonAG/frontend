@@ -5,7 +5,7 @@ import {
 	useNavigate,
 	useParams,
 	useRouteLoaderData,
-} from "react-router-dom";
+} from "react-router";
 import { useTranslation } from "react-i18next";
 import { Stack, Typography, Box, Button, SxProps, Theme } from "@mui/material";
 import { formatDate } from "../utils/DateUtils";

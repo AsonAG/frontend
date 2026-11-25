@@ -45,7 +45,7 @@ import {
 	useMatches,
 	useNavigate,
 	useParams,
-} from "react-router-dom";
+} from "react-router";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { AvailableCase } from "../models/AvailableCase";
 import { useRole } from "../user/utils";

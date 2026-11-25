@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, ReactNode, useMemo, useState } from "react";
-import { useAsyncValue } from "react-router-dom";
+import { useAsyncValue } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
 	Card,

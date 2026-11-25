@@ -1,4 +1,4 @@
-import { NavLinkProps, NavLink as RouterLink } from "react-router-dom";
+import { NavLinkProps, NavLink as RouterLink } from "react-router";
 import { Badge, Typography } from "@mui/material";
 import { styled, Theme } from "@mui/system";
 import { Ref, forwardRef } from "react";

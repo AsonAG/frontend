@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router";
 import { LookupSet } from "../models/LookupSet";
 import {
 	WageType,

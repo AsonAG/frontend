@@ -7,7 +7,7 @@ import {
 	Link as RouterLink,
 	useAsyncValue,
 	useLoaderData,
-} from "react-router-dom";
+} from "react-router";
 import { PayrunPeriod } from "../models/PayrunPeriod";
 import { QueryResult } from "../models/QueryResult";
 import { PaginatedContent } from "../components/PaginatedContent";

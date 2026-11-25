@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { forwardRef } from "react";
-import { NavLink as RouterLink } from "react-router-dom";
+import { NavLink as RouterLink } from "react-router";
 
 const Link = styled(
 	forwardRef(function Link(itemProps, ref) {

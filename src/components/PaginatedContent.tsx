@@ -3,7 +3,7 @@ import {
 	useAsyncValue,
 	useLoaderData,
 	useSearchParams,
-} from "react-router-dom";
+} from "react-router";
 import { Stack, Pagination } from "@mui/material";
 import { useIsMobile } from "../hooks/useIsMobile";
 

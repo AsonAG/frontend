@@ -3,7 +3,7 @@ import React, { PropsWithChildren, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { PayrollTableContext } from "./Dashboard";
 import { TabButton } from "../components/TabLink";
-import { useRouteLoaderData } from "react-router-dom";
+import { useRouteLoaderData } from "react-router";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 
 export type Tab = "Controlling" | "Payable" | "PaidOut";

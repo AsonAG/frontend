@@ -4,7 +4,7 @@ import {
 	useLoaderData,
 	useRouteLoaderData,
 	useNavigate,
-} from "react-router-dom";
+} from "react-router";
 import { CaseComponent } from "../../components/case/CaseComponent";
 import { createContext, useRef, useState } from "react";
 import { CaseFormButtons } from "../../components/buttons/CaseFormButtons";

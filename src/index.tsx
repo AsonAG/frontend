@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router/dom";
 import { browserRouter } from "./routes";
 import { AuthProvider } from "react-oidc-context";
 import { authConfig, useOidc } from "./auth/authConfig";
@@ -63,10 +63,7 @@ root.render(
 	<React.StrictMode>
 		<Authentication>
 			<AppScaffold>
-				<RouterProvider
-					router={browserRouter}
-					future={{ v7_startTransition: true }}
-				/>
+				<RouterProvider router={browserRouter} />
 			</AppScaffold>
 		</Authentication>
 	</React.StrictMode>,

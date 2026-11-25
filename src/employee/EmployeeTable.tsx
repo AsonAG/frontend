@@ -12,7 +12,7 @@ import {
 	useLoaderData,
 	Link as RouterLink,
 	LinkProps,
-} from "react-router-dom";
+} from "react-router";
 import {
 	Stack,
 	Typography,

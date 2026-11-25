@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useFetcher } from "react-router-dom";
+import { useFetcher } from "react-router";
 import {
 	localizationLanguages,
 	WageTypeLocalizationLanguage,

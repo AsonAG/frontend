@@ -1,6 +1,6 @@
 import { Button, Stack, Tooltip } from "@mui/material";
 import React from "react";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router";
 import { DataTable } from "./tables/DataTable";
 import { Warning } from "@mui/icons-material";
 import { MissingData } from "../models/MissingData";
