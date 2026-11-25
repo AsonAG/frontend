@@ -17,7 +17,7 @@ import {
 	ListItemText,
 } from "@mui/material";
 import React, { ReactNode, useMemo, useState } from "react";
-import { Outlet, useSubmit, useLoaderData } from "react-router-dom";
+import { Outlet, useSubmit, useLoaderData } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Clear, Delete, Schedule, Subject } from "@mui/icons-material";
 import dayjs from "dayjs";

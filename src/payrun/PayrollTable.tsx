@@ -5,7 +5,7 @@ import React, {
 	useMemo,
 	useReducer,
 } from "react";
-import { useRouteLoaderData, useSubmit } from "react-router-dom";
+import { useRouteLoaderData, useSubmit } from "react-router";
 import { Stack, Typography, Tooltip, SxProps, Theme, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Payout } from "./Payouts";

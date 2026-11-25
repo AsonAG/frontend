@@ -2,8 +2,8 @@ import SendIcon from "@mui/icons-material/Send";
 import { CircularProgress, Stack } from "@mui/material";
 import { Button, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { useNavigation } from "react-router-dom";
+import { Link } from "react-router";
+import { useNavigation } from "react-router";
 
 const iconProps = {
 	size: "1em",

@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink as RouterLink, useRouteLoaderData } from "react-router-dom";
+import { NavLink as RouterLink, useRouteLoaderData } from "react-router";
 import { PageHeaderTitle } from "../components/ContentLayout";
 import { IconButton, Stack, Tooltip } from "@mui/material";
 import { useTranslation } from "react-i18next";

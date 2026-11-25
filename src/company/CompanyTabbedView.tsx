@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Navigate, useLoaderData, useOutlet } from "react-router-dom";
+import { Navigate, useLoaderData, useOutlet } from "react-router";
 import { useTranslation } from "react-i18next";
 import { EventTabbedView } from "../components/EventTabbedView";
 import { TabLink } from "../components/TabLink";

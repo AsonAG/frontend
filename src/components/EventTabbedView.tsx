@@ -4,7 +4,7 @@ import {
 	useOutlet,
 	useLoaderData,
 	useParams,
-} from "react-router-dom";
+} from "react-router";
 import { ContentLayout } from "../components/ContentLayout";
 import { Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";

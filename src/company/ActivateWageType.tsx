@@ -8,7 +8,7 @@ import {
 	Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useFetcher } from "react-router-dom";
+import { useFetcher } from "react-router";
 import { useTranslation } from "react-i18next";
 
 type ActivateWageTypeActionData = {

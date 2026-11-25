@@ -1,6 +1,6 @@
 import { Button, Paper, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { Link, useLoaderData, useSubmit } from "react-router-dom";
+import { Link, useLoaderData, useSubmit } from "react-router";
 import { UserMembershipInvitation } from "../models/User";
 import { Centered } from "../components/Centered";
 

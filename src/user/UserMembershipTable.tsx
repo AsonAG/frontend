@@ -1,7 +1,7 @@
 import { Button, Chip, Stack, Tooltip, Typography } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";
-import { Link, Outlet, useLoaderData } from "react-router-dom";
+import { Link, Outlet, useLoaderData } from "react-router";
 import { UserMembership, UserMembershipInvitation } from "../models/User";
 import { Add, Edit } from "@mui/icons-material";
 import { Employee } from "../models/Employee";

@@ -13,7 +13,7 @@ import {
 	Outlet,
 	useRouteLoaderData,
 	LinkProps,
-} from "react-router-dom";
+} from "react-router";
 import { Stack, Typography, Button, Chip, Box, styled } from "@mui/material";
 import { ContentLayout } from "../components/ContentLayout";
 import { useTranslation } from "react-i18next";

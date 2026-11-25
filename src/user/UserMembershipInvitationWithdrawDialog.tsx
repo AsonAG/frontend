@@ -6,7 +6,7 @@ import {
 	useParams,
 	useRouteLoaderData,
 	useSubmit,
-} from "react-router-dom";
+} from "react-router";
 import { UserMembershipInvitation } from "../models/User";
 import {
 	ResponsiveDialog,

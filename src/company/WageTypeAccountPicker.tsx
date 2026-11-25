@@ -9,7 +9,7 @@ import {
 	Typography,
 } from "@mui/material";
 import React, { memo, useMemo } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router";
 import { LookupValue } from "../models/LookupSet";
 import { WageType } from "../models/WageType";
 import { useWageTypeDispatch, WageTypeListLoaderData } from "./WageTypeList";

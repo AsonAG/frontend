@@ -7,7 +7,7 @@ import {
 	Outlet,
 	useRouteLoaderData,
 	useNavigation,
-} from "react-router-dom";
+} from "react-router";
 import { Stack, Typography, Button, TextField } from "@mui/material";
 import { HtmlContent } from "./HtmlContent";
 import { ContentLayout } from "./ContentLayout";

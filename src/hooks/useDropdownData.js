@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { getLookupValues } from "../api/FetchClient";
 
 function getOptionData(option, index) {

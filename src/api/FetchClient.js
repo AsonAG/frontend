@@ -1,4 +1,4 @@
-import { generatePath } from "react-router-dom";
+import { generatePath } from "react-router";
 import { authUserAtom, localUserEmailAtom } from "../auth/getUser";
 import { getDefaultStore } from "jotai";
 import { payrollAtom, userAtom } from "../utils/dataAtoms";

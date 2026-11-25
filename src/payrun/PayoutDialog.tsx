@@ -10,7 +10,7 @@ import {
 import React, { PropsWithChildren } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigation, useRouteLoaderData } from "react-router-dom";
+import { useNavigation, useRouteLoaderData } from "react-router";
 import { DatePicker } from "../components/DatePicker";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import dayjs, { Dayjs } from "dayjs";

@@ -1,7 +1,7 @@
 import { IconButton, Tooltip } from "@mui/material";
 import { PayrunPeriodEntry } from "../models/PayrunPeriod";
 import React, { MouseEventHandler } from "react";
-import { Link, useRouteLoaderData } from "react-router-dom";
+import { Link, useRouteLoaderData } from "react-router";
 import { useTranslation } from "react-i18next";
 import FilePresentRoundedIcon from "@mui/icons-material/FilePresentRounded";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";

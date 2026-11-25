@@ -6,7 +6,7 @@ import React, {
 	useReducer,
 	useRef,
 } from "react";
-import { Link, Outlet, useLoaderData, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLoaderData, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
 	IconButton,

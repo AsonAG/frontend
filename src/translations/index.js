@@ -13,14 +13,7 @@ i18next.use(initReactI18next).init({
 		it: itTranslations,
 	},
 	lng: "de",
-	interpolation: {
-		escapeValue: false, // no need, react handles xss
-	},
-	lng: "fr",
-	interpolation: {
-		escapeValue: false, // no need, react handles xss
-	},
-	lng: "it",
+	fallbackLng: "en",
 	interpolation: {
 		escapeValue: false, // no need, react handles xss
 	},

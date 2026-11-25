@@ -14,7 +14,7 @@ import {
 	useLoaderData,
 	useLocation,
 	useNavigate,
-} from "react-router-dom";
+} from "react-router";
 import { useTranslation } from "react-i18next";
 import { useMemo, Suspense } from "react";
 import { ArrowBack, Download } from "@mui/icons-material";

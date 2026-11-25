@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import { Centered } from "./Centered";
-import { useRouteError } from "react-router-dom";
+import { useRouteError } from "react-router";
 import { useTranslation } from "react-i18next";
 
 export function ErrorView() {

@@ -1,7 +1,7 @@
 import { Button, Stack, TextField } from "@mui/material";
 import { ContentLayout } from "./ContentLayout";
 import { useTranslation } from "react-i18next";
-import { Form, Link as RouterLink, useLoaderData } from "react-router-dom";
+import { Form, Link as RouterLink, useLoaderData } from "react-router";
 import { Employee } from "../models/Employee";
 import { UIFeatureQuery, UIFeature } from "../utils/UIFeature";
 

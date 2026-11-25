@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { ContentLayout } from "./ContentLayout";
 import { AsyncDataRoute } from "../routes/AsyncDataRoute";
-import { useAsyncValue } from "react-router-dom";
+import { useAsyncValue } from "react-router";
 import { Paper, Stack, Typography } from "@mui/material";
 import { getEmployeeDisplayString } from "../models/Employee";
 import { MissingData, MissingDataCase } from "../models/MissingData";

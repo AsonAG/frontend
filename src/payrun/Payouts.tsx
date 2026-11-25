@@ -6,7 +6,7 @@ import {
 	useParams,
 	useRouteLoaderData,
 	useSubmit,
-} from "react-router-dom";
+} from "react-router";
 import dayjs from "dayjs";
 import {
 	Box,

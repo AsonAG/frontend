@@ -1,7 +1,7 @@
 import { Stack, SxProps, Theme, Typography } from "@mui/material";
 import React, { FC, PropsWithChildren, ReactNode, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { useLoaderData, useOutlet } from "react-router-dom";
+import { useLoaderData, useOutlet } from "react-router";
 
 type ContentLayoutProps = {
 	title: ReactNode | string;

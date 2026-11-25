@@ -18,7 +18,7 @@ import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { IdType } from "../models/IdType";
 import { atom, useAtom } from "jotai";
-import { useRouteLoaderData } from "react-router-dom";
+import { useRouteLoaderData } from "react-router";
 import { PayrunPeriodLoaderData } from "./PayrunPeriodLoaderData";
 import { PayrollTableContext } from "./Dashboard";
 

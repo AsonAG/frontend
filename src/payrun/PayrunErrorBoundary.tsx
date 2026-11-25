@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { isRouteErrorResponse, useRouteError } from "react-router-dom";
+import { isRouteErrorResponse, useRouteError } from "react-router";
 import { ErrorView } from "../components/ErrorView";
 import { Centered } from "../components/Centered";
 import { Stack } from "@mui/material";

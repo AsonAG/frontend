@@ -20,7 +20,7 @@ import {
 	useLoaderData,
 	useNavigation,
 	useSubmit,
-} from "react-router-dom";
+} from "react-router";
 import { PayrollSettingsLoaderData } from "./Settings";
 import { toast } from "../utils/dataAtoms";
 import { DatePicker } from "../components/DatePicker";

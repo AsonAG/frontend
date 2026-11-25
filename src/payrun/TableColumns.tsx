@@ -4,7 +4,7 @@ import { formatValue } from "./utils";
 import { CellContext, createColumnHelper } from "@tanstack/react-table";
 import WorkHistoryOutlinedIcon from "@mui/icons-material/WorkHistoryOutlined";
 import { TrendingDown, TrendingUp } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { TFunction } from "i18next";
 import { useOpenAmountDetails } from "./useOpenAmountDetails";
 import { TableSettingsButton } from "./TableSettings";

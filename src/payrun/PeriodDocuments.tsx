@@ -8,7 +8,7 @@ import {
 	useLoaderData,
 	useParams,
 	useRouteLoaderData,
-} from "react-router-dom";
+} from "react-router";
 import {
 	Alert,
 	Chip,

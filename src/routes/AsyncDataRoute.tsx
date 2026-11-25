@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactNode, Suspense } from "react";
 import { Loading } from "../components/Loading";
 import { ErrorView } from "../components/ErrorView";
-import { Await, useLoaderData } from "react-router-dom";
+import { Await, useLoaderData } from "react-router";
 import { Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import React from "react";

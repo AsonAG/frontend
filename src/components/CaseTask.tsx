@@ -3,7 +3,7 @@ import { Stack, Typography, Theme, styled, SxProps } from "@mui/material";
 import {
 	Link as RouterLink,
 	LinkProps as RouterLinkProps,
-} from "react-router-dom";
+} from "react-router";
 import { CategoryLabel } from "./CategoryLabel";
 
 type CaseTaskProps = {
